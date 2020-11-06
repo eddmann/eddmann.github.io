@@ -65,7 +65,7 @@ const xor = (a: Bit, b: Bit): Bit => and(or(a, b), nand(a, b));
 ### The Half Adder
 
 The [Half Adder](<https://en.wikipedia.org/wiki/Adder_(electronics)#Half_adder>) is used to add two single bits A and B together, resulting in Sum and Carry outputs.
-We can build such a circuit using the following three approaches - the simpliest of which is shown first, comprising of a single `XOR` and `AND` gate.
+We can build such a circuit using the following three approaches - the simplest of which is shown first, comprising of a single `XOR` and `AND` gate.
 
 ```typescript
 type Addition = {
@@ -76,9 +76,9 @@ type Addition = {
 type HalfAdder = (a: Bit, b: Bit) => Addition;
 ```
 
-#### Simpliest Half-Adder
+#### Simplest Half-Adder
 
-[![Simpliest Half-Adder](/uploads/binary-addition-using-half-and-full-adders-within-typescript/half-adder.jpg)](https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Half_Adder)
+[![Simplest Half-Adder](/uploads/binary-addition-using-half-and-full-adders-within-typescript/half-adder.jpg)](https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Half_Adder)
 
 ```typescript
 const halfAdder: HalfAdder = (a, b) => ({

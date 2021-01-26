@@ -60,3 +60,14 @@ const part2 = (input: string): number =>
 ```
 
 Using a similar _map_ we are able to calculate the required ribben per present and then _reduce_ this into the total sum required 🌟.
+
+Alternatively, as there are three dimensions and we wish to find the sum of the smallest two - we can add all the dimensions together and subtract the maximum dimension value.
+
+```typescript
+const part2 = (input: string): number =>
+  parsePresentDimensions(input)
+    .map(d => 2 * (d.reduce(sum) - Math.max(...d)) + d.reduce(product))
+    .reduce(sum);
+```
+
+This removes the need to perform the sort and produces a succinct one-liner.

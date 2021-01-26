@@ -48,6 +48,7 @@ This can be achieved using a single reduction which keeps track of what floor Sa
 Once we have reduced over all the directions we can return the resulting floor 🌟.
 
 Upon reflection of my initial solution I noticed that this could be simplied into just subtracting the total _Down_ directions from the _Up_ directions.
+Opting for the `split` method over the `RegExp` method to count occurrences you would usually be required to decrement the result by one to get the correct answer. However, using the same method for both cancels this out for the final answer.
 
 ```typescript
 const part1 = (input: string): number =>

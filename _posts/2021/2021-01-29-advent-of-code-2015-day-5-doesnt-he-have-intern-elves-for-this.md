@@ -32,11 +32,30 @@ To tally up all the provided strings (seperated by new-lines) we define a predic
 The predicate function itself validates three seperate rules.
 The first of which tallies up all the vowels that are present within the string, of-which we verify that at least three are present.
 For the second rule we ensure that their exists at least one repeated letter pair (such as `aa` or `bb`).
-To achieve this we use a [back-reference](https://www.regular-expressions.info/backref.html), that based on a supplied numbered group (in this case a single letter `[a-z]`) will ensure that the captured value is present in-place of the back-reference location.
+To achieve this we use a [back-reference](https://javascript.info/regexp-backreferences), that based on a supplied numbered group (in this case a single letter `[a-z]`) will ensure that the captured value is present in-place of the back-reference location.
 The final rule ensures that no restricted letter sequences are present in the string.
 
 When we combine all these sub-rules together we are able to validate if a string is indeed nice.
 From here we can filter down the listing and find the answer total we are looking for 🌟.
+
+We can alternately leverage more features provided to us by Regular Expressions and solve the problem within a single pattern like so:
+
+```typescript
+const part1 = (input: string): number =>
+  input.match(
+    /^(?=(?:.*[aeiou].*){3,})(?=.*(.)\1.*)(?!.*(?:ab|cd|pq|zy).*).*/gm
+  ).length;
+```
+
+Using the [multiline mode](https://javascript.info/regexp-multiline-mode) we are able to change the behaviour of the `^` and instead of it only matching the start of a string, it will now match the start of each line.
+Combined with three [lookahead](https://javascript.info/regexp-lookahead-lookbehind) patterns we can validate each line as follows:
+
+- `(?=(?:.*[aeiou].*){3,})` - We look for the presence of at least three `aeiou` character matches anywhere on the line.
+- `(?=.*(.)\1.*)` - We combine this with ensuring that a repeated letter pair appears anywhere on the line.
+- `(?!.*(?:ab|cd|pq|zy).*)` - Finally, we ensure that none of the restricted letter sequences appear on the line (using a negative lookahead).
+
+Using lookaheads in this manor provides us with a form of `AND` logic, giving us the ability to evaluate the entire line multiple times.
+Although this shows how powerful Regular Expressions can be, I still prefer the first solution due to its readability.
 
 ### Part 2
 
@@ -62,3 +81,17 @@ The second rule requires that the string must include a letter triplet which con
 Again, we can harness a back-reference to capture the starting letter, ensure that a single letter appears in the middle and finally validate that the captured value is present at the end.
 
 When we combine these sub-rules together we are then able to validate the string listing again, tallying up how many strings are now deemed nice 🌟.
+
+Again, we can alternately leverage more features provided to us by Regular Expressions and solve the problem within a single pattern like so:
+
+```typescript
+const part2 = (input: string): number =>
+  input.match(/^(?=.*(..).*\1)(?=.*(.).\2.*).*/gm).length;
+```
+
+Using multiline mode, lookahead patterns and back-references, we are able to evaluate each line based on the given rules like so:
+
+- `(?=.*(..).*\1)` - We first ensure that at least one repeated pair sequence exists somewhere within the line.
+- `(?=.*(.).\2.*)` - And that there also exists a letter triplet which contains the same letter at the start and end within the line.
+
+Combined these patterns form our validation logic, allowing us to match and return the total number of lines which conform to the rule set.

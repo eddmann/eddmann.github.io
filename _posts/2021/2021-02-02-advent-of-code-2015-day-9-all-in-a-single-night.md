@@ -109,7 +109,7 @@ const part1 = (input: string): number =>
   );
 ```
 
-### Part Two
+### Part 2
 
 For part two we are instead asked to determine what the longest distance for the longest route is based on the same location listing.
 Using the same building blocks provided for part one's solution, we can instead supply the `Math.max` aggregate function to return the desired answer 🌟.
@@ -121,4 +121,39 @@ const part2 = (input: string): number =>
     -Infinity,
     Math.max
   );
+```
+
+### Alternative Solution
+
+Instead of designing an aggregate function which applies a given reduction function, we could instead take the approach below.
+First we generate a list of all the possible trip distance totals, based on permutations of the location set.
+
+```typescript
+const calcTripDistances = ({
+  locations,
+  distances,
+}: Distances): number[] =>
+  [...permutations([...locations])].map(([first, ...rest]) => {
+    const [distance] = rest.reduce(
+      ([distance, previous], location) => [
+        distance + distances.get(previous).get(location),
+        location,
+      ],
+      [0, first] as [Distance, Location]
+    );
+    return distance;
+  });
+```
+
+Then we can supply this list as arguments to both the `Math.min` and `Math.max` functions.
+Using this approach works well for this input, however, we should be considerate that as all arguments are required to be put on the call stack within the chosen JavaScript VM, [there is a limit](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#using_apply_and_built-in_functions) to how many list items this will cater for.
+
+```typescript
+const part1 = (input: string): number =>
+  Math.min(...calcTripDistances(parseLocationsAndDistances(input)));
+```
+
+```typescript
+const part2 = (input: string): number =>
+  Math.max(...calcTripDistances(parseLocationsAndDistances(input)));
 ```

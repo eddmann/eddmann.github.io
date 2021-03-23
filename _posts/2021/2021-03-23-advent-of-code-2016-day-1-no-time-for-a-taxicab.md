@@ -1,0 +1,110 @@
+---
+layout: post
+title: 'Advent of Code 2016 - Day 1 - No Time for a Taxicab'
+meta: 'Solving the Advent of Code 2016 Day 1 puzzle using Python'
+---
+
+Having enjoyed documenting my progress in completing the Advent of Code 2015 advent calendar in TypeScript, I have decided to do the same for 2016.
+However, for this year I wish to instead explore Python.
+
+<!--more-->
+
+I have decided on Python as I've been very impressed with how consise and expressive some of the solutions for the 2015 calendar I have seen on the AoC subreddit have been.
+
+### Part 1
+
+The initial problem for the 2016 calendar requires us to navigate our way from our 'airdropped' location to Easter Bunny HQ.
+In doing so we are required to work out how many blocks away the location is (using [Manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry)).
+
+We begin by parsing the provided directions into tuples of the form `(direction, steps)`.
+
+```python
+def parse_instructions(input):
+    return [[i[0], int(i[1:])] for i in input.split(', ')]
+```
+
+With the instructions now parsed we can (from our starting postion of `0,0`) navigate our way to the final destiation.
+
+```python
+COMPASS = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+
+def part1(input):
+    dir = 0
+    pos = (0, 0)
+
+    for turn, steps in parse_instructions(input):
+        dir = (dir + (1 if turn == 'R' else -1)) % len(COMPASS)
+        pos = tuple(map(lambda p, d: p + d * steps, pos, COMPASS[dir]))
+
+    return sum(map(abs, pos))
+```
+
+We are able to calculate what the revised directional cordinates which need to be applied to the current position upon each instruction using the provided `COMPASS` lookup table.
+Once we have applied all the moves we return the _Manhattan distance_ of the final position to return the desired answer 🌟.
+
+### Part 2
+
+For part two we are required to instead now work out what the first position that we see twice is.
+This can be achieved storing the _seen_ positions within a Set and short-circuiting the instruction application upon seeing a position again 🌟.
+
+```python
+def part2(input):
+    dir = 0
+    pos = (0, 0)
+    seen = {pos}
+
+    for turn, steps in parse_instructions(input):
+        dir = (dir + (1 if turn == 'R' else -1)) % len(COMPASS)
+        for _ in range(steps):
+            pos = tuple(map(operator.add, pos, COMPASS[dir]))
+            if (pos in seen):
+                return sum(map(abs, pos))
+            seen.add(pos)
+
+    raise Exception('No repeated position')
+```
+
+### Alternative Solutions
+
+Like the 2015 calendar, I found that for the first couple of days solutions I had the time to devise several different ways in which to solve the problem.
+
+Having a chance to explore the Python standard library I was able to take advantage of [_Deque_](https://docs.python.org/3/library/collections.html#collections.deque) which is a double-ended queue implementation.
+This allows me to efficently [_rotate_](https://docs.python.org/3/library/collections.html#collections.deque.rotate) the queued items in a very succient mannor.
+
+```python
+def part1(input):
+    dir = collections.deque([(0, 1), (1, 0), (0, -1), (-1, 0)])
+    pos = (0, 0)
+
+    for turn, steps in parse_instructions(input):
+        dir.rotate(1 if turn == 'R' else -1)
+        pos = tuple(map(lambda p, d: p + d * steps, pos, dir[0]))
+
+    return sum(map(abs, pos))
+```
+
+Having explored storing the positonal state (x and y cordinates) in tuples several times I was very excitied to see that instead we could take advantage of [Complex numbers](https://docs.python.org/3/library/cmath.html) and model them in this form instead.
+Using this method we were able to get away from the directional lookup table concept and instead just apply left and right rotations using multiplication directly.
+
+```python
+TURNS = {'R': 0+1j, 'L': 0-1j}
+
+
+def manhattan_distance(pos):
+    return abs(int(pos.real)) + abs(int(pos.imag))
+
+
+def part1(input):
+    dir = 1+0j
+    pos = 0+0j
+
+    for turn, steps in parse_instructions(input):
+        dir *= TURNS[turn]
+        pos += dir * steps
+
+    return manhattan_distance(pos)
+```
+
+This is by far my favourite way in which to solve this problem, and highlights some of the powerful features that Python has to offer.
+I look forward to continuing on with my journey in solving the 2016 calendar in future posts.

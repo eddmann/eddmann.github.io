@@ -73,3 +73,36 @@ def part2(input):
 
     return calc_keycode(keypad, initial_key="5", instructions=input.splitlines())
 ```
+
+### Alternative Solution
+
+Instead of representing the coordinate as a Complex number, I additionally explored creating a more aptly modelled value object which managed this state in an immutable manor.
+Using [Data Classes](https://docs.python.org/3/library/dataclasses.html) and the `__add__` dunder method I was able to design the following:
+
+```python
+@dataclass(frozen=True)
+class Point2D:
+    x: int
+    y: int
+
+    def __add__(self, other):
+        if not isinstance(other, Point2D):
+            return NotImplemented
+        return Point2D(self.x + other.x, self.y + other.y)
+```
+
+The only other aspects of the original solution that required modification were in the instantiation of these objects.
+
+```python
+DIRECTIONS = {'U': Point2D(0, -1), 'D': Point2D(0, 1),
+              'L': Point2D(-1, 0), 'R': Point2D(1, 0)}
+
+
+def generate_keypad(input):
+    return {Point2D(x, y): key
+            for y, line in enumerate(input.splitlines())
+            for x, key in enumerate(line.split())
+            if key != '.'}
+```
+
+Providing such a model is preferred over _piggy-backing_ on Complex numbers, as this clearly expresses its purpose and intent.

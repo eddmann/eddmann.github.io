@@ -1,15 +1,19 @@
 .DEFAULT_GOAL := help
 
-IMAGE = starefossen/github-pages:latest
-DOCKER = docker run -it --rm -v $(PWD):/usr/src/app:rw,delegated
+IMAGE = jekyll/builder:3.8
+DOCKER = docker run --rm -v $(PWD):/srv/jekyll -v $(PWD)/vendor/bundle:/usr/local/bundle:rw,delegated
 
 .PHONY: start
 start: ## Start local development instance
-	$(DOCKER) -p 4000:4000 $(IMAGE)
+	$(DOCKER) -p 4000:4000 $(IMAGE) jekyll serve
+
+.PHONY: build
+build: ## Build static-site for deployment
+	@$(DOCKER) -e JEKYLL_UID -e JEKYLL_GID $(IMAGE) jekyll build
 
 .PHONY: shell
 shell: ## Shell instance for development purposes
-	@$(DOCKER) $(IMAGE) sh
+	@$(DOCKER) -it $(IMAGE) sh
 
 .PHONY: open
 open: ## Open local development website

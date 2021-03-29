@@ -1,0 +1,30 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Load Bundle Cache
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: jekyll-bundle-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            jekyll-bundle-
+
+      - name: Build Jekyll Site
+        run: JEKYLL_UID=1001 JEKYLL_GID=1001 make build
+
+      - name: Publish to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: _site

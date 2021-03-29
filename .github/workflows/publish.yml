@@ -15,12 +15,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: jekyll-bundle-${{ hashFiles('**/Gemfile.lock') }}
+          key: ruby-2.7.2-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            jekyll-bundle-
+            ruby-2.7.2-
 
       - name: Build Jekyll Site
-        run: JEKYLL_UID=1001 JEKYLL_GID=1001 make build
+        run: make install build
 
       - name: Publish to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v3

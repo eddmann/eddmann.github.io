@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 1 - No Time for a Taxicab'
 meta: 'Solving the Advent of Code 2016 Day 1 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 Having enjoyed documenting my progress in completing the Advent of Code 2015 advent calendar in TypeScript, I have decided to do the same for 2016.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 7 - Internet Protocol Version 7'
 meta: 'Solving the Advent of Code 2016 Day 7 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the seventh day of Advent of Code 2016 we are required to work out which IPv7 addresses support TLS (transport-layer snooping) and SSL (super-secret listening).

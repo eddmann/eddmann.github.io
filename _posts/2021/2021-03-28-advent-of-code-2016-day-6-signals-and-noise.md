@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 6 - Signals and Noise'
 meta: 'Solving the Advent of Code 2016 Day 6 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the sixth day of Advent of Code 2016 we are required to work what the error-corrected message is attempted to be sent to Santa.

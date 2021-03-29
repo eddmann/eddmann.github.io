@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 3 - Squares With Three Sides'
 meta: 'Solving the Advent of Code 2016 Day 3 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the third day of Advent of Code 2016 we are asked to work out how many valid triangles are present in a given listing.

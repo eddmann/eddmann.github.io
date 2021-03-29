@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 5 - How About a Nice Game of Chess?'
 meta: 'Solving the Advent of Code 2016 Day 5 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the fifth day of Advent of Code 2016 we are asked to calculate the password for a security door in Easter Bunny HQ.

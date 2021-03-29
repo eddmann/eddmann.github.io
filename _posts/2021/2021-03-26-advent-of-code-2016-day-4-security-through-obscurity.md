@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 4 - Security Through Obscurity'
 meta: 'Solving the Advent of Code 2016 Day 4 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the fourth day of Advent of Code 2016 we are asked to validate and decrypt a listing of room names.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2016 - Day 2 - Bathroom Security'
 meta: 'Solving the Advent of Code 2016 Day 2 puzzle using Python'
+tags: advent-of-code advent-of-code-2016 python
 ---
 
 On the second day of Advent of Code 2016 we are asked to work out what a bathroom code is based on the supplied instructions.

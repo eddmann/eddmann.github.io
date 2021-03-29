@@ -1,19 +1,23 @@
 .DEFAULT_GOAL := help
 
-IMAGE = jekyll/builder:3.8
-DOCKER = docker run --rm -v $(PWD):/srv/jekyll -v $(PWD)/vendor/bundle:/usr/local/bundle:rw,delegated
+IMAGE = ruby:2.7.2-buster
+DOCKER = docker run --rm -v $(PWD):/usr/src/app -v $(PWD)/vendor/bundle:/usr/local/bundle:rw,delegated -w /usr/src/app
+
+.PHONY: install
+install: ## Install dependencies
+	@$(DOCKER) $(IMAGE) bundle install
 
 .PHONY: start
-start: ## Start local development instance
-	$(DOCKER) -p 4000:4000 $(IMAGE) jekyll serve
+start: ## Start local development environment
+	$(DOCKER) -p 4000:4000 $(IMAGE) jekyll serve --host 0.0.0.0 --port 4000
 
 .PHONY: build
 build: ## Build static-site for deployment
-	@$(DOCKER) -e JEKYLL_UID -e JEKYLL_GID $(IMAGE) jekyll build
+	@$(DOCKER) $(IMAGE) jekyll build
 
 .PHONY: shell
 shell: ## Shell instance for development purposes
-	@$(DOCKER) -it $(IMAGE) sh
+	@$(DOCKER) -it $(IMAGE) bash
 
 .PHONY: open
 open: ## Open local development website

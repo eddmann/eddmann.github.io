@@ -54,7 +54,7 @@ Self-balancing trees such as the AVL variant provide us with the familiar worst-
 <h3 id="balance-factor">Balance Factor</h3>
 
 <p>Using the previous Binary Search Tree implementation as a base, we are able to expand upon this to include the AVL property.
-For the sake of performance you would typically store the height of each nodes children within the structure, however, as I wish to re-use the existing implementation I will instead calculate their height upon <code class="highlighter-rouge">factor</code> invocation.
+For the sake of performance you would typically store the height of each nodes children within the structure, however, as I wish to re-use the existing implementation I will instead calculate their height upon <code class="language-plaintext highlighter-rouge">factor</code> invocation.
 The balance factor per. node is calculated by the difference between the two child node’s heights, as shown below.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">height</span><span class="w">
@@ -123,7 +123,7 @@ The balance factor per. node is calculated by the difference between the two chi
 
 <h3 id="example-usage">Example Usage</h3>
 
-<p>Finally, we are able to create a new AVL insertion/deletion variant, that is a composition of the Binary Search Tree functions and the newly created <code class="highlighter-rouge">balance</code> one.</p>
+<p>Finally, we are able to create a new AVL insertion/deletion variant, that is a composition of the Binary Search Tree functions and the newly created <code class="language-plaintext highlighter-rouge">balance</code> one.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">avl-insert</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="n">insert</span><span class="p">))</span><span class="w">
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">avl-remove</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="nb">remove</span><span class="p">))</span><span class="w">

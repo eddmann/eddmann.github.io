@@ -48,7 +48,7 @@
 In this post I will document how I went about customising the Starter Pokémon choices available in Pokémon Red, and the modifications required to the ‘pokered’ source.
 </p>
 
-<p>I started off by updating the Starter Pokémon constants that are present in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/constants/starter_mons.asm"><code class="highlighter-rouge">constants/starter_mons.asm</code></a>.</p>
+<p>I started off by updating the Starter Pokémon constants that are present in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/constants/starter_mons.asm"><code class="language-plaintext highlighter-rouge">constants/starter_mons.asm</code></a>.</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- STARTER1 EQU CHARMANDER
 - STARTER2 EQU SQUIRTLE
@@ -63,7 +63,7 @@ Instead of the specific ‘So! You want the {type} Pokémon, {name}’, I reword
 As this required multiple disparate changes you can see the modifications in their entirety within <a href="https://github.com/eddmann/pokered/commit/5d86068da8ef0a8967caa7c2fd654b54518e7f31">this</a> commit.</p>
 
 <p>Next up was to update the Rival’s Pokémon party, based on each location we encounter them.
-This is defined within <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/data/trainer_parties.asm#L461"><code class="highlighter-rouge">data/trainer_parties.asm</code></a> under the sections <code class="highlighter-rouge">Green1Data</code>, <code class="highlighter-rouge">Green2Data</code> and <code class="highlighter-rouge">Green3Data</code> (an homage to <a href="https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Red_and_Green_Versions">Pokémon Green</a>).</p>
+This is defined within <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/data/trainer_parties.asm#L461"><code class="language-plaintext highlighter-rouge">data/trainer_parties.asm</code></a> under the sections <code class="language-plaintext highlighter-rouge">Green1Data</code>, <code class="language-plaintext highlighter-rouge">Green2Data</code> and <code class="language-plaintext highlighter-rouge">Green3Data</code> (an homage to <a href="https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Red_and_Green_Versions">Pokémon Green</a>).</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">Green1Data:
 </span><span class="gd">- db 5,SQUIRTLE,0
@@ -88,11 +88,11 @@ This is defined within <a href="https://github.com/eddmann/pokered/blob/change-s
 + db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,STARTER1,0
 </span></code></pre></div></div>
 
-<p>Above you can see the changes I made to the <code class="highlighter-rouge">Green1Data</code> section.
+<p>Above you can see the changes I made to the <code class="language-plaintext highlighter-rouge">Green1Data</code> section.
 I decided to keep the change-set simple and not evolve any of the Rival’s Starter Pokémon (i.e. Pikachu) throughout game-play.
 If you wish to do this however, it is within this file that you can decide how they evolve (or maybe even change!?).</p>
 
-<p>The final change that I made was to the Rival’s Starter Pokémon move-set in the final battle, found in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/engine/battle/read_trainer_party.asm#L132"><code class="highlighter-rouge">engine/battle/read_trainer_party.asm</code></a>.
+<p>The final change that I made was to the Rival’s Starter Pokémon move-set in the final battle, found in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/engine/battle/read_trainer_party.asm#L132"><code class="language-plaintext highlighter-rouge">engine/battle/read_trainer_party.asm</code></a>.
 In this battle each Starter Pokémon has a specific move made available to them.
 Again, for the sake of simplicity I normalised this to only include <a href="https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)">Hyper Beam</a> regardless of choice.</p>
 

@@ -92,7 +92,7 @@ From here, we model how we wish to store the state of a battle throughout game p
 
 <p>There are a couple of rules around which spells are available for a player to cast at a given point in the battle.
 These include if they have enough mana to purchase the spell, and if the spell is an effect that it is either not active or on its last turn.
-We will next translate these rules into a function which we can supply the current <code class="highlighter-rouge">BattleState</code> to and return the possible <code class="highlighter-rouge">Spell</code> listing.</p>
+We will next translate these rules into a function which we can supply the current <code class="language-plaintext highlighter-rouge">BattleState</code> to and return the possible <code class="language-plaintext highlighter-rouge">Spell</code> listing.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">hasBattleEnded</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">state</span><span class="p">.</span><span class="nx">bossHp</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">;</span>
@@ -129,9 +129,9 @@ First we will handle how we apply effects before each particpants turn.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We have used the same <code class="highlighter-rouge">sumProp</code> function found in the <a href="https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/">previous days</a> solution to help tally a collections property values.
+<p>We have used the same <code class="language-plaintext highlighter-rouge">sumProp</code> function found in the <a href="https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/">previous days</a> solution to help tally a collections property values.
 Next, we will handle how a player’s turn updates the battle state.
-We supply a given <code class="highlighter-rouge">Spell</code> we wish the player to cast for this round, and return a <code class="highlighter-rouge">BattleTransition</code> similiar to enacting effects.</p>
+We supply a given <code class="language-plaintext highlighter-rouge">Spell</code> we wish the player to cast for this round, and return a <code class="language-plaintext highlighter-rouge">BattleTransition</code> similiar to enacting effects.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">playerTurn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">spell</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">):</span> <span class="nx">BattleTransition</span> <span class="o">=&gt;</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="k">return</span> <span class="nx">state</span><span class="p">;</span>
@@ -161,16 +161,16 @@ We supply a given <code class="highlighter-rouge">Spell</code> we wish the playe
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With the core steps in-place, modeled uniformly as <code class="highlighter-rouge">BattleTransition</code> types we can begin to think about how we wish stitch these together.
+<p>With the core steps in-place, modeled uniformly as <code class="language-plaintext highlighter-rouge">BattleTransition</code> types we can begin to think about how we wish stitch these together.
 When reading the problem definition I thought it would be an ideal fit to employ composable state transitions.
-To wire these together I’ve opted to use a small <code class="highlighter-rouge">pipe</code> helper function which works in the opposite mannor to a conventional <code class="highlighter-rouge">compose</code>.
+To wire these together I’ve opted to use a small <code class="language-plaintext highlighter-rouge">pipe</code> helper function which works in the opposite mannor to a conventional <code class="language-plaintext highlighter-rouge">compose</code>.
 Instead of being called <em>right-to-left</em>, the pipe function composes the provided functions <em>left-to-right</em>, which reads more naturally.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">pipe</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">R</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">fn1</span><span class="p">:</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">R</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">R</span><span class="p">,</span> <span class="p">...</span><span class="nx">fns</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">R</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">R</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fns</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">prevFn</span><span class="p">,</span> <span class="nx">nextFn</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">nextFn</span><span class="p">(</span><span class="nx">prevFn</span><span class="p">(</span><span class="nx">value</span><span class="p">)),</span> <span class="nx">fn1</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Using this <code class="highlighter-rouge">pipe</code> function we can build up the steps required to complete a <em>round</em>.</p>
+<p>Using this <code class="language-plaintext highlighter-rouge">pipe</code> function we can build up the steps required to complete a <em>round</em>.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleRound</span> <span class="o">=</span> <span class="p">(</span><span class="nx">spell</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">BattleTransition</span><span class="p">;</span>
 
@@ -179,7 +179,7 @@ Instead of being called <em>right-to-left</em>, the pipe function composes the p
 </code></pre></div></div>
 
 <p>With the round simulation modeled, we can go about working on a solution to how we determine the minimum mana required to win the battle.
-To do this we will use a recursive function which takes in a <code class="highlighter-rouge">BattleConfiguration</code> and <code class="highlighter-rouge">BattleRound</code> function like so.</p>
+To do this we will use a recursive function which takes in a <code class="language-plaintext highlighter-rouge">BattleConfiguration</code> and <code class="language-plaintext highlighter-rouge">BattleRound</code> function like so.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleConfiguration</span> <span class="o">=</span> <span class="nb">Pick</span><span class="o">&lt;</span><span class="nx">BattleState</span><span class="p">,</span> <span class="dl">'</span><span class="s1">playerHp</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">playerMana</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">bossHp</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">bossDamage</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">;</span>
 
@@ -216,12 +216,12 @@ To do this we will use a recursive function which takes in a <code class="highli
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>The <code class="highlighter-rouge">BattleConfiguration</code> is a <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys">subset type</a> of the <code class="highlighter-rouge">BattleState</code>, allowing us to supply the battle properties that define the participants characteristics.
-The <code class="highlighter-rouge">BattleRound</code> function allows us to supply the <code class="highlighter-rouge">roundOfBattle</code> function we created earlier, to simulate each given rounds state transition.
+<p>The <code class="language-plaintext highlighter-rouge">BattleConfiguration</code> is a <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys">subset type</a> of the <code class="language-plaintext highlighter-rouge">BattleState</code>, allowing us to supply the battle properties that define the participants characteristics.
+The <code class="language-plaintext highlighter-rouge">BattleRound</code> function allows us to supply the <code class="language-plaintext highlighter-rouge">roundOfBattle</code> function we created earlier, to simulate each given rounds state transition.
 To locate the minimum amount of mana required we store the current minium mana for a winning battle and <em>prune</em> out any branches that exceed this amount until no enactable branches are remaining.
 This allows us to limit the scope of the problem greatly, as upon the first winning game we have ourselves a baseline to <em>prune</em> out any game that exceeds that mana spent.</p>
 
-<p>With this in-place we can parse the bosses characteristics from the supplied input and execute the <code class="highlighter-rouge">minManaSpent</code> function to find the desired answer 🌟.</p>
+<p>With this in-place we can parse the bosses characteristics from the supplied input and execute the <code class="language-plaintext highlighter-rouge">minManaSpent</code> function to find the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="p">[</span><span class="nx">bossHp</span><span class="p">,</span> <span class="nx">bossDamage</span><span class="p">]</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/gm</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
@@ -239,7 +239,7 @@ This allows us to limit the scope of the problem greatly, as upon the first winn
 We are to now create a <em>Hard Mode</em>, in-which at the start of each round the players health is now reduced by one HP.
 Based on this addition we need to work out what the revised minimum mana spent can be to still win the battle.</p>
 
-<p>We will first create the additional <code class="highlighter-rouge">BattleTransition</code> step, defining how the Hard Mode modifies the battle state.</p>
+<p>We will first create the additional <code class="language-plaintext highlighter-rouge">BattleTransition</code> step, defining how the Hard Mode modifies the battle state.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">applyHardMode</span><span class="p">:</span> <span class="nx">BattleTransition</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">({</span>
   <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
@@ -247,13 +247,13 @@ Based on this addition we need to work out what the revised minimum mana spent c
 <span class="p">});</span>
 </code></pre></div></div>
 
-<p>From this, we can create a new <em>round of battle</em> function which pipes the <code class="highlighter-rouge">BattleState</code> to the <code class="highlighter-rouge">applyHardMode</code> function before continuing on with the original game.</p>
+<p>From this, we can create a new <em>round of battle</em> function which pipes the <code class="language-plaintext highlighter-rouge">BattleState</code> to the <code class="language-plaintext highlighter-rouge">applyHardMode</code> function before continuing on with the original game.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">hardRoundOfBattle</span><span class="p">:</span> <span class="nx">BattleRound</span> <span class="o">=</span> <span class="nx">spell</span> <span class="o">=&gt;</span>
   <span class="nx">pipe</span><span class="p">(</span><span class="nx">applyHardMode</span><span class="p">,</span> <span class="nx">roundOfBattle</span><span class="p">(</span><span class="nx">spell</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>We can then use the same setup as we did for part one, instead supplying the new <code class="highlighter-rouge">hardRoundOfBattle</code> function instead.
+<p>We can then use the same setup as we did for part one, instead supplying the new <code class="language-plaintext highlighter-rouge">hardRoundOfBattle</code> function instead.
 In doing so we get the desired answer to the question 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -268,8 +268,8 @@ In doing so we get the desired answer to the question 🌟.</p>
 
 <p>I found today’s core-problem to not take too long to devise (the minimum pruning technique), however, simulating the game took the majority of the time.
 As mentioned when reading the problem definition I felt there could be a means to provide an elegant composable solution to representing the steps required to perform a round of battle.
-I’m happy with how the <code class="highlighter-rouge">BattleTransition</code> type has been employed, lending itself well to the <code class="highlighter-rouge">pipe</code> operation.
-Reading both the <code class="highlighter-rouge">roundOfBattle</code> and <code class="highlighter-rouge">hardRoundOfBattle</code> functions clearly express their intent and the stages of a round.</p>
+I’m happy with how the <code class="language-plaintext highlighter-rouge">BattleTransition</code> type has been employed, lending itself well to the <code class="language-plaintext highlighter-rouge">pipe</code> operation.
+Reading both the <code class="language-plaintext highlighter-rouge">roundOfBattle</code> and <code class="language-plaintext highlighter-rouge">hardRoundOfBattle</code> functions clearly express their intent and the stages of a round.</p>
 
 </article>
 

@@ -55,7 +55,7 @@ We start by creating a simple record definition which describes the contents of 
 <h2 id="insertion">Insertion</h2>
 
 <p>Using this Node record, we are able to now construct an insertion function which uses Clojure’s parameter deconstruction to great effect.
-Using the <code class="highlighter-rouge">cond</code> macro helps document an extremely succinct algorithm for inserting a new node into a provided tree.</p>
+Using the <code class="language-plaintext highlighter-rouge">cond</code> macro helps document an extremely succinct algorithm for inserting a new node into a provided tree.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -68,8 +68,8 @@ Using the <code class="highlighter-rouge">cond</code> macro helps document an ex
 <h2 id="removal">Removal</h2>
 
 <p>Removing a given value from the tree requires a little more work than its’ insertion counterpart.
-However, <code class="highlighter-rouge">cond</code> (again) allows us to clearly document these actions, handling the three different states the given values Node could be in.
-Note that the third state requires the use of the followingly documented <code class="highlighter-rouge">min</code> function.</p>
+However, <code class="language-plaintext highlighter-rouge">cond</code> (again) allows us to clearly document these actions, handling the three different states the given values Node could be in.
+Note that the third state requires the use of the followingly documented <code class="language-plaintext highlighter-rouge">min</code> function.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">remove</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -145,7 +145,7 @@ Note that the third state requires the use of the followingly documented <code c
 
 <h2 id="creating-and-displaying-the-tree">Creating and Displaying the Tree</h2>
 
-<p>Using the following function we are able to create a new tree from a supplied sequence - which uses a <code class="highlighter-rouge">reduce</code> to insert each value into the tree, building up the final result along the way.</p>
+<p>Using the following function we are able to create a new tree from a supplied sequence - which uses a <code class="language-plaintext highlighter-rouge">reduce</code> to insert each value into the tree, building up the final result along the way.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">to-tree</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="n">nil</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>

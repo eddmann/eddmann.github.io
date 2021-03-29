@@ -60,7 +60,7 @@ This makes for a more succient demo, and provides the ability to automatically h
 
 <h3 id="parsing-rtttl">Parsing RTTTL</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A-Team:d=8,o=5,b=125:4d#6,a#,2d#6,16p,g#,4a#,4d#.,p,16g,16a#,d#6,a#,f6,2d#6,16p,c#.6,16c6,16a#,g#.,2a#
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A-Team:d=8,o=5,b=125:4d#6,a#,2d#6,16p,g#,4a#,4d#.,p,16g,16a#,d#6,a#,f6,2d#6,16p,c#.6,16c6,16a#,g#.,2a#
 </code></pre></div></div>
 
 <p>The above may look familiar to anyone who owned a Nokia in the early 2000’s.
@@ -125,13 +125,13 @@ I found using regular expression named capture groups provided a very elegant me
 <p>With the RTTTL now parsed, my next objective was to translate the defined note/octaves of the melody into frequencies of which I could send to the <a href="https://modernweb.com/creating-sound-with-the-web-audio-api-and-oscillators/">Oscillator</a>.
 This lead me to research into the the <a href="https://en.wikipedia.org/wiki/Equal_temperament">Twelve-Tone Equal Temperament</a> system of tuning.
 Using this system and alittle bit of Math, we are able to calculate the frequency of a given note/octave using a known <em>base</em> note frequency.
-Typically <code class="highlighter-rouge">A4</code> (aka <a href="https://en.wikipedia.org/wiki/A440_(pitch_standard)">Stuttgart pitch</a>, 440Hz) is used as the base frequency of which all calculations are done, however, I noticed that if I instead use <code class="highlighter-rouge">C4</code> (<a href="https://en.wikipedia.org/wiki/C_(musical_note)#Middle_C">Middle-C</a>, 261.63Hz) it would save some offset Math calculations being required.</p>
+Typically <code class="language-plaintext highlighter-rouge">A4</code> (aka <a href="https://en.wikipedia.org/wiki/A440_(pitch_standard)">Stuttgart pitch</a>, 440Hz) is used as the base frequency of which all calculations are done, however, I noticed that if I instead use <code class="language-plaintext highlighter-rouge">C4</code> (<a href="https://en.wikipedia.org/wiki/C_(musical_note)#Middle_C">Middle-C</a>, 261.63Hz) it would save some offset Math calculations being required.</p>
 
 <p>The formula below provides the ability to calculate the octave frequency of a given note.</p>
 
 <p><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/octave-formula.gif" alt="Octave Formula" /></p>
 
-<p>This formula can be used to calculate the octave one lower and one higher than the provided frequency (in this case <code class="highlighter-rouge">C4</code>) like so in JavaScript:</p>
+<p>This formula can be used to calculate the octave one lower and one higher than the provided frequency (in this case <code class="language-plaintext highlighter-rouge">C4</code>) like so in JavaScript:</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">C4</span> <span class="o">=</span> <span class="mf">261.63</span><span class="p">;</span>
 <span class="kd">const</span> <span class="nx">C3</span> <span class="o">=</span> <span class="nx">C4</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">4</span><span class="p">);</span> <span class="c1">// 130.81</span>
@@ -139,12 +139,12 @@ Typically <code class="highlighter-rouge">A4</code> (aka <a href="https://en.wik
 </code></pre></div></div>
 
 <p>Further more, the formula below provides the ability to calculate the frequency of a desired note.
-This uses the offset from the base note within the scale (<code class="highlighter-rouge">c, c#, d, d#, e, f, f#, g, g#, a, a#, b</code>) to determine the frequency.</p>
+This uses the offset from the base note within the scale (<code class="language-plaintext highlighter-rouge">c, c#, d, d#, e, f, f#, g, g#, a, a#, b</code>) to determine the frequency.</p>
 
 <p><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/note-formula.gif" alt="Note Formula" /></p>
 
-<p>This forumla can again be implemented in JavaScript to calculate the note one lower and one higher than the provided frequency (in this case <code class="highlighter-rouge">C4</code>):
-Notice that using <code class="highlighter-rouge">C</code> as the base note allows omission of any offset calculation needing to be applied, thanks to the the array being zero-indexed.</p>
+<p>This forumla can again be implemented in JavaScript to calculate the note one lower and one higher than the provided frequency (in this case <code class="language-plaintext highlighter-rouge">C4</code>):
+Notice that using <code class="language-plaintext highlighter-rouge">C</code> as the base note allows omission of any offset calculation needing to be applied, thanks to the the array being zero-indexed.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">NOTES</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">c#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">];</span>
 <span class="kd">const</span> <span class="nx">C4</span> <span class="o">=</span> <span class="mf">261.63</span><span class="p">;</span>
@@ -208,7 +208,7 @@ Providing any valid base frequency will in-turn produce the same exact scale rep
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With this in-place, the <code class="highlighter-rouge">parse</code> function now returns an ordered listing of all the note durations and frequencies based on the supplied RTTTL.</p>
+<p>With this in-place, the <code class="language-plaintext highlighter-rouge">parse</code> function now returns an ordered listing of all the note durations and frequencies based on the supplied RTTTL.</p>
 
 <h3 id="getting-it-to-play">Getting it to Play</h3>
 
@@ -244,13 +244,13 @@ Providing any valid base frequency will in-turn produce the same exact scale rep
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using the parsed RTTTL and Web Audio API <code class="highlighter-rouge">AudioContext</code>/<code class="highlighter-rouge">Oscillator</code>, I am able to cycle through the melody ensuring that the given frequency is set for the desired duration within the Oscillator.
+<p>Using the parsed RTTTL and Web Audio API <code class="language-plaintext highlighter-rouge">AudioContext</code>/<code class="language-plaintext highlighter-rouge">Oscillator</code>, I am able to cycle through the melody ensuring that the given frequency is set for the desired duration within the Oscillator.
 This completed the implementation required to play the composition within the Browser 🎉.</p>
 
 <h3 id="generating-wav-files">Generating WAV files</h3>
 
 <p>The final step to this demostration was adding the ability to generate a WAV file from the supplied RTTTL composition.
-Thanks to the <code class="highlighter-rouge">OfflineAudioContext</code>, I was able to employ the same logic described above to generate an in-memory <code class="highlighter-rouge">AudioBuffer</code> representation of the melody.</p>
+Thanks to the <code class="language-plaintext highlighter-rouge">OfflineAudioContext</code>, I was able to employ the same logic described above to generate an in-memory <code class="language-plaintext highlighter-rouge">AudioBuffer</code> representation of the melody.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">generateAudioBuffer</span> <span class="o">=</span> <span class="k">async</span> <span class="nx">rtttl</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">melody</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">rtttl</span><span class="p">);</span>
@@ -327,7 +327,7 @@ Thanks to the <code class="highlighter-rouge">OfflineAudioContext</code>, I was 
 <h3 id="conclusion">Conclusion</h3>
 
 <p>To conclude, I enjoyed exploring how Nokia ringtones were represented in RTTTL, and how you could use alittle bit of Music Theory/Math to generate the corresponding frequencies.
-The Web Audio API <code class="highlighter-rouge">AudioContext</code>/<code class="highlighter-rouge">Oscillator</code> abstracted away alot of intricacies required to produce the desired sounds.
+The Web Audio API <code class="language-plaintext highlighter-rouge">AudioContext</code>/<code class="language-plaintext highlighter-rouge">Oscillator</code> abstracted away alot of intricacies required to produce the desired sounds.
 This allowed me to play the sound in real-time, as well was produce an in-memory representation that I could generate a WAV file from.
 I found the most interesting part of the exercise was researching into how a WAV files was constructed, from a raw bits/bytes level.</p>
 

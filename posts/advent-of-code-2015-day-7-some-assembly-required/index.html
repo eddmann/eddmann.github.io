@@ -51,7 +51,7 @@
 <h3 id="part-1">Part 1</h3>
 
 <p>Our input is an instruction booklet which describes how to connect these parts together.
-Based on following the instructions laid out in the booklet we are asked to provide what signal is ultimately provided to wire <code class="highlighter-rouge">a</code>.
+Based on following the instructions laid out in the booklet we are asked to provide what signal is ultimately provided to wire <code class="language-plaintext highlighter-rouge">a</code>.
 Like before, we will start off by parsing the input into a useable form within our solution.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Wire</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
@@ -65,10 +65,10 @@ Like before, we will start off by parsing the input into a useable form within o
   <span class="p">},</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">());</span>
 </code></pre></div></div>
 
-<p>The parser above converts the instruction listing into a <code class="highlighter-rouge">Circuit</code> mapping between the defined <code class="highlighter-rouge">Wire</code> and associated actionable <code class="highlighter-rouge">Instruction</code> (i.e. bitwise operation, assignment).
+<p>The parser above converts the instruction listing into a <code class="language-plaintext highlighter-rouge">Circuit</code> mapping between the defined <code class="language-plaintext highlighter-rouge">Wire</code> and associated actionable <code class="language-plaintext highlighter-rouge">Instruction</code> (i.e. bitwise operation, assignment).
 With the input now parsed we can move on to working out how we wish to emulate this circuit and record the outputted signals.
-Reviewing the input leads us to the conclusion that we can not expect the instructions to be in dependency order like the provided example is - i.e. <code class="highlighter-rouge">b</code> is declared and assigned almost at the end of the listing, but is referenced many times before this.
-Taking this on board, and as we only wish to work out what a single wire signal is; my initial solution is to begin at wire <code class="highlighter-rouge">a</code>’s instruction and recursively build up the resulting signal result.
+Reviewing the input leads us to the conclusion that we can not expect the instructions to be in dependency order like the provided example is - i.e. <code class="language-plaintext highlighter-rouge">b</code> is declared and assigned almost at the end of the listing, but is referenced many times before this.
+Taking this on board, and as we only wish to work out what a single wire signal is; my initial solution is to begin at wire <code class="language-plaintext highlighter-rouge">a</code>’s instruction and recursively build up the resulting signal result.
 In doing so this will cater for the unsorted ordering, and only perform the instructions that are required to answer the question.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getEmulatedSignal</span> <span class="o">=</span> <span class="p">(</span><span class="nx">circuit</span><span class="p">:</span> <span class="nx">Circuit</span><span class="p">,</span> <span class="nx">wire</span><span class="p">:</span> <span class="nx">Wire</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -105,7 +105,7 @@ Upon experimentation with this apppoach I noticed that performance was a big iss
 Upon review, due to naively recursing over all instructions, there was the case that seen instructions would be required to be re-evaluated down many different branches.
 To resolve this I employed a small generic <a href="https://en.wikipedia.org/wiki/Memoization">memoization</a> function which wrapped the closure and opaquely provided a caching mechanism for subsequent calls to the same resolved wire signal.</p>
 
-<p>You will also notice the use of a <code class="highlighter-rouge">0xffff</code> mask when applying the <em>NOT</em> operation on the value.
+<p>You will also notice the use of a <code class="language-plaintext highlighter-rouge">0xffff</code> mask when applying the <em>NOT</em> operation on the value.
 As explained in the question the signals are unsigned 16-bit values, however, JavaScript bitwise operators use 32-bits.
 So as to produce the desired results we are required to only consider the 16-bit mask supplied.</p>
 
@@ -113,12 +113,12 @@ So as to produce the desired results we are required to only consider the 16-bit
   <span class="nx">getEmulatedSignal</span><span class="p">(</span><span class="nx">parseCircuit</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>With the logic in-place we can combine the two functions together and determine what the resulting signal is from wire <code class="highlighter-rouge">a</code> 🌟.</p>
+<p>With the logic in-place we can combine the two functions together and determine what the resulting signal is from wire <code class="language-plaintext highlighter-rouge">a</code> 🌟.</p>
 
 <h3 id="part-2">Part 2</h3>
 
-<p>For part two we are required to replace the original inputs wire <code class="highlighter-rouge">b</code> value with the resulting signal that we emulated in part one for wire <code class="highlighter-rouge">a</code>.
-From this, we are the asked to determine what the resulting signal is now from wire <code class="highlighter-rouge">a</code>.</p>
+<p>For part two we are required to replace the original inputs wire <code class="language-plaintext highlighter-rouge">b</code> value with the resulting signal that we emulated in part one for wire <code class="language-plaintext highlighter-rouge">a</code>.
+From this, we are the asked to determine what the resulting signal is now from wire <code class="language-plaintext highlighter-rouge">a</code>.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">circuit</span> <span class="o">=</span> <span class="nx">parseCircuit</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
@@ -199,7 +199,7 @@ With this in hand we now need a means to emulate and return the signal value for
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We use a local <code class="highlighter-rouge">get</code> helper function to attempt to retrieve the instruction identifier value from the signal mapping, else fallback to assuming if not present it must be an integer value with must parse.
+<p>We use a local <code class="language-plaintext highlighter-rouge">get</code> helper function to attempt to retrieve the instruction identifier value from the signal mapping, else fallback to assuming if not present it must be an integer value with must parse.
 From here, we can then perform a single reduction over the instruction execution listing, building up the resulting signal mapping along the way.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -213,8 +213,8 @@ From here, we can then perform a single reduction over the instruction execution
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>It is then from this built map that we can get the signal value which has been emulated for wire <code class="highlighter-rouge">a</code>.
-Likewise we can solve part two in a similar mannor, except we must first replace the signal value of wire <code class="highlighter-rouge">b</code> with part ones answer.</p>
+<p>It is then from this built map that we can get the signal value which has been emulated for wire <code class="language-plaintext highlighter-rouge">a</code>.
+Likewise we can solve part two in a similar mannor, except we must first replace the signal value of wire <code class="language-plaintext highlighter-rouge">b</code> with part ones answer.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">createInstructionExecutionOrder</span><span class="p">(</span>

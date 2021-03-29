@@ -93,7 +93,7 @@ Providing the size and default value allows us to build a type-safe array which 
   <span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nb">Array</span><span class="p">(</span><span class="nx">rows</span><span class="p">),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Array</span><span class="p">(</span><span class="nx">cols</span><span class="p">).</span><span class="nx">fill</span><span class="p">(</span><span class="nx">defaultValue</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>Based on the three actions (On, Off and Toggle), we are required to iterate through the instructions and manipulate the specified lights (based on a given range) using a double <code class="highlighter-rouge">for</code> loop like so:</p>
+<p>Based on the three actions (On, Off and Toggle), we are required to iterate through the instructions and manipulate the specified lights (based on a given range) using a double <code class="language-plaintext highlighter-rouge">for</code> loop like so:</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="nx">create2DArray</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
@@ -117,8 +117,8 @@ Providing the size and default value allows us to build a type-safe array which 
 
 <p>Once we have followed the instructions we can flatten the two-dimensional array into a single-dimension and tally up all the lights that are still lit to reach the desired answer 🌟.</p>
 
-<p>Alternatively, we could replace the two-dimensional array with a more performant <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code class="highlighter-rouge">UInt8Array</code></a> one-dimensional array.
-In doing so we lose the the ability to express the light state as a <code class="highlighter-rouge">Boolean</code> now and instead map these states to <code class="highlighter-rouge">1</code> or <code class="highlighter-rouge">0</code> accordingly.</p>
+<p>Alternatively, we could replace the two-dimensional array with a more performant <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code class="language-plaintext highlighter-rouge">UInt8Array</code></a> one-dimensional array.
+In doing so we lose the the ability to express the light state as a <code class="language-plaintext highlighter-rouge">Boolean</code> now and instead map these states to <code class="language-plaintext highlighter-rouge">1</code> or <code class="language-plaintext highlighter-rouge">0</code> accordingly.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">);</span>
@@ -140,8 +140,8 @@ In doing so we lose the the ability to express the light state as a <code class=
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Accessing the desired row and column is now achieved using a small formula <code class="highlighter-rouge">1000 * row + col</code>.
-To toggle the light state we use the <code class="highlighter-rouge">1 - n</code> trick to flip the state between <code class="highlighter-rouge">1</code> and <code class="highlighter-rouge">0</code>.
+<p>Accessing the desired row and column is now achieved using a small formula <code class="language-plaintext highlighter-rouge">1000 * row + col</code>.
+To toggle the light state we use the <code class="language-plaintext highlighter-rouge">1 - n</code> trick to flip the state between <code class="language-plaintext highlighter-rouge">1</code> and <code class="language-plaintext highlighter-rouge">0</code>.
 Finally, we can sum up all the lights that are on with a single reduction, thanks to the values we are now storing (integers) and being a one-dimensional array.</p>
 
 <h3 id="part-2">Part 2</h3>
@@ -171,7 +171,7 @@ As such, we now wish to store integer values in our two-dimensional array - than
 <p>Following a very similiar form as to part one the only code that has really changed is the action we wish to enact based on the given instructions light range.
 Having iterated through the provided instructions we can again flatten the grid and return the light brightness sum to reach our desired answer 🌟.</p>
 
-<p>Following suite with part one’s alternative implementation, we can again opt to use a <code class="highlighter-rouge">Uint8Array</code> instead and use a small math formula to locate a given row and column.</p>
+<p>Following suite with part one’s alternative implementation, we can again opt to use a <code class="language-plaintext highlighter-rouge">Uint8Array</code> instead and use a small math formula to locate a given row and column.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">);</span>
@@ -197,7 +197,7 @@ In the case of the two-dimensional array, we produce this array somewhat dynamic
 
 <p>Upon review, due to how similiar both part one and two were, we could have possibly distilled down the logic for iterating through an instruction set and applying a given action into a more generalised higher-ordered function.
 In doing so it could have abstracted away how we stored the lighting grid and how we produced the desired resulting sum.
-As the callee we could then just supply different actions (possibly of the type <code class="highlighter-rouge">(Light) =&gt; Light</code>) to form the bases of each parts concrete solution.</p>
+As the callee we could then just supply different actions (possibly of the type <code class="language-plaintext highlighter-rouge">(Light) =&gt; Light</code>) to form the bases of each parts concrete solution.</p>
 
 </article>
 

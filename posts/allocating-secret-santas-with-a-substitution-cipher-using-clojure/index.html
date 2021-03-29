@@ -53,7 +53,7 @@ From here, I will then highlight how I expanded upon the solution to allow these
 
 <p>The first problem that I had to tackle was loading in a given text file which contained all the given participants and their gender, in CSV form.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>james,m
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>james,m
 robert,m
 david,m
 michael,m
@@ -75,9 +75,9 @@ In this case the invariant was that participants could only buy gifts for the sa
   </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="nb">map</span><span class="w"> </span><span class="nb">first</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">partition-by</span><span class="w"> </span><span class="nb">second</span><span class="w"> </span><span class="n">participants</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>To achieve this I first <a href="https://clojuredocs.org/clojure.core/slurp"><code class="highlighter-rouge">slurped</code></a> in the file contents, treating each given line as a new participant.
+<p>To achieve this I first <a href="https://clojuredocs.org/clojure.core/slurp"><code class="language-plaintext highlighter-rouge">slurped</code></a> in the file contents, treating each given line as a new participant.
 I then went about breaking each entry into their name and gender.
-This in-turn then allowed me to group the given list based on gender (the <a href="https://clojuredocs.org/clojure.core/second"><code class="highlighter-rouge">second</code></a> and finally return only the grouped participant names.</p>
+This in-turn then allowed me to group the given list based on gender (the <a href="https://clojuredocs.org/clojure.core/second"><code class="language-plaintext highlighter-rouge">second</code></a> and finally return only the grouped participant names.</p>
 
 <p>Now that we had the grouped names we could begin pairing up each participant.</p>
 
@@ -96,7 +96,7 @@ In the event that a buyer had been paired with themselves, the action would be r
 </span></code></pre></div></div>
 
 <p>Once complete I was able to compose these building blocks together.
-As participants were allocated within groups I used <a href="https://clojuredocs.org/clojure.core/mapcat"><code class="highlighter-rouge">mapcat</code></a> to ensure that the result was a flat listing of all the pairings.</p>
+As participants were allocated within groups I used <a href="https://clojuredocs.org/clojure.core/mapcat"><code class="language-plaintext highlighter-rouge">mapcat</code></a> to ensure that the result was a flat listing of all the pairings.</p>
 
 <h3 id="hiding-the-pairings-using-a-substitution-cipher">Hiding the Pairings using a Substitution Cipher</h3>
 
@@ -135,7 +135,7 @@ This padding was applied to both the beginning and end of the cipher, enclosing 
     </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[[</span><span class="n">buyer</span><span class="w"> </span><span class="n">receiver</span><span class="p">]]</span><span class="w"> </span><span class="p">[</span><span class="n">buyer</span><span class="w"> </span><span class="p">(</span><span class="nf">cipher</span><span class="w"> </span><span class="n">receiver</span><span class="p">)])</span><span class="w"> </span><span class="n">santas</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Finally, I was able to decorate the <code class="highlighter-rouge">secret-santa</code> function with the ability to return cipher text.
+<p>Finally, I was able to decorate the <code class="language-plaintext highlighter-rouge">secret-santa</code> function with the ability to return cipher text.
 This ensured that all paired up receivers were hidden and required a little work to uncover.</p>
 
 <p>I envision being able to use the solution this coming December, printing and cutting out each of the pairings to distribute to participants.</p>

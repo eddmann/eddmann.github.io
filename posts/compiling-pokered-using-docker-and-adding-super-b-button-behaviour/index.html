@@ -57,7 +57,7 @@ In this post I will go through compiling the ASM, tweaking the game to add <a hr
 
 <p>The <a href="https://github.com/pret/pokered">pokered</a> Git repository is well documented, including the steps required to compile the given assembly code for the desired platform.
 However, being an advocate of Docker I wished to take it a step further an Dockerise this process.
-To do this I created the <code class="highlighter-rouge">Dockerfile</code> below, which uses a small <a href="https://github.com/bitnami/minideb">Debian base image</a> to install all the required dependencies with.</p>
+To do this I created the <code class="language-plaintext highlighter-rouge">Dockerfile</code> below, which uses a small <a href="https://github.com/bitnami/minideb">Debian base image</a> to install all the required dependencies with.</p>
 
 <div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> bitnami/minideb:stretch</span>
 <span class="k">RUN </span>install_packages make git gcc byacc flex pkg-config libpng-dev ca-certificates
@@ -67,14 +67,14 @@ To do this I created the <code class="highlighter-rouge">Dockerfile</code> below
 <span class="k">CMD</span><span class="s"> ["make", "all"]</span>
 </code></pre></div></div>
 
-<p>From here I then compiled and pushed <a href="https://hub.docker.com/r/eddmann/pokered">this image</a> to Docker Hub and created a small executable <code class="highlighter-rouge">docker-make</code> script within the root of the repository.</p>
+<p>From here I then compiled and pushed <a href="https://hub.docker.com/r/eddmann/pokered">this image</a> to Docker Hub and created a small executable <code class="language-plaintext highlighter-rouge">docker-make</code> script within the root of the repository.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
 docker run <span class="nt">-v</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>:/opt/src eddmann/pokered make <span class="nv">$@</span>
 </code></pre></div></div>
 
-<p>This allowed me to seamlessly run all provided <code class="highlighter-rouge">make</code> targets within the Docker container like so <code class="highlighter-rouge">./docker-make all</code>.
-Once complete, two new build artifacts were now present in the root of the repository - <code class="highlighter-rouge">pokered.gbc</code> and <code class="highlighter-rouge">pokeblue.gbc</code>.
+<p>This allowed me to seamlessly run all provided <code class="language-plaintext highlighter-rouge">make</code> targets within the Docker container like so <code class="language-plaintext highlighter-rouge">./docker-make all</code>.
+Once complete, two new build artifacts were now present in the root of the repository - <code class="language-plaintext highlighter-rouge">pokered.gbc</code> and <code class="language-plaintext highlighter-rouge">pokeblue.gbc</code>.
 Both these ROMs were now playable using a desktop/web Game Boy emulator like <a href="https://wasmboy.app/">wasmboy</a>. 🎉</p>
 
 <h3 id="adding-the-super-b-button-behaviour">Adding the ‘Super B’ button behaviour</h3>
@@ -86,7 +86,7 @@ I started to review the code-base to see if there was a way of taking advantage 
 <h4 id="prevent-wild-pokémon-encounters">Prevent Wild Pokémon Encounters</h4>
 
 <p>It turns out that the game had an unused <a href="https://tcrf.net/Pok%C3%A9mon_Red_and_Blue/Debug_Functions#Debug_Mode">debug mode</a> that was left in, which provided one part of this behaviour.
-As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-126f3527215b40b1dc53ffe1ff45b479"><code class="highlighter-rouge">engine/battle/core.asm</code></a> to prevent wild Pokémon encounters if the B button was pressed.</p>
+As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-126f3527215b40b1dc53ffe1ff45b479"><code class="language-plaintext highlighter-rouge">engine/battle/core.asm</code></a> to prevent wild Pokémon encounters if the B button was pressed.</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">DetermineWildOpponent:
 </span><span class="gd">- ld a, [wd732]
@@ -103,7 +103,7 @@ As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e
 <h4 id="prevent-trainer-battle-encounters">Prevent Trainer Battle Encounters</h4>
 
 <p>Following this, I now hoped to follow a similar pattern in temporarily preventing trainer battle encounters.
-I was able to achieve this by making some minor modifications to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-33f8ea117b558305b57c03b757e4ef64"><code class="highlighter-rouge">home.asm</code></a>.</p>
+I was able to achieve this by making some minor modifications to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-33f8ea117b558305b57c03b757e4ef64"><code class="language-plaintext highlighter-rouge">home.asm</code></a>.</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">CheckFightingMapTrainers::
 </span><span class="gi">+ ld a, [hJoyHeld]
@@ -121,13 +121,13 @@ I was able to achieve this by making some minor modifications to <a href="https:
   ret
 </code></pre></div></div>
 
-<p>In a similar manor to how we prevented wild Pokémon encounters, if the B button is pressed we jump to <code class="highlighter-rouge">.noFight</code>, skipping the <code class="highlighter-rouge">CheckForEngagingTrainers</code> call.
+<p>In a similar manor to how we prevented wild Pokémon encounters, if the B button is pressed we jump to <code class="language-plaintext highlighter-rouge">.noFight</code>, skipping the <code class="language-plaintext highlighter-rouge">CheckForEngagingTrainers</code> call.
 Once compiled, I was able to experiment with these two changes and found them to be very interesting additions to game play.</p>
 
 <h4 id="walking-through-walls">Walking Through Walls</h4>
 
 <p>I then thought wouldn’t it be cool to accommodate for a similar ‘walk through walls’ glitch behaviour that you see in certain <a href="https://www.youtube.com/watch?v=5naL4X1vUbE">speed runs</a>.
-As such I delved back into the code-base and made a small modification to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-3dcdb47cbd60e627ff3c82d83193112c"><code class="highlighter-rouge">home/overworld.asm</code></a> which provided me with this capability.</p>
+As such I delved back into the code-base and made a small modification to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-3dcdb47cbd60e627ff3c82d83193112c"><code class="language-plaintext highlighter-rouge">home/overworld.asm</code></a> which provided me with this capability.</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">.noDirectionChange</span>
   ld a, [wPlayerDirection] ; current direction

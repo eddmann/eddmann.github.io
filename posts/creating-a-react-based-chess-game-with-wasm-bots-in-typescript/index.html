@@ -96,7 +96,7 @@ Thanks to <a href="https://yarnpkg.com/cli/patch">Yarn 2 patches</a> I was able 
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Looking at the engine implementation above you can see that along with some custom made types I also leveraged and exposed several types which were provided by the <code class="highlighter-rouge">chess.js</code> type-definition.</p>
+<p>Looking at the engine implementation above you can see that along with some custom made types I also leveraged and exposed several types which were provided by the <code class="language-plaintext highlighter-rouge">chess.js</code> type-definition.</p>
 
 <h3 id="the-bots">The Bots</h3>
 
@@ -154,8 +154,8 @@ The code executed in the Web Worker either being JavaScript-based in the case of
 </code></pre></div></div>
 
 <p>Providing the above abstraction allowed me to define many different external Bots and configurations (Levels and Depths), it also makes way for extension to any other Bot that supports tge UCI protocol in the future.
-Converting the Web Worker message-based system into a Promise was an interesting exercise, harnessing the power of Closures I needed to keep a reference to the current present <code class="highlighter-rouge">resolve</code> function.
-Upon the <code class="highlighter-rouge">bestmove</code> Bot response I could then resolve the given Promise.</p>
+Converting the Web Worker message-based system into a Promise was an interesting exercise, harnessing the power of Closures I needed to keep a reference to the current present <code class="language-plaintext highlighter-rouge">resolve</code> function.
+Upon the <code class="language-plaintext highlighter-rouge">bestmove</code> Bot response I could then resolve the given Promise.</p>
 
 <p>Finally, these Bots could be exposed for use within the React Chess implementation like so.</p>
 
@@ -194,8 +194,8 @@ Upon the <code class="highlighter-rouge">bestmove</code> Bot response I could th
 I also use a typed <a href="https://create-react-app.dev/docs/adding-a-css-modules-stylesheet/">CSS Modules Stylesheet</a> to cleanly seperate out the desired client-side styling concerns.
 The user is able to specifiy weather each player is User-based or Bot-based, and if Bot-based which configuration they would like to use.</p>
 
-<p>The <code class="highlighter-rouge">BotSelector</code> below provides a simple component which achieves this goal.
-Upon selection an initialised Bot is passed back to the parent Component via a <code class="highlighter-rouge">setSelectedBot</code> function invocation.</p>
+<p>The <code class="language-plaintext highlighter-rouge">BotSelector</code> below provides a simple component which achieves this goal.
+Upon selection an initialised Bot is passed back to the parent Component via a <code class="language-plaintext highlighter-rouge">setSelectedBot</code> function invocation.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">BotSelector</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">FC</span><span class="o">&lt;</span><span class="p">{</span>
   <span class="na">playerName</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
@@ -225,7 +225,7 @@ Upon selection an initialised Bot is passed back to the parent Component via a <
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>So as to recount the games previous moves, I also provided the concept of a <code class="highlighter-rouge">History</code> listing.
+<p>So as to recount the games previous moves, I also provided the concept of a <code class="language-plaintext highlighter-rouge">History</code> listing.
 This includes all the previous moves in <a href="https://en.wikipedia.org/wiki/Portable_Game_Notation">Portable Game Notation</a> (PGN) form.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">History</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">FC</span><span class="o">&lt;</span><span class="p">{</span> <span class="na">history</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">engine</span><span class="p">.</span><span class="nx">Move</span><span class="o">&gt;</span> <span class="p">}</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">history</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -244,7 +244,7 @@ This includes all the previous moves in <a href="https://en.wikipedia.org/wiki/P
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Using an empty <code class="highlighter-rouge">div</code> HTML reference I was able to ensure that the listing was pinned to the bottom at all times.
+<p>Using an empty <code class="language-plaintext highlighter-rouge">div</code> HTML reference I was able to ensure that the listing was pinned to the bottom at all times.
 The provided effect ensured that we only attempted to interact with the DOM and scroll the HTML element when the supplied history had changed.</p>
 
 <p>Finally, we could incorporate these two components into the React-interface itself.
@@ -359,7 +359,7 @@ Storing the Game state and Bot selection choices in this manor allowed me to har
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Wrapping the <code class="highlighter-rouge">doMove</code> in a Callback hook ensured that the Game effect was not needlessly invoked upon render unless the Game state or <code class="highlighter-rouge">onGameCompleted</code> callback had changed.
+<p>Wrapping the <code class="language-plaintext highlighter-rouge">doMove</code> in a Callback hook ensured that the Game effect was not needlessly invoked upon render unless the Game state or <code class="language-plaintext highlighter-rouge">onGameCompleted</code> callback had changed.
 I also provided some clean-up in the way that if the Game had changed in-between requesting a Bot move we would discard this previous move change, this ensured that the Game maintained a valid state.</p>
 
 <h3 id="conclusion">Conclusion</h3>

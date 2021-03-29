@@ -81,10 +81,10 @@ Both Pi’s allow you to connect the Raspberry Pi Camera Module v2 to them so as
 
 <h3 id="building-the-node-application">Building the Node Application</h3>
 
-<p>Now that I had decided on the equipment I was going to use, the next task was to create the <a href="https://github.com/eddmann/pi-timelapse/blob/master/timelapse.js"><code class="highlighter-rouge">timelapse.js</code></a> Node application.
-The application is a simple script which uses <code class="highlighter-rouge">setInterval</code> to block and call the give <code class="highlighter-rouge">shoot</code> function with the desired delay.
-Photos are organised into a deterministic <code class="highlighter-rouge">/year/month/day/hour/</code> directory structure, and each photos follows a <code class="highlighter-rouge">year_month_day_hour_minutes_seconds.jpg</code> naming convention.
-The actual act of taking the photo (with desired options) is delegated to the <a href="https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspistill.md"><code class="highlighter-rouge">raspistill</code></a> command-line tool which is provided by the Raspberry Pi organisation.</p>
+<p>Now that I had decided on the equipment I was going to use, the next task was to create the <a href="https://github.com/eddmann/pi-timelapse/blob/master/timelapse.js"><code class="language-plaintext highlighter-rouge">timelapse.js</code></a> Node application.
+The application is a simple script which uses <code class="language-plaintext highlighter-rouge">setInterval</code> to block and call the give <code class="language-plaintext highlighter-rouge">shoot</code> function with the desired delay.
+Photos are organised into a deterministic <code class="language-plaintext highlighter-rouge">/year/month/day/hour/</code> directory structure, and each photos follows a <code class="language-plaintext highlighter-rouge">year_month_day_hour_minutes_seconds.jpg</code> naming convention.
+The actual act of taking the photo (with desired options) is delegated to the <a href="https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspistill.md"><code class="language-plaintext highlighter-rouge">raspistill</code></a> command-line tool which is provided by the Raspberry Pi organisation.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">mkdirSync</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">fs</span><span class="dl">"</span><span class="p">);</span>
 <span class="kd">const</span> <span class="p">{</span> <span class="nx">execSync</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">child_process</span><span class="dl">"</span><span class="p">);</span>
@@ -138,7 +138,7 @@ The actual act of taking the photo (with desired options) is delegated to the <a
 <span class="nx">setInterval</span><span class="p">(</span><span class="nx">shoot</span><span class="p">,</span> <span class="nx">toMilliseconds</span><span class="p">(</span><span class="nx">delay</span><span class="p">),</span> <span class="nx">basePath</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>This script was then packaged into a Docker image using the following <a href="https://github.com/eddmann/pi-timelapse/blob/master/Dockerfile"><code class="highlighter-rouge">Dockerfile</code></a> file.</p>
+<p>This script was then packaged into a Docker image using the following <a href="https://github.com/eddmann/pi-timelapse/blob/master/Dockerfile"><code class="language-plaintext highlighter-rouge">Dockerfile</code></a> file.</p>
 
 <div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> balenalib/raspberry-pi-debian-node:11.3.0-stretch-run</span>
 <span class="k">RUN </span>apt-get update <span class="nt">-y</span> <span class="o">&amp;&amp;</span> apt-get <span class="nb">install </span>libraspberrypi-bin <span class="nt">-y</span>
@@ -147,7 +147,7 @@ The actual act of taking the photo (with desired options) is delegated to the <a
 <span class="k">CMD</span><span class="s"> ["node", "/var/timelapse.js"]</span>
 </code></pre></div></div>
 
-<p>The image ensures that the <a href="https://github.com/raspberrypi/userland">user-land</a> Raspberry Pi libraries are available (giving us access to <code class="highlighter-rouge">raspistill</code>) and provides us with a volume we can mount to our host OS - so as to persist photos taken regardless of the current container instance going away.</p>
+<p>The image ensures that the <a href="https://github.com/raspberrypi/userland">user-land</a> Raspberry Pi libraries are available (giving us access to <code class="language-plaintext highlighter-rouge">raspistill</code>) and provides us with a volume we can mount to our host OS - so as to persist photos taken regardless of the current container instance going away.</p>
 
 <p>With these two files in place I was now able to build and push the image to <a href="https://hub.docker.com/r/eddmann/pi-timelapse">Docker Hub</a> for later use on the Raspberry Pi’s.</p>
 
@@ -156,7 +156,7 @@ The actual act of taking the photo (with desired options) is delegated to the <a
 <p>The <a href="https://github.com/hypriot">Hypriot</a> project takes a lot of the pain out of getting setup with using Docker on the Raspberry Pi and it’s ARM architecture.
 It also includes the <a href="https://cloudinit.readthedocs.io/en/latest/">cloud-init</a> library which allows you to clearly define how you wish the instance to be provisioned on first boot.</p>
 
-<p>In regards to the two time-lapse devices I used the following cloud-config, specified in <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/user-data.yml"><code class="highlighter-rouge">user-data.yml</code></a>.</p>
+<p>In regards to the two time-lapse devices I used the following cloud-config, specified in <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/user-data.yml"><code class="language-plaintext highlighter-rouge">user-data.yml</code></a>.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#cloud-config</span>
 
@@ -215,7 +215,7 @@ It also includes the <a href="https://cloudinit.readthedocs.io/en/latest/">cloud
 </code></pre></div></div>
 
 <p>This provisions the given instance with the desired user account, WiFi access and starts the Docker container instance with the provided options.
-As well as this definition I was also required to ensure that the camera module was enabled, to do this I created a <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/boot-config.txt"><code class="highlighter-rouge">boot-config.txt</code></a> file like so.</p>
+As well as this definition I was also required to ensure that the camera module was enabled, to do this I created a <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/boot-config.txt"><code class="language-plaintext highlighter-rouge">boot-config.txt</code></a> file like so.</p>
 
 <div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">hdmi_force_hotplug</span><span class="p">=</span><span class="s">1</span>
 <span class="py">enable_uart</span><span class="p">=</span><span class="s">0</span>
@@ -243,7 +243,7 @@ The only varying factor per image was the desired hostname, and as such I was ab
 
 <h3 id="booting-the-raspberry-pi-time-lapse-camera">Booting the Raspberry Pi Time-lapse Camera</h3>
 
-<p>After inserting MicroSD cards into each Raspberry Pi I was able to access both devices via SSH using the chosen hostnames (i.e <code class="highlighter-rouge">timelapse.local</code>).
+<p>After inserting MicroSD cards into each Raspberry Pi I was able to access both devices via SSH using the chosen hostnames (i.e <code class="language-plaintext highlighter-rouge">timelapse.local</code>).
 The Docker container had been successfully configured to start at boot time and would restart automatically given any error that occurs.</p>
 
 <p><img src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pi-built.jpg" alt="Complete Raspberry Pi Builds" /></p>

@@ -60,7 +60,7 @@ I created this tool a while back in Python and thought it would be interesting t
 
 <p>I made a conscious effort to try and break up the problem as much as I could, so as to create smaller, more concise functions.
 The first problem to solve was fetching the links from the clipboard and then parsing this input into an array.
-You will notice that I am wrapping the callback-based <code class="highlighter-rouge">paste</code> asynchronous approach with a Promise so I can interact with it in the same way as the rest of the application functions.</p>
+You will notice that I am wrapping the callback-based <code class="language-plaintext highlighter-rouge">paste</code> asynchronous approach with a Promise so I can interact with it in the same way as the rest of the application functions.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">fromClipboard</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span>
   <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">paste</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">(</span><span class="nx">x</span><span class="p">)));</span>
@@ -73,7 +73,7 @@ You will notice that I am wrapping the callback-based <code class="highlighter-r
 <h2 id="fetching-and-extracting-link-titles">Fetching and Extracting Link Titles</h2>
 
 <p>Now that we have the desired input we can fetch and extract the titles for each of the links.
-Notice how I have created functions which handle an individual link transformation, and then used a <code class="highlighter-rouge">Promise.all</code> invocation to handle the array provided.</p>
+Notice how I have created functions which handle an individual link transformation, and then used a <code class="language-plaintext highlighter-rouge">Promise.all</code> invocation to handle the array provided.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">extractTitle</span> <span class="o">=</span> <span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">ok</span>
   <span class="p">?</span> <span class="nx">r</span><span class="p">.</span><span class="nx">text</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/&lt;title</span><span class="se">[^</span><span class="sr">&gt;</span><span class="se">]</span><span class="sr">*&gt;</span><span class="se">([^</span><span class="sr">&lt;</span><span class="se">]</span><span class="sr">+</span><span class="se">)</span><span class="sr">&lt;</span><span class="se">\/</span><span class="sr">title&gt;/</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>

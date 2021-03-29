@@ -164,9 +164,9 @@ Below is a simple implementation which addresses this requirement.</p>
 <p>The example implementation above defines an abstract ‘Facade’ class which provides the dynamic static invocation required by each facade.
 There is a requirement for each facade created to override the ‘getName’ method, simply returning the related name of the container instance.
 As static methods can rightfully not be made abstract, we instead throw an exception which informs the user of this restriction.
-Being the only concrete method defined in the class, any resolved container instance with a method called ‘getName’ will not be successfully called as it will not invoke <code class="highlighter-rouge">__callStatic</code>.
+Being the only concrete method defined in the class, any resolved container instance with a method called ‘getName’ will not be successfully called as it will not invoke <code class="language-plaintext highlighter-rouge">__callStatic</code>.
 In a more developed implementation this method name could be changed to something that would reduce the risk of conflicting with instance method names.
-The other method that is defined is the <a href="http://www.php.net/manual/en/language.oop5.magic.php">magic</a> <code class="highlighter-rouge">__callStatic</code> method, providing the ability to handle missing static method calls.
+The other method that is defined is the <a href="http://www.php.net/manual/en/language.oop5.magic.php">magic</a> <code class="language-plaintext highlighter-rouge">__callStatic</code> method, providing the ability to handle missing static method calls.
 Using the name that is returned in the concrete facade class, we are able to retrieve the correct instance from the container.
 From here we simply check to see if the instance contains the method, if this is not the case we throw a suitable error for the user.
 Finally, we call the method on the instance, passing in any arguments that were specified and return the result.

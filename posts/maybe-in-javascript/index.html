@@ -80,7 +80,7 @@ We then return the ability to take a value of a plain type and put it into a May
 <h3 id="division-by-zero-example">Division by Zero Example</h3>
 
 <p>The first example of using the Maybe type I will demonstrate is in the case of handling division by zero errors.
-In the event that the denominator is zero instead of throwing an exception or returning null (as shown in the basic <code class="highlighter-rouge">div</code> implementation) we will instead lift the function into the Maybe type and return a Some or None.
+In the event that the denominator is zero instead of throwing an exception or returning null (as shown in the basic <code class="language-plaintext highlighter-rouge">div</code> implementation) we will instead lift the function into the Maybe type and return a Some or None.
 This may not seem like much of a win at this time but when we later look at examples of composing these expressions together you will be shown its full power.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">null</span> <span class="p">:</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span><span class="p">;</span>
@@ -93,8 +93,8 @@ This may not seem like much of a win at this time but when we later look at exam
 
 <h3 id="property-retrieval-example">Property Retrieval Example</h3>
 
-<p>Another case were <code class="highlighter-rouge">undefined</code> values may appear in JavaScript is whilst retrieving properties from objects that may(not) be present.
-Again, we are able to highlight how the basic <code class="highlighter-rouge">get</code> function returns the object property or undefined if not present, were as lifting it into the Maybe type provides us with the Some and None abstractions.</p>
+<p>Another case were <code class="language-plaintext highlighter-rouge">undefined</code> values may appear in JavaScript is whilst retrieving properties from objects that may(not) be present.
+Again, we are able to highlight how the basic <code class="language-plaintext highlighter-rouge">get</code> function returns the object property or undefined if not present, were as lifting it into the Maybe type provides us with the Some and None abstractions.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="kd">get</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">prop</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">]);</span>
 <span class="kd">const</span> <span class="nx">mget</span> <span class="o">=</span> <span class="p">(</span><span class="nx">prop</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">lift</span><span class="p">(</span><span class="kd">get</span><span class="p">(</span><span class="nx">prop</span><span class="p">));</span>
@@ -112,14 +112,14 @@ Again, we are able to highlight how the basic <code class="highlighter-rouge">ge
 <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">age</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(25)</span>
 </code></pre></div></div>
 
-<p>We are then able to compose multiple <code class="highlighter-rouge">mget</code> functions together, handling application on the Maybe containers using <code class="highlighter-rouge">fmap</code> and <code class="highlighter-rouge">bind</code>.</p>
+<p>We are then able to compose multiple <code class="language-plaintext highlighter-rouge">mget</code> functions together, handling application on the Maybe containers using <code class="language-plaintext highlighter-rouge">fmap</code> and <code class="language-plaintext highlighter-rouge">bind</code>.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">fmap</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">functor</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">functor</span><span class="p">.</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
 <span class="kd">const</span> <span class="nx">bind</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">monad</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>You will notice that <code class="highlighter-rouge">fmap</code> double wraps the resulting value, this is due to as being a Functor definition its’ action is to wrap the resulting value (from our provided function) back into the given container.
-However, in the case of the <code class="highlighter-rouge">bind</code> Monad definition, it instead does not wrap the value back into the container upon completion, but instead relies on the function itself to return the correctly typed value.</p>
+<p>You will notice that <code class="language-plaintext highlighter-rouge">fmap</code> double wraps the resulting value, this is due to as being a Functor definition its’ action is to wrap the resulting value (from our provided function) back into the given container.
+However, in the case of the <code class="language-plaintext highlighter-rouge">bind</code> Monad definition, it instead does not wrap the value back into the container upon completion, but instead relies on the function itself to return the correctly typed value.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getStreet</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">street</span><span class="dl">'</span><span class="p">)),</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">address</span><span class="dl">'</span><span class="p">));</span>
 <span class="nx">getStreet</span><span class="p">({</span> <span class="na">address</span><span class="p">:</span> <span class="p">{}</span> <span class="p">});</span> <span class="c1">// Some(None)</span>

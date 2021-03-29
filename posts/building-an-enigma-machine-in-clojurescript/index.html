@@ -113,7 +113,7 @@ Within code we are able to represent this as <em>hash-map</em> like data-structu
    </span><span class="n">rotors</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Using the above code we define three of the original Rotors (with the scrambled wiring represented as <code class="highlighter-rouge">in</code> and <code class="highlighter-rouge">out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
+<p>Using the above code we define three of the original Rotors (with the scrambled wiring represented as <code class="language-plaintext highlighter-rouge">in</code> and <code class="language-plaintext highlighter-rouge">out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
 With the use of <em>hash-maps</em> we are able to clearly see how the machine used substitution to form the resulting cipher.</p>
 
 <p>To complete the circuit and send the current back through the (inverted) Rotors we use a supplied Reflector.
@@ -183,7 +183,7 @@ Finally, based on a supplied machine configuration (which has been setup using t
 
 <h3 id="testing">Testing</h3>
 
-<p>Now we have modelled the behaviour of the machine we can assert its correctness by-way of testing the <em>public API</em> - the <code class="highlighter-rouge">encode-message</code> function.
+<p>Now we have modelled the behaviour of the machine we can assert its correctness by-way of testing the <em>public API</em> - the <code class="language-plaintext highlighter-rouge">encode-message</code> function.
 We will first do this by performing a couple of basic assertions which centre around the inclusion and exclusion of a Plugboard mapping.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">deftest</span><span class="w"> </span><span class="n">encode-message-with-empty-plugboard</span><span class="w">
@@ -255,8 +255,8 @@ One of the true powers of this testing approach is how if a property does not se
 <p>Having modeled and verified the correctness of the machine behaviour we can move on to providing the client with a user interface.
 For this we will be using <a href="https://reagent-project.github.io/">Reagent</a>, which provides ClojureScript bindings for the React library.
 So as to not overload this article with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
-Instead I ask for you to head over to the <a href="https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs"><code class="highlighter-rouge">app.cljs</code></a> implementation which describes how we use Reagent to interact with our machine implementation.
-Below you will see how we combine all the child input components declared in <code class="highlighter-rouge">app.cljs</code>, into the stateful parent component which is rendered to the DOM.</p>
+Instead I ask for you to head over to the <a href="https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs"><code class="language-plaintext highlighter-rouge">app.cljs</code></a> implementation which describes how we use Reagent to interact with our machine implementation.
+Below you will see how we combine all the child input components declared in <code class="language-plaintext highlighter-rouge">app.cljs</code>, into the stateful parent component which is rendered to the DOM.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="p">[]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w">    </span><span class="p">[(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"III"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"II"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"I"</span><span class="p">)]</span><span class="w">
@@ -287,7 +287,7 @@ Below you will see how we combine all the child input components declared in <co
        </span><span class="p">[</span><span class="no">:pre</span><span class="w"> </span><span class="o">@</span><span class="n">cipher</span><span class="p">]])))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Making use of <a href="http://reagent-project.github.io/docs/master/reagent.ratom.html">Reagent Atoms</a> we are able to statefully store the users intended configuration and invoke the <code class="highlighter-rouge">encode-message</code> function when required.</p>
+<p>Making use of <a href="http://reagent-project.github.io/docs/master/reagent.ratom.html">Reagent Atoms</a> we are able to statefully store the users intended configuration and invoke the <code class="language-plaintext highlighter-rouge">encode-message</code> function when required.</p>
 
 <h3 id="conclusion">Conclusion</h3>
 

@@ -111,7 +111,7 @@ As such, we are required to roll our own; I opted to leverage Generators in the 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using this function we are then able to create a higher-order function which aggregates all the possible trip distances into a final reduced value, using a supplied <code class="highlighter-rouge">reducer</code> function.</p>
+<p>Using this function we are then able to create a higher-order function which aggregates all the possible trip distances into a final reduced value, using a supplied <code class="language-plaintext highlighter-rouge">reducer</code> function.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">aggregateTripDistances</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span>
   <span class="p">{</span> <span class="nx">locations</span><span class="p">,</span> <span class="nx">distances</span> <span class="p">}:</span> <span class="nx">Distances</span><span class="p">,</span>
@@ -135,7 +135,7 @@ As such, we are required to roll our own; I opted to leverage Generators in the 
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Finally, we can answer part one by calling this function, supplying the <code class="highlighter-rouge">Math.min</code> aggregate function to keep track of the shortest distance we have seen 🌟.</p>
+<p>Finally, we can answer part one by calling this function, supplying the <code class="language-plaintext highlighter-rouge">Math.min</code> aggregate function to keep track of the shortest distance we have seen 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">aggregateTripDistances</span><span class="p">(</span>
@@ -148,7 +148,7 @@ As such, we are required to roll our own; I opted to leverage Generators in the 
 <h3 id="part-2">Part 2</h3>
 
 <p>For part two we are instead asked to determine what the longest distance for the longest route is based on the same location listing.
-Using the same building blocks provided for part one’s solution, we can instead supply the <code class="highlighter-rouge">Math.max</code> aggregate function to return the desired answer 🌟.</p>
+Using the same building blocks provided for part one’s solution, we can instead supply the <code class="language-plaintext highlighter-rouge">Math.max</code> aggregate function to return the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">aggregateTripDistances</span><span class="p">(</span>
@@ -179,7 +179,7 @@ First we generate a list of all the possible trip distance totals, based on perm
   <span class="p">});</span>
 </code></pre></div></div>
 
-<p>Then we can supply this list as arguments to both the <code class="highlighter-rouge">Math.min</code> and <code class="highlighter-rouge">Math.max</code> functions.
+<p>Then we can supply this list as arguments to both the <code class="language-plaintext highlighter-rouge">Math.min</code> and <code class="language-plaintext highlighter-rouge">Math.max</code> functions.
 Using this approach works well for this input, however, we should be considerate that as all arguments are required to be put on the call stack within the chosen JavaScript VM, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#using_apply_and_built-in_functions">there is a limit</a> to how many list items this will cater for.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>

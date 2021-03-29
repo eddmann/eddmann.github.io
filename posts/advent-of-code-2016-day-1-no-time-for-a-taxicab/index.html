@@ -56,13 +56,13 @@ However, for this year I wish to instead explore Python.</p>
 <p>The initial problem for the 2016 calendar requires us to navigate our way from our ‘airdropped’ location to Easter Bunny HQ.
 In doing so we are required to work out how many blocks away the location is (using <a href="https://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a>).</p>
 
-<p>We begin by parsing the provided directions into tuples of the form <code class="highlighter-rouge">(direction, steps)</code>.</p>
+<p>We begin by parsing the provided directions into tuples of the form <code class="language-plaintext highlighter-rouge">(direction, steps)</code>.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_instructions</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">', '</span><span class="p">)]</span>
 </code></pre></div></div>
 
-<p>With the instructions now parsed we can (from our starting postion of <code class="highlighter-rouge">0,0</code>) navigate our way to the final destiation.</p>
+<p>With the instructions now parsed we can (from our starting postion of <code class="language-plaintext highlighter-rouge">0,0</code>) navigate our way to the final destiation.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">COMPASS</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 
@@ -78,7 +78,7 @@ In doing so we are required to work out how many blocks away the location is (us
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">abs</span><span class="p">,</span> <span class="n">pos</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p>We are able to calculate what the revised directional cordinates which need to be applied to the current position upon each instruction using the provided <code class="highlighter-rouge">COMPASS</code> lookup table.
+<p>We are able to calculate what the revised directional cordinates which need to be applied to the current position upon each instruction using the provided <code class="language-plaintext highlighter-rouge">COMPASS</code> lookup table.
 Once we have applied all the moves we return the <em>Manhattan distance</em> of the final position to return the desired answer 🌟.</p>
 
 <h3 id="part-2">Part 2</h3>

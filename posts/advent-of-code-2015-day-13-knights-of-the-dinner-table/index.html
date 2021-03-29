@@ -87,12 +87,12 @@ Like before, we initially begin by parsing the provided input into a form we can
 </code></pre></div></div>
 
 <p>Like in Day 9, we reduce over the listing building up both a <em>set</em> of all the family members and a <em>map</em> of the relationship happiness scores.
-Unlike the previous day, I have decided to opt for a single-level map which provides the associations in the form of <code class="highlighter-rouge">Neighbours</code> strings.
+Unlike the previous day, I have decided to opt for a single-level map which provides the associations in the form of <code class="language-plaintext highlighter-rouge">Neighbours</code> strings.
 As an aside, I’ve really enjoyed being able to map the problem domain into types of which I can construct the behaviour from.
 I find great value in being able to type-aliase primitives such as numbers and strings to the domain language.</p>
 
 <p>With the input now parsed we can move on to calculating the seating happiness scores.
-The input listing is not that large so again we can use the <code class="highlighter-rouge">permutations</code> function we implemented in Day 9 to iterate over every possible seating arrangement.
+The input listing is not that large so again we can use the <code class="language-plaintext highlighter-rouge">permutations</code> function we implemented in Day 9 to iterate over every possible seating arrangement.
 For each given arrangement we then calculate its total happiness score.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">calcSeatingHappiness</span> <span class="o">=</span> <span class="p">({</span>
@@ -110,22 +110,22 @@ For each given arrangement we then calculate its total happiness score.</p>
   <span class="p">);</span>
 </code></pre></div></div>
 
-<p>Instead of <em>piggy-backing</em> on the reduction to include the previous family member (like we did in Day 9) I decided to implement a <code class="highlighter-rouge">zip</code> function which returned a tuple of each seat neighbours (gracefully handling the circular nature of the table).
+<p>Instead of <em>piggy-backing</em> on the reduction to include the previous family member (like we did in Day 9) I decided to implement a <code class="language-plaintext highlighter-rouge">zip</code> function which returned a tuple of each seat neighbours (gracefully handling the circular nature of the table).
 These neighbouring tuples are then reduced over to produce the total happiness score for that given arrangement.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">zip</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">A</span><span class="p">[],</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">B</span><span class="p">[]):</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">][]</span> <span class="o">=&gt;</span>
   <span class="nx">a</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">x</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">b</span><span class="p">[</span><span class="nx">idx</span><span class="p">]]);</span>
 </code></pre></div></div>
 
-<p>Whilst solving this problem I encoutered an issue when using JavaScripts <code class="highlighter-rouge">Math.max</code> and the size of the possible arrangement happiness scores.
-Due to the nature in which <code class="highlighter-rouge">Math.max</code> (and <code class="highlighter-rouge">Math.min</code>) uses a multi-arity argument approach to supplying input, their is a finite amount of arguments that it can take till it exceeds the call-stack limit.
+<p>Whilst solving this problem I encoutered an issue when using JavaScripts <code class="language-plaintext highlighter-rouge">Math.max</code> and the size of the possible arrangement happiness scores.
+Due to the nature in which <code class="language-plaintext highlighter-rouge">Math.max</code> (and <code class="language-plaintext highlighter-rouge">Math.min</code>) uses a multi-arity argument approach to supplying input, their is a finite amount of arguments that it can take till it exceeds the call-stack limit.
 For this problem I encounted this issue and as such was required to implement an alternative approach.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">max</span> <span class="o">=</span> <span class="p">(</span><span class="nx">xs</span><span class="p">:</span> <span class="kr">number</span><span class="p">[])</span> <span class="o">=&gt;</span>
   <span class="nx">xs</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">m</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">x</span> <span class="o">&gt;</span> <span class="nx">m</span> <span class="p">?</span> <span class="nx">x</span> <span class="p">:</span> <span class="nx">m</span><span class="p">),</span> <span class="o">-</span><span class="kc">Infinity</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>With this custom <code class="highlighter-rouge">max</code> implementation we can now compose all the building blocks together and return the desired answer 🌟.</p>
+<p>With this custom <code class="language-plaintext highlighter-rouge">max</code> implementation we can now compose all the building blocks together and return the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">max</span><span class="p">(</span><span class="nx">calcSeatingHappiness</span><span class="p">(</span><span class="nx">parseFamilyRelationships</span><span class="p">(</span><span class="nx">input</span><span class="p">)));</span>
@@ -133,7 +133,7 @@ For this problem I encounted this issue and as such was required to implement an
 
 <h3 id="part-2">Part 2</h3>
 
-<p>To solve part two we are required to add ourselves to the seating arrangement; with neutral (<code class="highlighter-rouge">0</code>) happiness scores for all family members.
+<p>To solve part two we are required to add ourselves to the seating arrangement; with neutral (<code class="language-plaintext highlighter-rouge">0</code>) happiness scores for all family members.
 Once added we are required to then determine what the new optimial seating arrangement happiness score will be.
 We can sovle this in a similiar mannor to how we did for part one 🌟.</p>
 

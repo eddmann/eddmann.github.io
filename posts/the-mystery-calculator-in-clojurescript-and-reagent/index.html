@@ -56,8 +56,8 @@ I thought it would be interesting to create a small web application in <a href="
 <p>The magic trick is performed as follows:</p>
 
 <blockquote>
-  <p>The complete set consists of <code class="highlighter-rouge">N</code> cards, printed with a series of numbers, show all the cards to a friend and ask him or her to select-one number from any one card.
-Show the other <code class="highlighter-rouge">N-1</code> cards to your friend asking him or her to say whether the number appears on these cards.
+  <p>The complete set consists of <code class="language-plaintext highlighter-rouge">N</code> cards, printed with a series of numbers, show all the cards to a friend and ask him or her to select-one number from any one card.
+Show the other <code class="language-plaintext highlighter-rouge">N-1</code> cards to your friend asking him or her to say whether the number appears on these cards.
 Take all the cards on which your friend says the number appears, add together the top left hand corner number of each card and the total is the number your friend selected.</p>
 </blockquote>
 
@@ -67,13 +67,13 @@ Take all the cards on which your friend says the number appears, add together th
 Upon closer inspection, you may also see that each number can be written in terms of a subset (or all) of the numbers present in the top-left hand corner of each of the cards.</p>
 
 <p>I found it easier to visualise this by replacing the decimal number represenation with binary.
-If we number all the available cards (<code class="highlighter-rouge">1 to N</code>), you will see that each number on that given card has that positions bit set to <code class="highlighter-rouge">1</code>.
-This means that we can calculate the mystery number by performing a binary <code class="highlighter-rouge">AND</code> operation on the top-left hand corners number for all cards which include the chosen number.</p>
+If we number all the available cards (<code class="language-plaintext highlighter-rouge">1 to N</code>), you will see that each number on that given card has that positions bit set to <code class="language-plaintext highlighter-rouge">1</code>.
+This means that we can calculate the mystery number by performing a binary <code class="language-plaintext highlighter-rouge">AND</code> operation on the top-left hand corners number for all cards which include the chosen number.</p>
 
-<p>For eample, say I have picked the mystery number 28 (<code class="highlighter-rouge">11100</code> in binary).
+<p>For eample, say I have picked the mystery number 28 (<code class="language-plaintext highlighter-rouge">11100</code> in binary).
 That number appears on cards 3, 4 and 5 in a convential 6 card setup.
-The top-left hand corner numbers for these cards are 4 (<code class="highlighter-rouge">00100</code>), 8 (<code class="highlighter-rouge">01000</code>) and 16 (<code class="highlighter-rouge">10000</code>).
-If we perform the binary <code class="highlighter-rouge">AND</code> operation on these numbers we produce the chosen mystery number 28 (<code class="highlighter-rouge">11100</code>).
+The top-left hand corner numbers for these cards are 4 (<code class="language-plaintext highlighter-rouge">00100</code>), 8 (<code class="language-plaintext highlighter-rouge">01000</code>) and 16 (<code class="language-plaintext highlighter-rouge">10000</code>).
+If we perform the binary <code class="language-plaintext highlighter-rouge">AND</code> operation on these numbers we produce the chosen mystery number 28 (<code class="language-plaintext highlighter-rouge">11100</code>).
 This works for any number chosen from the given cards.</p>
 
 <h3 id="building-the-mystery-calculator">Building the Mystery Calculator</h3>
@@ -92,7 +92,7 @@ This works for any number chosen from the given cards.</p>
 
 <p>Using a Lisp we are able to succinctly express how a card is formed.
 First, we produce an exclusive range of all the sequential numbers up-to two to the power of the card count.
-For each number and card we check to see if the given numbers bit is set to <code class="highlighter-rouge">1</code> at that cards position.
+For each number and card we check to see if the given numbers bit is set to <code class="language-plaintext highlighter-rouge">1</code> at that cards position.
 For example, for the first card we would check the first bit, the second card the second bit etc.
 In doing this reducation we eventually construct all the desired cards with the specifically placed numbers.</p>
 
@@ -111,7 +111,7 @@ To do this I decided to explore using Reagent, which provides an efficient way t
 </span></code></pre></div></div>
 
 <p>Passing in the generated cards from the previous function and a <a href="http://reagent-project.github.io/docs/master/reagent.core.html#var-atom">state atom</a> which includes the users selection, we can present these for React to render using <a href="https://github.com/weavejester/hiccup">Hiccup</a>.
-If the user clicks on a card, we will toggle the presence of the cards top-left hand corners number within the <code class="highlighter-rouge">chosen-cards</code> state atom.</p>
+If the user clicks on a card, we will toggle the presence of the cards top-left hand corners number within the <code class="language-plaintext highlighter-rouge">chosen-cards</code> state atom.</p>
 
 <p>Finally, we can wire up the application, declaring the two state atoms with default values and displaying the mystery number if a card has been selected.</p>
 
@@ -137,12 +137,12 @@ If the user clicks on a card, we will toggle the presence of the cards top-left 
   </span><span class="p">(</span><span class="nf">reagent.dom/render</span><span class="w"> </span><span class="p">[</span><span class="n">app</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">.getElementById</span><span class="w"> </span><span class="n">js/document</span><span class="w"> </span><span class="s">"app"</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>We include a <code class="highlighter-rouge">clamp</code> function which is not present in the ClojureScript core, this provides us with the ability to restrict how many cards can be generated as this can be an expensive Browser operation.</p>
+<p>We include a <code class="language-plaintext highlighter-rouge">clamp</code> function which is not present in the ClojureScript core, this provides us with the ability to restrict how many cards can be generated as this can be an expensive Browser operation.</p>
 
 <h3 id="deployment">Deployment</h3>
 
 <p>To ease deployment and hosting I decided to leverage GitHub Actions and GitHub Pages.
-Upon a successful Git push, using the provided <code class="highlighter-rouge">Makefile</code> and Docker-setup, we first compile the application and subsequently release the artifact to the <code class="highlighter-rouge">gh-pages</code> branch.
+Upon a successful Git push, using the provided <code class="language-plaintext highlighter-rouge">Makefile</code> and Docker-setup, we first compile the application and subsequently release the artifact to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch.
 This branch is then used to host the web application made available <a href="https://eddmann.com/mystery-calculator-clojurescript/">here</a>.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Release</span>

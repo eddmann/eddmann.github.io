@@ -50,7 +50,7 @@ Through this process I also wanted to explore using Hspec and QuickCheck for com
 
 
 
-<p>You can experiment with the final implementation by pulling down the <a href="https://github.com/eddmann/enigma-machine-haskell">GitHub repository</a> and using the provided Makefile <code class="highlighter-rouge">encode</code> Makefile target.
+<p>You can experiment with the final implementation by pulling down the <a href="https://github.com/eddmann/enigma-machine-haskell">GitHub repository</a> and using the provided Makefile <code class="language-plaintext highlighter-rouge">encode</code> Makefile target.
 We leverage Docker to containerise the Haskell development/testing requirements when being run locally and during CI.</p>
 
 <p><a href="https://github.com/eddmann/enigma-machine-haskell"><img src="/uploads/building-an-enigma-machine-in-haskell/demo.png" alt="Command-line based Enigma Machine in Haskell" /></a></p>
@@ -128,11 +128,11 @@ Finally, we provide a means of passing a given letter through (and back-through)
 <span class="n">reflect</span> <span class="n">reflector</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">maybe</span> <span class="sc">'?'</span> <span class="n">id</span> <span class="o">$</span> <span class="n">lookup</span> <span class="n">letter</span> <span class="n">reflector</span>
 </code></pre></div></div>
 
-<p>Being a static substitution system the Reflector is trival to model - however, we do cater for the possibility of a value not being present in the ‘lookup’ invocation via unwrapping the <em>Maybe</em> and returning an <code class="highlighter-rouge">?</code> instead.
-This should not occur in practise, but to date I have not been able to find a means of adding the sufficent type-level constraints required to ensure that only <code class="highlighter-rouge">Char</code> values present in the <code class="highlighter-rouge">alphabet</code> listing should be consumed/returned.</p>
+<p>Being a static substitution system the Reflector is trival to model - however, we do cater for the possibility of a value not being present in the ‘lookup’ invocation via unwrapping the <em>Maybe</em> and returning an <code class="language-plaintext highlighter-rouge">?</code> instead.
+This should not occur in practise, but to date I have not been able to find a means of adding the sufficent type-level constraints required to ensure that only <code class="language-plaintext highlighter-rouge">Char</code> values present in the <code class="language-plaintext highlighter-rouge">alphabet</code> listing should be consumed/returned.</p>
 
-<p>This leads us on to modeling the Plugboard, which uses the <code class="highlighter-rouge">lookup</code> Haskell function again to see if a translation (plug) for the given letter has been provided.
-If this is not the case when unwrapping the <em>Maybe</em> monadic structure, the provided letter itself (by-way of the <code class="highlighter-rouge">id</code> function) is returned instead.</p>
+<p>This leads us on to modeling the Plugboard, which uses the <code class="language-plaintext highlighter-rouge">lookup</code> Haskell function again to see if a translation (plug) for the given letter has been provided.
+If this is not the case when unwrapping the <em>Maybe</em> monadic structure, the provided letter itself (by-way of the <code class="language-plaintext highlighter-rouge">id</code> function) is returned instead.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">type</span> <span class="kt">Plugboard</span> <span class="o">=</span> <span class="p">[(</span><span class="kt">Char</span><span class="p">,</span> <span class="kt">Char</span><span class="p">)]</span>
 
@@ -154,7 +154,7 @@ If this is not the case when unwrapping the <em>Maybe</em> monadic structure, th
         <span class="n">encode</span> <span class="n">rotated</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letter</span> <span class="o">:</span> <span class="n">encodeMessage</span> <span class="n">rotated</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letters</span>
 </code></pre></div></div>
 
-<p>Above we have opted to break the problem up into a recursive <code class="highlighter-rouge">encodeMessage</code> function which uses an internal <code class="highlighter-rouge">encode</code> function to provide threading the letter through the currently configured machine.
+<p>Above we have opted to break the problem up into a recursive <code class="language-plaintext highlighter-rouge">encodeMessage</code> function which uses an internal <code class="language-plaintext highlighter-rouge">encode</code> function to provide threading the letter through the currently configured machine.
 Unlike Clojure we do not have a means to express ‘threading’ the letter through a list of functions defined left-to-right.
 Instead we have to compose the functions together reading the function right-to-left.
 It would be nice to be able to provide some syntactic sugar around this use-case - as when you have big composition chains such as this, it is a lot more understable to read left-to-right (regardless of how the call stack is going to be built internally).</p>
@@ -219,14 +219,14 @@ Although the syntax is naturally different, the general philosophy of how a Prop
 
 <p>As stated in the previous article this test-suite is by no means exhaustive and can be expanded upon greatly.
 The goal of this is to highlight the key differences between conventional test assertions and testing validity of <em>System under test</em> (SUT) properties.
-This test-suite can be run locally using the <code class="highlighter-rouge">make test</code> target, or you can see example resulting output by-way of the configured <a href="https://github.com/eddmann/enigma-machine-haskell/actions">GitHub Action</a>.</p>
+This test-suite can be run locally using the <code class="language-plaintext highlighter-rouge">make test</code> target, or you can see example resulting output by-way of the configured <a href="https://github.com/eddmann/enigma-machine-haskell/actions">GitHub Action</a>.</p>
 
 <h3 id="the-user-interface">The User Interface</h3>
 
 <p>To make this implementation a little different I have opted to provide a Command-line based user interface over a Web-based one.
 In doing so we are able to see a very powerful use-case for Haskell’s <a href="http://learnyouahaskell.com/syntax-in-functions">pattern matching</a> functionality.</p>
 
-<p>To achieve this end-goal we must first provide a means for the client to translate their desired machine configuration into one that our <code class="highlighter-rouge">encodeMessage</code> function can understand.</p>
+<p>To achieve this end-goal we must first provide a means for the client to translate their desired machine configuration into one that our <code class="language-plaintext highlighter-rouge">encodeMessage</code> function can understand.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">toRotor</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Rotor</span>
 <span class="n">toRotor</span> <span class="o">=</span> <span class="p">(</span><span class="n">flip</span> <span class="n">lookup</span><span class="p">)</span> <span class="p">[(</span><span class="sc">'1'</span><span class="p">,</span> <span class="n">rotorI</span><span class="p">),</span> <span class="p">(</span><span class="sc">'2'</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">),</span> <span class="p">(</span><span class="sc">'3'</span><span class="p">,</span> <span class="n">rotorIII</span><span class="p">)]</span>
@@ -280,7 +280,7 @@ This allows us to neatly use <em>do</em> notation described below to build a ful
     <span class="n">print</span> <span class="o">$</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">message</span>
 </code></pre></div></div>
 
-<p>With the machine configuration successfully parsed we are able to invoke the <code class="highlighter-rouge">encodeMessage</code> function and print the resulting cipher message to the Terminal.</p>
+<p>With the machine configuration successfully parsed we are able to invoke the <code class="language-plaintext highlighter-rouge">encodeMessage</code> function and print the resulting cipher message to the Terminal.</p>
 
 <h3 id="conclusion">Conclusion</h3>
 

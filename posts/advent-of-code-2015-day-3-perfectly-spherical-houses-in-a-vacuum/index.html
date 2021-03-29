@@ -60,10 +60,10 @@ The first step is to parse the input data into a type-safe form.</p>
   <span class="p">[...</span><span class="nx">input</span><span class="p">].</span><span class="nx">filter</span><span class="p">((</span><span class="nx">d</span><span class="p">:</span> <span class="nx">Direction</span><span class="p">):</span> <span class="nx">d</span> <span class="k">is</span> <span class="nx">Direction</span> <span class="o">=&gt;</span> <span class="nx">directions</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">d</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>This filters out any invalid direction ensuring that the resulting values are within the defined <code class="highlighter-rouge">Direction</code> union-type.
+<p>This filters out any invalid direction ensuring that the resulting values are within the defined <code class="language-plaintext highlighter-rouge">Direction</code> union-type.
 Like before, we could have alternatively provided more stricter parsing rules and thrown an exception upon an invalid direction occurrence - but for this input the provided behaviour will suffice.</p>
 
-<p>From here, we create a small function which iterates through the provided directions, storing each house <code class="highlighter-rouge">Position</code> (represented as X-Y coordinate tuples) encountered along the way.</p>
+<p>From here, we create a small function which iterates through the provided directions, storing each house <code class="language-plaintext highlighter-rouge">Position</code> (represented as X-Y coordinate tuples) encountered along the way.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Position</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">y</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
 <span class="kd">const</span> <span class="nx">coordinates</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">K</span> <span class="k">in</span> <span class="nx">Direction</span><span class="p">]:</span> <span class="nx">Position</span> <span class="p">}</span> <span class="o">=</span> <span class="p">{</span>
@@ -88,9 +88,9 @@ Like before, we could have alternatively provided more stricter parsing rules an
 </code></pre></div></div>
 
 <p>We are only interested in the presence of a house being visited as opposed to how many times we encounter said house, which lends itself well to the Set data-structure.
-JavaScript does support storing compound data-types (such as <code class="highlighter-rouge">Position</code>) in a native Set, however, equality is based on reference as opposed to value semantics.
+JavaScript does support storing compound data-types (such as <code class="language-plaintext highlighter-rouge">Position</code>) in a native Set, however, equality is based on reference as opposed to value semantics.
 In many circumstances (such as this one) this is not the behaviour we desire, instead favouring equality based on value.
-There is a propsal in JavaScript to add <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> to the language, but until this is made available I decided to create a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">small <code class="highlighter-rouge">CompoundSet</code> implementation</a> which catered for this need.</p>
+There is a propsal in JavaScript to add <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> to the language, but until this is made available I decided to create a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">small <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation</a> which catered for this need.</p>
 
 <p>To answer part one we can now invoke this function, returning the resulting Sets’ size 🌟.</p>
 

@@ -50,7 +50,7 @@ Providing an anagram string and a dictionary file, I wished to be returned all p
 
 <p>I decided this expectational exercise was a great opportunity to use Clojure.
 Whilst thinking of ways to tackle this problem, I knew of initially two different means of storing an effective dictionary for anagram lookup.
-I was able to generalise into a higher-order function the process of taking each word within the supplied dictionary file, and adding it into the initial <code class="highlighter-rouge">dictionary</code> data-structure using the <code class="highlighter-rouge">add-word</code> function.
+I was able to generalise into a higher-order function the process of taking each word within the supplied dictionary file, and adding it into the initial <code class="language-plaintext highlighter-rouge">dictionary</code> data-structure using the <code class="language-plaintext highlighter-rouge">add-word</code> function.
 So as to not incur generation performance penalties each time this function was invoked, I decided to memoize the function.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">reader-&gt;words</span><span class="w"> </span><span class="p">[</span><span class="n">rdr</span><span class="p">]</span><span class="w">
@@ -66,7 +66,7 @@ So as to not incur generation performance penalties each time this function was 
       </span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">add-word</span><span class="w"> </span><span class="n">dictionary</span><span class="w"> </span><span class="p">(</span><span class="nf">reader-&gt;words</span><span class="w"> </span><span class="n">rdr</span><span class="p">))))))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>You will notice that I added some constraints upon the words that we wished to include from the supplied dictionary - this was to simplify the large English dictionary provided with Unix platforms such as Mac OS <code class="highlighter-rouge">/usr/share/dict/words</code>.</p>
+<p>You will notice that I added some constraints upon the words that we wished to include from the supplied dictionary - this was to simplify the large English dictionary provided with Unix platforms such as Mac OS <code class="language-plaintext highlighter-rouge">/usr/share/dict/words</code>.</p>
 
 <h3 id="hash-map">Hash-Map</h3>
 
@@ -110,7 +110,7 @@ Instead of the key being converted back into a sorted string, it was maintained 
 <p>After some <a href="http://stackoverflow.com/a/28948975">Internet research</a> I noticed a different way in which we could generate unique word keys, regardless of character ordering.
 Taking advantage of the fact that prime numbers are ‘multiplicatively unique’, I created a character to prime number lookup function.
 The product of each characters corresponding prime number resulted in a unique integer value been generated.
-I was then able to use a more efficient <code class="highlighter-rouge">int-map</code> dictionary data-structure, providing better lookup and storage costs than the initial implementation.</p>
+I was then able to use a more efficient <code class="language-plaintext highlighter-rouge">int-map</code> dictionary data-structure, providing better lookup and storage costs than the initial implementation.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">sieve</span><span class="w"> </span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w">

@@ -45,7 +45,7 @@
     <h1 class="post-title">Implementing a Compound Set in TypeScript</h1>
     <time datetime="2021-01-27T00:00:00-06:00" class="post-date">27 Jan 2021</time>
     <p>Since being introduced to Advent of Code, one feature missing from JavaScript that I have seen available in other languages (such as Python and Clojure) are Sets which hande <a href="https://www.oreilly.com/library/view/javascript-design/0735711674/0735711674_ch03lev1sec3.html">Compound data-types</a>.
-So as to focus each puzzle solution on the problem at hand and not <em>re-invent the wheel</em> I decided to implement a <code class="highlighter-rouge">CompoundSet</code> data-structure which would fill this void.</p>
+So as to focus each puzzle solution on the problem at hand and not <em>re-invent the wheel</em> I decided to implement a <code class="language-plaintext highlighter-rouge">CompoundSet</code> data-structure which would fill this void.</p>
 
 
 
@@ -54,7 +54,7 @@ However, in certain use-cases (such as storing X-Y coordinates) it is useful to 
 Although this is techincally possible, the <em>gotcha</em> is that equality is based on reference as opposed to value semantics.
 So storing the Compound data-type within the Set will be valid, except checking for existence will require the exact same value reference to be supplied.</p>
 
-<p>There is a proposal to introduce <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> in a future version of JavaScript which will alleviate this problem - but until that is introduced I decided to create a <code class="highlighter-rouge">CompoundSet</code> implementation backed by a native <code class="highlighter-rouge">Map</code> like so:</p>
+<p>There is a proposal to introduce <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> in a future version of JavaScript which will alleviate this problem - but until that is introduced I decided to create a <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation backed by a native <code class="language-plaintext highlighter-rouge">Map</code> like so:</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="k">private</span> <span class="na">set</span><span class="p">:</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="kr">string</span><span class="p">,</span> <span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
@@ -97,7 +97,7 @@ Encoding the value as a JSON string provides us with the primitive-type required
 Using an internal Map we are able to ensure that we persist the original value, which can be used when iterating over the Set.</p>
 
 <p>I have found this data-structure to be very useful whilst completing my first Advent of Code calendar in 2020.
-In the future I hope to explore how we could use a similiar means to provide a <code class="highlighter-rouge">CompoundMap</code> implementation.</p>
+In the future I hope to explore how we could use a similiar means to provide a <code class="language-plaintext highlighter-rouge">CompoundMap</code> implementation.</p>
 
 </article>
 

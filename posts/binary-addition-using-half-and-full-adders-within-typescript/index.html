@@ -51,7 +51,7 @@ I wanted to pay close attention to how I could leverage the TypeScript type-syst
 
 <h3 id="the-bit">The Bit</h3>
 
-<p>Starting from basic principles and working our way up we define the concept of a <code class="highlighter-rouge">Bit</code> and a fixed tuple of <code class="highlighter-rouge">Bits</code> using <a href="https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#recursive-conditional-types">Recursive Conditional Types</a> which will be available in TypeScript 4.1.</p>
+<p>Starting from basic principles and working our way up we define the concept of a <code class="language-plaintext highlighter-rouge">Bit</code> and a fixed tuple of <code class="language-plaintext highlighter-rouge">Bits</code> using <a href="https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#recursive-conditional-types">Recursive Conditional Types</a> which will be available in TypeScript 4.1.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Bit</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">|</span> <span class="mi">1</span><span class="p">;</span>
 <span class="kd">type</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">N</span> <span class="kd">extends</span> <span class="nx">N</span> <span class="p">?</span> <span class="p">(</span><span class="kr">number</span> <span class="kd">extends</span> <span class="nx">N</span> <span class="p">?</span> <span class="nx">Bit</span><span class="p">[]</span> <span class="p">:</span> <span class="nx">_Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="p">,</span> <span class="p">[]</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">:</span> <span class="nx">never</span><span class="p">;</span>
@@ -101,7 +101,7 @@ We are able to achieve this using the approach laid out below.</p>
 <h3 id="the-half-adder">The Half Adder</h3>
 
 <p>The <a href="https://en.wikipedia.org/wiki/Adder_(electronics)#Half_adder">Half Adder</a> is used to add two single bits A and B together, resulting in Sum and Carry outputs.
-We can build such a circuit using the following three approaches - the simplest of which is shown first, comprising of a single <code class="highlighter-rouge">XOR</code> and <code class="highlighter-rouge">AND</code> gate.</p>
+We can build such a circuit using the following three approaches - the simplest of which is shown first, comprising of a single <code class="language-plaintext highlighter-rouge">XOR</code> and <code class="language-plaintext highlighter-rouge">AND</code> gate.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Addition</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">sum</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">;</span>

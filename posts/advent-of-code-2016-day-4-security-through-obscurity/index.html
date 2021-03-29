@@ -54,7 +54,7 @@
 For part one we are required to filter down to only the valid rooms (based on their checkum) and return the sum of these sector ids.
 A room is <em>real</em> (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetization.</p>
 
-<p>We will begin by parsing each room entry into a tuple, consisting of the room name (without any <code class="highlighter-rouge">-</code>), sector id (as an integer) and checksum.</p>
+<p>We will begin by parsing each room entry into a tuple, consisting of the room name (without any <code class="language-plaintext highlighter-rouge">-</code>), sector id (as an integer) and checksum.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[(</span><span class="n">name</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'-'</span><span class="p">,</span> <span class="s">''</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="n">checksum</span><span class="p">)</span>
@@ -70,7 +70,7 @@ A room is <em>real</em> (not a decoy) if the checksum is the five most common le
 </code></pre></div></div>
 
 <p>The function above uses the <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter collection</a> provided within Python to tally up the letter occurrences present in the room name.
-From here we then sort the listing, initially based on occurrence <code class="highlighter-rouge">-o[1]</code>, and then ties based on alphabetization <code class="highlighter-rouge">o[0]</code>.
+From here we then sort the listing, initially based on occurrence <code class="language-plaintext highlighter-rouge">-o[1]</code>, and then ties based on alphabetization <code class="language-plaintext highlighter-rouge">o[0]</code>.
 As we have generated the checksum for the entire room name we only wish to assert that this value starts with the provided checksum.</p>
 
 <p>Finally, we can combine these two functions together to <em>filter-map</em> the listing down to the valid room sector ids.

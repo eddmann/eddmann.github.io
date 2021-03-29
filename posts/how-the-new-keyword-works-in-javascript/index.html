@@ -44,23 +44,23 @@
                 <article class="post">
     <h1 class="post-title">How the 'new' keyword works in JavaScript</h1>
     <time datetime="2015-09-03T00:00:00-05:00" class="post-date">03 Sep 2015</time>
-    <p>The <code class="highlighter-rouge">new</code> keyword in JavaScript can sometimes slip up new and experienced programmers alike.
+    <p>The <code class="language-plaintext highlighter-rouge">new</code> keyword in JavaScript can sometimes slip up new and experienced programmers alike.
 We typically associate this word with Classical-based Object-oriented languages (such as Java etc.), where as in JavaScript it works a little different.
 
 In fact due to the languages prototypical behavior any function can be used as a constructor call, which adds more fuel to the confusion.
-To demystify the process that occurs this article will take you through the four operations that occur when the <code class="highlighter-rouge">new</code> keyword is invoked on a Function.
+To demystify the process that occurs this article will take you through the four operations that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is invoked on a Function.
 After describing these steps we will then work through codifying a user-land function that mimics its’ behavior.</p>
 
 <ol>
   <li>It creates a plain ol’ object</li>
-  <li>It assigns the supplied Functions <code class="highlighter-rouge">prototype</code> object property as the new objects <code class="highlighter-rouge">[[prototype]]</code> link. All Functions are created with a prototype object property which initially just has a constructor member which links back to the Function itself.</li>
-  <li>It invokes the Function constructor (with supplied arguments), binding <code class="highlighter-rouge">this</code> to the newly created object.</li>
+  <li>It assigns the supplied Functions <code class="language-plaintext highlighter-rouge">prototype</code> object property as the new objects <code class="language-plaintext highlighter-rouge">[[prototype]]</code> link. All Functions are created with a prototype object property which initially just has a constructor member which links back to the Function itself.</li>
+  <li>It invokes the Function constructor (with supplied arguments), binding <code class="language-plaintext highlighter-rouge">this</code> to the newly created object.</li>
   <li>It checks to see if a non-primitive value has been returned from the function call, if so it will disregard the created object and return this, else the newly formed object is returned.</li>
 </ol>
 
 <h2 id="user-land-solution">User-land Solution</h2>
 
-<p>Now that we know the basic steps that occur when the <code class="highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimic this behavior.</p>
+<p>Now that we know the basic steps that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimic this behavior.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">isObj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">;</span>
 

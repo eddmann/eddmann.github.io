@@ -59,7 +59,7 @@ I thought it would be interesting to use some of the lesser-known features that 
 
 <p>The first task we need to complete is to create a table of the 52 cards that are present in a deck.
 We can do this rather succinctly by taking advantage of PostgreSQL’s arrays and a cross-join (Cartesian product) between the ranks and suits.
-Using a CTE by way of the <code class="highlighter-rouge">WITH</code> clause, we are able to use this table in later queries by name.</p>
+Using a CTE by way of the <code class="language-plaintext highlighter-rouge">WITH</code> clause, we are able to use this table in later queries by name.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">ARRAY</span><span class="p">(</span><span class="k">SELECT</span> <span class="n">card</span> <span class="k">FROM</span> <span class="n">deck</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">random</span><span class="p">()</span> <span class="k">LIMIT</span> <span class="mi">5</span><span class="p">)</span> <span class="k">AS</span> <span class="n">hand</span>
 </code></pre></div></div>

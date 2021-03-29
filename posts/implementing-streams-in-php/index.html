@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multiple ways of implementing the Stream data-structure using PHP">
+
+    <title>Implementing Streams in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing Streams in PHP</h1>
+    <time datetime="2015-01-16T00:00:00-06:00" class="post-date">16 Jan 2015</time>
+    <p>Typically, when we think about a list of elements we assume there is both a start and finite end.
+In this example the list has been precomputed and stored for subsequent traversal and transformation.
+If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.
+
+Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
+This concept is called a <a href="http://en.wikipedia.org/wiki/Stream_(computing)">Stream</a>, commonly also referred to as a lazy list, and is a foundational concept in languages such as Haskell.
+Streams are not interacted with in the same manner as finite lists, as they cannot be operated on as a whole.
+Instead they should be thought of as ‘codata’ (infinite) or an Object-oriented <a href="http://en.wikipedia.org/wiki/Iterator">Iterable</a>, as a opposed to just simply ‘data’ (finite).
+As well as being able to create a Stream based on a supplied promise, we are also able to compose new Streams using ‘map’ and ‘filter’ methods.
+In this article I will discuss two examples of implementing the Stream data-structure, using both class-based and generator approaches in PHP.</p>
+
+<h2 id="class-based-approach">Class-based Approach</h2>
+
+<p>The first implementation I will be discussing uses a ‘Classical’ approach, relying on a tail-promise function to return the next element in the Stream.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Stream</span> <span class="kd">implements</span> <span class="nc">Iterator</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">NIL_SENTINEL</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$head</span><span class="p">,</span> <span class="nv">$tail</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$current</span><span class="p">,</span> <span class="nv">$key</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$tail</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="nv">$head</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nv">$tail</span> <span class="o">?:</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nf">nil</span><span class="p">();</span> <span class="p">};</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">())</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">),</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">map</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">())</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">take</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nf">nil</span><span class="p">();</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">range</span><span class="p">(</span><span class="nv">$start</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span> <span class="o">=</span> <span class="no">INF</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$start</span> <span class="o">==</span> <span class="nv">$end</span><span class="p">)</span> <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$start</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="nv">$end</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nb">range</span><span class="p">(</span><span class="nv">$start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">current</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">next</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">key</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">valid</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="o">!</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">rewind</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span> <span class="o">=</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="n">isNil</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">===</span> <span class="k">self</span><span class="o">::</span><span class="no">NIL_SENTINEL</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="n">tail</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">function</span> <span class="n">nil</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">NIL_SENTINEL</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Looking at the above implementation you can see how much boilerplate code is required to make the Stream iterable.
+Through use of the tail promise we are able to defer execution of calculating the next element in the Stream until absolutely required.
+The inclusion of a ‘nil’ sentinel simplifies the design, as we are not required to use polymorphism and separate Nil and Cons implementations.
+So as to not detract from the following examples intent, we will be using the following function to display the returned iterators.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">sprint</span><span class="p">(</span><span class="nv">$xs</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">'['</span> <span class="mf">.</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="nb">iterator_to_array</span><span class="p">(</span><span class="nv">$xs</span><span class="p">))</span> <span class="mf">.</span> <span class="s2">"]</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Using this helper function we are now able to experiment with this initial implementation.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
+
+<span class="nf">sprint</span><span class="p">(</span><span class="nc">Stream</span><span class="o">::</span><span class="nb">range</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$isEven</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="c1">// [2, 4, 6, 8, 10]</span>
+
+<span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nv">$y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nv">$f</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$f</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$z</span> <span class="o">=</span> <span class="nv">$y</span><span class="p">;</span>
+        <span class="nv">$y</span> <span class="o">+=</span> <span class="nv">$x</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">Stream</span><span class="p">(</span><span class="nv">$z</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$f</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span> <span class="p">});</span>
+    <span class="p">};</span>
+<span class="p">});</span>
+
+<span class="nf">sprint</span><span class="p">((</span><span class="k">new</span> <span class="nc">Stream</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$fibonacci</span><span class="p">))</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="c1">// [0, 1, 1, 2, 3]</span>
+</code></pre></div></div>
+
+<p>To implement the Fibonacci sequence stream using this approach we are required to use a self-invoked function to wrap the previous value state required.
+Along with this we also need to provide a reference to the returned function itself, so as to invoke it again as the tail promise.
+These details, coupled with the requirement to return a new Stream instance in the tail-promise, seems to unnecessary cloud the solutions intent.</p>
+
+<h2 id="generator-approach">Generator Approach</h2>
+
+<p>Fortunately, as of PHP 5.5 we are able to take advantage of Generators and create a more succinct implementation which easily describes its purpose.
+Generators allow us to implement the Stream without the need to handle the deferred tail execution and implement the class-based Iterator interface.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">stream</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">yield</span> <span class="nv">$x</span><span class="p">;</span>
+        <span class="nv">$x</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$x</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nv">$g</span><span class="o">-&gt;</span><span class="nf">valid</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">yield</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">());</span>
+        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nv">$g</span><span class="o">-&gt;</span><span class="nf">valid</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">()))</span> <span class="k">yield</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">();</span>
+        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">take</span><span class="p">(</span><span class="nv">$n</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nv">$n</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">yield</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">();</span>
+        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">srange</span><span class="p">(</span><span class="nv">$start</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span> <span class="o">=</span> <span class="no">INF</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nf">take</span><span class="p">(</span><span class="nv">$end</span> <span class="o">-</span> <span class="nv">$start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">stream</span><span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see we have been able to instead flatten the class-based approach into top-level functions.
+Each function is aided by type-hints, describing what it is tasked to do far more clearly.
+Using the generators ‘valid’ method we are able to implement all but the ‘take’ method using imperative while loops.
+This implementation is able to compute the previous examples, as shown below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
+
+<span class="nf">sprint</span><span class="p">(</span><span class="nf">take</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nf">filter</span><span class="p">(</span><span class="nv">$isEven</span><span class="p">,</span> <span class="nf">srange</span><span class="p">())));</span> <span class="c1">// [2, 4, 6, 8, 10]</span>
+
+<span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nv">$y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$z</span> <span class="o">=</span> <span class="nv">$y</span><span class="p">;</span>
+        <span class="nv">$y</span> <span class="o">+=</span> <span class="nv">$x</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$z</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">});</span>
+
+<span class="nf">sprint</span><span class="p">(</span><span class="nf">take</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nf">stream</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$fibonacci</span><span class="p">)));</span> <span class="c1">// [0, 1, 1, 2, 3]</span>
+</code></pre></div></div>
+
+<p>As you can see by looking at the above examples, the Fibonacci sequence code has been simplified greatly.
+We have been able to remove the need to return a new Stream instance each time, and instead able to focus solely on the generation of the next value.
+Although both implementations solve the problem at hand, by now you will certainly see the stronger case put forth by the generator approach.
+Not only is it less code, it also provides us with a clearer way to expressively compose the functions together.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

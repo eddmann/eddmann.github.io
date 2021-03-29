@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 3 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 3 - Perfectly Spherical Houses in a Vacuum &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 3 - Perfectly Spherical Houses in a Vacuum</h1>
+    <time datetime="2021-01-27T00:00:00-06:00" class="post-date">27 Jan 2021</time>
+    <p>On the third day of Advent of Code 2015 we are asked to help determine (based on supplied directions) how many houses Santa (and Robo-Santa) will deliver presents to.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Based on a directional system that caters for <em>north (^), south (v), east (&gt;), or west (&lt;)</em> we are asked to navigate our way between houses (on a two-dimensional grid) recording how many receive presents along the way.
+The first step is to parse the input data into a type-safe form.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">directions</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">^</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">v</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">&lt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">&gt;</span><span class="dl">'</span><span class="p">]</span> <span class="k">as</span> <span class="kd">const</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Direction</span> <span class="o">=</span> <span class="k">typeof</span> <span class="nx">directions</span><span class="p">[</span><span class="kr">number</span><span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">parseDirections</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Direction</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="p">[...</span><span class="nx">input</span><span class="p">].</span><span class="nx">filter</span><span class="p">((</span><span class="nx">d</span><span class="p">:</span> <span class="nx">Direction</span><span class="p">):</span> <span class="nx">d</span> <span class="k">is</span> <span class="nx">Direction</span> <span class="o">=&gt;</span> <span class="nx">directions</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">d</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>This filters out any invalid direction ensuring that the resulting values are within the defined <code class="highlighter-rouge">Direction</code> union-type.
+Like before, we could have alternatively provided more stricter parsing rules and thrown an exception upon an invalid direction occurrence - but for this input the provided behaviour will suffice.</p>
+
+<p>From here, we create a small function which iterates through the provided directions, storing each house <code class="highlighter-rouge">Position</code> (represented as X-Y coordinate tuples) encountered along the way.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Position</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">y</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
+<span class="kd">const</span> <span class="nx">coordinates</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">K</span> <span class="k">in</span> <span class="nx">Direction</span><span class="p">]:</span> <span class="nx">Position</span> <span class="p">}</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="dl">'</span><span class="s1">^</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+  <span class="na">v</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+  <span class="dl">'</span><span class="s1">&gt;</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+  <span class="dl">'</span><span class="s1">&lt;</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">deliverPresents</span> <span class="o">=</span> <span class="p">(</span><span class="nx">directions</span><span class="p">:</span> <span class="nx">Direction</span><span class="p">[]):</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Position</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="na">current</span><span class="p">:</span> <span class="nx">Position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">];</span>
+  <span class="kd">const</span> <span class="nx">houses</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Position</span><span class="o">&gt;</span><span class="p">([</span><span class="nx">current</span><span class="p">]);</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">direction</span> <span class="k">of</span> <span class="nx">directions</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="nx">current</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">dx</span><span class="p">,</span> <span class="nx">dy</span><span class="p">]</span> <span class="o">=</span> <span class="nx">coordinates</span><span class="p">[</span><span class="nx">direction</span><span class="p">];</span>
+    <span class="nx">houses</span><span class="p">.</span><span class="nx">add</span><span class="p">((</span><span class="nx">current</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">dx</span><span class="p">,</span> <span class="nx">y</span> <span class="o">+</span> <span class="nx">dy</span><span class="p">]));</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">houses</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We are only interested in the presence of a house being visited as opposed to how many times we encounter said house, which lends itself well to the Set data-structure.
+JavaScript does support storing compound data-types (such as <code class="highlighter-rouge">Position</code>) in a native Set, however, equality is based on reference as opposed to value semantics.
+In many circumstances (such as this one) this is not the behaviour we desire, instead favouring equality based on value.
+There is a propsal in JavaScript to add <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> to the language, but until this is made available I decided to create a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">small <code class="highlighter-rouge">CompoundSet</code> implementation</a> which catered for this need.</p>
+
+<p>To answer part one we can now invoke this function, returning the resulting Sets’ size 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">deliverPresents</span><span class="p">(</span><span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">)).</span><span class="nx">size</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>In part two we are now asked to tally the total number of houses Santa and Robo-Santa would deliver presents too based on the supplied directions.
+In this instance the input directions are split (odd/even) between Santa and Robo-Santa.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">directions</span> <span class="o">=</span> <span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">santa</span> <span class="o">=</span> <span class="nx">directions</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">robot</span> <span class="o">=</span> <span class="nx">directions</span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">CompoundSet</span><span class="p">([...</span><span class="nx">deliverPresents</span><span class="p">(</span><span class="nx">santa</span><span class="p">),</span> <span class="p">...</span><span class="nx">deliverPresents</span><span class="p">(</span><span class="nx">robot</span><span class="p">)])</span>
+    <span class="p">.</span><span class="nx">size</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>To answer part two I opted to initially split the directions into the two seperate sub-direction listings.
+This was easy to do with a filter as we are provided the current index position as the second argument within JavaScript.
+The sub-problems have now taken the same shape as part one, and as such, we can use the above function again to determine which houses are delivered presents.
+Finally, we merge the sub-problems back together producing the union set to determine the total size 🌟.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

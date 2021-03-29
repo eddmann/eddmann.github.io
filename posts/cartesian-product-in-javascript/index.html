@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple, functional manner in which to find the Cartesian product using JavaScript ES2015">
+
+    <title>Cartesian Product in JavaScript &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Cartesian Product in JavaScript</h1>
+    <time datetime="2015-10-04T00:00:00-05:00" class="post-date">04 Oct 2015</time>
+    <p>This weekend I have had the chance to explore Cartesian products.
+The Cartesian product (cross-product) is essentially an operation which returns a product set from multiple supplied sets.
+
+When applied to more than a pair of sets it can be typically described as the n-fold Cartesian product.
+Below is a simple JavaScript implementation which codifies this operation in an immutable, functional manner.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">flatten</span> <span class="o">=</span> <span class="p">(</span><span class="nx">arr</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">.</span><span class="nx">apply</span><span class="p">([],</span> <span class="nx">arr</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">product</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">sets</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">sets</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">acc</span><span class="p">,</span> <span class="kd">set</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">flatten</span><span class="p">(</span><span class="nx">acc</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="kd">set</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">y</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="p">...</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]))),</span>
+    <span class="p">[[]]);</span>
+
+<span class="nx">product</span><span class="p">(</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">small</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">medium</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">large</span><span class="dl">'</span><span class="p">],</span> 
+  <span class="p">[</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">green</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span><span class="p">],</span> 
+  <span class="p">[</span><span class="dl">'</span><span class="s1">shirt</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">jeans</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">shoes</span><span class="dl">'</span><span class="p">]);</span>
+  <span class="c1">// [["small", "red", "shirt"], ["small", "red", "jeans"] ...</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

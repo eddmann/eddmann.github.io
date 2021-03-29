@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explores how to parse, play and generate WAV-files from Nokia (RTTTL) ringtones using the Web Audio API and JavaScript">
+
+    <title>Building a Nokia Composer (RTTTL) Player and WAV-file Generator in the Browser &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building a Nokia Composer (RTTTL) Player and WAV-file Generator in the Browser</h1>
+    <time datetime="2020-10-26T00:00:00-05:00" class="post-date">26 Oct 2020</time>
+    <p>Who remembers punching in key-combinations found online into their Nokia 3210 to create <em>custom ringtones</em>?
+I spent more time than I would to admit doing this in my youth.
+Over the weekend I decided as a bit of an nostalgic exercise to see if I could implement a <a href="https://nokia.fandom.com/wiki/Composer">Nokia Composer</a> clone using JavaScript and the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a>.
+From here, I expanded on the player to provide the ability to download the generated ringtone as a WAV file.</p>
+
+
+
+<p>The finished <a href="https://eddmann.com/nokia-composer-web/">player and WAV-file generator</a> is available to experiment with and code-review on <a href="https://github.com/eddmann/nokia-composer-web">GitHub</a>.</p>
+
+<p><a href="https://eddmann.com/nokia-composer-web/"><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/demo.png" alt="Nokia Composer (RTTTL) Player" /></a></p>
+
+<p>I decided to leverage in-line <a href="https://reactjs.org/docs/add-react-to-a-website.html">React and Babel</a>, so as to keep all the logic on a single webpage.
+This makes for a more succient demo, and provides the ability to automatically highlight the required code in-line.</p>
+
+<h3 id="parsing-rtttl">Parsing RTTTL</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A-Team:d=8,o=5,b=125:4d#6,a#,2d#6,16p,g#,4a#,4d#.,p,16g,16a#,d#6,a#,f6,2d#6,16p,c#.6,16c6,16a#,g#.,2a#
+</code></pre></div></div>
+
+<p>The above may look familiar to anyone who owned a Nokia in the early 2000’s.
+This is an example of the Ring Tone Transfer Language (RTTTL) which was developed by Nokia to represent ringtones on their mobile devices.
+Using the <a href="http://merwin.bespin.org/t4a/specs/nokia_rtttl.txt">provided specification</a> (in Backus–Naur form), we can see that the input can be broken up into <em>three</em> distinct parts:</p>
+
+<ul>
+  <li><strong>Name</strong> - the name of the melody, which consits of a maxium of 10 characters.</li>
+  <li><strong>Defaults</strong> - The octave, duration and beat to default to if one is not specified in the given melody note (duration=4, octave=6, beat=63).</li>
+  <li><strong>Melody</strong> - Comma-seperated listing of the notes - including optional duration, octave and <em>special-duration</em> dot.</li>
+</ul>
+
+<p>I used this specification to begin parsing the input using JavaScript.
+Parsing the <em>name</em> attribute was omitted as this was not required to complete the scoped demostration.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toDefaults</span> <span class="o">=</span> <span class="nx">unparsedDefaults</span> <span class="o">=&gt;</span>
+  <span class="nx">unparsedDefaults</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">,</span><span class="dl">"</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">option</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">]</span> <span class="o">=</span> <span class="nx">option</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">=</span><span class="dl">"</span><span class="p">);</span>
+      <span class="k">switch</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">:</span>
+          <span class="k">return</span> <span class="p">{</span> <span class="p">...</span><span class="nx">defaults</span><span class="p">,</span> <span class="na">duration</span><span class="p">:</span> <span class="nx">value</span> <span class="p">};</span>
+        <span class="k">case</span> <span class="dl">"</span><span class="s2">o</span><span class="dl">"</span><span class="p">:</span>
+          <span class="k">return</span> <span class="p">{</span> <span class="p">...</span><span class="nx">defaults</span><span class="p">,</span> <span class="na">octave</span><span class="p">:</span> <span class="nx">value</span> <span class="p">};</span>
+        <span class="k">case</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">:</span>
+          <span class="k">return</span> <span class="p">{</span> <span class="p">...</span><span class="nx">defaults</span><span class="p">,</span> <span class="na">beat</span><span class="p">:</span> <span class="nx">value</span> <span class="p">};</span>
+        <span class="nl">default</span><span class="p">:</span>
+          <span class="k">return</span> <span class="nx">defaults</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span> <span class="na">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">octave</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="na">beat</span><span class="p">:</span> <span class="mi">63</span> <span class="p">}</span>
+  <span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">toMelody</span> <span class="o">=</span> <span class="p">(</span><span class="nx">melody</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// ..</span>
+  <span class="k">return</span> <span class="nx">melody</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">,</span><span class="dl">"</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">unparsedNote</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="na">groups</span><span class="p">:</span> <span class="nx">parsed</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">unparsedNote</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+      <span class="sr">/</span><span class="se">(?&lt;</span><span class="sr">duration&gt;1|2|4|8|16|32|64</span><span class="se">)?(?&lt;</span><span class="sr">note&gt;</span><span class="se">(?:[</span><span class="sr">a-g</span><span class="se">]</span><span class="sr">|p</span><span class="se">)</span><span class="sr">#</span><span class="se">?){1}(?&lt;</span><span class="sr">dot&gt;</span><span class="se">\.?)(?&lt;</span><span class="sr">octave&gt;4|5|6|7</span><span class="se">)?</span><span class="sr">/</span>
+    <span class="p">);</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">note</span><span class="p">,</span> <span class="nx">dot</span><span class="p">,</span> <span class="nx">octave</span><span class="p">,</span> <span class="nx">beat</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">parsed</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">parsed</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">?</span> <span class="p">{</span> <span class="p">...</span><span class="nx">xs</span><span class="p">,</span> <span class="p">[</span><span class="nx">x</span><span class="p">]:</span> <span class="nx">parsed</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">}</span> <span class="p">:</span> <span class="nx">xs</span><span class="p">),</span>
+      <span class="nx">defaults</span>
+    <span class="p">);</span>
+    <span class="c1">// ..</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">parse</span> <span class="o">=</span> <span class="nx">rtttl</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">_</span><span class="p">,</span> <span class="nx">unparsedDefaults</span><span class="p">,</span> <span class="nx">unparsedMelody</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rtttl</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">:</span><span class="dl">"</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">toMelody</span><span class="p">(</span><span class="nx">unparsedMelody</span><span class="p">,</span> <span class="nx">toDefaults</span><span class="p">(</span><span class="nx">unparsedDefaults</span><span class="p">));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Looking at the above code you can see the described sections are broken apart, with the default values and melody notes subsquently being parsed individually.
+The default values are parsed first, so as to have these available when parsing the melody section.
+Using the supplied specification I was able to ensure that only valid melody notes were parsed.
+I found using regular expression named capture groups provided a very elegant means to produce the defined values per note (providing defaults were there were omissions).</p>
+
+<h3 id="a-tiny-bit-of-music-theory">A Tiny Bit of Music Theory</h3>
+
+<p>With the RTTTL now parsed, my next objective was to translate the defined note/octaves of the melody into frequencies of which I could send to the <a href="https://modernweb.com/creating-sound-with-the-web-audio-api-and-oscillators/">Oscillator</a>.
+This lead me to research into the the <a href="https://en.wikipedia.org/wiki/Equal_temperament">Twelve-Tone Equal Temperament</a> system of tuning.
+Using this system and alittle bit of Math, we are able to calculate the frequency of a given note/octave using a known <em>base</em> note frequency.
+Typically <code class="highlighter-rouge">A4</code> (aka <a href="https://en.wikipedia.org/wiki/A440_(pitch_standard)">Stuttgart pitch</a>, 440Hz) is used as the base frequency of which all calculations are done, however, I noticed that if I instead use <code class="highlighter-rouge">C4</code> (<a href="https://en.wikipedia.org/wiki/C_(musical_note)#Middle_C">Middle-C</a>, 261.63Hz) it would save some offset Math calculations being required.</p>
+
+<p>The formula below provides the ability to calculate the octave frequency of a given note.</p>
+
+<p><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/octave-formula.gif" alt="Octave Formula" /></p>
+
+<p>This formula can be used to calculate the octave one lower and one higher than the provided frequency (in this case <code class="highlighter-rouge">C4</code>) like so in JavaScript:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">C4</span> <span class="o">=</span> <span class="mf">261.63</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">C3</span> <span class="o">=</span> <span class="nx">C4</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">4</span><span class="p">);</span> <span class="c1">// 130.81</span>
+<span class="kd">const</span> <span class="nx">C5</span> <span class="o">=</span> <span class="nx">C4</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">5</span> <span class="o">-</span> <span class="mi">4</span><span class="p">);</span> <span class="c1">// 523.26</span>
+</code></pre></div></div>
+
+<p>Further more, the formula below provides the ability to calculate the frequency of a desired note.
+This uses the offset from the base note within the scale (<code class="highlighter-rouge">c, c#, d, d#, e, f, f#, g, g#, a, a#, b</code>) to determine the frequency.</p>
+
+<p><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/note-formula.gif" alt="Note Formula" /></p>
+
+<p>This forumla can again be implemented in JavaScript to calculate the note one lower and one higher than the provided frequency (in this case <code class="highlighter-rouge">C4</code>):
+Notice that using <code class="highlighter-rouge">C</code> as the base note allows omission of any offset calculation needing to be applied, thanks to the the array being zero-indexed.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">NOTES</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">c#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">];</span>
+<span class="kd">const</span> <span class="nx">C4</span> <span class="o">=</span> <span class="mf">261.63</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">B4</span> <span class="o">=</span> <span class="nx">C4</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="nx">NOTES</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span><span class="p">);</span> <span class="c1">// 493.89</span>
+<span class="kd">const</span> <span class="nx">D4</span> <span class="o">=</span> <span class="nx">C4</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="nx">NOTES</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span><span class="p">);</span> <span class="c1">// 293.69</span>
+</code></pre></div></div>
+
+<p>Finally, the two formulas can be combined to calculate the desired note/octave from a given reference point.</p>
+
+<p><img src="/uploads/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/note-octave-formula.gif" alt="Note/Octave Formula" /></p>
+
+<p>This formula can then be used to generate the frequencies for all notes/octaves, producing a scale.
+Providing any valid base frequency will in-turn produce the same exact scale representation.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">NOTES</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">c#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">scales</span> <span class="o">=</span> <span class="p">(</span><span class="nx">baseNote</span><span class="p">,</span> <span class="nx">baseOctave</span><span class="p">,</span> <span class="nx">baseFrequency</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">NOTES</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">scale</span><span class="p">,</span> <span class="nx">note</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="p">[...</span><span class="nb">Array</span><span class="p">(</span><span class="mi">9</span><span class="p">).</span><span class="nx">keys</span><span class="p">()].</span><span class="nx">reduce</span><span class="p">(</span>
+        <span class="p">(</span><span class="nx">scale</span><span class="p">,</span> <span class="nx">octave</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+          <span class="p">...</span><span class="nx">scale</span><span class="p">,</span>
+          <span class="p">[</span><span class="nx">note</span> <span class="o">+</span> <span class="nx">octave</span><span class="p">]:</span>
+            <span class="nx">baseFrequency</span> <span class="o">*</span>
+            <span class="mi">2</span> <span class="o">**</span>
+              <span class="p">(</span><span class="nx">octave</span> <span class="o">-</span>
+                <span class="nx">baseOctave</span> <span class="o">+</span>
+                <span class="p">(</span><span class="nx">NOTES</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">note</span><span class="p">)</span> <span class="o">-</span> <span class="nx">NOTES</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">baseNote</span><span class="p">))</span> <span class="o">/</span> <span class="nx">NOTES</span><span class="p">.</span><span class="nx">length</span><span class="p">),</span>
+        <span class="p">}),</span>
+        <span class="nx">scale</span>
+      <span class="p">),</span>
+    <span class="p">{}</span>
+  <span class="p">);</span>
+
+<span class="nx">scales</span><span class="p">(</span><span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">261.63</span><span class="p">);</span>
+<span class="nx">scales</span><span class="p">(</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">440</span><span class="p">);</span>
+<span class="nx">scales</span><span class="p">(</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">27.5</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>I used this exploration exercise as the bases to complete parsing the RTTTL input into a playable form.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toMelody</span> <span class="o">=</span> <span class="p">(</span><span class="nx">melody</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">notes</span> <span class="o">=</span> <span class="p">[</span><span class="dl">"</span><span class="s2">c</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">c#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">d#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">e</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">f#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">g#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">a#</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">b</span><span class="dl">"</span><span class="p">];</span>
+  <span class="kd">const</span> <span class="nx">middleC</span> <span class="o">=</span> <span class="mf">261.63</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="nx">melody</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">,</span><span class="dl">"</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">unparsedNote</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="na">groups</span><span class="p">:</span> <span class="nx">parsed</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">unparsedNote</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+      <span class="sr">/</span><span class="se">(?&lt;</span><span class="sr">duration&gt;1|2|4|8|16|32|64</span><span class="se">)?(?&lt;</span><span class="sr">note&gt;</span><span class="se">(?:[</span><span class="sr">a-g</span><span class="se">]</span><span class="sr">|p</span><span class="se">)</span><span class="sr">#</span><span class="se">?){1}(?&lt;</span><span class="sr">dot&gt;</span><span class="se">\.?)(?&lt;</span><span class="sr">octave&gt;4|5|6|7</span><span class="se">)?</span><span class="sr">/</span>
+    <span class="p">);</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">note</span><span class="p">,</span> <span class="nx">dot</span><span class="p">,</span> <span class="nx">octave</span><span class="p">,</span> <span class="nx">beat</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">parsed</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">(</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">parsed</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">?</span> <span class="p">{</span> <span class="p">...</span><span class="nx">xs</span><span class="p">,</span> <span class="p">[</span><span class="nx">x</span><span class="p">]:</span> <span class="nx">parsed</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">}</span> <span class="p">:</span> <span class="nx">xs</span><span class="p">),</span>
+      <span class="nx">defaults</span>
+    <span class="p">);</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">duration</span><span class="p">:</span> <span class="p">(</span><span class="mi">240</span> <span class="o">/</span> <span class="nx">beat</span> <span class="o">/</span> <span class="nx">duration</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nx">dot</span> <span class="p">?</span> <span class="mf">1.5</span> <span class="p">:</span> <span class="mi">1</span><span class="p">),</span>
+      <span class="na">frequency</span><span class="p">:</span>
+        <span class="nx">note</span> <span class="o">===</span> <span class="dl">"</span><span class="s2">p</span><span class="dl">"</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="nx">middleC</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="nx">octave</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">+</span> <span class="nx">notes</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">note</span><span class="p">)</span> <span class="o">/</span> <span class="mi">12</span><span class="p">),</span>
+    <span class="p">};</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With this in-place, the <code class="highlighter-rouge">parse</code> function now returns an ordered listing of all the note durations and frequencies based on the supplied RTTTL.</p>
+
+<h3 id="getting-it-to-play">Getting it to Play</h3>
+
+<p>From here, I then created a simple React component which provided the ability to supply a given RTTTL composition and play it.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">NokiaComposer</span><span class="p">({</span> <span class="nx">melodies</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">isPlaying</span><span class="p">,</span> <span class="nx">setPlaying</span><span class="p">]</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">useState</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">composition</span><span class="p">,</span> <span class="nx">setComposition</span><span class="p">]</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">useState</span><span class="p">(</span><span class="nx">melodies</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">||</span> <span class="dl">""</span><span class="p">);</span>
+
+  <span class="nx">React</span><span class="p">.</span><span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isPlaying</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="kd">const</span> <span class="nx">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AudioContext</span><span class="p">();</span>
+    <span class="kd">const</span> <span class="nx">oscillator</span> <span class="o">=</span> <span class="nx">audio</span><span class="p">.</span><span class="nx">createOscillator</span><span class="p">();</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">square</span><span class="dl">"</span><span class="p">;</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">audio</span><span class="p">.</span><span class="nx">destination</span><span class="p">);</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">onended</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">setPlaying</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+
+    <span class="kd">let</span> <span class="nx">time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+    <span class="nx">parse</span><span class="p">(</span><span class="nx">composition</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(({</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">frequency</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">oscillator</span><span class="p">.</span><span class="nx">frequency</span><span class="p">.</span><span class="nx">setValueAtTime</span><span class="p">(</span><span class="nx">frequency</span><span class="p">,</span> <span class="nx">time</span><span class="p">);</span>
+      <span class="nx">time</span> <span class="o">+=</span> <span class="nx">duration</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">stop</span><span class="p">(</span><span class="nx">time</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="nx">audio</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+    <span class="p">};</span>
+  <span class="p">},</span> <span class="p">[</span><span class="nx">isPlaying</span><span class="p">]);</span>
+
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Using the parsed RTTTL and Web Audio API <code class="highlighter-rouge">AudioContext</code>/<code class="highlighter-rouge">Oscillator</code>, I am able to cycle through the melody ensuring that the given frequency is set for the desired duration within the Oscillator.
+This completed the implementation required to play the composition within the Browser 🎉.</p>
+
+<h3 id="generating-wav-files">Generating WAV files</h3>
+
+<p>The final step to this demostration was adding the ability to generate a WAV file from the supplied RTTTL composition.
+Thanks to the <code class="highlighter-rouge">OfflineAudioContext</code>, I was able to employ the same logic described above to generate an in-memory <code class="highlighter-rouge">AudioBuffer</code> representation of the melody.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">generateAudioBuffer</span> <span class="o">=</span> <span class="k">async</span> <span class="nx">rtttl</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">melody</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">rtttl</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">totalDuration</span> <span class="o">=</span> <span class="nx">melody</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">total</span><span class="p">,</span> <span class="p">{</span> <span class="nx">duration</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">duration</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">audio</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">OfflineAudioContext</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">totalDuration</span> <span class="o">*</span> <span class="mi">44100</span><span class="p">,</span> <span class="mi">44100</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">oscillator</span> <span class="o">=</span> <span class="nx">audio</span><span class="p">.</span><span class="nx">createOscillator</span><span class="p">();</span>
+  <span class="nx">oscillator</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">square</span><span class="dl">"</span><span class="p">;</span>
+  <span class="nx">oscillator</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">audio</span><span class="p">.</span><span class="nx">destination</span><span class="p">);</span>
+
+  <span class="kd">let</span> <span class="nx">time</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="nx">oscillator</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+  <span class="nx">melody</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(({</span> <span class="nx">duration</span><span class="p">,</span> <span class="nx">frequency</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">oscillator</span><span class="p">.</span><span class="nx">frequency</span><span class="p">.</span><span class="nx">setValueAtTime</span><span class="p">(</span><span class="nx">frequency</span><span class="p">,</span> <span class="nx">time</span><span class="p">);</span>
+    <span class="nx">time</span> <span class="o">+=</span> <span class="nx">duration</span><span class="p">;</span>
+  <span class="p">});</span>
+  <span class="nx">oscillator</span><span class="p">.</span><span class="nx">stop</span><span class="p">(</span><span class="nx">time</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">audio</span><span class="p">.</span><span class="nx">startRendering</span><span class="p">();</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>From here, I spent alittle time <a href="http://soundfile.sapp.org/doc/WaveFormat/">researching</a> into how a WAV file was formed, electing to create a 32-bit float-point WAV file representation of the melody.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">generateWavBlob</span> <span class="o">=</span> <span class="nx">audioBuffer</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">writeString</span> <span class="o">=</span> <span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">string</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">""</span><span class="p">).</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">character</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">view</span><span class="p">.</span><span class="nx">setUint8</span><span class="p">(</span><span class="nx">offset</span> <span class="o">+</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">character</span><span class="p">.</span><span class="nx">charCodeAt</span><span class="p">());</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">samples</span> <span class="o">=</span> <span class="nx">audioBuffer</span><span class="p">.</span><span class="nx">getChannelData</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">bytesPerSample</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">ArrayBuffer</span><span class="p">(</span><span class="mi">44</span> <span class="o">+</span> <span class="nx">samples</span><span class="p">.</span><span class="nx">length</span> <span class="o">*</span> <span class="nx">bytesPerSample</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">DataView</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+
+  <span class="nx">writeString</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="dl">"</span><span class="s2">RIFF</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// ChunkID</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">36</span> <span class="o">+</span> <span class="nx">samples</span><span class="p">.</span><span class="nx">length</span> <span class="o">*</span> <span class="nx">bytesPerSample</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// ChunkSize</span>
+  <span class="nx">writeString</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="dl">"</span><span class="s2">WAVE</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// Format</span>
+  <span class="nx">writeString</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="dl">"</span><span class="s2">fmt </span><span class="dl">"</span><span class="p">);</span> <span class="c1">// Subchunk1ID</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// Subchunk1Size</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint16</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// AudioFormat (IEEE float)</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint16</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// NumChannels</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="nx">audioBuffer</span><span class="p">.</span><span class="nx">sampleRate</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// SampleRate</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="nx">audioBuffer</span><span class="p">.</span><span class="nx">sampleRate</span> <span class="o">*</span> <span class="nx">bytesPerSample</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// ByteRate</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint16</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="nx">bytesPerSample</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// BlockAlign</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint16</span><span class="p">(</span><span class="mi">34</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// BitsPerSample</span>
+  <span class="nx">writeString</span><span class="p">(</span><span class="nx">view</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="dl">"</span><span class="s2">data</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// Subchunk2ID</span>
+  <span class="nx">view</span><span class="p">.</span><span class="nx">setUint32</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="nx">samples</span><span class="p">.</span><span class="nx">length</span> <span class="o">*</span> <span class="nx">bytesPerSample</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// Subchunk2Size</span>
+  <span class="nx">samples</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">sample</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">view</span><span class="p">.</span><span class="nx">setFloat32</span><span class="p">(</span><span class="mi">44</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">*</span> <span class="nx">bytesPerSample</span><span class="p">,</span> <span class="nx">sample</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span> <span class="c1">// Data</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Blob</span><span class="p">([</span><span class="nx">view</span><span class="p">],</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="dl">"</span><span class="s2">audio/wav</span><span class="dl">"</span> <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Finally, I added the ability to automatically download the generated WAV blob as a named file within the Browser.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">NokiaComposer</span><span class="p">({</span> <span class="nx">melodies</span> <span class="p">})</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+  <span class="kd">const</span> <span class="nx">handleDownload</span> <span class="o">=</span> <span class="k">async</span> <span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">blob</span> <span class="o">=</span> <span class="nx">generateWavBlob</span><span class="p">(</span><span class="k">await</span> <span class="nx">generateAudioBuffer</span><span class="p">(</span><span class="nx">composition</span><span class="p">));</span>
+
+    <span class="kd">const</span> <span class="nx">autoDownloadLink</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">);</span>
+    <span class="nx">autoDownloadLink</span><span class="p">.</span><span class="nx">href</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">createObjectURL</span><span class="p">(</span><span class="nx">blob</span><span class="p">);</span>
+    <span class="nx">autoDownloadLink</span><span class="p">.</span><span class="nx">download</span> <span class="o">=</span> <span class="nx">composition</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">:</span><span class="dl">"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="nx">autoDownloadLink</span><span class="p">.</span><span class="nx">click</span><span class="p">();</span>
+  <span class="p">};</span>
+  <span class="c1">// ..</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>To conclude, I enjoyed exploring how Nokia ringtones were represented in RTTTL, and how you could use alittle bit of Music Theory/Math to generate the corresponding frequencies.
+The Web Audio API <code class="highlighter-rouge">AudioContext</code>/<code class="highlighter-rouge">Oscillator</code> abstracted away alot of intricacies required to produce the desired sounds.
+This allowed me to play the sound in real-time, as well was produce an in-memory representation that I could generate a WAV file from.
+I found the most interesting part of the exercise was researching into how a WAV files was constructed, from a raw bits/bytes level.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

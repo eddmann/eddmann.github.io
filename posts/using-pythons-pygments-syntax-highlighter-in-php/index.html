@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The best syntax-highlighting library, hands-down.">
+
+    <title>Using Python's Pygments Syntax Highlighter in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using Python's Pygments Syntax Highlighter in PHP</h1>
+    <time datetime="2014-01-06T00:00:00-06:00" class="post-date">06 Jan 2014</time>
+    <p>Having a website that is heavily software-development based, one important aspect that can not be overlooked is well presented code examples.
+Speaking on the importance of editor syntax highlighting in the <a href="http://threedevsandamaybe.com/posts/exploring-text-source-editors-and-ides/">previous episode</a> of our podcast, this attribute transcends over to aid in the readability of code online.
+Fortunately, there are many options to choose from, whether it is storing the code snippets in an embedded <a href="http://gist.github.com/">Gists</a> or using the front-end based <a href="http://highlightjs.org/">highlight.js</a> or <a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a>.
+One benefit that greatly simpled the publishing process when using a front-end based solution was that you could simply parse the Markdown file (maybe with a class language type-hint), and leave all the hard work for the client’s browser.
+As we all know, we have very little control over the viewing experience per user, and as I have started to post more frequently, cracks began to appear in the syntax highlighters I had been using.
+However, when looking for a solution, one had been staring me straight in the face all this time, that being <a href="http://pygments.org/">Pygments</a>.
+</p>
+
+<h2 id="enter-pygments">Enter Pygments</h2>
+
+<p>I was first introduced to Pygments through my time using <a href="http://jekyllrb.com/">Jekyll</a> a couple of years ago, since then however, due to limited demands in this area I stuck with highlight.js to perform my syntax highlighting.
+This had worked well until recently, when a couple of shell scripts and Java enumerated type declarations had slipped it up.
+If this is your first introduction to Pygments it is written in Python, and while I do like the language a lot I felt it maybe over-kill to move my blogging platform over to Python just for syntax highlighting (though, it was not out of the question).
+As a result, I decided to see if there was anything on-par in the PHP landscape, a <a href="http://packagist.org/">Packagist</a> search returned a few hopeful results, though the output was not comparable.
+I could now see why the Ruby-based Jekyll project had gone to the effort to depend on the Python-based Pygments project to handle code syntax highlighting.
+Looking deeper into Pygments success, the questions were answered by the attention paid to supporting new languages and edge-cases within the languages I was interested in using it for.
+Installation of Pygments can be simply achieved by using the <a href="http://pypi.python.org/pypi/setuptools">EasyInstall</a> package manager, or on a CentOS installation, via YUM.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>easy_install Pygments <span class="c"># EasyInstall</span>
+<span class="nv">$ </span><span class="nb">sudo </span>yum <span class="nb">install </span>python-pygments <span class="c"># CentOS</span>
+</code></pre></div></div>
+
+<h2 id="bridging-the-python-and-php-divide">Bridging the Python and PHP Divide</h2>
+
+<p>Knowing now that I would only be truly happy with Pygments, my best option was to write a simple wrapper over the provided command-line interface, which would be the less obtrusive to my PHP application.
+Making this decision now meant that I would have to handle the processing of posts code-snippets before supplying the Markdown parser with the files content.
+Fortunately, before updating my blog I had decided to use the <a href="http://michelf.ca/projects/php-markdown/extra/">Markdown Extra</a> parser produced by Michel Fortin, which allowed me to enclose code snippets in <a href="http://michelf.ca/projects/php-markdown/extra/#fenced-code-blocks">fenced blocks</a>.
+I had also added the extra restraint of declaring these blocks with three tilde characters and a class language type-hint (~~~ .example).
+This decision proved very useful when producing the example implementation below, though, it can be easily expanded to cater for more code-block declarations.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">pygments</span><span class="p">(</span><span class="nv">$post</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">preg_replace_callback</span><span class="p">(</span><span class="s1">'/~~~[\s]*\.([a-z]+)\n(.*?)\n~~~/is'</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$match</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">list</span><span class="p">(</span><span class="nv">$orig</span><span class="p">,</span> <span class="nv">$lang</span><span class="p">,</span> <span class="nv">$code</span><span class="p">)</span> <span class="o">=</span> <span class="nv">$match</span><span class="p">;</span>
+
+        <span class="nv">$proc</span> <span class="o">=</span> <span class="nb">proc_open</span><span class="p">(</span>
+            <span class="s1">'pygmentize -f html -O style=default,encoding=utf-8,startinline -l '</span> <span class="mf">.</span> <span class="nv">$lang</span><span class="p">,</span>
+            <span class="p">[</span> <span class="p">[</span> <span class="s1">'pipe'</span><span class="p">,</span> <span class="s1">'r'</span> <span class="p">],</span> <span class="p">[</span> <span class="s1">'pipe'</span><span class="p">,</span> <span class="s1">'w'</span> <span class="p">]</span> <span class="cm">/* ignore stderr */</span> <span class="p">],</span>
+            <span class="nv">$pipes</span>
+        <span class="p">);</span>
+
+        <span class="nb">fwrite</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nv">$code</span><span class="p">);</span>
+        <span class="nb">fclose</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+        <span class="nv">$output</span> <span class="o">=</span> <span class="nb">stream_get_contents</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="nb">fclose</span><span class="p">(</span><span class="nv">$pipes</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="nb">proc_close</span><span class="p">(</span><span class="nv">$proc</span><span class="p">))</span>
+            <span class="o">?</span> <span class="nv">$orig</span>
+            <span class="o">:</span> <span class="nv">$output</span><span class="p">;</span>
+    <span class="p">},</span> <span class="nv">$post</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Coupled with the decision to only handle a defined code-block definition, I also made the assumption that the ‘pygmentize’ command is present in the user’s path (this can be easily altered to).
+Using the ‘proc_open’ function supplied by PHP I was able to begin a child-process which used the defined STDIN, STDOUT and STDERR descriptor pipes I supplied.
+I decided to omit the STDERR pipe as I could pick up on an error occurring (regardless of the exact reason) when closing the process using ‘proc_close’.
+In the case of an error (a none zero returned value) I would simply return the original content, for the Markdown parser to process accordingly.
+Within the ‘pygmentize’ command I supplied the option for HTML and default-styling/UTF-8 output.
+The ‘startinline’ option removes the requirement to define a PHP start tag when displaying PHP syntax highlighted code-blocks.
+The ‘default’ styling was intentionally defined to provide easier setup, discussed in the next section.</p>
+
+<h2 id="simple-styling">Simple Styling</h2>
+
+<p>The are many styling and output options present in Pygments, and I would strongly recommend you check out the documentation.
+Custom styles are typically installed in the same manner as the library itself, using EasyInstall.
+However, there are many built-in styles which rely on the output generated from the ‘default’ style option, my favorite being <a href="http://slinky.imukuppi.org/zenburnpage/">Zenburn</a>.
+These stylesheets can be generated using the ‘pygmentize’ command itself, but to make it super simple <a href="http://github.com/richleland/pygments-css">this</a> GitHub repository provides them preprocessed.
+If you have not already got a style in mind you can check out <a href="http://igniteflow.com/pygments/themes/">this</a> page which neatly displays examples of each of the styles present.</p>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://highlightjs.org/">highlight.js</a></li>
+  <li><a href="http://code.google.com/p/google-code-prettify/">Google Code Prettify</a></li>
+  <li><a href="http://pygments.org/">Pygments</a></li>
+  <li><a href="http://packagist.org/">Packagist</a></li>
+  <li><a href="http://michelf.ca/projects/php-markdown/extra/">Markdown Extra</a></li>
+  <li><a href="http://www.sitepoint.com/proc-open-communicate-with-the-outside-world/">Proc_Open: Communicate with the Outside World</a></li>
+  <li><a href="http://www.php.net/manual/en/function.proc-open.php">PHP Documentation: proc_open</a></li>
+  <li><a href="http://github.com/richleland/pygments-css">Pygments CSS Styles</a></li>
+  <li><a href="http://igniteflow.com/pygments/themes/">Pygments Style Previews</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

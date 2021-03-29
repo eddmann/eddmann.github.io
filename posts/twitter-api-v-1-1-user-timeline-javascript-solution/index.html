@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Get back the ability to process user timelines in JavaScript without OAuth.">
+
+    <title>Twitter API v1.1 User Timeline JavaScript Solution &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Twitter API v1.1 User Timeline JavaScript Solution</h1>
+    <time datetime="2013-12-05T00:00:00-06:00" class="post-date">05 Dec 2013</time>
+    <p>When I re-designed my site earlier this year I wanted to include the last couple of twitter interactions in the footer.
+Using v1.0 of the Twitter API this was a very simple process, giving access to a JSONP response with the publicly available tweets of a specified handle.
+This all <a href="http://dev.twitter.com/discussions/11564">changed</a> in v1.1 with the introduction of required OAuth.
+Fortunately, I was able to find a work-around <a href="http://jasonmayes.com/projects/twitterApi/">here</a> which took advantage of the response made available from a widget you create.
+However, the returned tweets in this solution were already styled somewhat and I could not find a unminified version of the source.
+So in the end I decided to spend 45 mins last night implementing my own solution.
+</p>
+
+<p>Using the same request method that is present in the Twitter Fetcher project (major kudos) I request the widget response, and then parse the returned tweets into objects for your callback delights.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">TweetFetcher</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">instance</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">tf_</span><span class="dl">'</span> <span class="o">+</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">());</span>
+    <span class="nb">window</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">instance</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">TweetFetcher</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fetch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cb</span><span class="p">,</span> <span class="nx">limit</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">cb</span> <span class="o">=</span> <span class="nx">cb</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">limit</span> <span class="o">=</span> <span class="nx">limit</span> <span class="o">||</span> <span class="mi">20</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">script</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">s</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">//cdn.syndication.twimg.com/widgets/timelines/</span><span class="dl">'</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="o">+</span>
+            <span class="dl">'</span><span class="s1">?&amp;lang=en&amp;callback=</span><span class="dl">'</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">instance</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">.parse</span><span class="dl">'</span><span class="p">)</span> <span class="o">+</span>
+            <span class="dl">'</span><span class="s1">&amp;suppress_response_codes=true&amp;rnd=</span><span class="dl">'</span> <span class="o">+</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">());</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="dl">'</span><span class="s1">head</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">TweetFetcher</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">parse</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">raw</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">raw</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">res</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">tweets</span> <span class="o">=</span> <span class="nx">raw</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">li.tweet</span><span class="dl">'</span><span class="p">),</span>
+        <span class="nx">limit</span>  <span class="o">=</span> <span class="p">(</span><span class="nx">tweets</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">limit</span><span class="p">)</span> <span class="p">?</span> <span class="nx">tweets</span><span class="p">.</span><span class="nx">length</span> <span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">limit</span><span class="p">,</span>
+        <span class="nx">output</span> <span class="o">=</span> <span class="p">[];</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">limit</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">tr</span> <span class="o">=</span> <span class="nx">tweets</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">t</span> <span class="o">=</span> <span class="p">{};</span>
+
+        <span class="nx">t</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">data-tweet-id</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">author</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">handle</span><span class="p">:</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">span.p-nickname b</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerText</span><span class="p">,</span>
+            <span class="na">name</span><span class="p">:</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">span.p-name</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerText</span>
+        <span class="p">};</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="na">stamp</span><span class="p">:</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">time.dt-updated</span><span class="dl">'</span><span class="p">).</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">datetime</span><span class="dl">'</span><span class="p">),</span>
+            <span class="na">pretty</span><span class="p">:</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">time.dt-updated</span><span class="dl">'</span><span class="p">).</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">aria-label</span><span class="dl">'</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">isRetweet</span> <span class="o">=</span> <span class="o">!!</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">.retweet-credit</span><span class="dl">'</span><span class="p">);</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">retweets</span> <span class="o">=</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">span.stats-retweets</span><span class="dl">'</span><span class="p">)</span>
+            <span class="p">?</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">span.stats-retweets</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerText</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">,</span> <span class="dl">''</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="c1">// delete all unnecessary tweet content tags</span>
+
+        <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">tr</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="dl">'</span><span class="s1">p.e-entry-title</span><span class="dl">'</span><span class="p">),</span>
+            <span class="nx">tags</span> <span class="o">=</span> <span class="nx">content</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">tags</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">tag</span> <span class="o">=</span> <span class="nx">tags</span><span class="p">[</span><span class="nx">j</span><span class="p">],</span> <span class="nx">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">del</span> <span class="o">=</span> <span class="p">[];</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="nx">k</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">k</span> <span class="o">&lt;</span> <span class="nx">tag</span><span class="p">.</span><span class="nx">attributes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">k</span><span class="o">++</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">tag</span><span class="p">.</span><span class="nx">attributes</span><span class="p">[</span><span class="nx">k</span><span class="p">].</span><span class="nx">name</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">href</span><span class="dl">'</span><span class="p">)</span>
+                    <span class="nx">del</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tag</span><span class="p">.</span><span class="nx">attributes</span><span class="p">[</span><span class="nx">k</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+
+            <span class="k">while</span> <span class="p">(</span><span class="nx">del</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span>
+                <span class="nx">tag</span><span class="p">.</span><span class="nx">removeAttribute</span><span class="p">(</span><span class="nx">del</span><span class="p">.</span><span class="nx">pop</span><span class="p">());</span>
+        <span class="p">}</span>
+
+        <span class="nx">t</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="nx">content</span><span class="p">.</span><span class="nx">innerHTML</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/&lt;</span><span class="se">\/?</span><span class="sr">b</span><span class="se">[^</span><span class="sr">&gt;</span><span class="se">]</span><span class="sr">*&gt;/gi</span><span class="p">,</span> <span class="dl">''</span><span class="p">);</span>
+
+        <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">cb</span><span class="p">(</span><span class="nx">output</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>To parse the response I decided to use ‘querySelector/querySelectorAll’ which takes away alot of the tedious DOM querying.
+This script has been tested and working on IE8 but anything older in the IE family sadly does not <a href="http://caniuse.com/queryselector">support</a> ‘querySelector’.
+To use the fetcher all you need to do is simply create a new instance (supplying the widget id), then call ‘fetch’ with a callback of work to do with the tweets once returned and optionally a tweet limit (max of 20).
+Below is an example of the one used on this site.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">tf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TweetFetcher</span><span class="p">(</span><span class="dl">'</span><span class="s1">354188847791366144</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">tf</span><span class="p">.</span><span class="nx">fetch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">tweets</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">output</span> <span class="o">=</span> <span class="dl">''</span><span class="p">,</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">tweets</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">output</span> <span class="o">+=</span>
+            <span class="dl">'</span><span class="s1">&lt;div class="tweet col span_12"&gt;</span><span class="dl">'</span> <span class="o">+</span>
+                <span class="dl">'</span><span class="s1">&lt;p class="msg"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">tweets</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">content</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/p&gt;</span><span class="dl">'</span> <span class="o">+</span>
+                <span class="dl">'</span><span class="s1">&lt;p class="meta"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">tweets</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">time</span><span class="p">.</span><span class="nx">pretty</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/p&gt;</span><span class="dl">'</span> <span class="o">+</span>
+            <span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">tweets</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">output</span><span class="p">;</span>
+<span class="p">},</span> <span class="mi">2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>When the response has been parsed the supplied callback is given an array of processed tweets, each providing the following information.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="nl">id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">408662284337422337</span><span class="dl">'</span><span class="p">,</span>
+    <span class="nx">author</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nl">handle</span><span class="p">:</span> <span class="dl">'</span><span class="s1">edd_mann</span><span class="dl">'</span><span class="p">,</span>
+        <span class="nx">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Edd Mann</span><span class="dl">'</span>
+    <span class="p">},</span>
+    <span class="nx">time</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nl">stamp</span><span class="p">:</span> <span class="dl">'</span><span class="s1">2013-12-05T18:20:55+0000</span><span class="dl">'</span><span class="p">,</span>
+        <span class="nx">pretty</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Posted 1 hour ago</span><span class="dl">'</span>
+    <span class="p">},</span>
+    <span class="nx">isRetweet</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="nx">retweets</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="nx">content</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Sample Tweet!</span><span class="dl">'</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I have provided a <a href="http://gist.github.com/eddmann/7812893">Gist</a> of the above script for anyone wishing to make improvements/updates.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

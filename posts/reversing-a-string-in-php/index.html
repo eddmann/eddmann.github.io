@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interesting ways to reverse a string in PHP.">
+
+    <title>Reversing a String in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Reversing a String in PHP</h1>
+    <time datetime="2014-05-10T00:00:00-05:00" class="post-date">10 May 2014</time>
+    <p>Since recently setting up a forum for <a href="http://forum.threedevsandamaybe.com/">Three Devs and a Maybe</a>, we have started to partake in a weekly <a href="http://en.wikipedia.org/wiki/Kata_(programming)">code-kata</a>.
+What could be more fitting to start with than the common interview question, reversing a string in ‘X’ language.
+In this case the language is PHP, and below are some of the many ways contrived to solve the problem.
+</p>
+
+<h2 id="basic-implementations">Basic Implementations</h2>
+
+<p>The implementation below is the most simple, taking advantage of PHP’s vast amount of ‘built-in’ functions to reverse the supplied string.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">strrev</span><span class="p">(</span><span class="nv">$str</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In a similar manner, we are able to compose a ‘reverse’ function by joining (<a href="http://php.net/function.join">alias for ‘implode’</a>) a reversed array of the string characters.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">join</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="nb">array_reverse</span><span class="p">(</span><span class="nb">str_split</span><span class="p">(</span><span class="nv">$str</span><span class="p">)));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The most imperative approach to reverse a string is by looping over each character with indexes at each end, swapping their contents upon each iteration.
+PHP’s ability to access individual characters in an array manner turns out to be very useful in this case.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$j</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$j</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">,</span> <span class="nv">$j</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$tmp</span> <span class="o">=</span> <span class="nv">$str</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
+        <span class="nv">$str</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$str</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
+        <span class="nv">$str</span><span class="p">[</span><span class="nv">$j</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$tmp</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$str</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Though not best practice, the desired result can be compacted into a single ‘for’ loop declaration, shown below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$out</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$out</span> <span class="mf">.</span><span class="o">=</span> <span class="nv">$str</span><span class="p">[</span><span class="nv">$i</span><span class="o">--</span><span class="p">])</span> <span class="p">{}</span>
+
+    <span class="k">return</span> <span class="nv">$out</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Another non-practical approach using the ‘array_walk’ function can be found below.
+An interesting implementation detail, is how you are able to clearly see that a copy of ‘$out’ is being passed into the closure function.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">list</span><span class="p">(</span><span class="nv">$out</span><span class="p">,</span> <span class="nv">$len</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">str_split</span><span class="p">(</span><span class="nv">$str</span><span class="p">),</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">];</span>
+
+    <span class="nb">array_walk</span><span class="p">(</span><span class="nv">$out</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="o">&amp;</span><span class="nv">$ele</span><span class="p">,</span> <span class="nv">$idx</span><span class="p">)</span> <span class="nf">use</span> <span class="p">(</span><span class="nv">$out</span><span class="p">,</span> <span class="nv">$len</span><span class="p">)</span> <span class="c1">// copy, not ref.</span>
+    <span class="p">{</span>
+        <span class="nv">$ele</span> <span class="o">=</span> <span class="nv">$out</span><span class="p">[</span><span class="nv">$len</span> <span class="o">-</span> <span class="nv">$idx</span><span class="p">];</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nb">join</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="nv">$out</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="recursive-implementations">Recursive Implementations</h2>
+
+<p>The second group of implementations contrived used forms of recursion to achieve the desired result.
+The first of such methods is a simple recursive invocation of the function, removing the head character upon each call.
+Once the string has reached one character, the base-case has been hit and the remaining string is simply returned.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$str</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nf">reverse</span><span class="p">(</span><span class="nb">substr</span><span class="p">(</span><span class="nv">$str</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="mf">.</span> <span class="nv">$str</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The implementation below takes advantage of the <a href="http://en.wikipedia.org/wiki/Divide_and_conquer_algorithm">divide and conquer</a> algorithm paradigm, flipping the left and right substrings upon each recursive invocation.
+Similar to the previous example, if the base-case of a single character string is met, the remaining string is simply returned.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$str</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">int</span><span class="p">)</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="nv">$lft</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$str</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$mid</span><span class="p">);</span>
+    <span class="nv">$rgt</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$str</span><span class="p">,</span> <span class="nv">$mid</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">reverse</span><span class="p">(</span><span class="nv">$rgt</span><span class="p">)</span> <span class="mf">.</span> <span class="nf">reverse</span><span class="p">(</span><span class="nv">$lft</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="unicode-support-implementations">Unicode-Support Implementations</h2>
+
+<p>PHP’s in-built support for Unicode strings is ‘somewhat’ lacking, as such, extra steps are required to correctly reverse a string of this type.
+As Unicode character representations can consist of multiple bytes (i.e. UTF-8), we are unable to naively use ‘strlen’ and ‘str_split’ (which assume a character is always a single byte).
+The implementation below uses ‘preg_split’ support for Unicode characters, to correctly split the string into characters for us to reverse.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">join</span><span class="p">(</span><span class="s1">''</span><span class="p">,</span> <span class="nb">array_reverse</span><span class="p">(</span><span class="nb">preg_split</span><span class="p">(</span><span class="s1">'//u'</span><span class="p">,</span> <span class="nv">$str</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="no">PREG_SPLIT_NO_EMPTY</span><span class="p">)));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Using some <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> conversion trickery we are able to use PHP’s in-built ‘strrev’ function.
+The implementation below uses ‘iconv’ to achieve the desired results.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">iconv</span><span class="p">(</span><span class="s1">'UTF-16LE'</span><span class="p">,</span> <span class="s1">'UTF-8'</span><span class="p">,</span> <span class="nb">strrev</span><span class="p">(</span><span class="nb">iconv</span><span class="p">(</span><span class="s1">'UTF-8'</span><span class="p">,</span> <span class="s1">'UTF-16BE'</span><span class="p">,</span> <span class="nv">$str</span><span class="p">)));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Similar in-nature to the previous example, we are instead now using the ‘mb’ library to perform the conversion.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">mb_convert_encoding</span><span class="p">(</span><span class="nb">strrev</span><span class="p">(</span><span class="nb">mb_convert_encoding</span><span class="p">(</span><span class="nv">$str</span><span class="p">,</span> <span class="s1">'UTF-16BE'</span><span class="p">,</span> <span class="s1">'UTF-8'</span><span class="p">)),</span> <span class="s1">'UTF-8'</span><span class="p">,</span> <span class="s1">'UTF-16LE'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

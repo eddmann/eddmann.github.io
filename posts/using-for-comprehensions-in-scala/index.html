@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Looking into how to use for-comprehensions in Scala.">
+
+    <title>Using For-Comprehensions in Scala &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using For-Comprehensions in Scala</h1>
+    <time datetime="2013-12-11T00:00:00-06:00" class="post-date">11 Dec 2013</time>
+    <p>Scala can be a very deceptive language, type-inference is a very good example of this.
+Another less understood example that you will soon be welcome to upon closer exploration of the language is the ‘for-comprehension’.
+The first point I wish to highlight is that in Scala everything is an expression which returns a value, even if this be Unit (which is equivalent to nothing).
+This is a fundamental design principle of Scala which allows for productive use of its functional nature.
+In an imperative manner for example, we have become very accustom to maybe declaring and assigning a default value, only to reassign it with another if a condition is meet on the next line.
+Due to the expressive nature of the language this can instead be condensed into one-line, immutably and as a result less prone to error.
+</p>
+
+<h2 id="simple-expressions">Simple Expressions</h2>
+
+<p>Below are a couple of simple for-comprehension examples which use ranges, and in the case of the second one a condition to filter the result.
+The resulting value is a <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.immutable.Vector">Vector</a> which is the default implementation of a immutable indexed sequence in Scala - chosen as it has a good balance between selection and update speed.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">10</span> <span class="nf">until</span> <span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="o">-</span><span class="mi">2</span><span class="o">))</span>
+    <span class="k">yield</span> <span class="n">i</span>
+
+<span class="c1">// Vector(10, 8, 6, 4, 2)</span>
+
+<span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+    <span class="k">yield</span> <span class="n">i</span>
+
+<span class="c1">// Vector(2, 4, 6, 8, 10)</span>
+</code></pre></div></div>
+
+<p>At a birds-eye view for-comprehensions look and react like their imperative for-each counterparts, however, they can do so much more.
+If you have had any experience with Python comprehensions, you will be pleasantly suprised at their similarities.
+Not only can you iterate over a single collection, you can also iterate over collections within collections.
+You can be doing this whilst also including filters and subsequently like the ‘if-expression’ example yield (return) new immutable collections.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">;</span> <span class="n">j</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="n">i</span><span class="o">)</span>
+    <span class="nf">yield</span> <span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">j</span><span class="o">)</span>
+
+<span class="o">(</span><span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">).</span><span class="py">flatMap</span><span class="o">(</span>
+    <span class="n">x</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="mi">1</span> <span class="n">until</span> <span class="n">x</span><span class="o">).</span><span class="py">map</span><span class="o">(</span>
+        <span class="n">y</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span>
+    <span class="o">)</span>
+<span class="o">)</span>
+
+<span class="c1">// Vector((2,1), (3,1), (3,2), ...)</span>
+</code></pre></div></div>
+
+<p>What blew my mind when I was first explained this in the <a href="http://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> course was that all this added functionality simply reduces down into familiar high-order ‘map’, ‘flatMap’ and ‘withFilter’ chained function calls.
+The two above examples both evaluate to the same result, and in fact the first one is rewritten internally by the compiler into the second one (try ‘scala -Xprint:typer $filename’).
+So in essence it simply is syntactic sugar over already tried and tested functional concepts.
+In the case of an expression that does not yield a meaningful result (Unit) the compiler will instead rewrite this to use a ‘foreach’ method call.</p>
+
+<p>I should back-track a little and just recap on what a higher-order function actually is.
+Simply put they are a function that accepts another function as a parameter or returns a function as its value.</p>
+
+<h2 id="a-contrived-example">A Contrived Example</h2>
+
+<p>I will now demonstrate these comprehensions in a more defined example.
+What better time to discuss basketball?
+Below I am creating a case class (which for this purpose saves me having to define getter and setters) for an individual player, and then creating the starting line-up for the Heat.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="k">class</span> <span class="nc">Player</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">position</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">heat</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+    <span class="nc">Player</span><span class="o">(</span><span class="s">"Mario Chamlers"</span><span class="o">,</span> <span class="s">"PG"</span><span class="o">),</span>
+    <span class="nc">Player</span><span class="o">(</span><span class="s">"Dwayne Wade"</span><span class="o">,</span> <span class="s">"SG"</span><span class="o">),</span>
+    <span class="nc">Player</span><span class="o">(</span><span class="s">"LeBron Jame"</span><span class="o">,</span> <span class="s">"SF"</span><span class="o">),</span>
+    <span class="nc">Player</span><span class="o">(</span><span class="s">"Udonis Haslem"</span><span class="o">,</span> <span class="s">"PF"</span><span class="o">),</span>
+    <span class="nc">Player</span><span class="o">(</span><span class="s">"Chris Bosh"</span><span class="o">,</span> <span class="s">"C"</span><span class="o">)</span>
+<span class="o">)</span>
+</code></pre></div></div>
+
+<p>With the lineup now ready I am now going to filter the players into their respective positions.
+As you can see below I have purposly used different means of producing the same result, but in regard to the centre only returning the first item.
+The two last examples use the discussed ‘withFilter’ method for the first time.
+When a filter is added, instead of running the familiar ‘filter’ method over all items at that time, a view (projection) is generated which returns a type-compatible wrapper around the collection.
+The wrapper allows Scala to delay evaluation of the condition until the last moment (lazy-evaluation).
+This makes it a feasible way of chaining multiple filters together without the fear of redudant iteration steps in-between.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">guards</span> <span class="k">=</span>
+    <span class="nf">for</span> <span class="o">(</span><span class="n">player</span> <span class="k">&lt;-</span> <span class="n">heat</span> <span class="k">if</span> <span class="nv">player</span><span class="o">.</span><span class="py">position</span> <span class="n">endsWith</span> <span class="s">"G"</span><span class="o">)</span>
+        <span class="k">yield</span> <span class="nv">player</span><span class="o">.</span><span class="py">name</span>
+
+<span class="k">val</span> <span class="nv">forwards</span> <span class="k">=</span> <span class="n">heat</span>
+    <span class="o">.</span><span class="py">withFilter</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">position</span> <span class="n">endsWith</span> <span class="s">"F"</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">name</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">centre</span> <span class="k">=</span> <span class="n">heat</span>
+    <span class="o">.</span><span class="py">withFilter</span><span class="o">(</span><span class="n">player</span> <span class="k">=&gt;</span> <span class="nv">player</span><span class="o">.</span><span class="py">position</span> <span class="o">==</span> <span class="s">"C"</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="n">player</span> <span class="k">=&gt;</span> <span class="nv">player</span><span class="o">.</span><span class="py">name</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">head</span>
+</code></pre></div></div>
+
+<p>Now that we know the team, it is time to generate some game statistics to work with.
+Below I am using a for-comprehension to create an empty score-sheet (player name and score tuples), which I then call ‘map’ on to return random point totals for three different games.
+All three examples highlight different ways to use a tuple in a map context and then return the game statistics.
+To tally up the results for all the games we concatenate the collections together and then use the ‘groupBy’ method (similar in-kind to SQL) on the player’s name.
+From this step we map these names to the total summation of the player’s game scores.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">scoreSheet</span> <span class="k">=</span> <span class="nf">for</span> <span class="o">(</span><span class="nc">Player</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">&lt;-</span> <span class="n">heat</span><span class="o">)</span> <span class="nf">yield</span> <span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span>
+
+<span class="k">def</span> <span class="nf">points</span> <span class="k">=</span> <span class="nv">util</span><span class="o">.</span><span class="py">Random</span><span class="o">.</span><span class="py">nextInt</span><span class="o">(</span><span class="mi">30</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">vsThunder</span> <span class="k">=</span> <span class="n">scoreSheet</span> <span class="n">map</span> <span class="o">{</span> <span class="nf">case</span> <span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="n">points</span><span class="o">)</span> <span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">vsCeltics</span> <span class="k">=</span> <span class="n">scoreSheet</span> <span class="n">map</span> <span class="o">{</span> <span class="n">s</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nv">s</span><span class="o">.</span><span class="py">_1</span><span class="o">,</span> <span class="n">points</span><span class="o">)</span> <span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">vsLakers</span> <span class="k">=</span> <span class="n">scoreSheet</span> <span class="n">map</span> <span class="o">{</span> <span class="n">sheet</span> <span class="k">=&gt;</span> <span class="nf">val</span> <span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=</span> <span class="n">sheet</span><span class="o">;</span> <span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="n">points</span><span class="o">)</span> <span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">totalScores</span> <span class="k">=</span> <span class="o">(</span><span class="n">vsThunder</span> <span class="o">++</span> <span class="n">vsCeltics</span> <span class="o">++</span> <span class="n">vsLakers</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">groupBy</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">_1</span><span class="o">)</span>
+    <span class="o">.</span><span class="py">mapValues</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">map</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">_2</span><span class="o">).</span><span class="py">sum</span><span class="o">)</span>
+
+<span class="c1">// Map(Mario Chamlers -&gt; 38, Udonis Haslem -&gt; 32, LeBron Jame -&gt; 72, Chris Bosh -&gt; 52, Dwayne Wade -&gt; 44)</span>
+</code></pre></div></div>
+
+<p>Finally I wish to display the point totals in an easy to read format.
+Returned from our total scores computation is a <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.immutable.Map">Map</a> which I would now like to be sorted by the total score.
+As a basic Map does not have a total order we must convert it into a list and then once sucessfully sorted clean up the output to display neatly.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">totalScores</span>
+    <span class="o">.</span><span class="py">toList</span>
+    <span class="o">.</span><span class="py">sortBy</span><span class="o">(</span><span class="nv">_</span><span class="o">.</span><span class="py">_2</span><span class="o">)</span> <span class="c1">// sort by ASC score</span>
+    <span class="o">.</span><span class="py">map</span> <span class="o">{</span> <span class="nf">case</span> <span class="o">(</span><span class="n">p</span><span class="o">,</span> <span class="n">s</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">p</span> <span class="o">+</span> <span class="s">" ["</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s">"]"</span> <span class="o">}</span>
+    <span class="o">.</span><span class="py">mkString</span><span class="o">(</span><span class="s">"\n"</span><span class="o">)</span>
+
+<span class="c1">// Udonis Haslem [32]</span>
+<span class="c1">// Mario Chamlers [38]</span>
+<span class="c1">// Dwayne Wade [44]</span>
+<span class="c1">// Chris Bosh [52]</span>
+<span class="c1">// LeBron Jame [72]</span>
+</code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://tataryn.net/2011/10/whats-in-a-scala-for-comprehension/">What is in a Scala For Comprehension?</a></li>
+  <li><a href="http://tataryn.net/2011/10/learning-scala-learn-the-fundamentals-first/">Learning Scala? Learn the Fundamentals First</a></li>
+  <li><a href="http://daily-scala.blogspot.co.uk/2010/01/matching-in-for-comprehensions.html">Matching in for-comprehensions</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

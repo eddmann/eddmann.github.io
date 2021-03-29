@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Highlights how to use Swift, Interface Builder and Core Bluetooth to build a Contact Tracing Scanner application">
+
+    <title>Creating a Contact Tracing Scanner using Swift for macOS &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Creating a Contact Tracing Scanner using Swift for macOS</h1>
+    <time datetime="2020-10-20T00:00:00-05:00" class="post-date">20 Oct 2020</time>
+    <p>Following on from my <a href="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/">previous experiement</a> which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.</p>
+
+
+
+<p>The latest <a href="https://github.com/eddmann/contact-tracing-scanner-macos">application release</a> can be downloaded from GitHub, and simply unzipped/executed without any additional dependencies.</p>
+
+<p><a href="https://github.com/eddmann/contact-tracing-scanner-macos"><img src="/uploads/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner.png" alt="Contact Tracing Scanner using Swift for macOS" /></a></p>
+
+<p>Using <a href="https://developer.apple.com/documentation/corebluetooth">Core Bluetooth</a> I was able to scan for devices which were advertising the registered service UUID <code class="highlighter-rouge">0xfd6f</code> - and in-turn parse the service data.
+The process overall, was very similair to the one used when building the Web Bluetooth solution.</p>
+
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ...</span>
+
+<span class="k">let</span> <span class="nv">exposureNotificationServiceUuid</span> <span class="o">=</span> <span class="kt">CBUUID</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"FD6F"</span><span class="p">)</span>
+
+<span class="kd">open</span> <span class="kd">func</span> <span class="nf">centralManagerDidUpdateState</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">switch</span> <span class="n">central</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nv">poweredOn</span><span class="p">:</span>
+      <span class="n">central</span><span class="o">.</span><span class="nf">scanForPeripherals</span><span class="p">(</span><span class="nv">withServices</span><span class="p">:</span> <span class="p">[</span><span class="n">exposureNotificationServiceUuid</span><span class="p">],</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt">CBCentralManagerScanOptionAllowDuplicatesKey</span><span class="p">:</span> <span class="kc">true</span><span class="p">])</span>
+    <span class="k">case</span> <span class="o">.</span><span class="nv">poweredOff</span><span class="p">:</span>
+      <span class="n">central</span><span class="o">.</span><span class="nf">stopScan</span><span class="p">()</span>
+    <span class="k">default</span><span class="p">:</span>
+      <span class="k">break</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span> <span class="n">didDiscover</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">,</span> <span class="nv">advertisementData</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">],</span> <span class="n">rssi</span> <span class="kt">RSSI</span><span class="p">:</span> <span class="kt">NSNumber</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="k">let</span> <span class="nv">serviceAdvertisementData</span> <span class="o">=</span> <span class="n">advertisementData</span><span class="p">[</span><span class="kt">CBAdvertisementDataServiceDataKey</span><span class="p">]</span> <span class="k">as?</span> <span class="kt">NSDictionary</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">exposureNotificationServiceData</span> <span class="o">=</span> <span class="n">serviceAdvertisementData</span><span class="o">.</span><span class="nf">object</span><span class="p">(</span><span class="nv">forKey</span><span class="p">:</span> <span class="n">exposureNotificationServiceUuid</span><span class="p">)</span> <span class="k">as?</span> <span class="kt">Data</span> <span class="p">{</span>
+      <span class="k">let</span> <span class="nv">hex</span> <span class="o">=</span> <span class="n">exposureNotificationServiceData</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="kt">String</span><span class="p">(</span><span class="nv">format</span><span class="p">:</span> <span class="s">"%02hhx"</span><span class="p">,</span> <span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="nf">joined</span><span class="p">()</span>
+      <span class="nf">updateDevice</span><span class="p">(</span><span class="kt">Device</span><span class="p">(</span><span class="nv">uuid</span><span class="p">:</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">uuidString</span><span class="p">,</span> <span class="nv">rollingProximityId</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="n">hex</span><span class="o">.</span><span class="nf">prefix</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">metadata</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="n">hex</span><span class="o">.</span><span class="nf">suffix</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">rssi</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="kt">RSSI</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">lastSeen</span><span class="p">:</span> <span class="kt">Date</span><span class="p">()))</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ...</span>
+</code></pre></div></div>
+
+<p>To clean-up the listing and ensure that only active devices where present, I used a scheduled timer which would remove any old devices every 5 seconds.</p>
+
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">Timer</span><span class="o">.</span><span class="nf">scheduledTimer</span><span class="p">(</span><span class="nv">withTimeInterval</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nv">repeats</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span> <span class="n">timer</span> <span class="k">in</span>
+  <span class="k">self</span><span class="o">.</span><span class="nf">removeDevicesNotSeenInLastSeconds</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+  <span class="k">self</span><span class="o">.</span><span class="n">tableView</span><span class="p">?</span><span class="o">.</span><span class="nf">reloadData</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">private</span> <span class="kd">func</span> <span class="nf">removeDevicesNotSeenInLastSeconds</span><span class="p">(</span><span class="n">_</span> <span class="nv">seconds</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">devices</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="nf">filter</span><span class="p">({</span> <span class="kt">Date</span><span class="p">()</span><span class="o">.</span><span class="n">timeIntervalSince1970</span> <span class="o">-</span> <span class="nv">$0</span><span class="o">.</span><span class="n">lastSeen</span><span class="o">.</span><span class="n">timeIntervalSince1970</span> <span class="o">&lt;</span> <span class="n">seconds</span> <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For a deeper understanding of how the Exposure Notification system works, please visit my <a href="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/#how-it-works">previous post</a>.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

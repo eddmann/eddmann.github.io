@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring Binary Search Trees and associated actions in Clojure">
+
+    <title>Binary Search Trees in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Binary Search Trees in Clojure</h1>
+    <time datetime="2016-01-20T00:00:00-06:00" class="post-date">20 Jan 2016</time>
+    <p>This weekend I was able to spend some more time exploring Clojure.
+I decided that it would be interesting to reimplement some of the <a href="http://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/">Binary Search Tree work</a> I had previously done in PHP.
+We start by creating a simple record definition which describes the contents of a Node.
+</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">defrecord</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">])</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="insertion">Insertion</h2>
+
+<p>Using this Node record, we are able to now construct an insertion function which uses Clojure’s parameter deconstruction to great effect.
+Using the <code class="highlighter-rouge">cond</code> macro helps document an extremely succinct algorithm for inserting a new node into a provided tree.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">cond</span><span class="w">
+   </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">nil</span><span class="w"> </span><span class="n">nil</span><span class="p">)</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="p">(</span><span class="nf">insert</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="nb">right</span><span class="p">)</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="p">(</span><span class="nf">insert</span><span class="w"> </span><span class="nb">right</span><span class="w"> </span><span class="n">value</span><span class="p">))</span><span class="w">
+   </span><span class="no">:else</span><span class="w"> </span><span class="n">tree</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="removal">Removal</h2>
+
+<p>Removing a given value from the tree requires a little more work than its’ insertion counterpart.
+However, <code class="highlighter-rouge">cond</code> (again) allows us to clearly document these actions, handling the three different states the given values Node could be in.
+Note that the third state requires the use of the followingly documented <code class="highlighter-rouge">min</code> function.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">remove</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">cond</span><span class="w">
+   </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="n">nil</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="nb">right</span><span class="p">)</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="nb">right</span><span class="w"> </span><span class="n">value</span><span class="p">))</span><span class="w">
+   </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="nb">left</span><span class="p">)</span><span class="w"> </span><span class="nb">right</span><span class="w">
+   </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="nb">right</span><span class="p">)</span><span class="w"> </span><span class="nb">left</span><span class="w">
+   </span><span class="no">:else</span><span class="w"> </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">min-value</span><span class="w"> </span><span class="p">(</span><span class="nb">min</span><span class="w"> </span><span class="nb">right</span><span class="p">)]</span><span class="w">
+           </span><span class="p">(</span><span class="nf">Node.</span><span class="w"> </span><span class="n">min-value</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="nb">right</span><span class="w"> </span><span class="n">min-value</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="minimum-and-maximum-value">Minimum and Maximum Value</h2>
+
+<p>As a Binary Search Tree’s invariant is for every Nodes left branch to be less, and right branch to be greater, we can implement simple functions which return the minimum and maximum values present in the tree.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="p">]}]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nb">left</span><span class="w">
+    </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="nb">left</span><span class="p">)</span><span class="w">
+    </span><span class="n">el</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">max</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">right</span><span class="p">]}]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nb">right</span><span class="w">
+    </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="nb">right</span><span class="p">)</span><span class="w">
+    </span><span class="n">el</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="contains">Contains</h2>
+
+<p>Following a similar traversal pattern found in the insertion algorithm we are able to check if a given value is present in the tree using the following function.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">contains?</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">cond</span><span class="w">
+   </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="n">false</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w">
+   </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="nb">right</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w">
+   </span><span class="no">:else</span><span class="w"> </span><span class="n">true</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="count-and-height">Count and Height</h2>
+
+<p>Statistical analysis on the created tree can be carried out in the form of checking the height of the tree (depth), along with the total Node count.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">tree</span><span class="w">
+    </span><span class="p">(</span><span class="nb">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="nb">left</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="nb">right</span><span class="p">))</span><span class="w">
+    </span><span class="mi">0</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">height</span><span class="w">
+  </span><span class="p">([</span><span class="n">tree</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">
+  </span><span class="p">([</span><span class="n">tree</span><span class="w"> </span><span class="nb">count</span><span class="p">]</span><span class="w">
+    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">tree</span><span class="w">
+      </span><span class="p">(</span><span class="nb">max</span><span class="w"> </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="p">(</span><span class="no">:left</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">inc</span><span class="w"> </span><span class="nb">count</span><span class="p">))</span><span class="w">
+           </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="p">(</span><span class="no">:right</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">inc</span><span class="w"> </span><span class="nb">count</span><span class="p">)))</span><span class="w">
+      </span><span class="nb">count</span><span class="p">)))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="asserting-the-invariant">Asserting the Invariant</h2>
+
+<p>We are able to assert that the given tree maintains the invariance required to be a BST by using the following function.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">bst?</span><span class="w">
+  </span><span class="p">([</span><span class="n">tree</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">bst?</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="n">Integer/MIN_VALUE</span><span class="w"> </span><span class="n">Integer/MAX_VALUE</span><span class="p">))</span><span class="w">
+  </span><span class="p">([{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="nb">max</span><span class="p">]</span><span class="w">
+    </span><span class="p">(</span><span class="k">cond</span><span class="w">
+     </span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="n">true</span><span class="w">
+     </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="nb">min</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="nb">max</span><span class="p">))</span><span class="w"> </span><span class="n">false</span><span class="w">
+     </span><span class="no">:else</span><span class="w"> </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nf">bst?</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">el</span><span class="p">))</span><span class="w">
+                </span><span class="p">(</span><span class="nf">bst?</span><span class="w"> </span><span class="nb">right</span><span class="w"> </span><span class="p">(</span><span class="nb">inc</span><span class="w"> </span><span class="n">el</span><span class="p">)</span><span class="w"> </span><span class="nb">max</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="creating-and-displaying-the-tree">Creating and Displaying the Tree</h2>
+
+<p>Using the following function we are able to create a new tree from a supplied sequence - which uses a <code class="highlighter-rouge">reduce</code> to insert each value into the tree, building up the final result along the way.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">to-tree</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="n">nil</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>There are many ways to concatenate sequences within Clojure, however, I feel that the approach below clearly expresses the desired intent.
+Using a combination of ‘syntax-quote’ and ‘unquote-splicing’ we are able to build up a list of the supplied tree’s contents.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">to-list</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">tree</span><span class="w">
+    </span><span class="o">`</span><span class="p">(</span><span class="o">~@</span><span class="p">(</span><span class="nf">to-list</span><span class="w"> </span><span class="nb">left</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="n">el</span><span class="w"> </span><span class="o">~@</span><span class="p">(</span><span class="nf">to-list</span><span class="w"> </span><span class="nb">right</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="example">Example</h2>
+
+<p>Finally, we are able to use all these functions in a contrived example, highlighting each of them in action.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="p">(</span><span class="nf">to-tree</span><span class="w"> </span><span class="o">'</span><span class="p">(</span><span class="nf">5</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="mi">1</span><span class="p">)))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">bst?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="c1">; true</span><span class="w">
+</span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="c1">; 6</span><span class="w">
+</span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="c1">; 4</span><span class="w">
+</span><span class="p">(</span><span class="nb">max</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="c1">; 8</span><span class="w">
+</span><span class="p">(</span><span class="nb">min</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="c1">; 1</span><span class="w">
+</span><span class="p">(</span><span class="nf">to-list</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="c1">; (1 2 4 5 8)</span><span class="w">
+</span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="c1">; true</span><span class="w">
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

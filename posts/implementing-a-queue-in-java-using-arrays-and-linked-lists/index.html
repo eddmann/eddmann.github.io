@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Two alternative methods of implementing the common place Queue data-structure.">
+
+    <title>Implementing a Queue in Java using Arrays and Linked Lists &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing a Queue in Java using Arrays and Linked Lists</h1>
+    <time datetime="2013-12-24T00:00:00-06:00" class="post-date">24 Dec 2013</time>
+    <p>Following on from my previous post on implementing a <a href="/posts/implementing-a-stack-in-java-using-arrays-and-linked-lists/">stack</a> in Java, I now wish to discuss the as important queue data-structure.
+Similar in kind to the restrictions placed upon the stack implementation, the queue only allows mutation via two methods.
+Addition (enqueue) occurs at the end of the collection, and removal (dequeue) from the beginning, resulting in a FIFO (First-In-First-Out) structure.
+Queues are typically used in the application of buffers to store data, objects, events etc. that are to be held for future sequential processing.
+Discussed in the post on stacks, you are more than likely never going to have to implement such a data-structure in practical use-cases, as the language libraries will already include such an implementation (i.e. <a href="http://www.cplusplus.com/reference/queue/queue/">C++ STL</a> and <a href="http://www.php.net/manual/en/class.splqueue.php">PHP SplQueue</a>).
+</p>
+
+<p>The following examples solve the same problem, and as such I have again created a simple interface that each implementation must fulfill.
+Using this approach removes any worry from the user about specific implementation details and permits switching to alternative conforming instances later on, if the use-case warrants it.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">interface</span> <span class="nc">Queue</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nc">Queue</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nf">enqueue</span><span class="o">(</span><span class="no">T</span> <span class="n">ele</span><span class="o">);</span>
+    <span class="no">T</span> <span class="nf">dequeue</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="array-based-implementation">Array-based implementation</h2>
+
+<p>The first implementation stores the underlying collection in a fixed-sized array.
+Discussed in the previous post on stacks, this approach provides constant time ‘O(1)’ lookup on all items stored in the array, however, this is not of concern to us in this case.
+Adding an element to the queue first requires a check to see if the underlying array is full, if so it is doubled in size.
+This action occurs at this time instead of at the end of addition to the last available slot, as it would be a wasted exercise to preemptively perform the costly resize if no other items were to be queued.
+Once this action has taken place the item is added to the next available slot, which is then subsequently checked to see if the new ‘next’ index overflows the underlying array.
+In such a case a crafty ‘wrap-around’ optimisation takes place were the structure can store the next item at the beginning of the array.
+Performing such an optimisation allows the structure to reuse the current underlying array until it is absolutely necessarily to warrant a larger capacity.
+As a result, the resize method must be aware of this ‘wrap-around’ offset when copying over the current contents of the collection to the new array, the modular arithmetic is put in place for this case.
+Finally, to remove (dequeue) the first element from the collection, the ‘first’ index is used to access the desired item.
+This items slot is then nulled to stop <a href="http://stackoverflow.com/questions/18109915/java-loitering-and-garbage-collection">loitering</a> and the ‘wrap-around’ technique for the ‘next’ index is put into affect.
+Array maintenance can then be carried out, cutting the array in half if the queue now only contains a quarter of its previous size.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueArray</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="nc">Queue</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="no">T</span><span class="o">[]</span> <span class="n">arr</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">total</span><span class="o">,</span> <span class="n">first</span><span class="o">,</span> <span class="n">next</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">QueueArray</span><span class="o">()</span>
+    <span class="o">{</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="o">(</span><span class="no">T</span><span class="o">[])</span> <span class="k">new</span> <span class="nc">Object</span><span class="o">[</span><span class="mi">2</span><span class="o">];</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kt">void</span> <span class="nf">resize</span><span class="o">(</span><span class="kt">int</span> <span class="n">capacity</span><span class="o">)</span>
+    <span class="o">{</span>
+        <span class="no">T</span><span class="o">[]</span> <span class="n">tmp</span> <span class="o">=</span> <span class="o">(</span><span class="no">T</span><span class="o">[])</span> <span class="k">new</span> <span class="nc">Object</span><span class="o">[</span><span class="n">capacity</span><span class="o">];</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">total</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
+            <span class="n">tmp</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[(</span><span class="n">first</span> <span class="o">+</span> <span class="n">i</span><span class="o">)</span> <span class="o">%</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">];</span>
+
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">;</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="n">next</span> <span class="o">=</span> <span class="n">total</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">QueueArray</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nf">enqueue</span><span class="o">(</span><span class="no">T</span> <span class="n">ele</span><span class="o">)</span>
+    <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="n">total</span><span class="o">)</span> <span class="n">resize</span><span class="o">(</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">*</span> <span class="mi">2</span><span class="o">);</span>
+        <span class="n">arr</span><span class="o">[</span><span class="n">next</span><span class="o">++]</span> <span class="o">=</span> <span class="n">ele</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">next</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="n">next</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="n">total</span><span class="o">++;</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="no">T</span> <span class="nf">dequeue</span><span class="o">()</span>
+    <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">NoSuchElementException</span><span class="o">();</span>
+        <span class="no">T</span> <span class="n">ele</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">first</span><span class="o">];</span>
+        <span class="n">arr</span><span class="o">[</span><span class="n">first</span><span class="o">]</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(++</span><span class="n">first</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">)</span> <span class="n">first</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(--</span><span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">total</span> <span class="o">==</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">/</span> <span class="mi">4</span><span class="o">)</span> <span class="n">resize</span><span class="o">(</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">/</span> <span class="mi">2</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">ele</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span>
+    <span class="o">{</span>
+        <span class="k">return</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="linked-list-implementation">Linked-List implementation</h2>
+
+<p>In a similar vein to the stack examples, the second implementation uses a linked-list to store the queues contents.
+Using such an approach provides a very efficient, succinct implementation with low computation complexity.
+Usual performance considerations of a singly-link list can be dismissed as keeping a reference to both ends of the list provides constant time ‘O(1)’ insertion and deletion from the collection.
+Adding an item to the queue first stores a temporary reference to the current ‘last’ element of the list.
+The structure is then able to go about storing the the new node instance referenced by the ‘last’ variable.
+If previously the collection was empty we set the ‘first’ element to this new item as well as the consistent last reference.
+However, in the case that there are already items present, we simply set the previous last elements ‘next’ reference to this new node.
+Removing (dequeuing) elements from the collection is also a trivial task, simply returning the node referenced from the ‘first’ variable.
+This reference is then updated to the returned nodes ‘next’ reference, and a simple check to clear the last reference if the collection is now empty takes place.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">QueueLinkedList</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="kd">implements</span> <span class="nc">Queue</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kt">int</span> <span class="n">total</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nc">Node</span> <span class="n">first</span><span class="o">,</span> <span class="n">last</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">class</span> <span class="nc">Node</span> <span class="o">{</span>
+        <span class="kd">private</span> <span class="no">T</span> <span class="n">ele</span><span class="o">;</span>
+        <span class="kd">private</span> <span class="nc">Node</span> <span class="n">next</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">QueueLinkedList</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">QueueLinkedList</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nf">enqueue</span><span class="o">(</span><span class="no">T</span> <span class="n">ele</span><span class="o">)</span>
+    <span class="o">{</span>
+        <span class="nc">Node</span> <span class="n">current</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Node</span><span class="o">();</span>
+        <span class="n">last</span><span class="o">.</span><span class="na">ele</span> <span class="o">=</span> <span class="n">ele</span><span class="o">;</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">total</span><span class="o">++</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="n">first</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+        <span class="k">else</span> <span class="n">current</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">last</span><span class="o">;</span>
+
+        <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="no">T</span> <span class="nf">dequeue</span><span class="o">()</span>
+    <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">NoSuchElementException</span><span class="o">();</span>
+        <span class="no">T</span> <span class="n">ele</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="na">ele</span><span class="o">;</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">first</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(--</span><span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="n">last</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">ele</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span>
+    <span class="o">{</span>
+        <span class="nc">StringBuilder</span> <span class="n">sb</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuilder</span><span class="o">();</span>
+        <span class="nc">Node</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">first</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">tmp</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">sb</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">tmp</span><span class="o">.</span><span class="na">ele</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="s">", "</span><span class="o">);</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="na">next</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">sb</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="example-usage">Example Usage</h2>
+
+<p>Below is an example showing the linked-list implementation in action.
+Similar to the stack examples, declaring the instance variable as the queue interface allows for a simple switch to another implementation if future requirements warrant it.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Queue</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">greeting</span>  <span class="o">=</span> <span class="k">new</span> <span class="nc">QueueLinkedList</span><span class="o">&lt;&gt;();</span>
+
+<span class="n">greeting</span><span class="o">.</span><span class="na">enqueue</span><span class="o">(</span><span class="s">"Hello"</span><span class="o">).</span><span class="na">enqueue</span><span class="o">(</span><span class="s">", "</span><span class="o">).</span><span class="na">enqueue</span><span class="o">(</span><span class="s">"World!"</span><span class="o">);</span>
+
+<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">greeting</span><span class="o">.</span><span class="na">dequeue</span><span class="o">()</span> <span class="o">+</span> <span class="n">greeting</span><span class="o">.</span><span class="na">dequeue</span><span class="o">()</span> <span class="o">+</span> <span class="n">greeting</span><span class="o">.</span><span class="na">dequeue</span><span class="o">());</span>
+</code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://algs4.cs.princeton.edu/13stacks/">Bags, Queues, and Stacks</a></li>
+  <li><a href="http://stackoverflow.com/questions/18109915/java-loitering-and-garbage-collection">Java Loitering and Garbage Collection</a></li>
+  <li><a href="http://www.php.net/manual/en/class.splqueue.php">PHP SplQueue</a></li>
+  <li><a href="http://www.cplusplus.com/reference/queue/queue/">C++ STL Queue</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

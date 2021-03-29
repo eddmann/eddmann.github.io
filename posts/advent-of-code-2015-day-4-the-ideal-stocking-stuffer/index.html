@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 4 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 4 - The Ideal Stocking Stuffer &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 4 - The Ideal Stocking Stuffer</h1>
+    <time datetime="2021-01-28T00:00:00-06:00" class="post-date">28 Jan 2021</time>
+    <p>On the fourth day of Advent of Code 2015 Santa needs help mining some AdventCoins 💵.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Mining AdventCoin is very similiar in principle to how Bitcoin is mined.
+Difficulty of mining <em>a block</em> is based on how many leading-zeros must appear when hashing the desired block contents with a generated nonce value.
+In the case of AdventCoin the hashing algorithm used is MD5.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">createHash</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">crypto</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">hash</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">string</span> <span class="o">=&gt;</span>
+  <span class="nx">createHash</span><span class="p">(</span><span class="dl">'</span><span class="s1">md5</span><span class="dl">'</span><span class="p">).</span><span class="nx">update</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">digest</span><span class="p">(</span><span class="dl">'</span><span class="s1">hex</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">calcLowestNonce</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">totalLeadingZeros</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">prefix</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">0</span><span class="dl">'</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="nx">totalLeadingZeros</span><span class="p">);</span>
+
+  <span class="kd">let</span> <span class="nx">nonce</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nx">hash</span><span class="p">(</span><span class="nx">input</span> <span class="o">+</span> <span class="nx">nonce</span><span class="p">).</span><span class="nx">startsWith</span><span class="p">(</span><span class="nx">prefix</span><span class="p">))</span> <span class="nx">nonce</span><span class="o">++</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="nx">nonce</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We begin by creating a small function <code class="highlighter-rouge">calcLowestNonce</code> which uses brute-force to determine the lowest matching nonce value based on the supplied input.
+Once found we then return this nonce value to the callee.</p>
+
+<p>To answer part one we are required to find the first valid nonce value which has five leading-zeros, using the above function we are able to return this answer like so 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="nx">calcLowestNonce</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading-zeros.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="nx">calcLowestNonce</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Tweaking the <code class="highlighter-rouge">totalLeadingZero</code> argument to our <code class="highlighter-rouge">calcLowestNonce</code> function provides us with this answer 🌟.</p>
+
+<p>By-design this problem is computational-hard to produce and requires forms of brute-force to be solved.
+As such, there are no real optimisations that can be made - other than possibly designing a <a href="https://en.bitcoin.it/wiki/ASIC">Hardware ASIC miner</a> for AdventCoin!</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explores creating an Enigma Machine in Haskell, using Property-based testing to assert its correctness">
+
+    <title>Building an Enigma Machine in Haskell &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building an Enigma Machine in Haskell</h1>
+    <time datetime="2020-11-27T00:00:00-06:00" class="post-date">27 Nov 2020</time>
+    <p>Following on from my previous post which highlighted my experience building an <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/">Enigma Machine in ClojureScript</a>, I decided it would be interesting to model the machine within Haskell.
+I felt solving the same problem in this mannor would be a great way to compare and contrast Lisp and heavily-typed languages such as Haskell.
+Through this process I also wanted to explore using Hspec and QuickCheck for comparable Property-based testing that I achieved in the ClojureScript counterpart.</p>
+
+
+
+<p>You can experiment with the final implementation by pulling down the <a href="https://github.com/eddmann/enigma-machine-haskell">GitHub repository</a> and using the provided Makefile <code class="highlighter-rouge">encode</code> Makefile target.
+We leverage Docker to containerise the Haskell development/testing requirements when being run locally and during CI.</p>
+
+<p><a href="https://github.com/eddmann/enigma-machine-haskell"><img src="/uploads/building-an-enigma-machine-in-haskell/demo.png" alt="Command-line based Enigma Machine in Haskell" /></a></p>
+
+<h3 id="how-it-works">How it works</h3>
+
+<p>I spent some time within the previous ClojureScript implementation discussing the purpose and inner-workings of the Enigma Machine.
+So as to not simply repeat myself here I ask that you refer to <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/#how-it-works">this section</a> for a basic understanding of the machine behaviour we will be modeling.</p>
+
+<p><img src="/uploads/building-an-enigma-machine-in-haskell/enigma-machine.jpg" alt="Enigma Machine" /></p>
+
+<h3 id="the-machine">The Machine</h3>
+
+<p>In a similar fashion to how we tackled the previous implementation, the first element of the machine that we will model are the Rotors.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">alphabet</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Char</span><span class="p">]</span>
+<span class="n">alphabet</span> <span class="o">=</span> <span class="p">[</span><span class="sc">'A'</span><span class="o">..</span><span class="sc">'Z'</span><span class="p">]</span>
+
+<span class="kr">data</span> <span class="kt">Rotor</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="p">{</span> <span class="n">_out</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">_in</span> <span class="o">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">_step</span> <span class="o">::</span> <span class="kt">Char</span> <span class="p">}</span>
+    <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Show</span><span class="p">)</span>
+
+<span class="kr">type</span> <span class="kt">Rotors</span> <span class="o">=</span> <span class="p">(</span><span class="kt">Rotor</span><span class="p">,</span> <span class="kt">Rotor</span><span class="p">,</span> <span class="kt">Rotor</span><span class="p">)</span>
+
+<span class="n">rotorI</span> <span class="o">::</span> <span class="kt">Rotor</span>
+<span class="n">rotorI</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="s">"EKMFLGDQVZNTOWYHXUSPAIBRCJ"</span> <span class="n">alphabet</span> <span class="sc">'Q'</span>
+
+<span class="n">rotorII</span> <span class="o">::</span> <span class="kt">Rotor</span>
+<span class="n">rotorII</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="s">"AJDKSIRUXBLHWTMCQGZNPYFVOE"</span> <span class="n">alphabet</span> <span class="sc">'E'</span>
+
+<span class="n">rotorIII</span> <span class="o">::</span> <span class="kt">Rotor</span>
+<span class="n">rotorIII</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="s">"BDFHJLCPRTXVZNYEIWGAKMUSQO"</span> <span class="n">alphabet</span> <span class="sc">'V'</span>
+
+<span class="n">isStep</span> <span class="o">::</span> <span class="kt">Rotor</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+<span class="n">isStep</span> <span class="n">rotor</span> <span class="o">=</span> <span class="n">_step</span> <span class="n">rotor</span> <span class="o">==</span> <span class="n">head</span> <span class="p">(</span><span class="n">_in</span> <span class="n">rotor</span><span class="p">)</span>
+
+<span class="n">rotate</span> <span class="o">::</span> <span class="kt">Rotor</span> <span class="o">-&gt;</span> <span class="kt">Rotor</span>
+<span class="n">rotate</span> <span class="p">(</span><span class="kt">Rotor</span> <span class="n">_out</span> <span class="n">_in</span> <span class="n">_step</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="p">(</span><span class="n">tail</span> <span class="n">_out</span> <span class="o">++</span> <span class="p">[</span><span class="n">head</span> <span class="n">_out</span><span class="p">])</span> <span class="p">(</span><span class="n">tail</span> <span class="n">_in</span> <span class="o">++</span> <span class="p">[</span><span class="n">head</span> <span class="n">_in</span><span class="p">])</span> <span class="n">_step</span>
+
+<span class="n">rotateAll</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Rotors</span>
+<span class="n">rotateAll</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">rotate</span> <span class="n">a</span><span class="p">,</span> <span class="kr">if</span> <span class="n">isStep</span> <span class="n">a</span> <span class="o">||</span> <span class="n">isStep</span> <span class="n">b</span> <span class="kr">then</span> <span class="n">rotate</span> <span class="n">b</span> <span class="kr">else</span> <span class="n">b</span><span class="p">,</span> <span class="kr">if</span> <span class="n">isStep</span> <span class="n">b</span> <span class="kr">then</span> <span class="n">rotate</span> <span class="n">c</span> <span class="kr">else</span> <span class="n">c</span><span class="p">)</span>
+
+<span class="n">passthrough</span> <span class="o">::</span> <span class="kt">Rotor</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">passthrough</span> <span class="n">rotor</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">maybe</span> <span class="sc">'?'</span> <span class="n">id</span> <span class="p">(</span><span class="n">lookup</span> <span class="n">letter</span> <span class="n">in'</span> <span class="o">&gt;&gt;=</span> <span class="p">(</span><span class="n">flip</span> <span class="n">lookup</span><span class="p">)</span> <span class="n">out'</span><span class="p">)</span>
+    <span class="kr">where</span> <span class="n">in'</span> <span class="o">=</span> <span class="n">zip</span> <span class="n">alphabet</span> <span class="p">(</span><span class="n">_out</span> <span class="n">rotor</span><span class="p">)</span>
+          <span class="n">out'</span> <span class="o">=</span> <span class="n">zip</span> <span class="p">(</span><span class="n">_in</span> <span class="n">rotor</span><span class="p">)</span> <span class="n">alphabet</span>
+
+<span class="n">passthroughAll</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">passthroughAll</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">passthrough</span> <span class="n">c</span> <span class="o">.</span> <span class="n">passthrough</span> <span class="n">b</span> <span class="o">.</span> <span class="n">passthrough</span> <span class="n">a</span> <span class="o">$</span> <span class="n">letter</span>
+
+<span class="n">invert</span> <span class="o">::</span> <span class="kt">Rotor</span> <span class="o">-&gt;</span> <span class="kt">Rotor</span>
+<span class="n">invert</span> <span class="p">(</span><span class="kt">Rotor</span> <span class="n">_out</span> <span class="n">_in</span> <span class="n">_step</span><span class="p">)</span> <span class="o">=</span> <span class="kt">Rotor</span> <span class="n">_in</span> <span class="n">_out</span> <span class="n">_step</span>
+
+<span class="n">invertedPassthroughAll</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">invertedPassthroughAll</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">passthrough</span> <span class="p">(</span><span class="n">invert</span> <span class="n">a</span><span class="p">)</span> <span class="o">.</span> <span class="n">passthrough</span> <span class="p">(</span><span class="n">invert</span> <span class="n">b</span><span class="p">)</span> <span class="o">.</span> <span class="n">passthrough</span> <span class="p">(</span><span class="n">invert</span> <span class="n">c</span><span class="p">)</span> <span class="o">$</span> <span class="n">letter</span>
+</code></pre></div></div>
+
+<p>Based on the code above we first create a new <em>data type</em> which will represent a given Rotor - along with an aggregate tuple which represents the collection of Rotors.
+This leads us to providing the behaviour necessary to rotate the Rotor collection based on each given Rotors position and step.
+Finally, we provide a means of passing a given letter through (and back-through) the Rotors, performing the substitution encryption (scrambled wiring) along the way.</p>
+
+<p>From here, we will now model the Reflector, which is used to complete the circuit and send the current (letter) back through the Rotors.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">type</span> <span class="kt">Reflector</span> <span class="o">=</span> <span class="p">[(</span><span class="kt">Char</span><span class="p">,</span> <span class="kt">Char</span><span class="p">)]</span>
+
+<span class="n">reflectorA</span> <span class="o">::</span> <span class="kt">Reflector</span>
+<span class="n">reflectorA</span> <span class="o">=</span> <span class="n">zip</span> <span class="n">alphabet</span> <span class="s">"EJMZALYXVBWFCRQUONTSPIKHGD"</span>
+
+<span class="n">reflectorB</span> <span class="o">::</span> <span class="kt">Reflector</span>
+<span class="n">reflectorB</span> <span class="o">=</span> <span class="n">zip</span> <span class="n">alphabet</span> <span class="s">"YRUHQSLDPXNGOKMIEBFZCWVJAT"</span>
+
+<span class="n">reflectorC</span> <span class="o">::</span> <span class="kt">Reflector</span>
+<span class="n">reflectorC</span> <span class="o">=</span> <span class="n">zip</span> <span class="n">alphabet</span> <span class="s">"FVPJIAOYEDRZXWGCTKUQSBNMHL"</span>
+
+<span class="n">reflect</span> <span class="o">::</span> <span class="kt">Reflector</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">reflect</span> <span class="n">reflector</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">maybe</span> <span class="sc">'?'</span> <span class="n">id</span> <span class="o">$</span> <span class="n">lookup</span> <span class="n">letter</span> <span class="n">reflector</span>
+</code></pre></div></div>
+
+<p>Being a static substitution system the Reflector is trival to model - however, we do cater for the possibility of a value not being present in the ‘lookup’ invocation via unwrapping the <em>Maybe</em> and returning an <code class="highlighter-rouge">?</code> instead.
+This should not occur in practise, but to date I have not been able to find a means of adding the sufficent type-level constraints required to ensure that only <code class="highlighter-rouge">Char</code> values present in the <code class="highlighter-rouge">alphabet</code> listing should be consumed/returned.</p>
+
+<p>This leads us on to modeling the Plugboard, which uses the <code class="highlighter-rouge">lookup</code> Haskell function again to see if a translation (plug) for the given letter has been provided.
+If this is not the case when unwrapping the <em>Maybe</em> monadic structure, the provided letter itself (by-way of the <code class="highlighter-rouge">id</code> function) is returned instead.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">type</span> <span class="kt">Plugboard</span> <span class="o">=</span> <span class="p">[(</span><span class="kt">Char</span><span class="p">,</span> <span class="kt">Char</span><span class="p">)]</span>
+
+<span class="n">plug</span> <span class="o">::</span> <span class="kt">Plugboard</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">plug</span> <span class="n">plugboard</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">maybe</span> <span class="n">letter</span> <span class="n">id</span> <span class="o">$</span> <span class="n">lookup</span> <span class="n">letter</span> <span class="n">plugboard'</span>
+    <span class="kr">where</span> <span class="n">plugboard'</span> <span class="o">=</span> <span class="p">(</span><span class="n">plugboard</span> <span class="o">++</span> <span class="n">map</span> <span class="n">swap</span> <span class="n">plugboard</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>With all the building blocks now in-place we can begin to compose them together to handle encoding a given message through the machine.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">encode</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Reflector</span> <span class="o">-&gt;</span> <span class="kt">Plugboard</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
+<span class="n">encode</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letter</span> <span class="o">=</span>
+    <span class="n">plug</span> <span class="n">plugboard</span> <span class="o">.</span> <span class="n">invertedPassthroughAll</span> <span class="n">rotors</span> <span class="o">.</span> <span class="n">reflect</span> <span class="n">reflector</span> <span class="o">.</span> <span class="n">passthroughAll</span> <span class="n">rotors</span> <span class="o">.</span> <span class="n">plug</span> <span class="n">plugboard</span> <span class="o">$</span> <span class="n">letter</span>
+
+<span class="n">encodeMessage</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Reflector</span> <span class="o">-&gt;</span> <span class="kt">Plugboard</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+<span class="n">encodeMessage</span> <span class="kr">_</span> <span class="kr">_</span> <span class="kr">_</span> <span class="s">""</span> <span class="o">=</span> <span class="s">""</span>
+<span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="p">(</span><span class="n">letter</span> <span class="o">:</span> <span class="n">letters</span><span class="p">)</span> <span class="o">=</span>
+    <span class="kr">let</span> <span class="n">rotated</span> <span class="o">=</span> <span class="n">rotateAll</span> <span class="n">rotors</span> <span class="kr">in</span>
+        <span class="n">encode</span> <span class="n">rotated</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letter</span> <span class="o">:</span> <span class="n">encodeMessage</span> <span class="n">rotated</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letters</span>
+</code></pre></div></div>
+
+<p>Above we have opted to break the problem up into a recursive <code class="highlighter-rouge">encodeMessage</code> function which uses an internal <code class="highlighter-rouge">encode</code> function to provide threading the letter through the currently configured machine.
+Unlike Clojure we do not have a means to express ‘threading’ the letter through a list of functions defined left-to-right.
+Instead we have to compose the functions together reading the function right-to-left.
+It would be nice to be able to provide some syntactic sugar around this use-case - as when you have big composition chains such as this, it is a lot more understable to read left-to-right (regardless of how the call stack is going to be built internally).</p>
+
+<h3 id="testing">Testing</h3>
+
+<p>With the machine behaviour now modeled in code we can move on to asserting its correctness.
+In a similar fashion to how we tested the ClojureScript implementation, I have opted to explore testing using static example-based test-cases, along with random examples which ensure desired properties of the machine hold true.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">genReflector</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Reflector</span>
+<span class="n">genReflector</span> <span class="o">=</span> <span class="n">elements</span> <span class="p">[</span><span class="n">reflectorA</span><span class="p">,</span> <span class="n">reflectorB</span><span class="p">,</span> <span class="n">reflectorB</span><span class="p">]</span>
+
+<span class="n">genRotor</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Rotor</span>
+<span class="n">genRotor</span> <span class="o">=</span> <span class="n">elements</span> <span class="p">[</span><span class="n">rotorI</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">,</span> <span class="n">rotorIII</span><span class="p">]</span>
+
+<span class="n">genRotors</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Rotors</span>
+<span class="n">genRotors</span> <span class="o">=</span> <span class="n">liftM3</span> <span class="p">(,,)</span> <span class="n">genRotor</span> <span class="n">genRotor</span> <span class="n">genRotor</span>
+
+<span class="n">plugboard</span> <span class="o">::</span> <span class="p">[</span><span class="kt">Char</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="p">[(</span><span class="kt">Char</span><span class="p">,</span> <span class="kt">Char</span><span class="p">)]</span>
+<span class="n">plugboard</span> <span class="n">zs</span> <span class="o">=</span> <span class="n">zip</span> <span class="n">xs</span> <span class="n">ys</span>
+    <span class="kr">where</span> <span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span> <span class="o">=</span> <span class="n">splitAt</span> <span class="p">((</span><span class="n">length</span> <span class="n">zs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="p">`</span><span class="n">div</span><span class="p">`</span> <span class="mi">2</span><span class="p">)</span> <span class="n">zs</span>
+
+<span class="n">genPlugboard</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Plugboard</span>
+<span class="n">genPlugboard</span> <span class="o">=</span> <span class="n">fmap</span> <span class="n">plugboard</span> <span class="o">$</span> <span class="n">shuffle</span> <span class="n">alphabet</span>
+
+<span class="n">genMessage</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">String</span>
+<span class="n">genMessage</span> <span class="o">=</span> <span class="n">listOf</span> <span class="o">$</span> <span class="n">elements</span> <span class="n">alphabet</span>
+</code></pre></div></div>
+
+<p>Using <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a>, we are able to succinctly provide a means of defining how a valid machine configuration and message input should be constructed.
+One omission to this implementation that should be highlighted is that we do not provide the operator with the ability to specify the Rotor starting positions.
+This can be trivially added but I decided that in the interest of code-sample clarity I would leave this as an exercise of the reader to implement if they so wish.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span> <span class="n">hspec</span> <span class="o">$</span> <span class="kr">do</span>
+    <span class="n">describe</span> <span class="s">"Machine"</span> <span class="o">$</span> <span class="kr">do</span>
+        <span class="n">it</span> <span class="s">"encodes message without plugboard"</span> <span class="o">$</span> <span class="kr">do</span>
+            <span class="n">encodeMessage</span> <span class="p">(</span><span class="n">rotorIII</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">,</span> <span class="n">rotorI</span><span class="p">)</span> <span class="n">reflectorB</span> <span class="kt">[]</span> <span class="s">"HELLOWORLD"</span> <span class="p">`</span><span class="n">shouldBe</span><span class="p">`</span> <span class="s">"ILBDAAMTAZ"</span>
+
+        <span class="n">it</span> <span class="s">"encodes message with plugboard"</span> <span class="o">$</span> <span class="kr">do</span>
+            <span class="n">encodeMessage</span> <span class="p">(</span><span class="n">rotorIII</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">,</span> <span class="n">rotorI</span><span class="p">)</span> <span class="n">reflectorB</span> <span class="p">[(</span><span class="sc">'A'</span><span class="p">,</span> <span class="sc">'B'</span><span class="p">)]</span> <span class="s">"HELLOWORLD"</span> <span class="p">`</span><span class="n">shouldBe</span><span class="p">`</span> <span class="s">"ILADBBMTBZ"</span>
+
+        <span class="n">it</span> <span class="s">"encoded cipher matches message"</span> <span class="o">$</span> <span class="kr">do</span>
+            <span class="n">property</span> <span class="o">$</span> <span class="n">forAll</span> <span class="n">genReflector</span> <span class="o">$</span> <span class="nf">\</span><span class="n">reflector</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genRotors</span> <span class="o">$</span> <span class="nf">\</span><span class="n">rotors</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genPlugboard</span> <span class="o">$</span> <span class="nf">\</span><span class="n">plugboard</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genMessage</span> <span class="o">$</span> <span class="nf">\</span><span class="n">message</span> <span class="o">-&gt;</span>
+                          <span class="kr">let</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">message</span> <span class="kr">in</span>
+                              <span class="n">message</span> <span class="o">==</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">cipher</span>
+
+        <span class="n">it</span> <span class="s">"cipher is same length as message"</span> <span class="o">$</span> <span class="kr">do</span>
+            <span class="n">property</span> <span class="o">$</span> <span class="n">forAll</span> <span class="n">genReflector</span> <span class="o">$</span> <span class="nf">\</span><span class="n">reflector</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genRotors</span> <span class="o">$</span> <span class="nf">\</span><span class="n">rotors</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genPlugboard</span> <span class="o">$</span> <span class="nf">\</span><span class="n">plugboard</span> <span class="o">-&gt;</span>
+                       <span class="n">forAll</span> <span class="n">genMessage</span> <span class="o">$</span> <span class="nf">\</span><span class="n">message</span> <span class="o">-&gt;</span>
+                          <span class="kr">let</span> <span class="n">cipher</span> <span class="o">=</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">message</span> <span class="kr">in</span>
+                              <span class="n">length</span> <span class="n">message</span> <span class="o">==</span> <span class="n">length</span> <span class="n">cipher</span>
+</code></pre></div></div>
+
+<p>Coupled with the help of <a href="https://hspec.github.io/">Hspec</a> we are then able to define the two static example-based tests that we created before, along with the two machine properties that we wish to hold true.
+Although the syntax is naturally different, the general philosophy of how a Property-based test is expressed and validated is very similar to the ClojureScript counterpart.</p>
+
+<p>As stated in the previous article this test-suite is by no means exhaustive and can be expanded upon greatly.
+The goal of this is to highlight the key differences between conventional test assertions and testing validity of <em>System under test</em> (SUT) properties.
+This test-suite can be run locally using the <code class="highlighter-rouge">make test</code> target, or you can see example resulting output by-way of the configured <a href="https://github.com/eddmann/enigma-machine-haskell/actions">GitHub Action</a>.</p>
+
+<h3 id="the-user-interface">The User Interface</h3>
+
+<p>To make this implementation a little different I have opted to provide a Command-line based user interface over a Web-based one.
+In doing so we are able to see a very powerful use-case for Haskell’s <a href="http://learnyouahaskell.com/syntax-in-functions">pattern matching</a> functionality.</p>
+
+<p>To achieve this end-goal we must first provide a means for the client to translate their desired machine configuration into one that our <code class="highlighter-rouge">encodeMessage</code> function can understand.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">toRotor</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Rotor</span>
+<span class="n">toRotor</span> <span class="o">=</span> <span class="p">(</span><span class="n">flip</span> <span class="n">lookup</span><span class="p">)</span> <span class="p">[(</span><span class="sc">'1'</span><span class="p">,</span> <span class="n">rotorI</span><span class="p">),</span> <span class="p">(</span><span class="sc">'2'</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">),</span> <span class="p">(</span><span class="sc">'3'</span><span class="p">,</span> <span class="n">rotorIII</span><span class="p">)]</span>
+
+<span class="n">toReflector</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Reflector</span>
+<span class="n">toReflector</span> <span class="o">=</span> <span class="p">(</span><span class="n">flip</span> <span class="n">lookup</span><span class="p">)</span> <span class="p">[(</span><span class="sc">'A'</span><span class="p">,</span> <span class="n">reflectorA</span><span class="p">),</span> <span class="p">(</span><span class="sc">'B'</span><span class="p">,</span> <span class="n">reflectorB</span><span class="p">),</span> <span class="p">(</span><span class="sc">'C'</span><span class="p">,</span> <span class="n">reflectorC</span><span class="p">)]</span>
+
+<span class="n">toPlugboard</span> <span class="o">::</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">Plugboard</span>
+<span class="n">toPlugboard</span> <span class="p">(</span><span class="n">x</span> <span class="o">:</span> <span class="n">y</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="o">=</span> <span class="p">[(</span><span class="n">toUpper</span> <span class="n">x</span><span class="p">,</span> <span class="n">toUpper</span> <span class="n">y</span><span class="p">)]</span> <span class="o">++</span> <span class="n">toPlugboard</span> <span class="n">xs</span>
+<span class="n">toPlugboard</span> <span class="kr">_</span> <span class="o">=</span> <span class="kt">[]</span>
+</code></pre></div></div>
+
+<p>With this functionality now in-place we can move on to parsing the Command-line argument input.
+Thanks to how powerful Haskell’s pattern matching is, we are able to concisely break-up the problem of parsing each of the required machine components as follows.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parseRotors</span> <span class="o">::</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Rotors</span>
+<span class="n">parseRotors</span> <span class="p">(</span><span class="s">"-rotors"</span> <span class="o">:</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">:</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kr">case</span> <span class="p">(</span><span class="n">toRotor</span> <span class="n">a</span><span class="p">,</span> <span class="n">toRotor</span> <span class="n">b</span><span class="p">,</span> <span class="n">toRotor</span> <span class="n">c</span><span class="p">)</span> <span class="kr">of</span>
+    <span class="p">(</span><span class="kt">Just</span> <span class="n">a'</span><span class="p">,</span> <span class="kt">Just</span> <span class="n">b'</span><span class="p">,</span> <span class="kt">Just</span> <span class="n">c'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pure</span> <span class="p">(</span><span class="n">a'</span><span class="p">,</span> <span class="n">b'</span><span class="p">,</span> <span class="n">c'</span><span class="p">)</span>
+    <span class="kr">_</span> <span class="o">-&gt;</span> <span class="n">fail</span> <span class="o">$</span> <span class="s">"invalid rotors "</span> <span class="o">++</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">++</span> <span class="s">" specified in args"</span>
+<span class="n">parseRotors</span> <span class="p">(</span><span class="kr">_</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="o">=</span> <span class="n">parseRotors</span> <span class="n">xs</span>
+<span class="n">parseRotors</span> <span class="kt">[]</span> <span class="o">=</span> <span class="n">fail</span> <span class="s">"rotors must be specified in args"</span>
+
+<span class="n">parsePlugboard</span> <span class="o">::</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Plugboard</span>
+<span class="n">parsePlugboard</span> <span class="p">(</span><span class="s">"-plugboard"</span> <span class="o">:</span> <span class="n">plugboard</span> <span class="o">:</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pure</span> <span class="o">$</span> <span class="n">toPlugboard</span> <span class="n">plugboard</span>
+<span class="n">parsePlugboard</span> <span class="p">(</span><span class="kr">_</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="o">=</span> <span class="n">parsePlugboard</span> <span class="n">xs</span>
+<span class="n">parsePlugboard</span> <span class="kt">[]</span> <span class="o">=</span> <span class="n">pure</span> <span class="kt">[]</span>
+
+<span class="n">parseReflector</span> <span class="o">::</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Reflector</span>
+<span class="n">parseReflector</span> <span class="p">(</span><span class="s">"-reflector"</span> <span class="o">:</span> <span class="p">[</span><span class="n">reflector</span><span class="p">]</span> <span class="o">:</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kr">case</span> <span class="p">(</span><span class="n">toReflector</span> <span class="o">.</span> <span class="n">toUpper</span><span class="p">)</span> <span class="n">reflector</span> <span class="kr">of</span>
+    <span class="kt">Just</span> <span class="n">reflector'</span> <span class="o">-&gt;</span> <span class="n">pure</span> <span class="n">reflector'</span>
+    <span class="kt">Nothing</span> <span class="o">-&gt;</span> <span class="n">fail</span> <span class="o">$</span> <span class="s">"invalid reflector "</span> <span class="o">++</span> <span class="p">[</span><span class="n">reflector</span><span class="p">]</span> <span class="o">++</span> <span class="s">" specified in args"</span>
+<span class="n">parseReflector</span> <span class="p">(</span><span class="kr">_</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="o">=</span> <span class="n">parseReflector</span> <span class="n">xs</span>
+<span class="n">parseReflector</span> <span class="kt">[]</span> <span class="o">=</span> <span class="n">fail</span> <span class="s">"reflector must be specified in args"</span>
+
+<span class="n">parseMessage</span> <span class="o">::</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">String</span>
+<span class="n">parseMessage</span> <span class="p">(</span><span class="s">"-message"</span> <span class="o">:</span> <span class="n">message</span> <span class="o">:</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="n">pure</span> <span class="o">$</span> <span class="n">map</span> <span class="n">toUpper</span> <span class="n">message</span>
+<span class="n">parseMessage</span> <span class="p">(</span><span class="kr">_</span> <span class="o">:</span> <span class="n">xs</span><span class="p">)</span> <span class="o">=</span> <span class="n">parseMessage</span> <span class="n">xs</span>
+<span class="n">parseMessage</span> <span class="kt">[]</span> <span class="o">=</span> <span class="n">fail</span> <span class="s">"message must be specified in args"</span>
+</code></pre></div></div>
+
+<p>I have decided to take advantage of the <em>IO</em> Monad and return a wrapped value for each given parsed configuration option.
+This allows us to neatly use <em>do</em> notation described below to build a fully configured machine, short circuiting at any stage where we are unable to parse the given input option.</p>
+
+<div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
+<span class="n">main</span> <span class="o">=</span>  <span class="kr">do</span>
+    <span class="n">args</span> <span class="o">&lt;-</span> <span class="kt">System</span><span class="o">.</span><span class="kt">Environment</span><span class="o">.</span><span class="n">getArgs</span>
+    <span class="n">rotors</span> <span class="o">&lt;-</span> <span class="n">parseRotors</span> <span class="n">args</span>
+    <span class="n">reflector</span> <span class="o">&lt;-</span> <span class="n">parseReflector</span> <span class="n">args</span>
+    <span class="n">plugboard</span> <span class="o">&lt;-</span> <span class="n">parsePlugboard</span> <span class="n">args</span>
+    <span class="n">message</span> <span class="o">&lt;-</span> <span class="n">parseMessage</span> <span class="n">args</span>
+    <span class="n">print</span> <span class="o">$</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">message</span>
+</code></pre></div></div>
+
+<p>With the machine configuration successfully parsed we are able to invoke the <code class="highlighter-rouge">encodeMessage</code> function and print the resulting cipher message to the Terminal.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>I felt reimplementing the Enigma Machine in Haskell was a very worthwhile endeavour, allowing me to compare and contrast how the problem can be solved in the two different languages.
+I am big fan of Lisp and the Clojure dialect, but did find how useful declaring functions by means of simple type transformations was a very pleasing/powerful development process.
+Starting off by thinking in soley type transformations as opposed to concrete behaviour provided a means to build up the system in a very succinct manner.
+From here, I hope to spend some additional time solving future problems using Haskell, taking more time to leverage further aspects of its very expressive type system.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Creating a small infix-calculator in Clojure using the Shunting Yard algorithm and RPN evaluation">
+
+    <title>Infix Calculator in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Infix Calculator in Clojure</h1>
+    <time datetime="2016-01-03T00:00:00-06:00" class="post-date">03 Jan 2016</time>
+    <p>Following on from my previous post, I have continued my exploration into Clojure by implementing a simple infix calculator - using the Shunting Yard algorithm and RPN evaluation.
+The documented implementation is split into three distinct parts of which I will describe piece-by-piece, before composing them together to result in the final calculator.
+</p>
+
+<h2 id="tokenization">Tokenization</h2>
+
+<p>The first problem to solve is to correctly split up the supplied infix expression into the tokenized output.
+The implementation below ‘reduces’ over each of the characters in the expression producing an output list which correctly merges co-located digits.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">tokenize</span><span class="w"> </span><span class="p">[</span><span class="n">expr</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">to-chars</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">clojure.string/split</span><span class="w"> </span><span class="p">(</span><span class="nf">clojure.string/replace</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="s">" "</span><span class="w"> </span><span class="s">""</span><span class="p">)</span><span class="w"> </span><span class="o">#</span><span class="s">""</span><span class="p">)</span><span class="w">
+        </span><span class="n">is-digit?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="p">(</span><span class="nb">re-find</span><span class="w"> </span><span class="o">#</span><span class="s">"^\d+$"</span><span class="w"> </span><span class="n">%</span><span class="p">))]</span><span class="w">
+    </span><span class="p">(</span><span class="nb">reverse</span><span class="w">
+      </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
+        </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[[</span><span class="n">t</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tokens</span><span class="p">]</span><span class="w"> </span><span class="n">token</span><span class="p">]</span><span class="w">
+          </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nf">is-digit?</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">is-digit?</span><span class="w"> </span><span class="n">t</span><span class="p">))</span><span class="w">
+            </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="n">ts</span><span class="p">)</span><span class="w">
+            </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="n">tokens</span><span class="p">)))</span><span class="w">
+        </span><span class="o">'</span><span class="p">()</span><span class="n">,</span><span class="w"> </span><span class="p">(</span><span class="nf">to-chars</span><span class="w"> </span><span class="n">expr</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="shunting-yard-algorithm">Shunting Yard Algorithm</h2>
+
+<p>To produce the desired Reverse Polish notation required to evaluate the expression into its final result, we can use the Shunting Yard algorithm invented by Edsger Dijkstra.
+The implementation below follows a similar pattern to a previous one I documented in JavaScript however, I feel that Clojure has been able to more succinctly codify its intent.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">shunting-yard</span><span class="w"> </span><span class="p">[</span><span class="n">tokens</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">ops</span><span class="w"> </span><span class="p">{</span><span class="s">"+"</span><span class="w"> </span><span class="mi">1</span><span class="n">,</span><span class="w"> </span><span class="s">"-"</span><span class="w"> </span><span class="mi">1</span><span class="n">,</span><span class="w"> </span><span class="s">"*"</span><span class="w"> </span><span class="mi">2</span><span class="n">,</span><span class="w"> </span><span class="s">"/"</span><span class="w"> </span><span class="mi">2</span><span class="p">}]</span><span class="w">
+    </span><span class="p">(</span><span class="nf">flatten</span><span class="w">
+      </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
+        </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[[</span><span class="n">rpn</span><span class="w"> </span><span class="n">stack</span><span class="p">]</span><span class="w"> </span><span class="n">token</span><span class="p">]</span><span class="w">
+          </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">less-op?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="n">ops</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;=</span><span class="w"> </span><span class="p">(</span><span class="nf">ops</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">ops</span><span class="w"> </span><span class="n">%</span><span class="p">)))</span><span class="w">
+                </span><span class="n">not-open-paren?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">not=</span><span class="w"> </span><span class="s">"("</span><span class="w"> </span><span class="n">%</span><span class="p">)]</span><span class="w">
+            </span><span class="p">(</span><span class="k">cond</span><span class="w">
+              </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="s">"("</span><span class="p">)</span><span class="w"> </span><span class="p">[</span><span class="n">rpn</span><span class="w"> </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="n">stack</span><span class="p">)]</span><span class="w">
+              </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="s">")"</span><span class="p">)</span><span class="w"> </span><span class="p">[(</span><span class="nf">vec</span><span class="w"> </span><span class="p">(</span><span class="nb">concat</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="p">(</span><span class="nb">take-while</span><span class="w"> </span><span class="n">not-open-paren?</span><span class="w"> </span><span class="n">stack</span><span class="p">)))</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="p">(</span><span class="nb">drop-while</span><span class="w"> </span><span class="n">not-open-paren?</span><span class="w"> </span><span class="n">stack</span><span class="p">))]</span><span class="w">
+              </span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="n">ops</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="p">[(</span><span class="nf">vec</span><span class="w"> </span><span class="p">(</span><span class="nb">concat</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="p">(</span><span class="nb">take-while</span><span class="w"> </span><span class="n">less-op?</span><span class="w"> </span><span class="n">stack</span><span class="p">)))</span><span class="w"> </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="p">(</span><span class="nb">drop-while</span><span class="w"> </span><span class="n">less-op?</span><span class="w"> </span><span class="n">stack</span><span class="p">))]</span><span class="w">
+              </span><span class="no">:else</span><span class="w"> </span><span class="p">[(</span><span class="nb">conj</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="n">stack</span><span class="p">])))</span><span class="w">
+        </span><span class="p">[[]</span><span class="w"> </span><span class="p">()]</span><span class="w">
+        </span><span class="n">tokens</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Looking at the implementation above you will notice that we have been able to use a two element vector to represent the output notation and stack which are then joined at the end to return the final output.</p>
+
+<h2 id="rpn-evaluation">RPN Evaluation</h2>
+
+<p>With the expression now represented in RPN we can use the following implementation to evaluate this token sequence, returning the final result.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="p">[</span><span class="n">tokens</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">ops</span><span class="w"> </span><span class="p">{</span><span class="s">"+"</span><span class="w"> </span><span class="n">+,</span><span class="w"> </span><span class="s">"-"</span><span class="w"> </span><span class="n">-,</span><span class="w"> </span><span class="s">"*"</span><span class="w"> </span><span class="n">*,</span><span class="w"> </span><span class="s">"/"</span><span class="w"> </span><span class="nb">/</span><span class="p">}]</span><span class="w">
+    </span><span class="p">(</span><span class="nb">first</span><span class="w">
+      </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
+        </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">stack</span><span class="w"> </span><span class="n">token</span><span class="p">]</span><span class="w">
+          </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="n">ops</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w">
+            </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">((</span><span class="nf">ops</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">second</span><span class="w"> </span><span class="n">stack</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">stack</span><span class="p">))</span><span class="w"> </span><span class="p">(</span><span class="nb">drop</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">stack</span><span class="p">))</span><span class="w">
+            </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">(</span><span class="nf">read-string</span><span class="w"> </span><span class="n">token</span><span class="p">)</span><span class="w"> </span><span class="n">stack</span><span class="p">)))</span><span class="w">
+        </span><span class="p">[]</span><span class="w"> </span><span class="n">tokens</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="calculator">Calculator</h2>
+
+<p>With all the pieces now created, we can compose the calculator function from these constituent parts.
+We are able to document the transformation from expression to result using the following ‘log’ function, which can be thought of as an identity function with the side-effect of printing out the supplied parameter.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">do</span><span class="w"> </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With this function now declared we can create the ‘calc’ function which is a composition of the implemented functions above.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">calc</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="n">shunting-yard</span><span class="w"> </span><span class="n">tokenize</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">calc-debug</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="n">shunting-yard</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="n">tokenize</span><span class="p">))</span><span class="w">
+</span><span class="p">(</span><span class="nf">calc-debug</span><span class="w"> </span><span class="s">"3 + 4 * 5 / (3 + 2)"</span><span class="p">)</span><span class="w">
+</span><span class="c1">; (3 + 4 * 5 / ( 3 + 2 ))</span><span class="w">
+</span><span class="c1">; (3 4 5 * 3 2 + / +)</span><span class="w">
+</span><span class="c1">; 7</span><span class="w">
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 15 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 15 - Science for Hungry People &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 15 - Science for Hungry People</h1>
+    <time datetime="2021-02-08T00:00:00-06:00" class="post-date">08 Feb 2021</time>
+    <p>On the fifteen day of Advent of Code 2015 we are tasked with finding the right balance of ingredients to make the perfect milk-dunking cookie recipe.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are provided with a listing of the four available ingredients, along with five properties for each.
+These properties are capacity, durability, flavor, texture and calories.
+Our resultung recipe leaves room for exactly 100 teaspoons of ingredients.</p>
+
+<p>For part one we are asked to find the ingredient mixture that has the highest total <em>cookie score</em>.
+The total score of a cookie can be found by adding up each of the properties (negative totals become 0) and then multiplying together everything except calories.</p>
+
+<p>We start by parsing the ingredients into a form we can work with going forward.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Property</span> <span class="o">=</span> <span class="kr">number</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Ingredient</span> <span class="o">=</span> <span class="nx">Property</span><span class="p">[];</span>
+
+<span class="kd">const</span> <span class="nx">parseIngredients</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Ingredient</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(</span><span class="sr">-</span><span class="se">?\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/g</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>For this exercise we are not too bothered with the names of the ingredients and properties, and as such we can simply store all the given properties values.
+From here, we are required to iterate over all the possible combinations of teaspoon quantities per ingredient that sum up to the 100 teaspoons available.
+Initially, I solved this with a hardcoded triple for-loop 😬, but upon reflection I have decided to generalise the solution to cater for any arity of ingredients.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Quantity</span> <span class="o">=</span> <span class="kr">number</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Mixture</span> <span class="o">=</span> <span class="nx">Quantity</span><span class="p">[];</span>
+
+<span class="kd">function</span><span class="o">*</span> <span class="nx">mixtures</span><span class="p">(</span>
+  <span class="nx">teaspoons</span><span class="p">:</span> <span class="nx">Quantity</span><span class="p">,</span>
+  <span class="nx">ingredients</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="nx">Mixture</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">ingredients</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">yield</span> <span class="p">[</span><span class="nx">teaspoons</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">quantity</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">quantity</span> <span class="o">&lt;=</span> <span class="nx">teaspoons</span><span class="p">;</span> <span class="nx">quantity</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">mixture</span> <span class="k">of</span> <span class="nx">mixtures</span><span class="p">(</span>
+      <span class="nx">teaspoons</span> <span class="o">-</span> <span class="nx">quantity</span><span class="p">,</span>
+      <span class="nx">ingredients</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="p">))</span> <span class="p">{</span>
+      <span class="k">yield</span> <span class="p">[</span><span class="nx">quantity</span><span class="p">,</span> <span class="p">...</span><span class="nx">mixture</span><span class="p">];</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The above implementation harnesses a Generator to recursively combine all the quantities of each ingredient that could be possible.
+For comparison, I also decided to implement a solution which uses plain ol’ arrays like so.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">mixtures</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">teaspoons</span><span class="p">:</span> <span class="nx">Quantity</span><span class="p">,</span>
+  <span class="nx">ingredients</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="nx">Mixture</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">ingredients</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="p">[[</span><span class="nx">teaspoons</span><span class="p">]];</span>
+
+  <span class="k">return</span> <span class="p">[...</span><span class="nb">Array</span><span class="p">(</span><span class="nx">teaspoons</span> <span class="o">+</span> <span class="mi">1</span><span class="p">).</span><span class="nx">keys</span><span class="p">()].</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">mixes</span><span class="p">,</span> <span class="nx">quantity</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">mixes</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span>
+        <span class="nx">mixtures</span><span class="p">(</span>
+          <span class="nx">teaspoons</span> <span class="o">-</span> <span class="nx">quantity</span><span class="p">,</span>
+          <span class="nx">ingredients</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">mixture</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nx">quantity</span><span class="p">,</span> <span class="p">...</span><span class="nx">mixture</span><span class="p">])</span>
+      <span class="p">),</span>
+    <span class="p">[]</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With the ability to now iterate over all the possible quantities of ingredients we can now codify how to calculate the score of a given cookie.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">calcCookieScore</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">ingredients</span><span class="p">:</span> <span class="nx">Ingredient</span><span class="p">[],</span>
+  <span class="nx">mixture</span><span class="p">:</span> <span class="nx">Mixture</span>
+<span class="p">):</span> <span class="p">{</span> <span class="nl">score</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">calories</span><span class="p">:</span> <span class="kr">number</span> <span class="p">}</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">properties</span> <span class="o">=</span> <span class="nx">transpose</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">property</span> <span class="o">=&gt;</span>
+    <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span>
+      <span class="nx">zip</span><span class="p">(</span><span class="nx">property</span><span class="p">,</span> <span class="nx">mixture</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">sum</span><span class="p">,</span> <span class="p">[</span><span class="nx">p</span><span class="p">,</span> <span class="nx">m</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="nx">sum</span> <span class="o">+</span> <span class="nx">p</span> <span class="o">*</span> <span class="nx">m</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+      <span class="mi">0</span>
+    <span class="p">)</span>
+  <span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">calories</span> <span class="o">=</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
+
+  <span class="k">return</span> <span class="p">{</span> <span class="na">score</span><span class="p">:</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">product</span><span class="p">),</span> <span class="nx">calories</span> <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Providing the ingredients and desired mixture we first <code class="highlighter-rouge">transpose</code> the ingredients array (matrix) into rows of all the properties values.
+The function in question has been implemented like so.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">transpose</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">T</span><span class="p">[][])</span> <span class="o">=&gt;</span>
+  <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">map</span><span class="p">((</span><span class="nx">_</span><span class="p">,</span> <span class="nx">c</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">:</span> <span class="nx">T</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">[</span><span class="nx">c</span><span class="p">]));</span>
+</code></pre></div></div>
+
+<p>We then <a href="https://eddmann.com/posts/advent-of-code-2015-day-13-knights-of-the-dinner-table/"><code class="highlighter-rouge">zip</code></a> these properties with the desired mixture and apply the formula for calculating the score.
+Finally, we <em>pop</em> the calories off the bottom and return the score (product of all the properties individual scores, excluding calories) and the calories themselves.</p>
+
+<p>With these building blocks in-place we can then calculate all the possible scores and return the highest to answer part one 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">RECIPE_TEASPOONS</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">ingredients</span> <span class="o">=</span> <span class="nx">parseIngredients</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">scores</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">...</span><span class="nx">mixtures</span><span class="p">(</span><span class="nx">RECIPE_TEASPOONS</span><span class="p">,</span> <span class="nx">ingredients</span><span class="p">.</span><span class="nx">length</span><span class="p">),</span>
+  <span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">mixture</span> <span class="o">=&gt;</span> <span class="nx">calcCookieScore</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">,</span> <span class="nx">mixture</span><span class="p">).</span><span class="nx">score</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">max</span><span class="p">(</span><span class="nx">scores</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Note: due to the size of the scores array that is produced we are again required to use the <a href="https://eddmann.com/posts/advent-of-code-2015-day-13-knights-of-the-dinner-table/"><code class="highlighter-rouge">max</code></a> function produced in a previous days solution over <code class="highlighter-rouge">Math.max</code>.</p>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are asked to determine what mixture produces the highest cookie score again, expect this time the mixtures calories should equal to 500.
+In a similar manor to part one we can calculate all the possible cookie scores, however, now we only return this score if the calories are equal to 500.
+We can then locate the highest scored cookie from this partial listing to answer part two 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">ingredients</span> <span class="o">=</span> <span class="nx">parseIngredients</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">scores</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">...</span><span class="nx">mixtures</span><span class="p">(</span><span class="nx">RECIPE_TEASPOONS</span><span class="p">,</span> <span class="nx">ingredients</span><span class="p">.</span><span class="nx">length</span><span class="p">),</span>
+  <span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="nx">mixture</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">score</span><span class="p">,</span> <span class="nx">calories</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">calcCookieScore</span><span class="p">(</span><span class="nx">ingredients</span><span class="p">,</span> <span class="nx">mixture</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">calories</span> <span class="o">===</span> <span class="mi">500</span> <span class="p">?</span> <span class="nx">score</span> <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">max</span><span class="p">(</span><span class="nx">scores</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

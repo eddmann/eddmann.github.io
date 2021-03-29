@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="I make stuff for the web, and occasionally ramble about it here.">
+
+    <title>Edd Mann &middot; Developer</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <div class="posts">
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/least-significant-digit-lsd-radix-sort-in-java/">
+                    Least Significant Digit (LSD) Radix Sort in Java
+                </a>
+            </h1>
+
+            <time datetime="2013-12-28T00:00:00-06:00" class="post-date">28 Dec 2013</time>
+
+            <p>Radix sort is a O(digits·keys) sorting algorithm which relies on integer key grouping to successfully process and naturally order the specified data set.
+Basing the sort on structure and positional notation, many other data types which can be represented in integer form (i.e. ASCII characters) can take advantage of the algorithm.
+Sorting occurs by acting on the comparison between item digits in the same position.
+Two alternative version of the algorithm exists, both tackling the problem from the opposite direction.
+In this post I will be describing an iterative lowest significant digit implementation which as the name hints at, starts processing from the right most digit position.
+This implementation results in a <a href="http://en.wikipedia.org/wiki/Stable_sort#Stability">stable</a> sort, where as the other implementation, tackles the most significant digit first and can not make such guarantees.
+In a stable sorting algorithm the initial ordering of equal keys is left unchanged in the result.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/using-partial-application-in-php/">
+                    Using Partial Application in PHP
+                </a>
+            </h1>
+
+            <time datetime="2013-12-26T00:00:00-06:00" class="post-date">26 Dec 2013</time>
+
+            <p>Partial function application is a common place feature found in many languages that lean towards the functional paradigm.
+Unlike some functional concepts (monads) it can be simply explained as taking a function and binding argument values to one or more of its parameters, resulting in a new function.
+Function argument size in computer science circles is described as its <a href="http://en.wikipedia.org/wiki/Arity">arity</a>, and through this process we are reducing the arity based on the partial application call.
+Discussion of partial application typically brings up the related topic of <a href="http://en.wikipedia.org/wiki/Currying">currying</a>, which follows the stricter rule of transforming a multiple argument function into a chain of single argument calls.
+This is useful as it helps simplify the study of functions in theoretical computer sciences, such as lambda calculus.
+Currying however is not that useful in general-purpose languages, dissimilar to Haskell which at its core only supports the mathematical notion of single argument functions.
+Using a combination of syntactic sugar and currying, the language is able to give the misguided impression of multi-argument calls, when in-fact it is just a chain of single argument curried calls.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/implementing-a-queue-in-java-using-arrays-and-linked-lists/">
+                    Implementing a Queue in Java using Arrays and Linked Lists
+                </a>
+            </h1>
+
+            <time datetime="2013-12-24T00:00:00-06:00" class="post-date">24 Dec 2013</time>
+
+            <p>Following on from my previous post on implementing a <a href="/posts/implementing-a-stack-in-java-using-arrays-and-linked-lists/">stack</a> in Java, I now wish to discuss the as important queue data-structure.
+Similar in kind to the restrictions placed upon the stack implementation, the queue only allows mutation via two methods.
+Addition (enqueue) occurs at the end of the collection, and removal (dequeue) from the beginning, resulting in a FIFO (First-In-First-Out) structure.
+Queues are typically used in the application of buffers to store data, objects, events etc. that are to be held for future sequential processing.
+Discussed in the post on stacks, you are more than likely never going to have to implement such a data-structure in practical use-cases, as the language libraries will already include such an implementation (i.e. <a href="http://www.cplusplus.com/reference/queue/queue/">C++ STL</a> and <a href="http://www.php.net/manual/en/class.splqueue.php">PHP SplQueue</a>).</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/shunting-yard-implementation-in-java/">
+                    Shunting Yard Implementation in Java
+                </a>
+            </h1>
+
+            <time datetime="2013-12-23T00:00:00-06:00" class="post-date">23 Dec 2013</time>
+
+            <p>The Shunting Yard algorithm was developed by the great <a href="http://en.wikipedia.org/wiki/Edsger_Dijkstra">Edsger Dijkstra</a> as a means to parse an infix mathematical expression into Reverse Polish notation (postfix).
+Using said notation allows the computer to evaluate the expression in a simple stack based form, <a href="/posts/reverse-polish-notation-rpn-in-scala/">examples</a> of which I have shown in Scala.
+The algorithm itself also uses a stack along with a built-up output string to create the resulting value.
+Below is an example implementation which only takes into consideration bracket and the four common operator precedences.
+Although it is possible to evaluate more, including functions and associativity, I decided on keeping the implementation simple to better highlight the process.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/uploading-podcast-audio-to-youtube/">
+                    Uploading Podcast Audio to YouTube
+                </a>
+            </h1>
+
+            <time datetime="2013-12-22T00:00:00-06:00" class="post-date">22 Dec 2013</time>
+
+            <p>YouTube unfortunately does not provide you with the ability to upload audio tracks individually, which is a pain if you do not work with video (such as a podcast).
+The way to get around this limitation is to create a video which includes the desired audio track and a fixed image (i.e. cover-art) which lasts the duration of the track.
+There are many ways of achieving such a result, from iMovie and Windows Movie Maker to the online service <a href="http://www.tunestotube.com/">TunesToTube</a>.
+With a little <a href="https://trac.ffmpeg.org/wiki/EncodeforYouTube">research</a> however, I was able to come up with a even simpler solution that only requires the ever useful <a href="http://www.ffmpeg.org">ffmpeg</a>.</p>
+
+
+        </article>
+    
+</div>
+
+<div class="pagination">
+    
+        <a class="pagination-item older" href="/page/37/">Older</a>
+    
+    
+        <a class="pagination-item newer" href="/page/35/">Newer</a>
+    
+</div>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Demystifying the syntactic sugar that is required to provide Classical Inheritance in JavaScript">
+
+    <title>Implementing Classical Inheritance in JavaScript &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing Classical Inheritance in JavaScript</h1>
+    <time datetime="2015-09-05T00:00:00-05:00" class="post-date">05 Sep 2015</time>
+    <p>Developers who are well versed in class-based languages such as Java and C++ may find JavaScript’s prototypical and in my heart true object-oriented nature confusing.
+With the addition of the <code class="highlighter-rouge">class</code> keyword in ES6 it has become extremely easy to crossover these class-based principles into JavaScript.
+However, it should be noted that this is nothing more than syntactic sugar over an extremely expressive and flexible language construct.
+
+In fact it is very easy to build our own Class implementation, using specially constructed ‘class’ functions as templates for the ‘new’ instances we wish to use.
+Below is an example implementation highlighting how to simply create a classical inheritance hierarchy within JavaScript.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">Class</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">properties</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">properties</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">properties</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">;</span>
+    <span class="nx">parent</span> <span class="o">=</span> <span class="nx">Class</span><span class="p">;</span>
+  <span class="p">}</span>
+  
+  <span class="kd">var</span> <span class="nx">pp</span> <span class="o">=</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span>
+  
+  <span class="kd">function</span> <span class="nx">C</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span> <span class="p">}</span>
+  <span class="nx">C</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">pp</span><span class="p">),</span> <span class="nx">properties</span><span class="p">);</span>
+  <span class="nx">C</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="kd">constructor</span> <span class="o">=</span> <span class="nx">C</span><span class="p">;</span>
+  <span class="nx">C</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="k">super</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">pp</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">bind</span> <span class="p">?</span> <span class="nx">pp</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="p">:</span> <span class="nx">pp</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+  <span class="p">};</span>
+  
+  <span class="k">return</span> <span class="nx">C</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Looking at the example above you will notice that we take into consideration the possibility of either a new class being defined (one parameter) or an inherited class being supplied.
+The new ‘class functions’ prototype is composed of its parents, along with any new properties supplied.
+The constructed function which is returned will be invoked as a constructor function throughout its lifetime, creating new instances of the defined class.
+We also include a simple <code class="highlighter-rouge">super</code> function which allows the user to call its parents method implementation.</p>
+
+<p>We are now able to use this implementation in a contrived representation of both a User and Admin class.
+You will notice how we call the parent classes (User) <code class="highlighter-rouge">init</code> and <code class="highlighter-rouge">getName</code> implementation within the Admin class.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">User</span> <span class="o">=</span> <span class="nx">Class</span><span class="p">({</span>
+  <span class="na">init</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">getName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">Admin</span> <span class="o">=</span> <span class="nx">Class</span><span class="p">(</span><span class="nx">User</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">init</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">level</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="k">super</span><span class="p">(</span><span class="dl">'</span><span class="s1">init</span><span class="dl">'</span><span class="p">)(</span><span class="nx">name</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">level</span> <span class="o">=</span> <span class="nx">level</span><span class="p">;</span>
+  <span class="p">},</span>
+  <span class="na">getName</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="k">super</span><span class="p">(</span><span class="dl">'</span><span class="s1">getName</span><span class="dl">'</span><span class="p">)()</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> (</span><span class="dl">'</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">level</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>We are then able to create a couple of ‘class instances’ and type-check them accordingly.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">(</span><span class="dl">'</span><span class="s1">Foo</span><span class="dl">'</span><span class="p">),</span>
+    <span class="nx">bar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Admin</span><span class="p">(</span><span class="dl">'</span><span class="s1">Bar</span><span class="dl">'</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+    <span class="nx">baz</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Admin</span><span class="p">(</span><span class="dl">'</span><span class="s1">Baz</span><span class="dl">'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+
+<span class="nx">foo</span><span class="p">.</span><span class="nx">getName</span><span class="p">();</span> <span class="c1">// Foo</span>
+<span class="nx">bar</span><span class="p">.</span><span class="nx">getName</span><span class="p">();</span> <span class="c1">// Bar (5)</span>
+<span class="nx">baz</span><span class="p">.</span><span class="nx">getName</span><span class="p">();</span> <span class="c1">// Baz (10)</span>
+
+<span class="nx">foo</span> <span class="k">instanceof</span> <span class="nx">User</span><span class="p">;</span> <span class="c1">// true</span>
+<span class="nx">bar</span> <span class="k">instanceof</span> <span class="nx">Admin</span><span class="p">;</span> <span class="c1">// true</span>
+<span class="nx">baz</span> <span class="k">instanceof</span> <span class="nx">Class</span><span class="p">;</span> <span class="c1">// true</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

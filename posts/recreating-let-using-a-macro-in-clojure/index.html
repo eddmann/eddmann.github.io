@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Creating a macro using Lambda trickery to mimic the 'Let' special-form">
+
+    <title>Recreating 'Let' using a Macro in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Recreating 'Let' using a Macro in Clojure</h1>
+    <time datetime="2016-01-15T00:00:00-06:00" class="post-date">15 Jan 2016</time>
+    <p>Inspired by a good friends recent <a href="https://gist.github.com/keyvanakbary/190eb819632db0d6c303">Gist</a> on how the functionality of the special form <code class="highlighter-rouge">let</code> could be achieved using a little Lambda trickery, I decided to write a simple Macro that would do this transformation.
+
+It is very interesting to see how concepts such as this can be built up from underlying calculus fundamentals.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmacro</span><span class="w"> </span><span class="n">lets</span><span class="w"> </span><span class="p">[</span><span class="n">bindings</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">body</span><span class="p">]</span><span class="w">
+  </span><span class="o">`</span><span class="p">((</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="o">~@</span><span class="p">(</span><span class="nb">take-nth</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">bindings</span><span class="p">)]</span><span class="w"> </span><span class="o">~@</span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="o">~@</span><span class="p">(</span><span class="nb">take-nth</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="n">bindings</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">lets</span><span class="w"> </span><span class="p">[</span><span class="n">foo</span><span class="w"> </span><span class="s">"bar"</span><span class="w"> </span><span class="n">baz</span><span class="w"> </span><span class="mi">123</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="n">baz</span><span class="p">))</span><span class="w"> </span><span class="c1">; bar 123</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">clojure.walk/macroexpand-all</span><span class="w"> </span><span class="o">'</span><span class="p">(</span><span class="nf">lets</span><span class="w"> </span><span class="p">[</span><span class="n">foo</span><span class="w"> </span><span class="s">"bar"</span><span class="w"> </span><span class="n">baz</span><span class="w"> </span><span class="mi">123</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="n">baz</span><span class="p">)))</span><span class="w">
+</span><span class="c1">; ((fn* ([foo baz] (println foo baz))) "bar" 123)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You can see how simple the macro actually is, with the inclusion of only two unquote-splicing actions.
+I was hoping to also include some of the guards that are present in the <a href="https://github.com/clojure/clojure/blob/clojure-1.7.0/src/clj/clojure/core.clj#L4301"><code class="highlighter-rouge">let</code></a> macro using <a href="https://github.com/clojure/clojure/blob/clojure-1.7.0/src/clj/clojure/core.clj#L1718"><code class="highlighter-rouge">assert-args</code></a> but sadly this has been made private within the core library.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

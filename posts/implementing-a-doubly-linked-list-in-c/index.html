@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple C implementation of a Doubly Linked-List.">
+
+    <title>Implementing a Doubly Linked-List in C &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing a Doubly Linked-List in C</h1>
+    <time datetime="2014-01-03T00:00:00-06:00" class="post-date">03 Jan 2014</time>
+    <p>Following on from the discussion on implementing a <a href="/posts/implementing-a-singly-linked-list-in-c/">singly linked-list</a> in C, a logical follow-up data-structure is the doubly linked-list.
+In a similar fashion, the structure is composed from a set of sequentially linked nodes, each now containing references (pointers) to not only the next node but the previous one to.
+This structure is useful if the use-case dictates the desire to traverse the list both forwards and backwards, or quickly determine preceding and following elements from a given node.
+The head and tail nodes can be terminated with either <a href="http://en.wikipedia.org/wiki/Sentinel_node">sentinel nodes</a> (referred to as ‘circularly linked’ if only one is used) or like in the implementation shown below, NULL.
+An observational implementation difference between the two structures is that through storing the previous and next reference, it can significantly simplify the complexity and running time of certain operations (removal from the tail being the most obvious).
+</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">node</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">item</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">prev</span><span class="p">,</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">node</span><span class="p">;</span>
+
+<span class="n">node</span> <span class="o">*</span><span class="n">head</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">insert</span><span class="p">(</span><span class="kt">int</span> <span class="n">item</span><span class="p">,</span> <span class="n">bool</span> <span class="n">at_tail</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">node</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">node</span><span class="p">));</span>
+    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">;</span>
+    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">at_tail</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="n">head</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">delete</span><span class="p">(</span><span class="n">bool</span> <span class="n">from_tail</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Empty list.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">from_tail</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">prev</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">tail</span><span class="p">)</span> <span class="n">head</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
+        <span class="k">else</span> <span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="k">else</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">list</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%d "</span><span class="p">,</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">);</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">);</span>
+
+    <span class="n">list</span><span class="p">();</span> <span class="c1">// 10 9 8 7 6 1 2 3 4 5</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">delete</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">list</span><span class="p">();</span> <span class="c1">// 8 7 6 1 2 3</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Looking at the implementation above you will notice the omission of the list traversal when removing a node from the tail, as the previous nodes reference is already at hand.
+The ‘list’ method only takes into consideration forward iteration over the list, however, it would be very easy to modify the code to perform backwards traversal.
+It is good practice to not only free the memory that you do not require anymore, but also NULL any related pointers, as these pointers still have access to the now unowned memory location.</p>
+
+<p>One C implementation detail I would like to discuss is the use of ‘typedef struct’ when declaring the node structure.
+In C there are two different namespaces for types, a namespace for ‘struct’ tags and one for ‘typedef’ names.
+Referring to a ‘struct’ can be very verbose and to get around this we can declare both a node ‘struct’ and a plain node in the ‘typedef’ namespace.
+These both refer to the same type, and we are then able to omit the ‘struct’ keyword.
+Using only the ‘typedef’ declaration however, would not allow us to perform <a href="http://en.wikipedia.org/wiki/Forward_declaration">forward declaration</a>, which gives us the ability to use an identifier before giving the compiler the complete definition.</p>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://stackoverflow.com/questions/612328/difference-between-struct-and-typedef-struct-in-c">Difference between ‘struct’ and ‘typedef struct’ in C++?</a></li>
+  <li><a href="http://en.wikipedia.org/wiki/Forward_declaration">Forward declaration</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

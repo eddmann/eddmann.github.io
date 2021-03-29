@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An introduction to the Y-combinator, using PHP.">
+
+    <title>The Y (Fixed-Point) Combinator in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">The Y (Fixed-Point) Combinator in PHP</h1>
+    <time datetime="2014-04-01T00:00:00-05:00" class="post-date">01 Apr 2014</time>
+    <p>A combinator is a type of higher-order function that can be used to express functions without the explicit use of variables.
+A fixed point is a value that is unchanged by a function, satisfying the equation which can be found <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator">here</a>.
+Using the Y-combinator allows us to essentially convert non-recursive code into a recursive counterpart (without directly using named recursion or iteration).
+To work it’s magic the recursive function is computed as the fixed point of the non-recursive function.
+</p>
+
+<p>You may be asking yourself why is this at all relevant in an imperative language such as PHP?
+Well, with the introduction of Closures (since PHP 5.3) the language has slowly started to embrace many functional concepts.
+One such concept however, still requires some work to correctly implement in-practice, that being recursive closures.
+In a previous memorization <a href="/posts/implementing-and-using-memoization-in-php/">post</a> I highlighted a factorial implementation using such an approach, requiring some PHP reference hackery to pass in the closure variable, as this would not typically be available in the function scope.
+With a little research I stumbled upon the concept of Haskell’s ‘fix’ function which is generally known by the name ‘Y-combinator’.
+I was keen to provide a thought-experiment into how this could be implemented in the PHP language along with some interesting example use-cases.</p>
+
+<h2 id="basic-implementation">Basic Implementation</h2>
+
+<p>Below is my first attempt at implementing the Y combinator in PHP, cheating a little by temporarily storing the fix-point function in a variable to remove code duplication.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">Y</span><span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$x</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$F</span><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$f</span><span class="p">(</span><span class="nv">$f</span><span class="p">),</span> <span class="nb">func_get_args</span><span class="p">());</span>
+        <span class="p">});</span>
+    <span class="p">};</span>
+
+    <span class="k">return</span> <span class="nv">$x</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This function can be then be applied to solve the Fibonacci sequence, as shown below.
+As you can see the implementation provides us with the ability to reference the function by parameter instead of name (call-by-name), which in (typed) lambda calculus is not possible.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">Y</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$n</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="o">?</span> <span class="nv">$fib</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$fib</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">:</span> <span class="nv">$n</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h2 id="adding-memorization">Adding Memorization</h2>
+
+<p>With the basic concept now implemented, we can simply expand on this example to include the ability to memorize function call results.
+Providing an initial empty cache, we first check to see if the hashed function call arguments have already be processed in the past, if so we skip the function invocation step and return the answer.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">YMemo</span><span class="p">(</span><span class="nv">$F</span><span class="p">,</span> <span class="nv">$cache</span> <span class="o">=</span> <span class="p">[])</span>
+<span class="p">{</span>
+    <span class="nv">$x</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$F</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$cache</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$F</span><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$cache</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$hash</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span><span class="nb">serialize</span><span class="p">(</span><span class="nb">func_get_args</span><span class="p">()));</span>
+
+            <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$cache</span><span class="p">[</span><span class="nv">$hash</span><span class="p">]))</span> <span class="p">{</span>
+                <span class="nv">$cache</span><span class="p">[</span><span class="nv">$hash</span><span class="p">]</span> <span class="o">=</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$f</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$cache</span><span class="p">),</span> <span class="nb">func_get_args</span><span class="p">());</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="nv">$cache</span><span class="p">[</span><span class="nv">$hash</span><span class="p">];</span>
+        <span class="p">});</span>
+    <span class="p">};</span>
+
+    <span class="k">return</span> <span class="nv">$x</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As the added memorization is an implementation detail, the user facing API has not changed and the function can again be expressed in the same manner as before (now with significant run-time speed increases).</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">YMemo</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$n</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="o">?</span> <span class="nv">$fib</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$fib</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">:</span> <span class="nv">$n</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h2 id="using-closure-bindings">Using Closure Bindings</h2>
+
+<p>Included more for it’s athsetic appeal (syntactic sugar) we can take advantage of <a href="http://www.php.net/manual/en/closure.bind.php">Closure Bindings</a> within PHP (since 5.4) to remove the need to explicitly pass in the fixed-point function.
+Although clearly violating the properties of a true Y-combinator, we are instead able to now simply invoke ‘$this’ with the supplied arguments, providing a more user-friendly implementation.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">Yish</span><span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$x</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$F</span><span class="o">-&gt;</span><span class="nf">bindTo</span><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$f</span><span class="p">(</span><span class="nv">$f</span><span class="p">),</span> <span class="nb">func_get_args</span><span class="p">());</span>
+        <span class="p">});</span>
+    <span class="p">};</span>
+
+    <span class="k">return</span> <span class="nv">$x</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can use the example of the Fibonacci sequence again, to this time make use of the closure bound implementation.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">Yish</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$n</span> <span class="o">&gt;</span> <span class="mi">1</span>
+        <span class="o">?</span> <span class="nv">$this</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$this</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="o">:</span> <span class="nv">$n</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://en.wikibooks.org/wiki/Haskell/Fix_and_recursion">Haskell - Fix and Recursion</a></li>
+  <li><a href="http://php100.wordpress.com/2009/04/13/php-y-combinator/">Y-Combinator in PHP</a></li>
+  <li><a href="http://matt.might.net/articles/implementation-of-recursive-fixed-point-y-combinator-in-javascript-for-memoization/">Fixed-point combinators in JavaScript</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

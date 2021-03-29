@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Showcases how you can use Create React App, Styled Components and React Hooks to build a Flag Guessing Game">
+
+    <title>Building a Flag Guessing Game using React Hooks &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building a Flag Guessing Game using React Hooks</h1>
+    <time datetime="2019-05-03T00:00:00-05:00" class="post-date">03 May 2019</time>
+    <p>Since <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks</a> were announced last autumn I’ve been looking at ways to experiment with them in a couple of small side-projects.
+In this post we will create a simple flag guessing game (called <a href="https://eddmann.com/fun-with-flags/">Fun with Flags</a>) leveraging <a href="https://facebook.github.io/create-react-app/">Create React App</a>, <a href="https://www.styled-components.com/">Styled Components</a> and React Hooks.
+Along the way we will highlight use-cases for several different hooks such as State, Effect and Memoization.
+Finally, we will automate the process of publishing the compiled game to <a href="https://pages.github.com/">GitHub Pages</a>.
+</p>
+
+<p><img src="/uploads/building-a-flag-guessing-game-using-react-hooks/sheldon.jpg" alt="Sheldon Cooper Presents: Fun with Flags" /></p>
+
+<h3 id="setup">Setup</h3>
+
+<p>The first step we need to take is to initialise the project, including the required <code class="highlighter-rouge">styled-components</code> dependency.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yarn create react-app fun-with-flags
+<span class="nv">$ </span><span class="nb">cd </span>fun-with-flags <span class="o">&amp;&amp;</span> yarn add styled-components
+</code></pre></div></div>
+
+<p>The game will take advantage of the <a href="https://emojipedia.org/flags/">flag emojis</a>, which we store in <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/flags.js"><code class="highlighter-rouge">src/flags.js</code></a> along with their associated name.
+If you are following along with this post, you can find the completed listing within the <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/flags.js">GitHub repository</a>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="na">emoji</span><span class="p">:</span> <span class="dl">"</span><span class="s2">🇬🇧</span><span class="dl">"</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="dl">"</span><span class="s2">United Kingdom</span><span class="dl">"</span>
+  <span class="p">},</span>
+  <span class="c1">// ...</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<h3 id="the-answer-box">The Answer Box</h3>
+
+<p>It is good practise to decompose an application into smaller, high cohesion units - of which we can then compose together to provide the desired behaviour.
+With this in mind, we will begin by focusing our attention on the special input field (located within <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/AnswerBox.js"><code class="highlighter-rouge">src/AnswerBox.js</code></a>) that will be used to manage the user’s entered answer.</p>
+
+<p>We start off by defining some key styled building blocks used to create the overall <code class="highlighter-rouge">AnswerBox</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useState</span><span class="p">,</span> <span class="nx">useEffect</span><span class="p">,</span> <span class="nx">useMemo</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">styled</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">styled-components</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">Form</span> <span class="o">=</span> <span class="nx">styled</span><span class="p">.</span><span class="nx">form</span><span class="s2">`
+  margin-bottom: 1em;
+`</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">Placeholder</span> <span class="o">=</span> <span class="nx">styled</span><span class="p">.</span><span class="nx">span</span><span class="s2">`
+  font-family: courier;
+  padding: 0 0 0.2em 0.2em;
+  font-size: 2em;
+  letter-spacing: 0.2em;
+`</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">HiddenInput</span> <span class="o">=</span> <span class="nx">styled</span><span class="p">.</span><span class="nx">input</span><span class="s2">`
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  caret-color: transparent;
+  &amp;:focus + </span><span class="p">${</span><span class="nx">Placeholder</span><span class="p">}</span><span class="s2"> {
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  }
+`</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The input will be presented to the user in placeholder form, using a <code class="highlighter-rouge">_</code> to indicate the presence of a character and including any word separators.
+To achieve this we will use a hidden text input within a form, displaying the resulting input value within a styled span element presented to the user.
+In doing this we can still take advantage of the form lifecycle events (i.e. <code class="highlighter-rouge">onChange</code> and <code class="highlighter-rouge">onSubmit</code>).</p>
+
+<p>Thank you to <a href="https://github.com/sebastianplsim">Sebastian Sim</a> for this idea!</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toPlaceholder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">answer</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="p">[...</span><span class="nx">value</span><span class="p">].</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">placeholder</span><span class="p">,</span> <span class="nx">char</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">placeholder</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="dl">"</span><span class="s2">_</span><span class="dl">"</span><span class="p">,</span> <span class="nx">char</span><span class="p">);</span>
+  <span class="p">},</span> <span class="nx">answer</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[^\s]</span><span class="sr">/g</span><span class="p">,</span> <span class="dl">"</span><span class="s2">_</span><span class="dl">"</span><span class="p">));</span>
+
+<span class="kd">const</span> <span class="nx">normalise</span> <span class="o">=</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">value</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[^</span><span class="sr">A-Z</span><span class="se">]</span><span class="sr">/g</span><span class="p">,</span> <span class="dl">""</span><span class="p">);</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="nx">answer</span><span class="p">,</span> <span class="nx">onCorrect</span><span class="p">,</span> <span class="nx">onIncorrect</span><span class="p">,</span> <span class="p">...</span><span class="nx">props</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">value</span><span class="p">,</span> <span class="nx">setValue</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
+
+  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">setValue</span><span class="p">(</span><span class="dl">""</span><span class="p">),</span> <span class="p">[</span><span class="nx">answer</span><span class="p">]);</span>
+
+  <span class="kd">const</span> <span class="nx">handleChange</span> <span class="o">=</span> <span class="nx">event</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setValue</span><span class="p">(</span><span class="nx">normalise</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">));</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">handleSubmit</span> <span class="o">=</span> <span class="nx">event</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+    <span class="nx">value</span> <span class="o">===</span> <span class="nx">normalise</span><span class="p">(</span><span class="nx">answer</span><span class="p">)</span> <span class="p">?</span> <span class="nx">onCorrect</span><span class="p">()</span> <span class="p">:</span> <span class="nx">onIncorrect</span><span class="p">();</span>
+    <span class="nx">setValue</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">placeholder</span> <span class="o">=</span> <span class="nx">useMemo</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">toPlaceholder</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">answer</span><span class="p">),</span> <span class="p">[</span>
+    <span class="nx">value</span><span class="p">,</span>
+    <span class="nx">answer</span>
+  <span class="p">]);</span>
+
+  <span class="kd">const</span> <span class="nx">maxLength</span> <span class="o">=</span> <span class="nx">useMemo</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">normalise</span><span class="p">(</span><span class="nx">answer</span><span class="p">).</span><span class="nx">length</span><span class="p">,</span> <span class="p">[</span><span class="nx">answer</span><span class="p">]);</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">Form</span> <span class="nx">onSubmit</span><span class="o">=</span><span class="p">{</span><span class="nx">handleSubmit</span><span class="p">}</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">HiddenInput</span>
+        <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">handleChange</span><span class="p">}</span>
+        <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">value</span><span class="p">}</span>
+        <span class="nx">maxLength</span><span class="o">=</span><span class="p">{</span><span class="nx">maxLength</span><span class="p">}</span>
+        <span class="nx">autoFocus</span>
+      <span class="o">/&gt;</span>
+      <span class="o">&lt;</span><span class="nx">Placeholder</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">placeholder</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/Placeholder</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/Form</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Looking at the implementation above you can see that we manage the user’s answer with a State hook.
+This value is reset if the desired answer changes (i.e. a new flag is displayed) using an Effect hook.
+From here, both calculating the actual answer’s length and generating the placeholder for the current state are <a href="https://en.wikipedia.org/wiki/Referential_transparency">referentially transparent</a> operations, and as such can be cached using the Memoization hook.
+Finally, when the user submits the form (i.e. hits enter), we check the value and based on its correctness invoke the provided <code class="highlighter-rouge">onCorrect</code>/<code class="highlighter-rouge">onIncorrect</code> callbacks.</p>
+
+<h3 id="managing-the-game">Managing the Game</h3>
+
+<p>With the <code class="highlighter-rouge">AnswerBox</code> now implemented we can move on to developing the encompassing <code class="highlighter-rouge">Game</code> management component within <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js"><code class="highlighter-rouge">src/Game.js</code></a>.
+In a similar manner to before, we define several styled building blocks that will be used to present the overall game to the user.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useState</span><span class="p">,</span> <span class="nx">useEffect</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">styled</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">styled-components</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">AnswerBox</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./AnswerBox</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">CentreWrapper</span> <span class="o">=</span> <span class="nx">styled</span><span class="p">.</span><span class="nx">div</span><span class="s2">`
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: sans-serif;
+`</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">Flag</span> <span class="o">=</span> <span class="nx">styled</span><span class="p">(({</span> <span class="nx">flag</span><span class="p">,</span> <span class="p">...</span><span class="nx">props</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="p">{...</span><span class="nx">props</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">flag</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="se">)</span><span class="err">`
+</span>  <span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="p">:</span> <span class="mi">5</span><span class="nx">em</span><span class="p">;</span>
+  <span class="nx">line</span><span class="o">-</span><span class="nx">height</span><span class="p">:</span> <span class="mi">1</span><span class="nx">em</span><span class="p">;</span>
+  <span class="nl">padding</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="nl">margin</span><span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+<span class="s2">`;
+
+const Results = styled(({ score, attempts, ...props }) =&gt; (
+  &lt;div {...props}&gt;
+    Score: &lt;span&gt;{score}&lt;/span&gt;, Attempts: &lt;span&gt;{attempts}&lt;/span&gt;
+  &lt;/div&gt;
+))`</span>
+  <span class="nx">display</span><span class="p">:</span> <span class="nx">block</span><span class="p">;</span>
+  <span class="nx">font</span><span class="o">-</span><span class="nx">size</span><span class="p">:</span> <span class="mf">1.5</span><span class="nx">em</span><span class="p">;</span>
+  <span class="nx">span</span> <span class="p">{</span>
+    <span class="nx">font</span><span class="o">-</span><span class="nx">weight</span><span class="p">:</span> <span class="nx">bold</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="s2">`;
+</span></code></pre></div></div>
+
+<p>This component manages the current score, attempts and flag ordering - delegating to the <code class="highlighter-rouge">AnswerBox</code> for presenting and verifying the answer input.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">shuffle</span> <span class="o">=</span> <span class="nx">arr</span> <span class="o">=&gt;</span> <span class="p">[...</span><span class="nx">arr</span><span class="p">].</span><span class="nx">sort</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">());</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">props</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">flags</span><span class="p">,</span> <span class="nx">setFlags</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">shuffle</span><span class="p">(</span><span class="nx">props</span><span class="p">.</span><span class="nx">flags</span><span class="p">));</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">score</span><span class="p">,</span> <span class="nx">setScore</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">attempts</span><span class="p">,</span> <span class="nx">setAttempts</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="p">(</span><span class="nx">props</span><span class="p">.</span><span class="nx">attempts</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">nextFlag</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setFlags</span><span class="p">(</span><span class="nx">flags</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">?</span> <span class="nx">flags</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="nx">shuffle</span><span class="p">(</span><span class="nx">props</span><span class="p">.</span><span class="nx">flags</span><span class="p">));</span>
+    <span class="nx">setAttempts</span><span class="p">(</span><span class="nx">props</span><span class="p">.</span><span class="nx">attempts</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">onCorrect</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">setScore</span><span class="p">(</span><span class="nx">score</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="nx">nextFlag</span><span class="p">();</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">onIncorrect</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">attempts</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">setAttempts</span><span class="p">(</span><span class="nx">attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">setScore</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">score</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+    <span class="nx">nextFlag</span><span class="p">();</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="p">[{</span> <span class="nx">emoji</span><span class="p">,</span> <span class="nx">name</span> <span class="p">}]</span> <span class="o">=</span> <span class="nx">flags</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">(</span>
+    <span class="o">&lt;</span><span class="nx">CentreWrapper</span><span class="o">&gt;</span>
+      <span class="o">&lt;</span><span class="nx">Flag</span> <span class="nx">flag</span><span class="o">=</span><span class="p">{</span><span class="nx">emoji</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">AnswerBox</span>
+        <span class="nx">answer</span><span class="o">=</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span>
+        <span class="nx">onCorrect</span><span class="o">=</span><span class="p">{</span><span class="nx">onCorrect</span><span class="p">}</span>
+        <span class="nx">onIncorrect</span><span class="o">=</span><span class="p">{</span><span class="nx">onIncorrect</span><span class="p">}</span>
+      <span class="sr">/</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="nx">Results</span> <span class="nx">score</span><span class="o">=</span><span class="p">{</span><span class="nx">score</span><span class="p">}</span> <span class="nx">attempts</span><span class="o">=</span><span class="p">{</span><span class="nx">attempts</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="sr">/CentreWrapper</span><span class="err">&gt;
+</span>  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>When the game is started (or all flags exhausted) we reset the <code class="highlighter-rouge">flags</code> state to a shuffled ordering of the provided listing.
+In the case of the <code class="highlighter-rouge">flags</code> initial state, we only wish to shuffle the provided flags once at the beginning (not wastefully on each render).
+To do this we wrap the behaviour in a function which ensures that the operation is only called when required during the components lifecycle.
+From here, based on the decision made within the <code class="highlighter-rouge">AnswerBox</code> component, we update the user’s attempts/score accordingly.</p>
+
+<p>Finally, we are able to compose all these pieces together into a <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/index.js"><code class="highlighter-rouge">src/index.js</code></a> entry point.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">ReactDOM</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">react-dom</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">Game</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./Game</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">flags</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">./flags</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span>
+  <span class="o">&lt;</span><span class="nx">Game</span> <span class="nx">flags</span><span class="o">=</span><span class="p">{</span><span class="nx">flags</span><span class="p">}</span> <span class="nx">attempts</span><span class="o">=</span><span class="p">{</span><span class="mi">3</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">,
+</span>  <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">root</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can then <code class="highlighter-rouge">yarn start</code> to experiment with the game locally 🎉.</p>
+
+<h3 id="publishing-to-github-pages">Publishing to GitHub Pages</h3>
+
+<p>Now that we are happy with the game locally, the next step is to share it with the masses 😎.
+This can be easily achieved via compiling a production build locally and publishing it to GitHub Pages.
+We can even automate this process by adding the following <a href="https://github.com/tschaub/gh-pages"><code class="highlighter-rouge">gh-pages</code></a> dependency.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yarn add gh-pages
+</code></pre></div></div>
+
+<p>With this dependency added, include the following <code class="highlighter-rouge">scripts</code> actions into the <code class="highlighter-rouge">package.json</code> file.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"predeploy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"yarn build"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"deploy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gh-pages -d build"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now, whenever you wish to publish a new version of the game simply run the following command and <code class="highlighter-rouge">gh-pages</code> will build and commit a new version to the <code class="highlighter-rouge">gh-pages</code> branch.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yarn deploy
+</code></pre></div></div>
+
+<p>This in-turn will publish a new static version of the game to GitHub Pages, accessible in my case via <a href="https://eddmann.github.io/fun-with-flags"><code class="highlighter-rouge">https://eddmann.github.io/fun-with-flags</code></a> and as I have my apex DNS record pointing to GitHub at <a href="https://eddmann.com/fun-with-flags/"><code class="highlighter-rouge">https://eddmann.com/fun-with-flags</code></a>.</p>
+
+<p><img src="/uploads/building-a-flag-guessing-game-using-react-hooks/fun-with-flags.png" alt="Fun with Flags" /></p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

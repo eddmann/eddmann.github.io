@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Implementing the commonly found Christmas cracker gift in ClojureScript using Reagent">
+
+    <title>The Mystery Calculator in ClojureScript and Reagent &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">The Mystery Calculator in ClojureScript and Reagent</h1>
+    <time datetime="2020-10-31T00:00:00-05:00" class="post-date">31 Oct 2020</time>
+    <p>The Mystery Calculator is a commonly found Christmas cracker gift, which uses a neat powers of two (binary) addition trick to fool the spectator.
+I thought it would be interesting to create a small web application in <a href="https://clojurescript.org/">ClojureScript</a> and <a href="http://reagent-project.github.io/">Reagent</a>, which provided the ability to generate a selection of these cards and perform the trick.</p>
+
+
+
+<p>You can generate a selection of these mystery cards and perform the trick yourself by visiting <a href="https://eddmann.com/mystery-calculator-clojurescript/">here</a>, the source-code is also availble on <a href="https://github.com/eddmann/mystery-calculator-clojurescript/">GitHub</a>.</p>
+
+<p><a href="https://eddmann.com/mystery-calculator-clojurescript/"><img src="/uploads/the-mystery-calculator-in-clojurescript-and-reagent/mystery-calculator.png" alt="The Mystery Calculator" /></a></p>
+
+<p>The magic trick is performed as follows:</p>
+
+<blockquote>
+  <p>The complete set consists of <code class="highlighter-rouge">N</code> cards, printed with a series of numbers, show all the cards to a friend and ask him or her to select-one number from any one card.
+Show the other <code class="highlighter-rouge">N-1</code> cards to your friend asking him or her to say whether the number appears on these cards.
+Take all the cards on which your friend says the number appears, add together the top left hand corner number of each card and the total is the number your friend selected.</p>
+</blockquote>
+
+<h3 id="how-it-works">How it works?</h3>
+
+<p>You may notice that all the card numbers that are chosen can be written in terms of powers of two.
+Upon closer inspection, you may also see that each number can be written in terms of a subset (or all) of the numbers present in the top-left hand corner of each of the cards.</p>
+
+<p>I found it easier to visualise this by replacing the decimal number represenation with binary.
+If we number all the available cards (<code class="highlighter-rouge">1 to N</code>), you will see that each number on that given card has that positions bit set to <code class="highlighter-rouge">1</code>.
+This means that we can calculate the mystery number by performing a binary <code class="highlighter-rouge">AND</code> operation on the top-left hand corners number for all cards which include the chosen number.</p>
+
+<p>For eample, say I have picked the mystery number 28 (<code class="highlighter-rouge">11100</code> in binary).
+That number appears on cards 3, 4 and 5 in a convential 6 card setup.
+The top-left hand corner numbers for these cards are 4 (<code class="highlighter-rouge">00100</code>), 8 (<code class="highlighter-rouge">01000</code>) and 16 (<code class="highlighter-rouge">10000</code>).
+If we perform the binary <code class="highlighter-rouge">AND</code> operation on these numbers we produce the chosen mystery number 28 (<code class="highlighter-rouge">11100</code>).
+This works for any number chosen from the given cards.</p>
+
+<h3 id="building-the-mystery-calculator">Building the Mystery Calculator</h3>
+
+<p>Now we are familiar with how it works, we can start by building the functionality which produces these crafted cards based on a desired card count.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">generate-cards</span><span class="w"> </span><span class="p">[</span><span class="n">num-of-cards</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
+    </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">cards</span><span class="w"> </span><span class="n">number</span><span class="p">]</span><span class="w">
+      </span><span class="p">(</span><span class="nf">map-indexed</span><span class="w">
+        </span><span class="o">#</span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">bit-test</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">%1</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">conj</span><span class="w"> </span><span class="n">%2</span><span class="w"> </span><span class="n">number</span><span class="p">)</span><span class="w"> </span><span class="n">%2</span><span class="p">)</span><span class="w">
+        </span><span class="n">cards</span><span class="p">))</span><span class="w">
+    </span><span class="p">(</span><span class="nb">repeat</span><span class="w"> </span><span class="n">num-of-cards</span><span class="w"> </span><span class="p">(</span><span class="nb">vector</span><span class="p">))</span><span class="w">
+    </span><span class="p">(</span><span class="nb">range</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">(</span><span class="nf">Math/pow</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">num-of-cards</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Using a Lisp we are able to succinctly express how a card is formed.
+First, we produce an exclusive range of all the sequential numbers up-to two to the power of the card count.
+For each number and card we check to see if the given numbers bit is set to <code class="highlighter-rouge">1</code> at that cards position.
+For example, for the first card we would check the first bit, the second card the second bit etc.
+In doing this reducation we eventually construct all the desired cards with the specifically placed numbers.</p>
+
+<p>Now that we can generate these cards, we next want to present them to the user.
+To do this I decided to explore using Reagent, which provides an efficient way to create React components using ClojureScript.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">display-cards</span><span class="w"> </span><span class="p">[</span><span class="n">chosen-cards</span><span class="w"> </span><span class="n">cards</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">toggle-choice</span><span class="w"> </span><span class="o">#</span><span class="p">((</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="n">%1</span><span class="w"> </span><span class="n">%2</span><span class="p">)</span><span class="w"> </span><span class="nb">disj</span><span class="w"> </span><span class="nb">conj</span><span class="p">)</span><span class="w"> </span><span class="n">%1</span><span class="w"> </span><span class="n">%2</span><span class="p">)]</span><span class="w">
+    </span><span class="p">[</span><span class="no">:div.cards</span><span class="w">
+      </span><span class="p">(</span><span class="nb">doall</span><span class="w">
+        </span><span class="p">(</span><span class="k">for</span><span class="w"> </span><span class="p">[</span><span class="n">card</span><span class="w"> </span><span class="n">cards</span><span class="p">]</span><span class="w">
+          </span><span class="o">^</span><span class="p">{</span><span class="no">:key</span><span class="w"> </span><span class="n">card</span><span class="p">}</span><span class="w">
+          </span><span class="p">[</span><span class="no">:div</span><span class="w"> </span><span class="p">{</span><span class="no">:class</span><span class="w"> </span><span class="p">[</span><span class="s">"card"</span><span class="w"> </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nb">contains?</span><span class="w"> </span><span class="o">@</span><span class="n">chosen-cards</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">card</span><span class="p">))</span><span class="w"> </span><span class="s">"chosen"</span><span class="p">)]</span><span class="w">
+                 </span><span class="no">:on-click</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">swap!</span><span class="w"> </span><span class="n">chosen-cards</span><span class="w"> </span><span class="n">toggle-choice</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">card</span><span class="p">))}</span><span class="w">
+            </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">num</span><span class="p">]</span><span class="w"> </span><span class="o">^</span><span class="p">{</span><span class="no">:key</span><span class="w"> </span><span class="n">num</span><span class="p">}</span><span class="w"> </span><span class="p">[</span><span class="no">:span</span><span class="w"> </span><span class="n">num</span><span class="p">])</span><span class="w"> </span><span class="n">card</span><span class="p">)]))]))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Passing in the generated cards from the previous function and a <a href="http://reagent-project.github.io/docs/master/reagent.core.html#var-atom">state atom</a> which includes the users selection, we can present these for React to render using <a href="https://github.com/weavejester/hiccup">Hiccup</a>.
+If the user clicks on a card, we will toggle the presence of the cards top-left hand corners number within the <code class="highlighter-rouge">chosen-cards</code> state atom.</p>
+
+<p>Finally, we can wire up the application, declaring the two state atoms with default values and displaying the mystery number if a card has been selected.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">clamp</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="nb">max</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="nb">min</span><span class="p">)</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="nb">max</span><span class="p">)</span><span class="w"> </span><span class="nb">max</span><span class="w"> </span><span class="n">x</span><span class="p">)))</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="p">[]</span><span class="w">
+  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">num-of-cards</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w">
+        </span><span class="n">chosen-cards</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="o">#</span><span class="p">{})]</span><span class="w">
+    </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[]</span><span class="w">
+      </span><span class="p">[</span><span class="no">:div</span><span class="w">
+        </span><span class="p">[</span><span class="no">:p</span><span class="w">
+          </span><span class="s">"Number of cards: "</span><span class="w">
+          </span><span class="p">[</span><span class="no">:input</span><span class="w"> </span><span class="p">{</span><span class="no">:type</span><span class="w"> </span><span class="s">"number"</span><span class="w">
+                   </span><span class="no">:value</span><span class="w"> </span><span class="o">@</span><span class="n">num-of-cards</span><span class="w">
+                   </span><span class="no">:on-change</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">reset!</span><span class="w"> </span><span class="n">num-of-cards</span><span class="w"> </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">.-target</span><span class="w"> </span><span class="n">.-value</span><span class="w"> </span><span class="p">(</span><span class="nf">clamp</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="mi">7</span><span class="p">)))}]]</span><span class="w">
+        </span><span class="p">(</span><span class="nf">display-cards</span><span class="w"> </span><span class="n">chosen-cards</span><span class="w"> </span><span class="p">(</span><span class="nf">generate-cards</span><span class="w"> </span><span class="o">@</span><span class="n">num-of-cards</span><span class="p">))</span><span class="w">
+        </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">mystery-number</span><span class="w"> </span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="nb">+</span><span class="w"> </span><span class="o">@</span><span class="n">chosen-cards</span><span class="p">)]</span><span class="w">
+          </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nb">pos?</span><span class="w"> </span><span class="n">mystery-number</span><span class="p">)</span><span class="w">
+            </span><span class="p">[</span><span class="no">:p.number</span><span class="w"> </span><span class="s">"Your mystery number is "</span><span class="w"> </span><span class="p">[</span><span class="no">:strong</span><span class="w"> </span><span class="n">mystery-number</span><span class="p">]</span><span class="w"> </span><span class="s">" ✨"</span><span class="p">]))])))</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="o">^</span><span class="no">:export</span><span class="w"> </span><span class="n">init</span><span class="w"> </span><span class="p">[]</span><span class="w">
+  </span><span class="p">(</span><span class="nf">reagent.dom/render</span><span class="w"> </span><span class="p">[</span><span class="n">app</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">.getElementById</span><span class="w"> </span><span class="n">js/document</span><span class="w"> </span><span class="s">"app"</span><span class="p">)))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We include a <code class="highlighter-rouge">clamp</code> function which is not present in the ClojureScript core, this provides us with the ability to restrict how many cards can be generated as this can be an expensive Browser operation.</p>
+
+<h3 id="deployment">Deployment</h3>
+
+<p>To ease deployment and hosting I decided to leverage GitHub Actions and GitHub Pages.
+Upon a successful Git push, using the provided <code class="highlighter-rouge">Makefile</code> and Docker-setup, we first compile the application and subsequently release the artifact to the <code class="highlighter-rouge">gh-pages</code> branch.
+This branch is then used to host the web application made available <a href="https://eddmann.com/mystery-calculator-clojurescript/">here</a>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Release</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">master</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">release</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+      <span class="pi">-</span> <span class="na">run</span><span class="pi">:</span> <span class="s">make release</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">JamesIves/github-pages-deploy-action@releases/v3</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">ACCESS_TOKEN</span><span class="pi">:</span> <span class="s">${{ secrets.ACCESS_TOKEN }}</span>
+          <span class="na">BRANCH</span><span class="pi">:</span> <span class="s">gh-pages</span>
+          <span class="na">FOLDER</span><span class="pi">:</span> <span class="s">public</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

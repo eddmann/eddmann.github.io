@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring how to use PostgreSQL for performing operations on a Deck of Cards">
+
+    <title>Operations on a Deck of Cards in PostgreSQL &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Operations on a Deck of Cards in PostgreSQL</h1>
+    <time datetime="2016-04-12T00:00:00-05:00" class="post-date">12 Apr 2016</time>
+    <p>Recently I have been looking more into SQL and in-particular how RDMS’s work under-the-hood.
+I thought it would be interesting to use some of the lesser-known features that PostgreSQL has to offer, concentrating my efforts on operations performed on a deck of cards.
+</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">WITH</span> <span class="n">deck</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">rank</span> <span class="o">||</span> <span class="n">suit</span> <span class="k">AS</span> <span class="n">card</span>
+    <span class="k">FROM</span>
+        <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(</span><span class="s1">'2 3 4 5 6 7 8 9 10 J Q K A'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">))</span> <span class="k">AS</span> <span class="n">rank</span><span class="p">,</span>
+        <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(</span><span class="s1">'♠ ♥ ♦ ♣'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">))</span> <span class="k">as</span> <span class="n">suit</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>The first task we need to complete is to create a table of the 52 cards that are present in a deck.
+We can do this rather succinctly by taking advantage of PostgreSQL’s arrays and a cross-join (Cartesian product) between the ranks and suits.
+Using a CTE by way of the <code class="highlighter-rouge">WITH</code> clause, we are able to use this table in later queries by name.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">ARRAY</span><span class="p">(</span><span class="k">SELECT</span> <span class="n">card</span> <span class="k">FROM</span> <span class="n">deck</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">random</span><span class="p">()</span> <span class="k">LIMIT</span> <span class="mi">5</span><span class="p">)</span> <span class="k">AS</span> <span class="n">hand</span>
+</code></pre></div></div>
+
+<p>We can then use this deck to retrieve a randomised five card hand.</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span>
+    <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">AS</span> <span class="n">hands</span>
+<span class="k">FROM</span>
+    <span class="n">deck</span> <span class="k">AS</span> <span class="n">a</span><span class="p">,</span> <span class="n">deck</span> <span class="k">AS</span> <span class="n">b</span><span class="p">,</span> <span class="n">deck</span> <span class="k">AS</span> <span class="k">c</span><span class="p">,</span> <span class="n">deck</span> <span class="k">AS</span> <span class="n">d</span><span class="p">,</span> <span class="n">deck</span> <span class="k">AS</span> <span class="n">e</span>
+<span class="k">WHERE</span>
+    <span class="n">a</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">.</span><span class="n">card</span> <span class="k">AND</span> <span class="n">b</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="k">c</span><span class="p">.</span><span class="n">card</span> <span class="k">AND</span>
+    <span class="k">c</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">.</span><span class="n">card</span> <span class="k">AND</span> <span class="n">d</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">card</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Alternatively we can return all the possible combinations of hands present within a deck.
+Using a similar cross-join present when creating the deck we instead condition the result to only return unique combinations.
+This uses the fact that although each card is a string value, combined they are comparable and still provide a <a href="https://en.wikipedia.org/wiki/Total_order">total order</a>.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

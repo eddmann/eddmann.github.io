@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 5 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 5 - Doesn't He Have Intern-Elves For This? &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 5 - Doesn't He Have Intern-Elves For This?</h1>
+    <time datetime="2021-01-29T00:00:00-06:00" class="post-date">29 Jan 2021</time>
+    <p>On the fifth day of Advent of Code 2015 Santa needs help figuring out which strings in his text file are <em>naughty or nice</em> - a.k.a best load up a <a href="https://regex101.com/">Regular Expression tester</a>!</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>For part one we are supplied several rules which when combined constitute the supplied string being <em>nice</em>.
+String validation rules such as this lend themselves well to Regular Expression pattern matching.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">isNice</span> <span class="o">=</span> <span class="p">(</span><span class="na">line</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">totalVowels</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">[</span><span class="sr">aeiou</span><span class="se">]</span><span class="sr">/g</span><span class="p">)?.</span><span class="nx">length</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">hasRepeatedLetter</span> <span class="o">=</span> <span class="sr">/</span><span class="se">([</span><span class="sr">a-z</span><span class="se">])\1</span><span class="sr">/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">hasRestrictedSequence</span> <span class="o">=</span> <span class="sr">/</span><span class="se">(</span><span class="sr">ab|cd|pq|xy</span><span class="se">)</span><span class="sr">/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">totalVowels</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="nx">hasRepeatedLetter</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">hasRestrictedSequence</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="k">return</span> <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">isNice</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>To tally up all the provided strings (seperated by new-lines) we define a predicate function (<code class="highlighter-rouge">isNice</code>) used within a filter; returning the resulting lists length.</p>
+
+<p>The predicate function itself validates three seperate rules.
+The first of which tallies up all the vowels that are present within the string, of-which we verify that at least three are present.
+For the second rule we ensure that their exists at least one repeated letter pair (such as <code class="highlighter-rouge">aa</code> or <code class="highlighter-rouge">bb</code>).
+To achieve this we use a <a href="https://javascript.info/regexp-backreferences">back-reference</a>, that based on a supplied numbered group (in this case a single letter <code class="highlighter-rouge">[a-z]</code>) will ensure that the captured value is present in-place of the back-reference location.
+The final rule ensures that no restricted letter sequences are present in the string.</p>
+
+<p>When we combine all these sub-rules together we are able to validate if a string is indeed nice.
+From here we can filter down the listing and find the answer total we are looking for 🌟.</p>
+
+<p>We can alternately leverage more features provided to us by Regular Expressions and solve the problem within a single pattern like so:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+    <span class="sr">/^</span><span class="se">(?=(?:</span><span class="sr">.*</span><span class="se">[</span><span class="sr">aeiou</span><span class="se">]</span><span class="sr">.*</span><span class="se">){3,})(?=</span><span class="sr">.*</span><span class="se">(</span><span class="sr">.</span><span class="se">)\1</span><span class="sr">.*</span><span class="se">)(?!</span><span class="sr">.*</span><span class="se">(?:</span><span class="sr">ab|cd|pq|zy</span><span class="se">)</span><span class="sr">.*</span><span class="se">)</span><span class="sr">.*/gm</span>
+  <span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Using the <a href="https://javascript.info/regexp-multiline-mode">multiline mode</a> we are able to change the behaviour of the <code class="highlighter-rouge">^</code> and instead of it only matching the start of a string, it will now match the start of each line.
+Combined with three <a href="https://javascript.info/regexp-lookahead-lookbehind">lookahead</a> patterns we can validate each line as follows:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">(?=(?:.*[aeiou].*){3,})</code> - We look for the presence of at least three <code class="highlighter-rouge">aeiou</code> character matches anywhere on the line.</li>
+  <li><code class="highlighter-rouge">(?=.*(.)\1.*)</code> - We combine this with ensuring that a repeated letter pair appears anywhere on the line.</li>
+  <li><code class="highlighter-rouge">(?!.*(?:ab|cd|pq|zy).*)</code> - Finally, we ensure that none of the restricted letter sequences appear on the line (using a negative lookahead).</li>
+</ul>
+
+<p>Using lookaheads in this manor provides us with a form of <code class="highlighter-rouge">AND</code> logic, giving us the ability to evaluate the entire line multiple times.
+Although this shows how powerful Regular Expressions can be, I still prefer the first solution due to its readability.</p>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For the next part we are asked to revise the rules which dictate how we determine a nice string, and evalulate the list again.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">isNice</span> <span class="o">=</span> <span class="p">(</span><span class="na">line</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">hasRepeatedPairWithoutOverlap</span> <span class="o">=</span> <span class="sr">/</span><span class="se">([</span><span class="sr">a-z</span><span class="se">]{2})[</span><span class="sr">a-z</span><span class="se">]</span><span class="sr">*</span><span class="se">\1</span><span class="sr">/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">hasTripletWithRepeatedStartAndEnd</span> <span class="o">=</span> <span class="sr">/</span><span class="se">([</span><span class="sr">a-z</span><span class="se">])[</span><span class="sr">a-z</span><span class="se">]\1</span><span class="sr">/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">line</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">hasRepeatedPairWithoutOverlap</span> <span class="o">&amp;&amp;</span> <span class="nx">hasTripletWithRepeatedStartAndEnd</span><span class="p">;</span>
+  <span class="p">};</span>
+
+  <span class="k">return</span> <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">isNice</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We now need to harness back-references in both defined pattern matches.
+In the first instance we now wish to ensure that at least one repeated pair sequence exists (i.e. <code class="highlighter-rouge">abcdeab</code>, <code class="highlighter-rouge">abab</code>), however, cases of overlapping must be excluded (such as <code class="highlighter-rouge">aaa</code> or <code class="highlighter-rouge">bbb</code>).
+To achieve this we capture groups of two letters, and then ensure that zero or more letters appear before we see this capture groups value again.
+The second rule requires that the string must include a letter triplet which contains the same letter at the start and end.
+Again, we can harness a back-reference to capture the starting letter, ensure that a single letter appears in the middle and finally validate that the captured value is present at the end.</p>
+
+<p>When we combine these sub-rules together we are then able to validate the string listing again, tallying up how many strings are now deemed nice 🌟.</p>
+
+<p>Again, we can alternately leverage more features provided to us by Regular Expressions and solve the problem within a single pattern like so:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^</span><span class="se">(?=</span><span class="sr">.*</span><span class="se">(</span><span class="sr">..</span><span class="se">)</span><span class="sr">.*</span><span class="se">\1)(?=</span><span class="sr">.*</span><span class="se">(</span><span class="sr">.</span><span class="se">)</span><span class="sr">.</span><span class="se">\2</span><span class="sr">.*</span><span class="se">)</span><span class="sr">.*/gm</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Using multiline mode, lookahead patterns and back-references, we are able to evaluate each line based on the given rules like so:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">(?=.*(..).*\1)</code> - We first ensure that at least one repeated pair sequence exists somewhere within the line.</li>
+  <li><code class="highlighter-rouge">(?=.*(.).\2.*)</code> - And that there also exists a letter triplet which contains the same letter at the start and end within the line.</li>
+</ul>
+
+<p>Combined these patterns form our validation logic, allowing us to match and return the total number of lines which conform to the rule set.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

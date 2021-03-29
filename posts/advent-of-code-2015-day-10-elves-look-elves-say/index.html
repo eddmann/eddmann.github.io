@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 10 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 10 - Elves Look, Elves Say &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 10 - Elves Look, Elves Say</h1>
+    <time datetime="2021-02-03T00:00:00-06:00" class="post-date">03 Feb 2021</time>
+    <p>On the tenth day of Advent of Code 2015 the Elves are playing a game of <a href="https://en.wikipedia.org/wiki/Look-and-say_sequence">look-and-say</a>, of which we are asked to find several terms in the sequence.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>For part one we are asked to determine the length of the result of the 40th term in the sequence (starting with the provided input).
+Based on a famous integer sequence, we begin by implementing how the next term can be produced from a supplied value.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">lookAndSay</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">string</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span>
+    <span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d)\1</span><span class="sr">*/g</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">next</span><span class="p">,</span> <span class="nx">digit</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">+</span> <span class="nx">digit</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="nx">digit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="dl">''</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>For this implementation I have decided to take advantage of Regular Expression back-reference’s again to capture all the grouped adjacent digits - treating integers as strings in the process.
+From here we can reduce over these groups forming the next value in the sequence.</p>
+
+<p>Now we have the ability to produce the next term in the sequence, we need a means to iterate over this process for a given amount of times.
+For this I decided to create a small generic utility function, which is influenced by the <a href="https://clojuredocs.org/clojure.core/iterate"><code class="highlighter-rouge">iterate</code></a> function provided in Clojure (expect this one is not lazy).</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">repeat</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span>
+  <span class="nx">times</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span>
+  <span class="nx">fn</span><span class="p">:</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">T</span><span class="p">,</span>
+  <span class="nx">initialValue</span><span class="p">?:</span> <span class="nx">T</span>
+<span class="p">):</span> <span class="nx">T</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">accumulator</span> <span class="o">=</span> <span class="nx">initialValue</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="nx">times</span><span class="o">--</span><span class="p">)</span> <span class="nx">accumulator</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nx">accumulator</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">accumulator</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Providing an optional initial value, this function abstracts away the mutational looping required to apply this process in a performant manor.
+With these two functions now present we can compose them together and find the 40th term which is requird to answer this parts question 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">repeat</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="nx">lookAndSay</span><span class="p">,</span> <span class="nx">input</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are required to instead find the 50th terms length in the sequence.
+Again we can compose the two above functions together to find the desired answer 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">repeat</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="nx">lookAndSay</span><span class="p">,</span> <span class="nx">input</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

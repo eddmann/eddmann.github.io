@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 17 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 17 - No Such Thing as Too Much &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 17 - No Such Thing as Too Much</h1>
+    <time datetime="2021-02-10T00:00:00-06:00" class="post-date">10 Feb 2021</time>
+    <p>On the seventeenth day of Advent of Code 2015 the elves bought 150 litres of eggnog that we are asked to fit in the supplied containers for refrigeration.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are supplied a list of all the different sized containers we have available to us as input; and for part one asked how many combinations of these will fit the 150 litre requirement.
+At its core today centres around the <a href="https://en.wikipedia.org/wiki/Subset_sum_problem">Subset sum problem</a>, where-by given a <a href="https://en.wikipedia.org/wiki/Multiset">Multiset</a> we are required to find all the possible subsets that sum to a given number (in this case 150).
+We begin by parsing the supplied containers into a form we can then process.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">parseContainers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>There are several popular ways to solve the Subset sum problem, all with their own complexity characteristics.
+Due to the input being so small I have opted for the native combinations approach, with a small optimisation to prune subsets that have already exceeded the desired total.
+In the future I hope to spend some time investigating how you can employ Dynamic Programming to help improve performance.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">subsetSum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">numbers</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span> <span class="nx">target</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span><span class="p">[][]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">recur</span> <span class="o">=</span> <span class="p">(</span><span class="na">remaining</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span> <span class="na">subset</span><span class="p">:</span> <span class="kr">number</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">total</span> <span class="o">=</span> <span class="nx">subset</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">total</span> <span class="o">===</span> <span class="nx">target</span><span class="p">)</span> <span class="k">return</span> <span class="p">[</span><span class="nx">subset</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">total</span> <span class="o">&gt;=</span> <span class="nx">target</span><span class="p">)</span> <span class="k">return</span> <span class="p">[];</span>
+
+    <span class="k">return</span> <span class="nx">remaining</span><span class="p">.</span><span class="nx">flatMap</span><span class="p">((</span><span class="nx">n</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">recur</span><span class="p">(</span><span class="nx">remaining</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">[...</span><span class="nx">subset</span><span class="p">,</span> <span class="nx">n</span><span class="p">])</span>
+    <span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="k">return</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">numbers</span><span class="p">,</span> <span class="p">[]);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>The above implementation uses a recursive closure to iterate through all the possible subsets.
+An optimisation I omitted would be to check upon each iteration that the sum of the current total and remaining numbers is not less than the target.
+If this is the case we can prune these branches, as we know that no following subset will meet the desired criteria.</p>
+
+<p>Following on from this, I also spent a little time implementing the same recursive implementation using Generators.
+I find that recursive problems such as this can be succinctly defined in this manor.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">subsetSum</span><span class="p">(</span>
+  <span class="nx">numbers</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span>
+  <span class="nx">target</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="kr">number</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="kd">function</span><span class="o">*</span> <span class="nx">recur</span><span class="p">(</span><span class="na">remaining</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span> <span class="na">subset</span><span class="p">:</span> <span class="kr">number</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">total</span> <span class="o">=</span> <span class="nx">subset</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">total</span> <span class="o">===</span> <span class="nx">target</span><span class="p">)</span> <span class="k">yield</span> <span class="nx">subset</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">total</span> <span class="o">&gt;=</span> <span class="nx">target</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">remaining</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">yield</span><span class="o">*</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">remaining</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="p">[...</span><span class="nx">subset</span><span class="p">,</span> <span class="nx">remaining</span><span class="p">[</span><span class="nx">i</span><span class="p">]]);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">yield</span><span class="o">*</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">numbers</span><span class="p">,</span> <span class="p">[]);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With the ability to now determine all the possible subsets which sum to the given number we can answer the first part of today’s problem 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">subsetSum</span><span class="p">(</span><span class="nx">parseContainers</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">150</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are asked to investigate the possible subsets further, determining how many combinations of the least amount of containers can we use.
+Again, due to the search-space being so small we can harness the same functionality implemented in part one and construct an occurrences map per subset length.
+With this occurrence mapping we can then workout the smallest subset length present and then return this count to answer part two 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">sizes</span> <span class="o">=</span> <span class="nx">subsetSum</span><span class="p">(</span><span class="nx">parseContainers</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">150</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">sizes</span><span class="p">,</span> <span class="nx">subset</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">sizes</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">subset</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="p">(</span><span class="nx">sizes</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">subset</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">||</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="k">new</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="kr">number</span><span class="p">,</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">()</span>
+  <span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">sizes</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(...</span><span class="nx">sizes</span><span class="p">.</span><span class="nx">keys</span><span class="p">()));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Like in the part one there are more performant solutions to achieving this end result.
+In the future I hope to explore the Subset sum problem in more detail and explore these options.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 8 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 8 - Matchsticks &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 8 - Matchsticks</h1>
+    <time datetime="2021-02-01T00:00:00-06:00" class="post-date">01 Feb 2021</time>
+    <p>On the eighth day of Advent of Code 2015 Santa wants to know how much space his newly digitised list will take up when stored.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Based on the supplied input list of string literals; part one asks us to tally up the additional space this literal interpretation takes us as opposed to their in-memory representations.
+When parsing each string literal we need to take into consideration any escape sequences and hexadecimal notation.
+This problem feels like it could be solved using Regular Expression patterns, however, upon examination we may be able to harness a couple of in-built JavaScript functions to do alot of the heavy lifting.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span>
+    <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">(</span><span class="nx">total</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">total</span> <span class="o">+</span> <span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">line</span><span class="p">).</span><span class="nx">length</span><span class="p">),</span>
+      <span class="mi">0</span>
+    <span class="p">);</span>
+</code></pre></div></div>
+
+<p>Using the <em>dreaded</em> <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval"><code class="highlighter-rouge">eval</code></a> function we are able to leverage JavaScript in evaluating each provided string literal, returning to us the in-memory represenation.
+Although I would refrain from using this approach with untrusted input, in a small puzzle like this it provides a very succinct solution.
+Reducing over the input listing tallying up the length differences along the way, we are able to produce the desired answer 🌟.</p>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>In part two we are asked to apply an additional encoding on the provided string literals, returning the total difference between the encoded and original input.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span>
+    <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">(</span><span class="nx">total</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">total</span> <span class="o">+</span> <span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">line</span><span class="p">).</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">line</span><span class="p">.</span><span class="nx">length</span><span class="p">),</span>
+      <span class="mi">0</span>
+    <span class="p">);</span>
+</code></pre></div></div>
+
+<p>Again, we are able to harness another built-in function <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify"><code class="highlighter-rouge">JSON.stringify</code></a> which will provide us with the desired escape sequences and quotes.
+Reducing over the input listing we can tally up these length differences and return the answer we require 🌟.</p>
+
+<p>To summarise, todays solutions depend greatly on functionality provided by the chosen language (JavaScript).
+In the future I hope to spend a little more time exploring how we could leverage Regular Expressions to solve this problem in a more translatable mannor.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

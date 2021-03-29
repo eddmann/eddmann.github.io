@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documenting how to compile Pokémon Red (pokered) using Docker and adding 'Super B' button behaviour">
+
+    <title>Compiling Pokémon Red (pokered) using Docker and adding 'Super B' button behaviour &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Compiling Pokémon Red (pokered) using Docker and adding 'Super B' button behaviour</h1>
+    <time datetime="2019-01-29T00:00:00-06:00" class="post-date">29 Jan 2019</time>
+    <p>Over the Christmas break I found myself on a bit of a nostalgic gaming journey.
+Along with building a <a href="https://retropie.org.uk/">RetroPie</a>, I dusted off my old Game Boy and decided to ‘catch them all’ one more time on Pokémon Red.
+Whilst playing, the developer in me started to contrive how a game like this was created, and better still could be changed.
+Enter <a href="https://github.com/pret/pokered">pokered</a>, a disassembly of Pokémon Red/Blue which has been organised so that an assembly code noice like myself can understand it.
+In this post I will go through compiling the ASM, tweaking the game to add <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de">‘Super B’ button behaviour</a>, and then running the compiled ROM on an actual handheld!
+</p>
+
+<p><strong>Note:</strong> I don’t condone piracy and personally own both Pokémon Red/Blue game cartridges that this project is based on.</p>
+
+<h3 id="compiling-pokered-using-docker">Compiling pokered using Docker</h3>
+
+<p>The <a href="https://github.com/pret/pokered">pokered</a> Git repository is well documented, including the steps required to compile the given assembly code for the desired platform.
+However, being an advocate of Docker I wished to take it a step further an Dockerise this process.
+To do this I created the <code class="highlighter-rouge">Dockerfile</code> below, which uses a small <a href="https://github.com/bitnami/minideb">Debian base image</a> to install all the required dependencies with.</p>
+
+<div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> bitnami/minideb:stretch</span>
+<span class="k">RUN </span>install_packages make git gcc byacc flex pkg-config libpng-dev ca-certificates
+<span class="k">RUN </span>git clone https://github.com/rednex/rgbds /opt/rgbds <span class="o">&amp;&amp;</span> make <span class="nt">-C</span> /opt/rgbds <span class="nb">install</span> <span class="o">&amp;&amp;</span> <span class="nb">rm</span> <span class="nt">-fr</span> /opt/rgbds
+<span class="k">RUN </span><span class="nb">mkdir</span> /opt/src
+<span class="k">WORKDIR</span><span class="s"> /opt/src</span>
+<span class="k">CMD</span><span class="s"> ["make", "all"]</span>
+</code></pre></div></div>
+
+<p>From here I then compiled and pushed <a href="https://hub.docker.com/r/eddmann/pokered">this image</a> to Docker Hub and created a small executable <code class="highlighter-rouge">docker-make</code> script within the root of the repository.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+docker run <span class="nt">-v</span> <span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>:/opt/src eddmann/pokered make <span class="nv">$@</span>
+</code></pre></div></div>
+
+<p>This allowed me to seamlessly run all provided <code class="highlighter-rouge">make</code> targets within the Docker container like so <code class="highlighter-rouge">./docker-make all</code>.
+Once complete, two new build artifacts were now present in the root of the repository - <code class="highlighter-rouge">pokered.gbc</code> and <code class="highlighter-rouge">pokeblue.gbc</code>.
+Both these ROMs were now playable using a desktop/web Game Boy emulator like <a href="https://wasmboy.app/">wasmboy</a>. 🎉</p>
+
+<h3 id="adding-the-super-b-button-behaviour">Adding the ‘Super B’ button behaviour</h3>
+
+<p>Now that I could now compile the game into a working ROM, my mind began thinking of all the small tweaks to the game I would like to experiment with.
+One aspect of the original that always felt time consuming was when trying to get to a destination in a hurry and be caught out by many wild Pokémon (without <a href="https://bulbapedia.bulbagarden.net/wiki/Repel">Repel</a> active) and trainer-battle encounters.
+I started to review the code-base to see if there was a way of taking advantage of when the B button was pressed, possibly temporarily preventing these two activities.</p>
+
+<h4 id="prevent-wild-pokémon-encounters">Prevent Wild Pokémon Encounters</h4>
+
+<p>It turns out that the game had an unused <a href="https://tcrf.net/Pok%C3%A9mon_Red_and_Blue/Debug_Functions#Debug_Mode">debug mode</a> that was left in, which provided one part of this behaviour.
+As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-126f3527215b40b1dc53ffe1ff45b479"><code class="highlighter-rouge">engine/battle/core.asm</code></a> to prevent wild Pokémon encounters if the B button was pressed.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">DetermineWildOpponent:
+</span><span class="gd">- ld a, [wd732]
+- bit 1, a
+- jr z, .asm_3ef2f
+</span>  ld a, [hJoyHeld]
+<span class="gd">- bit 1, a ; B button pressed?
+</span><span class="gi">+ and B_BUTTON
+</span>  ret nz
+</code></pre></div></div>
+
+<p>This tweak simply removes the check for if the debug mode is enabled and short-circuits the action if the B button is pressed.</p>
+
+<h4 id="prevent-trainer-battle-encounters">Prevent Trainer Battle Encounters</h4>
+
+<p>Following this, I now hoped to follow a similar pattern in temporarily preventing trainer battle encounters.
+I was able to achieve this by making some minor modifications to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-33f8ea117b558305b57c03b757e4ef64"><code class="highlighter-rouge">home.asm</code></a>.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">CheckFightingMapTrainers::
+</span><span class="gi">+ ld a, [hJoyHeld]
++ and B_BUTTON
++ jr nz, .noFight
+</span>
+  call CheckForEngagingTrainers
+  ld a, [wSpriteIndex]
+  cp $ff
+  jr nz, .trainerEngaging
+<span class="gi">+ .noFight
+</span>  xor a
+  ld [wSpriteIndex], a
+  ld [wTrainerHeaderFlagBit], a
+  ret
+</code></pre></div></div>
+
+<p>In a similar manor to how we prevented wild Pokémon encounters, if the B button is pressed we jump to <code class="highlighter-rouge">.noFight</code>, skipping the <code class="highlighter-rouge">CheckForEngagingTrainers</code> call.
+Once compiled, I was able to experiment with these two changes and found them to be very interesting additions to game play.</p>
+
+<h4 id="walking-through-walls">Walking Through Walls</h4>
+
+<p>I then thought wouldn’t it be cool to accommodate for a similar ‘walk through walls’ glitch behaviour that you see in certain <a href="https://www.youtube.com/watch?v=5naL4X1vUbE">speed runs</a>.
+As such I delved back into the code-base and made a small modification to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-3dcdb47cbd60e627ff3c82d83193112c"><code class="highlighter-rouge">home/overworld.asm</code></a> which provided me with this capability.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">.noDirectionChange</span>
+  ld a, [wPlayerDirection] ; current direction
+  ld [wPlayerMovingDirection], a ; save direction
+  call UpdateSprites
+
++ ld a, [hJoyHeld]
+<span class="gi">+ and B_BUTTON
++ jr nz, .noCollision
+</span>
+  ld a, [wWalkBikeSurfState]
+  cp $02 ; surfing
+  jr z, .surfing
+</code></pre></div></div>
+
+<p>After another compile I was now able to not only prevent wild Pokémon and trainer battle encounters, but also ‘walk through walls’ when desired.
+You can see a small clip below of how game play is altered when the ‘Super B’ button is pressed.</p>
+
+<p><img src="/uploads/compiling-pokered-using-docker-and-adding-super-b-button-behaviour/superb.gif" alt="Super B Button" /></p>
+
+<p>Due to the effort put into making the pokered project so readable, I found it very easy to work my way through the code-base and locate the areas of interest to experiment with.
+The people behind this disassembly have also worked on doing the same for <a href="https://github.com/pret">many other</a> Pokémon releases.</p>
+
+<h3 id="playing-on-a-handheld">Playing on a Handheld</h3>
+
+<p>With this modifications in place I ideally wished to now use this new behaviour on a handled console, as opposed to just through a desktop emulator.
+To achieve this I purchased an <a href="http://www.ezflash.cn/product/omega/">EZ-Flash Omega</a> cartridge for the GBA which allowed me to transfer these ROMs onto a micro-SD card.
+Now I could play these games on a backlit screen using my Nintendo DS Lite. 😎</p>
+
+<p><img src="/uploads/compiling-pokered-using-docker-and-adding-super-b-button-behaviour/ezflash.jpg" alt="EZ-Flash Omega" /></p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

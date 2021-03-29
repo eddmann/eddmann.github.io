@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 12 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 12 - JSAbacusFramework.io &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 12 - JSAbacusFramework.io</h1>
+    <time datetime="2021-02-05T00:00:00-06:00" class="post-date">05 Feb 2021</time>
+    <p>On the twelfth day of Advent of Code 2015 Santa’s Accounting-Elves need help balancing the books after a recent order.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>The supplied input comes in the form of a serialised JSON document, of which we are initially asked to sum up all the numbers present.
+For this, we are required to traverse through the deserialised document structure and sum up all the numbers.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">sumJsonNumbers</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">x</span><span class="p">:</span> <span class="kr">any</span><span class="p">,</span>
+  <span class="nx">isSkipped</span> <span class="o">=</span> <span class="p">(</span><span class="nx">_</span><span class="p">:</span> <span class="kr">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="kc">false</span>
+<span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">isSkipped</span><span class="p">(</span><span class="nx">x</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">x</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">number</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">x</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">x</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">y</span> <span class="o">=&gt;</span> <span class="nx">sumJsonNumbers</span><span class="p">(</span><span class="nx">y</span><span class="p">,</span> <span class="nx">isSkipped</span><span class="p">))</span>
+      <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With some pre-warning that part two will require us to inspect the provided document in some form, I have opted to provide the ability to optional include a predicate function which will skip the provided sub-section.
+As stated in the problem we can expect all number values to be typed as such and none are present in string form.
+Using this above function we can now invoke the function with the supplied deserialised JSON document to return the desired answer 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">sumJsonNumbers</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>As eluded to in part one, we are now required to instead of simply summing up <em>all</em> numbers present, we must apply some predicate logic.
+We are now asked ignore any object (and all of its children) which has any property with the value “red”.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">sumJsonNumbers</span><span class="p">(</span>
+    <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span>
+    <span class="nx">x</span> <span class="o">=&gt;</span>
+      <span class="k">typeof</span> <span class="nx">x</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+      <span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+      <span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">x</span><span class="p">).</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>The predicate function itself checks to ensure that the current document value is not an Array (as Arrays are represented as Objects in JavaScript) and then attempts to see if any of the Objects values include the value “red”.
+We can then invoke the <code class="highlighter-rouge">sumJsonNumbers</code> function again, returning the required answer for part two 🌟.</p>
+
+<h3 id="alternative-solution">Alternative Solution</h3>
+
+<p>Alternatively, we could tackle this problem in a more simplified mannor.
+Instead of deserialising the JSON document and recursing over its contents, we could just employ a Regular Expression to extract all numbers present.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(</span><span class="sr">-</span><span class="se">?\d)</span><span class="sr">+/g</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">sum</span> <span class="o">+</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">val</span><span class="p">),</span>
+    <span class="mi">0</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>For solving part two, we could then harness a lesser-known second argument to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse"><code class="highlighter-rouge">JSON.parse</code></a> and ensure that when attempting to deserialise the input we <em>revive</em> its contents only if it matches a the given predicate.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">part1</span><span class="p">(</span>
+    <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span>
+      <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="k">typeof</span> <span class="nx">value</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">&amp;&amp;</span>
+        <span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+        <span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">value</span><span class="p">).</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">)</span>
+          <span class="p">?</span> <span class="dl">''</span>
+          <span class="p">:</span> <span class="nx">value</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can then subsequently re-serialise this reduced JSON document and supply it to our part one solution to determine the answer.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

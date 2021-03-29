@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documents how to change the Starter Pokémon available in Pokémon Red (pokered)">
+
+    <title>Changing the Starter Pokémon within Pokémon Red (pokered) &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Changing the Starter Pokémon within Pokémon Red (pokered)</h1>
+    <time datetime="2019-04-29T00:00:00-05:00" class="post-date">29 Apr 2019</time>
+    <p>Taking a closer look through the <a href="https://github.com/pret/pokered">pokered</a> source, I stumbled upon the <a href="https://bulbapedia.bulbagarden.net/wiki/Starter_Pok%C3%A9mon">Starter Pokémon</a> choices and thought how it would be possible to change these.
+In this post I will document how I went about customising the Starter Pokémon choices available in Pokémon Red, and the modifications required to the ‘pokered’ source.
+</p>
+
+<p>I started off by updating the Starter Pokémon constants that are present in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/constants/starter_mons.asm"><code class="highlighter-rouge">constants/starter_mons.asm</code></a>.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gd">- STARTER1 EQU CHARMANDER
+- STARTER2 EQU SQUIRTLE
+- STARTER3 EQU BULBASAUR
+</span><span class="gi">+ STARTER1 EQU MEW
++ STARTER2 EQU PIKACHU
++ STARTER3 EQU SNORLAX
+</span></code></pre></div></div>
+
+<p>From here, I then generalised the wording Professor Oak uses when you are selecting the Starter Pokémon.
+Instead of the specific ‘So! You want the {type} Pokémon, {name}’, I reworded it to ‘So! You want this Pokémon?’.
+As this required multiple disparate changes you can see the modifications in their entirety within <a href="https://github.com/eddmann/pokered/commit/5d86068da8ef0a8967caa7c2fd654b54518e7f31">this</a> commit.</p>
+
+<p>Next up was to update the Rival’s Pokémon party, based on each location we encounter them.
+This is defined within <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/data/trainer_parties.asm#L461"><code class="highlighter-rouge">data/trainer_parties.asm</code></a> under the sections <code class="highlighter-rouge">Green1Data</code>, <code class="highlighter-rouge">Green2Data</code> and <code class="highlighter-rouge">Green3Data</code> (an homage to <a href="https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Red_and_Green_Versions">Pokémon Green</a>).</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">Green1Data:
+</span><span class="gd">- db 5,SQUIRTLE,0
+- db 5,BULBASAUR,0
+- db 5,CHARMANDER,0
+</span><span class="gi">+ db 5,STARTER2,0
++ db 5,STARTER3,0
++ db 5,STARTER1,0
+</span><span class="err">;</span> Route 22
+<span class="gd">- db $FF,9,PIDGEY,8,SQUIRTLE,0
+- db $FF,9,PIDGEY,8,BULBASAUR,0
+- db $FF,9,PIDGEY,8,CHARMANDER,0
+</span><span class="gi">+ db $FF,9,PIDGEY,8,STARTER2,0
++ db $FF,9,PIDGEY,8,STARTER3,0
++ db $FF,9,PIDGEY,8,STARTER1,0
+</span><span class="err">;</span> Cerulean City
+<span class="gd">- db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,SQUIRTLE,0
+- db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,BULBASAUR,0
+- db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,CHARMANDER,0
+</span><span class="gi">+ db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,STARTER2,0
++ db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,STARTER3,0
++ db $FF,18,PIDGEOTTO,15,ABRA,15,RATTATA,17,STARTER1,0
+</span></code></pre></div></div>
+
+<p>Above you can see the changes I made to the <code class="highlighter-rouge">Green1Data</code> section.
+I decided to keep the change-set simple and not evolve any of the Rival’s Starter Pokémon (i.e. Pikachu) throughout game-play.
+If you wish to do this however, it is within this file that you can decide how they evolve (or maybe even change!?).</p>
+
+<p>The final change that I made was to the Rival’s Starter Pokémon move-set in the final battle, found in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/engine/battle/read_trainer_party.asm#L132"><code class="highlighter-rouge">engine/battle/read_trainer_party.asm</code></a>.
+In this battle each Starter Pokémon has a specific move made available to them.
+Again, for the sake of simplicity I normalised this to only include <a href="https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)">Hyper Beam</a> regardless of choice.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">;</span> starter
+<span class="gd">- ld a, [wRivalStarter]
+- cp STARTER3
+- ld b, MEGA_DRAIN
+- jr z, .GiveStarterMove
+- cp STARTER1
+- ld b, FIRE_BLAST
+- jr z, .GiveStarterMove
+- ld b, BLIZZARD ; must be squirtle
+- .GiveStarterMove
+- ld a, b
+</span><span class="gi">+ ld a, HYPER_BEAM
+</span>  ld [wEnemyMon6Moves + 2], a
+</code></pre></div></div>
+
+<p>With these changes applied and the new ROM compiled, I was now able to see the results of the updates above.</p>
+
+<p><img src="/uploads/changing-the-starter-pokemon-within-pokered/starters.gif" alt="Custom Starter Pokémon" /></p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

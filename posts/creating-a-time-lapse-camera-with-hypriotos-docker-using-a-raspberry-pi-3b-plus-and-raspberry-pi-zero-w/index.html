@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documenting my experience with building Raspberry Pi time-lapse camera's using HypriotOS and Docker">
+
+    <title>Creating a Time-lapse Camera with HypriotOS/Docker using a Raspberry Pi 3B+ and Raspberry Pi Zero W &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Creating a Time-lapse Camera with HypriotOS/Docker using a Raspberry Pi 3B+ and Raspberry Pi Zero W</h1>
+    <time datetime="2019-02-16T00:00:00-06:00" class="post-date">16 Feb 2019</time>
+    <p>I have recently started a project that requires the ability to create a time-lapse video over a set duration.
+Looking at all the possible ways of achieving this I felt that a Raspberry Pi would be well suited for the job.
+In this post I will discuss how I went about setting up both a <a href="https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/">Raspberry Pi 3 Model B+</a> and <a href="https://www.raspberrypi.org/products/raspberry-pi-zero-w/">Raspberry Pi Zero W</a> with <a href="https://blog.hypriot.com/">HypriotOS</a> to run a Docker-based time-lapse camera Node application.
+</p>
+
+<p>The decision to run the Node application within Docker provides me with the best flexibility for updating and adding further functionality to the devices at a later date.</p>
+
+<h3 id="the-setup">The Setup</h3>
+
+<p>I decided on using both a Raspberry Pi 3 Model B+ and Raspberry Pi Zero W so as to experiment with the two different form factors and see how well both would perform with the given workload.
+Both Pi’s allow you to connect the Raspberry Pi Camera Module v2 to them so as to control how/when a photo is taken.</p>
+
+<ul>
+  <li><a href="https://www.amazon.co.uk/Raspberry-Pi-Model-64-Bit-Processor/dp/B07BDR5PDW">Raspberry Pi 3 Model B+</a></li>
+  <li><a href="https://www.amazon.co.uk/Pi-Blox-Raspberry-Model-Camera-Black/dp/B017Z32E8A/">Pi-Blox Case for Raspberry Pi 3</a></li>
+  <li><a href="https://www.amazon.co.uk/Raspberry-Pi-1080p-Camera-Module/dp/B01ER2SKFS/">Raspberry Pi Camera Module v2.1</a></li>
+</ul>
+
+<div>
+  <img style="width:49%;padding:0;float:left" src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pi3b.jpg" />
+  <img style="width:49%;padding:0;float:right" src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pi3b-built.jpg" />
+  <div style="clear:both"></div>
+</div>
+
+<ul>
+  <li><a href="https://www.amazon.co.uk/Raspberry-Pi-Zero-Starter-Kit/dp/B072LWBL37/">Raspberry Pi Zero W Starter Kit (inc. Case)</a></li>
+  <li><a href="https://www.amazon.co.uk/Raspberry-Pi-1080p-Camera-Module/dp/B01ER2SKFS/">Raspberry Pi Camera Module v2.1</a></li>
+</ul>
+
+<div>
+  <img style="width:49%;padding:0;float:left" src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pizero.jpg" />
+  <img style="width:49%;padding:0;float:right" src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pizero-built.jpg" />
+  <div style="clear:both"></div>
+</div>
+
+<h3 id="building-the-node-application">Building the Node Application</h3>
+
+<p>Now that I had decided on the equipment I was going to use, the next task was to create the <a href="https://github.com/eddmann/pi-timelapse/blob/master/timelapse.js"><code class="highlighter-rouge">timelapse.js</code></a> Node application.
+The application is a simple script which uses <code class="highlighter-rouge">setInterval</code> to block and call the give <code class="highlighter-rouge">shoot</code> function with the desired delay.
+Photos are organised into a deterministic <code class="highlighter-rouge">/year/month/day/hour/</code> directory structure, and each photos follows a <code class="highlighter-rouge">year_month_day_hour_minutes_seconds.jpg</code> naming convention.
+The actual act of taking the photo (with desired options) is delegated to the <a href="https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspistill.md"><code class="highlighter-rouge">raspistill</code></a> command-line tool which is provided by the Raspberry Pi organisation.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">mkdirSync</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">fs</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">execSync</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">"</span><span class="s2">child_process</span><span class="dl">"</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">toMilliseconds</span> <span class="o">=</span> <span class="nx">seconds</span> <span class="o">=&gt;</span> <span class="nx">seconds</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">getCurrentDate</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">now</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">pad</span> <span class="o">=</span> <span class="nx">number</span> <span class="o">=&gt;</span> <span class="nx">number</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">padStart</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="dl">"</span><span class="s2">0</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">year</span><span class="p">:</span> <span class="nx">now</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">(),</span>
+    <span class="na">month</span><span class="p">:</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="na">day</span><span class="p">:</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getDate</span><span class="p">()),</span>
+    <span class="na">hours</span><span class="p">:</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getHours</span><span class="p">()),</span>
+    <span class="na">minutes</span><span class="p">:</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getMinutes</span><span class="p">()),</span>
+    <span class="na">seconds</span><span class="p">:</span> <span class="nx">pad</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nx">getSeconds</span><span class="p">())</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">getDirectoryPath</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">month</span><span class="p">,</span> <span class="nx">day</span><span class="p">,</span> <span class="nx">hours</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">getCurrentDate</span><span class="p">();</span>
+
+  <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="nx">path</span><span class="p">}</span><span class="s2">/</span><span class="p">${</span><span class="nx">year</span><span class="p">}</span><span class="s2">/</span><span class="p">${</span><span class="nx">month</span><span class="p">}</span><span class="s2">/</span><span class="p">${</span><span class="nx">day</span><span class="p">}</span><span class="s2">/</span><span class="p">${</span><span class="nx">hours</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">getFileName</span> <span class="o">=</span> <span class="nx">path</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">month</span><span class="p">,</span> <span class="nx">day</span><span class="p">,</span> <span class="nx">hours</span><span class="p">,</span> <span class="nx">minutes</span><span class="p">,</span> <span class="nx">seconds</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">getCurrentDate</span><span class="p">();</span>
+
+  <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="nx">path</span><span class="p">}</span><span class="s2">/</span><span class="p">${</span><span class="nx">year</span><span class="p">}</span><span class="s2">_</span><span class="p">${</span><span class="nx">month</span><span class="p">}</span><span class="s2">_</span><span class="p">${</span><span class="nx">day</span><span class="p">}</span><span class="s2">_</span><span class="p">${</span><span class="nx">hours</span><span class="p">}</span><span class="s2">_</span><span class="p">${</span><span class="nx">minutes</span><span class="p">}</span><span class="s2">_</span><span class="p">${</span><span class="nx">seconds</span><span class="p">}</span><span class="s2">.jpg`</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">shoot</span> <span class="o">=</span> <span class="p">(</span><span class="nx">basePath</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">directory</span> <span class="o">=</span> <span class="nx">getDirectoryPath</span><span class="p">(</span><span class="nx">basePath</span><span class="p">);</span>
+
+  <span class="nx">mkdirSync</span><span class="p">(</span><span class="nx">directory</span><span class="p">,</span> <span class="p">{</span> <span class="na">recursive</span><span class="p">:</span> <span class="kc">true</span> <span class="p">});</span>
+
+  <span class="kd">const</span> <span class="nx">file</span> <span class="o">=</span> <span class="nx">getFileName</span><span class="p">(</span><span class="nx">directory</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">output</span> <span class="o">=</span> <span class="nx">execSync</span><span class="p">(</span><span class="s2">`/opt/vc/bin/raspistill </span><span class="p">${</span><span class="nx">options</span><span class="p">}</span><span class="s2"> -o </span><span class="p">${</span><span class="nx">file</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">delay</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TIME_DELAY</span> <span class="o">||</span> <span class="mi">30</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">basePath</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">BASE_PATH</span> <span class="o">||</span> <span class="dl">"</span><span class="s2">/var/photos</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">OPTIONS</span> <span class="o">||</span> <span class="dl">""</span><span class="p">;</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`Delay: </span><span class="p">${</span><span class="nx">delay</span><span class="p">}</span><span class="s2">s, Path: '</span><span class="p">${</span><span class="nx">basePath</span><span class="p">}</span><span class="s2">', Options: '</span><span class="p">${</span><span class="nx">options</span><span class="p">}</span><span class="s2">'`</span><span class="p">);</span>
+
+<span class="nx">setInterval</span><span class="p">(</span><span class="nx">shoot</span><span class="p">,</span> <span class="nx">toMilliseconds</span><span class="p">(</span><span class="nx">delay</span><span class="p">),</span> <span class="nx">basePath</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This script was then packaged into a Docker image using the following <a href="https://github.com/eddmann/pi-timelapse/blob/master/Dockerfile"><code class="highlighter-rouge">Dockerfile</code></a> file.</p>
+
+<div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> balenalib/raspberry-pi-debian-node:11.3.0-stretch-run</span>
+<span class="k">RUN </span>apt-get update <span class="nt">-y</span> <span class="o">&amp;&amp;</span> apt-get <span class="nb">install </span>libraspberrypi-bin <span class="nt">-y</span>
+<span class="k">COPY</span><span class="s"> timelapse.js /var/timelapse.js</span>
+<span class="k">VOLUME</span><span class="s"> /var/photos</span>
+<span class="k">CMD</span><span class="s"> ["node", "/var/timelapse.js"]</span>
+</code></pre></div></div>
+
+<p>The image ensures that the <a href="https://github.com/raspberrypi/userland">user-land</a> Raspberry Pi libraries are available (giving us access to <code class="highlighter-rouge">raspistill</code>) and provides us with a volume we can mount to our host OS - so as to persist photos taken regardless of the current container instance going away.</p>
+
+<p>With these two files in place I was now able to build and push the image to <a href="https://hub.docker.com/r/eddmann/pi-timelapse">Docker Hub</a> for later use on the Raspberry Pi’s.</p>
+
+<h3 id="building-the-hypriotos-image">Building the HypriotOS Image</h3>
+
+<p>The <a href="https://github.com/hypriot">Hypriot</a> project takes a lot of the pain out of getting setup with using Docker on the Raspberry Pi and it’s ARM architecture.
+It also includes the <a href="https://cloudinit.readthedocs.io/en/latest/">cloud-init</a> library which allows you to clearly define how you wish the instance to be provisioned on first boot.</p>
+
+<p>In regards to the two time-lapse devices I used the following cloud-config, specified in <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/user-data.yml"><code class="highlighter-rouge">user-data.yml</code></a>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#cloud-config</span>
+
+<span class="na">hostname</span><span class="pi">:</span> <span class="s">timelapse</span>
+<span class="na">manage_etc_hosts</span><span class="pi">:</span> <span class="no">true</span>
+
+<span class="na">users</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pi</span>
+    <span class="na">gecos</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Raspberry</span><span class="nv"> </span><span class="s">Pi"</span>
+    <span class="na">sudo</span><span class="pi">:</span> <span class="s">ALL=(ALL) NOPASSWD:ALL</span>
+    <span class="na">shell</span><span class="pi">:</span> <span class="s">/bin/bash</span>
+    <span class="na">groups</span><span class="pi">:</span> <span class="s">users,docker,video</span>
+    <span class="na">plain_text_passwd</span><span class="pi">:</span> <span class="s">password</span>
+    <span class="na">lock_passwd</span><span class="pi">:</span> <span class="no">false</span>
+    <span class="na">ssh_pwauth</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">chpasswd</span><span class="pi">:</span> <span class="pi">{</span> <span class="nv">expire</span><span class="pi">:</span> <span class="nv">false</span> <span class="pi">}</span>
+
+<span class="na">locale</span><span class="pi">:</span> <span class="s2">"</span><span class="s">en_US.UTF-8"</span>
+<span class="na">timezone</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Europe/London"</span>
+
+<span class="na">write_files</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">content</span><span class="pi">:</span> <span class="pi">|</span>
+      <span class="s">allow-hotplug wlan0</span>
+      <span class="s">iface wlan0 inet dhcp</span>
+      <span class="s">wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf</span>
+      <span class="s">iface default inet dhcp</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/etc/network/interfaces.d/wlan0</span>
+  <span class="pi">-</span> <span class="na">content</span><span class="pi">:</span> <span class="pi">|</span>
+      <span class="s">country=GB</span>
+      <span class="s">ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev</span>
+      <span class="s">update_config=1</span>
+      <span class="s">network={</span>
+        <span class="s">ssid="ssid"</span>
+        <span class="s">psk="password"</span>
+        <span class="s">proto=RSN</span>
+        <span class="s">key_mgmt=WPA-PSK</span>
+        <span class="s">pairwise=CCMP</span>
+        <span class="s">auth_alg=OPEN</span>
+      <span class="s">}</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/etc/wpa_supplicant/wpa_supplicant.conf</span>
+
+<span class="na">runcmd</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s1">'</span><span class="s">systemctl</span><span class="nv"> </span><span class="s">restart</span><span class="nv"> </span><span class="s">avahi-daemon'</span>
+  <span class="pi">-</span> <span class="s1">'</span><span class="s">ifup</span><span class="nv"> </span><span class="s">wlan0'</span>
+  <span class="pi">-</span> <span class="s1">'</span><span class="s">mkdir</span><span class="nv"> </span><span class="s">-p</span><span class="nv"> </span><span class="s">/home/pi/photos'</span>
+  <span class="pi">-</span> <span class="pi">[</span>
+      <span class="nv">docker</span><span class="pi">,</span> <span class="nv">run</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">-d"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">--privileged"</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">--restart"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">always"</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">--volume"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">/home/pi/photos:/var/photos"</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">--name"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">timelapse"</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">--env"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">TIME_DELAY=30"</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">--env"</span><span class="pi">,</span> <span class="s1">'</span><span class="s">OPTIONS=""'</span><span class="pi">,</span>
+      <span class="s2">"</span><span class="s">eddmann/pi-timelapse"</span>
+    <span class="pi">]</span>
+</code></pre></div></div>
+
+<p>This provisions the given instance with the desired user account, WiFi access and starts the Docker container instance with the provided options.
+As well as this definition I was also required to ensure that the camera module was enabled, to do this I created a <a href="https://github.com/eddmann/pi-timelapse/blob/master/hypriot/boot-config.txt"><code class="highlighter-rouge">boot-config.txt</code></a> file like so.</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">hdmi_force_hotplug</span><span class="p">=</span><span class="s">1</span>
+<span class="py">enable_uart</span><span class="p">=</span><span class="s">0</span>
+
+<span class="c"># camera settings, see http://elinux.org/RPiconfig#Camera
+</span><span class="py">start_x</span><span class="p">=</span><span class="s">1</span>
+<span class="py">disable_camera_led</span><span class="p">=</span><span class="s">1</span>
+<span class="py">gpu_mem</span><span class="p">=</span><span class="s">128</span>
+
+<span class="c"># Enable audio (added by raspberrypi-sys-mods)
+</span><span class="py">dtparam</span><span class="p">=</span><span class="s">audio=on</span>
+</code></pre></div></div>
+
+<p>With these two files now defined I was able to use the <a href="https://github.com/hypriot/flash">flash script</a> provided by Hypriot to easily write the given image to two separate MicroSD cards.
+The only varying factor per image was the desired hostname, and as such I was able to supply this whilst invoking the flash script.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>flash <span class="se">\</span>
+  <span class="nt">--hostname</span> timelapse <span class="se">\</span>
+  <span class="nt">--userdata</span> user-data.yml <span class="se">\</span>
+  <span class="nt">--bootconf</span> boot-config.txt <span class="se">\</span>
+  https://github.com/hypriot/image-builder-rpi/releases/download/v1.10.0-rc2/hypriotos-rpi-v1.10.0-rc2.img.zip
+</code></pre></div></div>
+
+<p>With both the Docker and Raspberry Pi HypriotOS images now written I was able to move on to actually experimenting with the devices. 📸</p>
+
+<h3 id="booting-the-raspberry-pi-time-lapse-camera">Booting the Raspberry Pi Time-lapse Camera</h3>
+
+<p>After inserting MicroSD cards into each Raspberry Pi I was able to access both devices via SSH using the chosen hostnames (i.e <code class="highlighter-rouge">timelapse.local</code>).
+The Docker container had been successfully configured to start at boot time and would restart automatically given any error that occurs.</p>
+
+<p><img src="/uploads/creating-a-time-lapse-camera-with-hypriotos-docker-using-a-raspberry-pi-3b-plus-and-raspberry-pi-zero-w/pi-built.jpg" alt="Complete Raspberry Pi Builds" /></p>
+
+<p>The only step now is to wait for the time-lapse to complete and then finally I can stitch the images together using some simple video editing software.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

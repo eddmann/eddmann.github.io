@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 21 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 21 - RPG Simulator 20XX &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 21 - RPG Simulator 20XX</h1>
+    <time datetime="2021-02-15T00:00:00-06:00" class="post-date">15 Feb 2021</time>
+    <p>On the twenty first day of Advent of Code 2015 we are asked to help ‘Little Henry Case’ beat the boss in a new video game he got for Christmas.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>The game is a turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
+The rules can be read by visiting the <a href="https://adventofcode.com/2015/day/21">problem specification</a>.
+For part one, we are asked to work out what is the least amount of gold we can spend and still win the fight.
+We will begin by getting a copy of the shop items that are available for purchase.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">ITEMS</span> <span class="o">=</span> <span class="s2">`
+Weapons:    Cost  Damage  Armor
+Dagger        8     4       0
+Shortsword   10     5       0
+Warhammer    25     6       0
+Longsword    40     7       0
+Greataxe     74     8       0
+
+Armor:      Cost  Damage  Armor
+Leather      13     0       1
+Chainmail    31     0       2
+Splintmail   53     0       3
+Bandedmail   75     0       4
+Platemail   102     0       5
+
+Rings:      Cost  Damage  Armor
+Damage +1    25     1       0
+Damage +2    50     2       0
+Damage +3   100     3       0
+Defense +1   20     0       1
+Defense +2   40     0       2
+Defense +3   80     0       3
+`</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>We can now go about parsing these items into a form we can use for future work.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Item</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">cost</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">damage</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">armor</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="kd">type</span> <span class="nx">ShopItems</span> <span class="o">=</span> <span class="p">{</span> <span class="na">weapons</span><span class="p">:</span> <span class="nx">Item</span><span class="p">[];</span> <span class="nl">armor</span><span class="p">:</span> <span class="nx">Item</span><span class="p">[];</span> <span class="nl">rings</span><span class="p">:</span> <span class="nx">Item</span><span class="p">[]</span> <span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">parseItemSection</span> <span class="o">=</span> <span class="p">(</span><span class="nx">section</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Item</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="p">[</span>
+    <span class="p">...</span><span class="nx">section</span><span class="p">.</span><span class="nx">matchAll</span><span class="p">(</span><span class="sr">/</span><span class="se">(\w</span><span class="sr">+</span><span class="se">(?:\s\+\d)?)\s</span><span class="sr">+</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)\s</span><span class="sr">+</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)\s</span><span class="sr">+</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/g</span><span class="p">),</span>
+  <span class="p">].</span><span class="nx">map</span><span class="p">(([,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">cost</span><span class="p">,</span> <span class="nx">damage</span><span class="p">,</span> <span class="nx">armor</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">({</span>
+    <span class="nx">name</span><span class="p">,</span>
+    <span class="na">cost</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">cost</span><span class="p">),</span>
+    <span class="na">damage</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">damage</span><span class="p">),</span>
+    <span class="na">armor</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">armor</span><span class="p">),</span>
+  <span class="p">}));</span>
+
+<span class="kd">const</span> <span class="nx">parseShopItems</span> <span class="o">=</span> <span class="p">(</span><span class="nx">items</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">ShopItems</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">weapons</span><span class="p">,</span> <span class="nx">armor</span><span class="p">,</span> <span class="nx">rings</span><span class="p">]</span> <span class="o">=</span> <span class="nx">items</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n\n</span><span class="dl">'</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">weapons</span><span class="p">:</span> <span class="nx">parseItemSection</span><span class="p">(</span><span class="nx">weapons</span><span class="p">),</span>
+    <span class="na">armor</span><span class="p">:</span> <span class="nx">parseItemSection</span><span class="p">(</span><span class="nx">armor</span><span class="p">),</span>
+    <span class="na">rings</span><span class="p">:</span> <span class="nx">parseItemSection</span><span class="p">(</span><span class="nx">rings</span><span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With the shop items now parsed, we can move onto parsing the Boss configuration that has been provided as input.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Participant</span> <span class="o">=</span> <span class="p">{</span> <span class="na">hp</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">damage</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">armor</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">parseBossConfiguration</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Participant</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">hp</span><span class="p">,</span> <span class="nx">damage</span><span class="p">,</span> <span class="nx">armor</span><span class="p">]</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/gm</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">hp</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">hp</span><span class="p">),</span>
+    <span class="na">damage</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">damage</span><span class="p">),</span>
+    <span class="na">armor</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">armor</span><span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Reading through the shop item purchase criteria, I have decided that an elegant way in which to produce all possible valid configurations is via an <a href="https://en.wikipedia.org/wiki/Cartesian_product">cartesian product</a>.
+For this I will be using the below generalised implementation.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cartesianProduct</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(...</span><span class="nx">a</span><span class="p">:</span> <span class="nx">T</span><span class="p">[][]):</span> <span class="nx">T</span><span class="p">[][]</span> <span class="o">=&gt;</span>
+  <span class="nx">a</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">.</span><span class="nx">flatMap</span><span class="p">(</span><span class="nx">d</span> <span class="o">=&gt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nx">d</span><span class="p">,</span> <span class="nx">e</span><span class="p">].</span><span class="nx">flat</span><span class="p">())),</span> <span class="p">[[]]);</span>
+</code></pre></div></div>
+
+<p>We will also need a means to sum up a given array of objects property.
+This can be achieved in a type-safe manor using the code below.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">sumProp</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">els</span><span class="p">:</span> <span class="nx">T</span><span class="p">[],</span> <span class="nx">prop</span><span class="p">:</span> <span class="kr">keyof</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">els</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">sum</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">sum</span> <span class="o">+</span> <span class="o">+</span><span class="nx">el</span><span class="p">[</span><span class="nx">prop</span><span class="p">],</span> <span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>With these two utility helper functions in-hand we can go about creating a function to return all the possible valid player configurations.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">PlayerConfiguration</span> <span class="o">=</span> <span class="nx">Participant</span> <span class="o">&amp;</span> <span class="p">{</span> <span class="na">cost</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">NO_ITEM</span><span class="p">:</span> <span class="nx">Item</span> <span class="o">=</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">None</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">0</span> <span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">generatePlayerConfigurations</span> <span class="o">=</span> <span class="p">({</span>
+  <span class="nx">weapons</span><span class="p">,</span>
+  <span class="nx">armor</span><span class="p">,</span>
+  <span class="nx">rings</span><span class="p">,</span>
+<span class="p">}:</span> <span class="nx">ShopItems</span><span class="p">):</span> <span class="nx">PlayerConfiguration</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">optionalArmor</span> <span class="o">=</span> <span class="p">[...</span><span class="nx">armor</span><span class="p">,</span> <span class="nx">NO_ITEM</span><span class="p">];</span>
+  <span class="kd">const</span> <span class="nx">optionalRing</span> <span class="o">=</span> <span class="p">[...</span><span class="nx">rings</span><span class="p">,</span> <span class="nx">NO_ITEM</span><span class="p">];</span>
+
+  <span class="k">return</span> <span class="nx">cartesianProduct</span><span class="p">(</span>
+    <span class="nx">weapons</span><span class="p">,</span>
+    <span class="nx">optionalArmor</span><span class="p">,</span>
+    <span class="nx">optionalRing</span><span class="p">,</span>
+    <span class="nx">optionalRing</span>
+  <span class="p">)</span>
+    <span class="p">.</span><span class="nx">filter</span><span class="p">(([,</span> <span class="p">,</span> <span class="nx">r1</span><span class="p">,</span> <span class="nx">r2</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">r1</span> <span class="o">===</span> <span class="nx">NO_ITEM</span> <span class="o">&amp;&amp;</span> <span class="nx">r2</span> <span class="o">!==</span> <span class="nx">NO_ITEM</span><span class="p">)</span> <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nx">r1</span><span class="p">.</span><span class="nx">name</span> <span class="o">!==</span> <span class="nx">r2</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">items</span> <span class="o">=&gt;</span> <span class="p">({</span>
+      <span class="na">hp</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="na">cost</span><span class="p">:</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="dl">'</span><span class="s1">cost</span><span class="dl">'</span><span class="p">),</span>
+      <span class="na">damage</span><span class="p">:</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="dl">'</span><span class="s1">damage</span><span class="dl">'</span><span class="p">),</span>
+      <span class="na">armor</span><span class="p">:</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">items</span><span class="p">,</span> <span class="dl">'</span><span class="s1">armor</span><span class="dl">'</span><span class="p">),</span>
+    <span class="p">}));</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>As the armour and both rings are optional, we add a dummy <code class="highlighter-rouge">NO_ITEM</code> item option which provides us with the <em>non-existent</em> purchase.
+Unfortuantly, the rules surrounding how rings may be purchased makes this not a <em>true</em> cartesian product.
+Instead, we must additional ensure that we do not purchase the same ring twice, and cater for the option of no ring being purchased at all.
+With these configurations not excluded we can return an array of <code class="highlighter-rouge">PlayerConfiguration</code> which along with the total damage, armor and hit points (we always start with 100), also includes the total cost of the configuration.</p>
+
+<p>Leading on from this, we now need a means in which to simulate a given battle scenario.
+Looking at how a battle is conducted we can determine using a single formula how many turns it would take for a given participant to beat the other.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">isPlayerWinner</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">player</span><span class="p">:</span> <span class="nx">Participant</span><span class="p">,</span>
+  <span class="nx">boss</span><span class="p">:</span> <span class="nx">Participant</span>
+<span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">playerTurnsForWin</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span>
+    <span class="nx">boss</span><span class="p">.</span><span class="nx">hp</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">player</span><span class="p">.</span><span class="nx">damage</span> <span class="o">-</span> <span class="nx">boss</span><span class="p">.</span><span class="nx">armor</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">bossTurnsForWin</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span>
+    <span class="nx">player</span><span class="p">.</span><span class="nx">hp</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">boss</span><span class="p">.</span><span class="nx">damage</span> <span class="o">-</span> <span class="nx">player</span><span class="p">.</span><span class="nx">armor</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">playerTurnsForWin</span> <span class="o">&lt;=</span> <span class="nx">bossTurnsForWin</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We can calculate the total turns it would take for both the player and boss to win; and then providing the players turn total is less than or equal to the bosses (as the player goes first) we can be sure the player has won.
+With the ability to now simulate a battle in place, we can go about solving the question laid out in part one.
+Generating all the possible valid player configurations we can filter down to only the ones that the player wins.
+From here, we return the minimal cost of those player configurations, leading us to our answer 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">items</span> <span class="o">=</span> <span class="nx">parseShopItems</span><span class="p">(</span><span class="nx">ITEMS</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">boss</span> <span class="o">=</span> <span class="nx">parseBossConfiguration</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span>
+    <span class="p">...</span><span class="nx">generatePlayerConfigurations</span><span class="p">(</span><span class="nx">items</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">player</span> <span class="o">=&gt;</span> <span class="nx">isPlayerWinner</span><span class="p">(</span><span class="nx">player</span><span class="p">,</span> <span class="nx">boss</span><span class="p">))</span>
+      <span class="p">.</span><span class="nx">map</span><span class="p">(({</span> <span class="nx">cost</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">cost</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are asked to determine what is the most amount of gold we could spend and still lose the fight.
+We can re-use all the functionality we built up for part one, except this time we wish to only include games the player loses.
+From these lost games we can determine the highest costing player configuration 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">items</span> <span class="o">=</span> <span class="nx">parseShopItems</span><span class="p">(</span><span class="nx">ITEMS</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">boss</span> <span class="o">=</span> <span class="nx">parseBossConfiguration</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span>
+    <span class="p">...</span><span class="nx">generatePlayerConfigurations</span><span class="p">(</span><span class="nx">items</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">player</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="nx">isPlayerWinner</span><span class="p">(</span><span class="nx">player</span><span class="p">,</span> <span class="nx">boss</span><span class="p">))</span>
+      <span class="p">.</span><span class="nx">map</span><span class="p">(({</span> <span class="nx">cost</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="nx">cost</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

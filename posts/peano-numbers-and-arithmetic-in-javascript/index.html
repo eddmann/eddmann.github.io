@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring how to represent natural numbers and arithmetic operations without typical language constructs">
+
+    <title>Peano Numbers and Arithmetic in JavaScript &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Peano Numbers and Arithmetic in JavaScript</h1>
+    <time datetime="2015-10-01T00:00:00-05:00" class="post-date">01 Oct 2015</time>
+    <p>Whilst completing the <a href="https://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> course a couple of years ago one of the exercises was in the realm of Peano numbers.
+This subject fascinated me, how we were able to represent non-negative natural numbers without any preformed concepts - relying solely on the logical expressions and recursive algorithms.
+
+Peano numbers allow us to represent all natural numbers using a defined zero value and a successor function.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">zero</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="kc">false</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">isZero</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">==</span> <span class="nx">zero</span><span class="p">();</span>
+
+<span class="kd">const</span> <span class="nx">succ</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">pred</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Following these rules we have created the concept of zero (represented as false within our host language), along with the successor function which wraps and returns this value in a new lambda upon each invocation.
+We have also supplied accompanying zero comparator and predecessor functions which will assist us in upcoming examples.</p>
+
+<h2 id="arithmetic">Arithmetic</h2>
+
+<p>Using this representation as a basis we are able to expand on the example by describing the four common-place arithmetic operations.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">add</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">b</span> <span class="p">:</span> <span class="nx">add</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">sub</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">||</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">?</span> <span class="nx">a</span> <span class="p">:</span> <span class="nx">sub</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">pred</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">mul</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">zero</span><span class="p">()</span> <span class="p">:</span> <span class="nx">add</span><span class="p">(</span><span class="nx">mul</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">b</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">zero</span><span class="p">()</span> <span class="p">:</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">div</span><span class="p">(</span><span class="nx">sub</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">b</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>Looking at the definitions above you can see how we have been able to represent these operations using recursion and the functions defined before hand.</p>
+
+<h2 id="logic">Logic</h2>
+
+<p>We are also able to as easily represent logical operations which return the host languages boolean value type.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">equal</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">:</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">equal</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">pred</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">less</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="o">!</span><span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">:</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">less</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">pred</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">greater</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="o">!</span> <span class="p">(</span><span class="nx">equal</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">||</span> <span class="nx">less</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h2 id="example">Example</h2>
+
+<p>Finally, we are able to combine all these operations into succinct examples.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toNumber</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="nx">toNumber</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">_0</span> <span class="o">=</span> <span class="nx">zero</span><span class="p">(),</span>
+      <span class="nx">_1</span> <span class="o">=</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">_0</span><span class="p">),</span>
+      <span class="nx">_2</span> <span class="o">=</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">_1</span><span class="p">),</span>
+      <span class="nx">_3</span> <span class="o">=</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">_2</span><span class="p">),</span>
+      <span class="nx">_4</span> <span class="o">=</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">_3</span><span class="p">),</span>
+      <span class="nx">_5</span> <span class="o">=</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">_4</span><span class="p">);</span>
+
+<span class="nx">toNumber</span><span class="p">(</span><span class="nx">mul</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="nx">_2</span><span class="p">,</span> <span class="nx">_3</span><span class="p">),</span> <span class="nx">sub</span><span class="p">(</span><span class="nx">_5</span><span class="p">,</span> <span class="nx">_3</span><span class="p">)));</span> <span class="c1">// 10</span>
+<span class="nx">toNumber</span><span class="p">(</span><span class="nx">div</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="nx">_2</span><span class="p">,</span> <span class="nx">_2</span><span class="p">),</span> <span class="nx">_2</span><span class="p">));</span> <span class="c1">// 2</span>
+
+<span class="nx">equal</span><span class="p">(</span><span class="nx">add</span><span class="p">(</span><span class="nx">_1</span><span class="p">,</span> <span class="nx">_1</span><span class="p">),</span> <span class="nx">div</span><span class="p">(</span><span class="nx">_4</span><span class="p">,</span> <span class="nx">_2</span><span class="p">));</span> <span class="c1">// true</span>
+<span class="nx">less</span><span class="p">(</span><span class="nx">div</span><span class="p">(</span><span class="nx">_4</span><span class="p">,</span> <span class="nx">_2</span><span class="p">),</span> <span class="nx">_4</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nx">greater</span><span class="p">(</span><span class="nx">mul</span><span class="p">(</span><span class="nx">_4</span><span class="p">,</span> <span class="nx">_2</span><span class="p">),</span> <span class="nx">_5</span><span class="p">);</span> <span class="c1">// true</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Comparison article on the differences when using Bit Flags and EnumSets in Java.">
+
+    <title>Using Bit Flags and EnumSets in Java &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using Bit Flags and EnumSets in Java</h1>
+    <time datetime="2013-12-20T00:00:00-06:00" class="post-date">20 Dec 2013</time>
+    <h2 id="bit-flags">Bit Flags</h2>
+
+<p>Bit flags, commonly referred to as Bit fields are an efficient way of storing several related boolean values in a single primitive type.
+Internally represented in binary, you can decide on how large the storage type needs to be - for example, a Java integer will provide you with space for 31 flags.
+Being a 32 bit type you would assume to have access to this many flags, however, due to it being a signed value the most significant bit is reserved to store its +/- sign.
+</p>
+
+<p>Flags are typically stored as public constants within the related class, for example, the <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">Pattern</a> class includes the flags ‘CASE_INSENSITIVE’ and ‘MULTILINE’ to alter match criteria.
+Setting the values as incremental powers of 2 allows the user to compose multiple constants together using the | (OR) operator to achieve the desired flag combination.
+The implementer is then able to base the methods execution on the passed in flags by checking for presence of the constant value using the &amp; (AND) operator as a bit mask.
+This idea can be more meaningfully described using the example below.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">UPPERCASE</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>  <span class="c1">// 0001</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">REVERSE</span>   <span class="o">=</span> <span class="mi">2</span><span class="o">;</span>  <span class="c1">// 0010</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">FULL_STOP</span> <span class="o">=</span> <span class="mi">4</span><span class="o">;</span>  <span class="c1">// 0100</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">EMPHASISE</span> <span class="o">=</span> <span class="mi">8</span><span class="o">;</span>  <span class="c1">// 1000</span>
+<span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">ALL_OPTS</span>  <span class="o">=</span> <span class="mi">15</span><span class="o">;</span> <span class="c1">// 1111</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">format</span><span class="o">(</span><span class="nc">String</span> <span class="n">value</span><span class="o">,</span> <span class="kt">int</span> <span class="n">flags</span><span class="o">)</span>
+<span class="o">{</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="no">UPPERCASE</span><span class="o">)</span> <span class="o">==</span> <span class="no">UPPERCASE</span><span class="o">)</span> <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">toUpperCase</span><span class="o">();</span>
+
+    <span class="k">if</span> <span class="o">((</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="no">REVERSE</span><span class="o">)</span> <span class="o">==</span> <span class="no">REVERSE</span><span class="o">)</span> <span class="n">value</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuffer</span><span class="o">(</span><span class="n">value</span><span class="o">).</span><span class="na">reverse</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+
+    <span class="k">if</span> <span class="o">((</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="no">FULL_STOP</span><span class="o">)</span> <span class="o">==</span> <span class="no">FULL_STOP</span><span class="o">)</span> <span class="n">value</span> <span class="o">+=</span> <span class="s">"."</span><span class="o">;</span>
+
+    <span class="k">if</span> <span class="o">((</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="no">EMPHASISE</span><span class="o">)</span> <span class="o">==</span> <span class="no">EMPHASISE</span><span class="o">)</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"~*~ "</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="s">" ~*~"</span><span class="o">;</span>
+
+    <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>As you can see, I have defined 5 different constants all with specific values that correspond to different binary representations.
+In regard to the final constant which I set to the decimal 15, in essence this fills in all of the previously created value combinations.
+Within the method block I check for presence of each flag by masking the ‘flags’ parameter with the constant value.
+If the resulting value is equal to the specified constant we can then act on this condition.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">format</span><span class="o">(</span><span class="s">"Joe"</span><span class="o">,</span> <span class="no">UPPERCASE</span><span class="o">);</span> <span class="c1">// JOE</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Joe"</span><span class="o">,</span> <span class="no">REVERSE</span><span class="o">);</span> <span class="c1">// eoJ</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Joe"</span><span class="o">,</span> <span class="no">FULL_STOP</span> <span class="o">|</span> <span class="no">EMPHASISE</span><span class="o">);</span> <span class="c1">// ~*~ Joe. ~*~</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Joe"</span><span class="o">,</span> <span class="no">ALL_OPTS</span><span class="o">);</span> <span class="c1">// ~*~ EOJ. ~*~</span>
+</code></pre></div></div>
+
+<p>Above are a few examples of the method being used in multiple ways.
+The third example shows the ability of composing values from multiple flags (binary representation 1100).</p>
+
+<h2 id="emunsets">EmunSets</h2>
+
+<p>Traditional use of bit flags has been around for many years and are a very performant storage mechanism (especially in graphic rendering).
+However, it can be very easy for the resulting code to be hard to understand.
+Another glaring issue is that they are not type safe, nullifying the benefits of having a type system put in place.
+<a href="http://docs.oracle.com/javase/7/docs/api/java/util/EnumSet.html">EnumSets</a> however have the efficiency of bit flags, but without the loss of safety the the type system provides.
+I should point out that there is another Set implementation called <a href="http://docs.oracle.com/javase/7/docs/api/java/util/BitSet.html">BitSet</a> which provides similar functionality.
+It is recommended that if you desire a flagging system such as the use-case described an EnumSet will provide you with the best results.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="nc">Flag</span> <span class="o">{</span>
+    <span class="no">UPPERCASE</span><span class="o">,</span> <span class="no">REVERSE</span><span class="o">,</span> <span class="no">FULL_STOP</span><span class="o">,</span> <span class="no">EMPHASISE</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">EnumSet</span><span class="o">&lt;</span><span class="nc">Flag</span><span class="o">&gt;</span> <span class="no">ALL_OPTS</span> <span class="o">=</span> <span class="nc">EnumSet</span><span class="o">.</span><span class="na">allOf</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">format</span><span class="o">(</span><span class="nc">String</span> <span class="n">value</span><span class="o">,</span> <span class="nc">EnumSet</span><span class="o">&lt;</span><span class="nc">Flag</span><span class="o">&gt;</span> <span class="n">flags</span><span class="o">)</span>
+<span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">flags</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">UPPERCASE</span><span class="o">))</span> <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">toUpperCase</span><span class="o">();</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">flags</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">REVERSE</span><span class="o">))</span> <span class="n">value</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuffer</span><span class="o">(</span><span class="n">value</span><span class="o">).</span><span class="na">reverse</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">flags</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">FULL_STOP</span><span class="o">))</span> <span class="n">value</span> <span class="o">+=</span> <span class="s">"."</span><span class="o">;</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">flags</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">EMPHASISE</span><span class="o">))</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"~*~ "</span> <span class="o">+</span> <span class="n">value</span> <span class="o">+</span> <span class="s">" ~*~"</span><span class="o">;</span>
+
+    <span class="k">return</span> <span class="n">value</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>In the case of an EnumSet you must first define your enumerated type, which encapsulates all the desired constants.
+Similar to how I defined the ‘ALL_OPTS’ constant in the first example, I have created a EnumSet consisting of all constants in the Flag type.
+EnumSet implements the Set interface, so you can use it as you would a typical set, calling ‘contains’ on it to query presence of a certain flag.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">format</span><span class="o">(</span><span class="s">"Sally"</span><span class="o">,</span> <span class="nc">EnumSet</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">UPPERCASE</span><span class="o">));</span> <span class="c1">// SALLY</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Sally"</span><span class="o">,</span> <span class="nc">EnumSet</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">REVERSE</span><span class="o">));</span> <span class="c1">// yllaS</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Sally"</span><span class="o">,</span> <span class="nc">EnumSet</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="nc">Flag</span><span class="o">.</span><span class="na">FULL_STOP</span><span class="o">,</span> <span class="nc">Flag</span><span class="o">.</span><span class="na">EMPHASISE</span><span class="o">));</span> <span class="c1">// ~*~ Sally. ~*~</span>
+
+<span class="n">format</span><span class="o">(</span><span class="s">"Sally"</span><span class="o">,</span> <span class="nc">Flag</span><span class="o">.</span><span class="na">ALL_OPTS</span><span class="o">);</span> <span class="c1">// ~*~ YLLAS. ~*~</span>
+</code></pre></div></div>
+
+<p>Above are a few examples of using the EnumSet in place of a typical bit flag system.
+As you can see, we are able to complete all the examples that were possible in the previous use-case, but this time it is more readable and we are less prone to error.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

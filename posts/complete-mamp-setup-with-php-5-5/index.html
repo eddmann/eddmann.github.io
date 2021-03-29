@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A MAMP setup that makes development-setup even easier than MAMP Pro.">
+
+    <title>Complete MAMP Setup with PHP 5.5 &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Complete MAMP Setup with PHP 5.5</h1>
+    <time datetime="2012-07-08T00:00:00-05:00" class="post-date">08 Jul 2012</time>
+    <p>I have been a loyal <a href="http://www.mamp.info/en/mamp-pro/">MAMP Pro</a> user for many years, I fell in love with how easy it was to setup custom hosts, without the need to tweak the hosts file myself.
+However, ever since I documented my <a href="http://eddmann.com/posts/dnsmasq-your-local-development-dns/">experiences</a> with DNSMasq I have been intrested in how <a href="http://davidwinter.me/articles/2011/06/18/simple-local-web-development-with-apache-and-dnsmasq/">this</a> article documented setting up a web-stack with Apache similar to Ruby user’s <a href="http://pow.cx/">Pow</a>.
+The ability to setup a new development site with only the creation of a new folder (i.e. a folder called test could be accessible from test.dev) appealed to me greatly.
+
+Below is a step by step guide on how I setup my MAMP environment, full credit goes to the discussed approach, without it a small part of my heart would never have been filled.</p>
+
+<h2 id="apache-and-php">Apache and PHP</h2>
+
+<p>The first piece of the puzzle is to setup Apache, luckily for us Mac OSX (Lion or greater) already comes pre-installed with an adequate Apache installation, all we have to do is enable it.
+To go about achieving this we must first go to System Preferences, then Sharing and finally check Web Sharing.</p>
+
+<p>How easy was that? The second piece is PHP, and again an installation is already provided with OSX Mavericks (5.4 to be exact), all that is required is to load the PHP5 module into your Apache setup.
+This can be achieved by uncommenting ‘LoadModule php5_module libexec/apache2/libphp5’ in your ‘/etc/apache2/httpd.conf’ file.</p>
+
+<h2 id="fancy-some-php-55">Fancy some PHP 5.5?</h2>
+
+<p>If you feel ultra-cool and want to use the latest and greatest from PHP - such as traits and yield, you can install PHP 5.5 using <a href="http://brew.sh/">Homebrew</a> following the below intructions:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>brew tap homebrew/dupes
+<span class="nv">$ </span>brew tap josegonzalez/homebrew-php
+<span class="nv">$ </span>brew options php55 <span class="c"># list available configuration options</span>
+<span class="nv">$ </span>brew <span class="nb">install </span>php55
+</code></pre></div></div>
+
+<p>To enable PHP 5.5 for use with Apache you need to replace the uncommented PHP module (from the last step) with ‘LoadModule php5_module /usr/local/Cellar/php55/5.5.6/libexec/apache2/libphp5.so’.</p>
+
+<h2 id="mysql">MySQL</h2>
+
+<p>To install MySQL I have decided to skip all the hard work of compiling my own build and again let Homebrew do all the hard work.
+Run the following commands to successfully setup your own personal MySQL installation.
+Remember to follow the instructions Homebrew provides you, I personally also recommend you run the optional secure installation script once complete (even if it is just a development setup).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>brew <span class="nb">install </span>mysql
+<span class="nv">$ </span><span class="c"># The folder version may vary</span>
+<span class="nv">$ </span>/usr/local/Cellar/mysql/5.5.20/bin/mysql_secure_installation
+</code></pre></div></div>
+
+<p>We must then make Apache aware that MySQL now has setup shop on your system.
+To do this, run the following commands.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo mkdir</span> /var/mysql
+<span class="nv">$ </span><span class="nb">sudo ln</span> <span class="nt">-s</span> /tmp/mysql.sock /var/mysql/mysql.sock
+</code></pre></div></div>
+
+<p>Now we are ready to add DNSMasq into the mix.</p>
+
+<h2 id="dnsmasq-and-the-magical-part">DNSMasq and the magical part</h2>
+
+<p>Now that we have successfully setup are MAMP stack its time to add the magic sauce which makes this setup o’ so much better.
+I have already documented what DNSMasq is and how to set it up on a Linux distribution (Ubuntu) in a previous article so I will just skip the introductions and install it.
+To install DNSMasq on Mac OSX I have decided to follow a similar process to MySQL and let Homebrew do all the hard work.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>brew <span class="nb">install </span>dnsmasq
+</code></pre></div></div>
+
+<p>Once successfully downloaded/installed follow the onscreen instructions and copy the configuration file to ‘/usr/local/etc/dnsmasq.conf’.
+Before continuing on to the second stage of installation however, we need to tell DNSMasq (using the copied configuration file) that we want any address with a <a href="http://en.wikipedia.org/wiki/Top-level_domain">TLD</a> of ‘.dev’ to loopback to our own machine.</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>address=/dev/127.0.0.1
+listen-address=127.0.0.1
+</code></pre></div></div>
+
+<p>We then need to add our loopback address (127.0.0.1) as the first DNS record to our primary network adaptor.
+We do this by going to System Preferences, then Network, once there we click Advanced and then DNS.
+Finally we can then add 127.0.0.1 as the first DNS record.</p>
+
+<p>The last step is to setup the last development Apache Virtual Host you will hopefully ever have to look at.
+Add the following Virtual Host information into your custom Apache configuration file, located at ‘/etc/apache2/users/[your-username].conf’.</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">NameVirtualHost</span> *:<span class="m">80</span>
+
+&lt;<span class="n">Directory</span> <span class="s2">"/Users/[your-username]/Sites/"</span>&gt;
+  <span class="n">Options</span> <span class="n">Indexes</span> <span class="n">MultiViews</span> <span class="n">FollowSymLinks</span> <span class="n">Includes</span>
+  <span class="n">AllowOverride</span> <span class="n">All</span>
+  <span class="n">Order</span> <span class="n">allow</span>,<span class="n">deny</span>
+  <span class="n">Allow</span> <span class="n">from</span> <span class="n">all</span>
+&lt;/<span class="n">Directory</span>&gt;
+
+&lt;<span class="n">VirtualHost</span> *:<span class="m">80</span>&gt;
+  <span class="n">UseCanonicalName</span> <span class="n">off</span>
+  <span class="n">VirtualDocumentRoot</span> /<span class="n">Users</span>/[<span class="n">your</span>-<span class="n">username</span>]/<span class="n">Sites</span>/%<span class="m">1</span>
+&lt;/<span class="n">VirtualHost</span>&gt;
+</code></pre></div></div>
+
+<p>All that is needed now is to simply restart Apache by using the following command.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apachectl restart
+</code></pre></div></div>
+
+<p>You can now add a new folder to your ‘~/Sites’ directory and without any other excess work visit the folder’s name with the ‘.dev’ TLD prepended in your browser of choice.
+I have added a simple function to my dotfiles which cuts out even this laborious task.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function </span>newsite<span class="o">()</span> <span class="o">{</span>
+  <span class="nb">mkdir</span> <span class="nt">-p</span> ~/Sites/<span class="nv">$1</span>
+  <span class="nb">echo</span> <span class="s2">"Hello, world..."</span> <span class="o">&gt;</span> ~/Sites/<span class="nv">$1</span>/index.html
+  <span class="nb">echo</span> <span class="s2">"&lt;?php phpinfo();"</span> <span class="o">&gt;</span> ~/Sites/<span class="nv">$1</span>/info.php
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Now that I have this setup I can not imagine a world without it.
+All the tedious work required in setting up a new project has now vanished!</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

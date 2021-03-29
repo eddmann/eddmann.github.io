@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Used all the time, so lets make it better.">
+
+    <title>An alternative to 'var_dump' in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">An alternative to 'var_dump' in PHP</h1>
+    <time datetime="2012-09-10T00:00:00-05:00" class="post-date">10 Sep 2012</time>
+    <p>Whilst working with PHP, I seem to use ‘var_dump’ a ridiculous amount, its a debugging must-have.
+However, it does fall short in a few ways, especially in how it does not take into consideration that the function is almost always displayed in a HTML page - switching to the page’s source can become a pain.
+Due to the pitfalls a host of projects such as <a href="http://krumo.sourceforge.net/">Krumo</a> and <a href="http://raveren.github.io/kint/">Kint</a> have cropped up to cater for these needs.
+As well as these projects, if you have <a href="http://xdebug.org/">XDebug</a> installed it will replace the default ‘var_dump’ function with its own implementation that outputs the information with well-needed styling.
+
+For me though, I do not need all bells n’ whistles that these provide, my base requirements are:</p>
+
+<ul>
+  <li>Better presentation on a HTML page, no viewing of source necessarily</li>
+  <li>Output of the Page, Class, Function, Line that called the function</li>
+  <li>Ability to end script execution immediately after outputting the information (for easier debugging)</li>
+</ul>
+
+<h2 id="the-code">The code…</h2>
+
+<p>So as a result of these requirements I created the two simple functions below.
+I am sure there are many similar implementations available online, but these two are serving me well.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">dump</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="nv">$args</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+
+  <span class="k">echo</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">&lt;pre style=</span><span class="se">\"</span><span class="s2">border:1px solid #ccc;padding:10px;"</span> <span class="mf">.</span>
+       <span class="s2">"margin:10px;font:14px courier;background:whitesmoke;"</span> <span class="mf">.</span>
+       <span class="s2">"display:block;border-radius:4px;</span><span class="se">\"</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+
+  <span class="nv">$trace</span> <span class="o">=</span> <span class="nb">debug_backtrace</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+  <span class="nv">$offset</span> <span class="o">=</span> <span class="p">(</span><span class="o">@</span><span class="nv">$trace</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="s1">'function'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'dump_d'</span><span class="p">)</span> <span class="o">?</span> <span class="mi">2</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">echo</span> <span class="s2">"&lt;span style=</span><span class="se">\"</span><span class="s2">color:red</span><span class="se">\"</span><span class="s2">&gt;"</span> <span class="mf">.</span>
+       <span class="o">@</span><span class="nv">$trace</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="nv">$offset</span><span class="p">][</span><span class="s1">'class'</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">"&lt;/span&gt;:"</span> <span class="mf">.</span>
+       <span class="s2">"&lt;span style=</span><span class="se">\"</span><span class="s2">color:blue;</span><span class="se">\"</span><span class="s2">&gt;"</span> <span class="mf">.</span>
+       <span class="o">@</span><span class="nv">$trace</span><span class="p">[</span><span class="mi">1</span><span class="o">+</span><span class="nv">$offset</span><span class="p">][</span><span class="s1">'function'</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">"&lt;/span&gt;:"</span> <span class="mf">.</span>
+       <span class="o">@</span><span class="nv">$trace</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="nv">$offset</span><span class="p">][</span><span class="s1">'line'</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">" "</span> <span class="mf">.</span>
+       <span class="s2">"&lt;span style=</span><span class="se">\"</span><span class="s2">color:green;</span><span class="se">\"</span><span class="s2">&gt;"</span> <span class="mf">.</span>
+       <span class="o">@</span><span class="nv">$trace</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="nv">$offset</span><span class="p">][</span><span class="s1">'file'</span><span class="p">]</span> <span class="mf">.</span> <span class="s2">"&lt;/span&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">empty</span><span class="p">(</span><span class="nv">$args</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nb">call_user_func_array</span><span class="p">(</span><span class="s1">'var_dump'</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">echo</span> <span class="s2">"&lt;/pre&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">function</span> <span class="n">dump_d</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="nb">call_user_func_array</span><span class="p">(</span><span class="s1">'dump'</span><span class="p">,</span> <span class="nb">func_get_args</span><span class="p">());</span>
+  <span class="k">die</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://gist.github.com/3692379">A Gist of the above implementation</a></li>
+  <li><a href="http://raveren.github.io/kint/">Kint</a></li>
+  <li><a href="http://krumo.sourceforge.net/">Krumo</a></li>
+  <li><a href="http://xdebug.org/">XDebug</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 1 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 1 - Not Quite Lisp &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 1 - Not Quite Lisp</h1>
+    <time datetime="2021-01-25T00:00:00-06:00" class="post-date">25 Jan 2021</time>
+    <p>This past Decemeber a <a href="https://github.com/tomcant">fellow colleague</a> introduced us to <a href="https://adventofcode.com/">Advent of Code</a>.
+What initially started out as completing each daily 2020 puzzle <em>in my own time</em> soon turned into a daily obession, and in-turn an incredible learning experience shared amongst the team.</p>
+
+<p>Having completed the 2020 calendar at the end of last year, over the past couple of weeks we have began working through the previous calendars.
+Over the coming months I hope to record each of my solutions, with the goal of completing all the previous puzzles just-in-time for the 2021 calendar to commence.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>And so the journey begins…</p>
+
+<p>The first part of todays puzzle centres around determining what floor Santa will be on based on following the supplied directions.
+Parsing the input is trivial, but as we have the power of TypeScript behind us we can also provide an element of type-safetly.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">enum</span> <span class="nx">Direction</span> <span class="p">{</span>
+  <span class="nx">Up</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">(</span><span class="dl">'</span><span class="p">,</span>
+  <span class="nx">Down</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">parseDirections</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Direction</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="p">[...</span><span class="nx">input</span><span class="p">].</span><span class="nx">filter</span><span class="p">((</span><span class="nx">d</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">d</span> <span class="k">is</span> <span class="nx">Direction</span> <span class="o">=&gt;</span>
+    <span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">Direction</span><span class="p">).</span><span class="nx">includes</span><span class="p">(</span><span class="nx">d</span> <span class="k">as</span> <span class="nx">Direction</span><span class="p">)</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>In this instance we simply remove any invalid directions that do not conform to our expected input.
+Alternatively, we could have thrown an exception so as to not silently ignore invalid input.</p>
+
+<p>With the input now parsed into an excpected form we can go about determining which floor Santa will land up on.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">floor</span><span class="p">,</span> <span class="nx">direction</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">floor</span> <span class="o">+</span> <span class="p">(</span><span class="nx">direction</span> <span class="o">===</span> <span class="nx">Direction</span><span class="p">.</span><span class="nx">Up</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+    <span class="mi">0</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>This can be achieved using a single reduction which keeps track of what floor Santa is currently on.
+Once we have reduced over all the directions we can return the resulting floor 🌟.</p>
+
+<p>Upon reflection of my initial solution I noticed that this could be simplied into just subtracting the total <em>Down</em> directions from the <em>Up</em> directions.
+Opting for the <code class="highlighter-rouge">split</code> method over the <code class="highlighter-rouge">RegExp</code> method to count occurrences you would usually be required to decrement the result by one to get the correct answer. However, using the same method for both cancels this out for the final answer.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">(</span><span class="dl">'</span><span class="p">).</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>In the second part of todays puzzle we are asked to answer a different question based on same supplied input.
+We are now required to work out at which directions position (one-indexed) that Santa first enters the Basement (<code class="highlighter-rouge">-1</code>).</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">floor</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">position</span><span class="p">,</span> <span class="nx">direction</span><span class="p">]</span> <span class="k">of</span> <span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">entries</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nx">floor</span> <span class="o">+=</span> <span class="nx">direction</span> <span class="o">===</span> <span class="nx">Direction</span><span class="p">.</span><span class="nx">Up</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">floor</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nx">position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Santa never enters the basement</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>To solve this problem I opted to replace the reduction with a conventional <em>for loop</em> which allows us to return the first time we see Santa enter the basement (negative floor value).
+As the array index supplied by <code class="highlighter-rouge">Array.prototype.entries()</code> is zero-indexed we are required to increment this value by one to produce the desired position 🌟.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

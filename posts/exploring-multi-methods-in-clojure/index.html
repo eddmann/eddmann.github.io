@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring Multi-Methods in Clojure using some simple examples">
+
+    <title>Exploring Multi-Methods in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Exploring Multi-Methods in Clojure</h1>
+    <time datetime="2016-01-21T00:00:00-06:00" class="post-date">21 Jan 2016</time>
+    <p>Currently reading through the <a href="https://www.manning.com/books/the-joy-of-clojure">Joy of Clojure</a> book I have recently been introduced to Clojure’s multi-method support.
+I decided that it would be interesting to see this feature in action, so I opened up LightTable and codified some example use-cases.
+</p>
+
+<h2 id="fizzbuzz">FizzBuzz</h2>
+
+<p>The implementation below carries on from were my article about <a href="/posts/fizzbuzz-in-clojure/">FizzBuzz in Clojure</a> left off.
+Using the two documented <code class="highlighter-rouge">fizz?</code> and <code class="highlighter-rouge">buzz?</code> helpers, followed by the <a href="https://clojuredocs.org/clojure.core/juxt"><code class="highlighter-rouge">juxt</code></a> core function we are able to codify the problem in a highly descriptive manner.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">3</span><span class="p">)))</span><span class="w">
+</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">5</span><span class="p">)))</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">(</span><span class="nf">juxt</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="n">buzz?</span><span class="p">))</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">true</span><span class="w"> </span><span class="n">false</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="s">"Fizz"</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">false</span><span class="w"> </span><span class="n">true</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">true</span><span class="w"> </span><span class="n">true</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">  </span><span class="s">"FizzBuzz"</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="no">:default</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">n</span><span class="p">))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">range</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="p">))</span><span class="w"> </span><span class="c1">; (1 2 "Fizz" 4 "Buzz" "Fizz" 7 8 "Fizz")</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="factorial">Factorial</h2>
+
+<p>We are also able to use multi-methods in a similar manner to pattern-matching found in languages such as Scala and Haskell.
+The below implementation recursively computes the supplied arguments factorial value, handling the base-case of 0 using the function <code class="highlighter-rouge">identity</code> as the dispatch call.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">factorial</span><span class="w"> </span><span class="nb">identity</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">factorial</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">factorial</span><span class="w"> </span><span class="no">:default</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="c1">; 120</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="rock-paper-scissors">Rock-Paper-Scissors</h2>
+
+<p>We are able to expand upon the rules based approach laid out in the previous examples by documenting the Rock-Paper-Scissors game in code.
+Using this multi-method allows us to compute all the possible winning-moves for both players.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="nb">vector</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="p">[</span><span class="no">:paper</span><span class="w"> </span><span class="no">:rock</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="w"> </span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="n">true</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="p">[</span><span class="no">:scissors</span><span class="w"> </span><span class="no">:paper</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="w"> </span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="n">true</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="p">[</span><span class="no">:rock</span><span class="w"> </span><span class="no">:scissors</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="w"> </span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="n">true</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="no">:default</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="w"> </span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="n">false</span><span class="p">)</span><span class="w">
+
+</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">winning-moves</span><span class="w">
+  </span><span class="p">(</span><span class="k">for</span><span class="w"> </span><span class="p">[</span><span class="n">one</span><span class="w"> </span><span class="p">[</span><span class="no">:rock</span><span class="w"> </span><span class="no">:paper</span><span class="w"> </span><span class="no">:scissors</span><span class="p">]</span><span class="w">
+        </span><span class="n">two</span><span class="w"> </span><span class="p">[</span><span class="no">:rock</span><span class="w"> </span><span class="no">:paper</span><span class="w"> </span><span class="no">:scissors</span><span class="p">]</span><span class="w">
+        </span><span class="no">:let</span><span class="w"> </span><span class="p">[</span><span class="n">one-wins</span><span class="w"> </span><span class="p">(</span><span class="nf">beats?</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="p">)</span><span class="w">
+              </span><span class="n">two-wins</span><span class="w"> </span><span class="p">(</span><span class="nf">beats?</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">one</span><span class="p">)]</span><span class="w">
+        </span><span class="no">:when</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="n">one-wins</span><span class="w"> </span><span class="n">two-wins</span><span class="p">)]</span><span class="w">
+    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">one-wins</span><span class="w"> </span><span class="p">[</span><span class="s">"1"</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="s">"2"</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="p">])))</span><span class="w">
+</span><span class="c1">; [2 :rock :paper] [1 :rock :scissors] [1 :paper :rock]</span><span class="w">
+</span><span class="c1">; [2 :paper :scissors] [2 :scissors :rock] [1 :scissors :paper])</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="odd-or-even">Odd or Even</h2>
+
+<p>Finally we can use the core <code class="highlighter-rouge">odd?</code> function to polymorphically return a string depicting the supplied values odd-even status.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">odd?</span><span class="p">)</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">true</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">" is Odd"</span><span class="p">))</span><span class="w">
+</span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">" is Even"</span><span class="p">))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">odd-even?</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="c1">; 5 is Odd</span><span class="w">
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

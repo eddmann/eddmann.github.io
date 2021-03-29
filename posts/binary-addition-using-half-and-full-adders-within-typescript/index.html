@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explores performing Binary Addition within TypeScript using Logic Gates and Half/Full Adders">
+
+    <title>Binary Addition using Half and Full Adders within TypeScript &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Binary Addition using Half and Full Adders within TypeScript</h1>
+    <time datetime="2020-11-06T00:00:00-06:00" class="post-date">06 Nov 2020</time>
+    <p>Recently, I watched an interesting talk about <a href="https://www.youtube.com/watch?v=7lyb22x9tcM">Binary Addition in the TypeScript Type System</a> and thought it would be interesting to explore this concept in more depth.
+I wanted to pay close attention to how I could leverage the TypeScript type-system to help ensure validity in the final implementation.</p>
+
+
+
+<h3 id="the-bit">The Bit</h3>
+
+<p>Starting from basic principles and working our way up we define the concept of a <code class="highlighter-rouge">Bit</code> and a fixed tuple of <code class="highlighter-rouge">Bits</code> using <a href="https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#recursive-conditional-types">Recursive Conditional Types</a> which will be available in TypeScript 4.1.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Bit</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">|</span> <span class="mi">1</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">N</span> <span class="kd">extends</span> <span class="nx">N</span> <span class="p">?</span> <span class="p">(</span><span class="kr">number</span> <span class="kd">extends</span> <span class="nx">N</span> <span class="p">?</span> <span class="nx">Bit</span><span class="p">[]</span> <span class="p">:</span> <span class="nx">_Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="p">,</span> <span class="p">[]</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">:</span> <span class="nx">never</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">_Bits</span><span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">R</span> <span class="kd">extends</span> <span class="nx">Bit</span><span class="p">[]</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">R</span><span class="p">[</span><span class="dl">"</span><span class="s2">length</span><span class="dl">"</span><span class="p">]</span> <span class="kd">extends</span> <span class="nx">N</span> <span class="p">?</span> <span class="nx">R</span> <span class="p">:</span> <span class="nx">_Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="p">,</span> <span class="p">[</span><span class="nx">Bit</span><span class="p">,</span> <span class="p">...</span><span class="nx">R</span><span class="p">]</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>From here, we create a simple factory function which, based on the desired Bit width size, pads out a supplied Partial type with trailing zeros.
+For this exercise we will be storing the Bits in <a href="https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_bit">Least Significant Bit</a> order.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">PartialBits</span><span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nb">Partial</span><span class="o">&lt;</span><span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">Bits</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">size</span><span class="p">:</span> <span class="nx">N</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">bits</span><span class="p">:</span> <span class="nx">PartialBits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Bit</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">size</span><span class="p">)</span> <span class="k">as</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">size</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">bits</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">Int8</span> <span class="o">=</span> <span class="nx">Bits</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">Int16</span> <span class="o">=</span> <span class="nx">Bits</span><span class="p">(</span><span class="mi">16</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>In doing this we are now levaging the type system to ensure that any supplied bits do not exceed the allocated represenation width.
+This is highlighted in the examples below.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]);</span> <span class="c1">// valid</span>
+<span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]);</span> <span class="c1">// invalid</span>
+<span class="nx">Int16</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]);</span> <span class="c1">// valid</span>
+</code></pre></div></div>
+
+<h3 id="the-logic-gates">The Logic Gates</h3>
+
+<p>So as to perform the final addition we need to provide the tooling around being able to construct Logic Gates based on supplied Bits.
+We are able to achieve this using the approach laid out below.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">and</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="nx">b</span> <span class="o">===</span> <span class="mi">1</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">or</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span> <span class="o">===</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">b</span> <span class="o">===</span> <span class="mi">1</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">invert</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">nand</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="nx">invert</span><span class="p">(</span><span class="nx">and</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">nor</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="nx">invert</span><span class="p">(</span><span class="nx">or</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">xor</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">):</span> <span class="nx">Bit</span> <span class="o">=&gt;</span> <span class="nx">and</span><span class="p">(</span><span class="nx">or</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">nand</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h3 id="the-half-adder">The Half Adder</h3>
+
+<p>The <a href="https://en.wikipedia.org/wiki/Adder_(electronics)#Half_adder">Half Adder</a> is used to add two single bits A and B together, resulting in Sum and Carry outputs.
+We can build such a circuit using the following three approaches - the simplest of which is shown first, comprising of a single <code class="highlighter-rouge">XOR</code> and <code class="highlighter-rouge">AND</code> gate.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Addition</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">sum</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">;</span>
+  <span class="nl">carry</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">type</span> <span class="nx">HalfAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Addition</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="simplest-half-adder">Simplest Half-Adder</h4>
+
+<p><a href="https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Half_Adder"><img src="/uploads/binary-addition-using-half-and-full-adders-within-typescript/half-adder.jpg" alt="Simplest Half-Adder" /></a></p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">halfAdder</span><span class="p">:</span> <span class="nx">HalfAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">sum</span><span class="p">:</span> <span class="nx">xor</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span>
+  <span class="na">carry</span><span class="p">:</span> <span class="nx">and</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h4 id="half-adder-using-only-nand-gates">Half-Adder using only NAND Gates</h4>
+
+<p><a href="https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Half_Adder_using_NAND_Gates"><img src="/uploads/binary-addition-using-half-and-full-adders-within-typescript/half-adder-nand.jpg" alt="Half-Adder using only NAND Gates" /></a></p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">halfAdderUsingNand</span><span class="p">:</span> <span class="nx">HalfAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">ab</span> <span class="o">=</span> <span class="nx">nand</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">sum</span><span class="p">:</span> <span class="nx">nand</span><span class="p">(</span><span class="nx">nand</span><span class="p">(</span><span class="nx">ab</span><span class="p">,</span> <span class="nx">a</span><span class="p">),</span> <span class="nx">nand</span><span class="p">(</span><span class="nx">ab</span><span class="p">,</span> <span class="nx">b</span><span class="p">)),</span>
+    <span class="na">carry</span><span class="p">:</span> <span class="nx">nand</span><span class="p">(</span><span class="nx">ab</span><span class="p">,</span> <span class="nx">ab</span><span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h4 id="half-adder-using-only-nor-gates">Half-Adder using only NOR Gates</h4>
+
+<p><a href="https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Half_Adder_using_NOR_Gates"><img src="/uploads/binary-addition-using-half-and-full-adders-within-typescript/half-adder-nor.jpg" alt="Half-Adder using only NOR Gates" /></a></p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">halfAdderUsingNor</span><span class="p">:</span> <span class="nx">HalfAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">carry</span> <span class="o">=</span> <span class="nx">nor</span><span class="p">(</span><span class="nx">nor</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">a</span><span class="p">),</span> <span class="nx">nor</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">b</span><span class="p">));</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">sum</span><span class="p">:</span> <span class="nx">nor</span><span class="p">(</span><span class="nx">carry</span><span class="p">,</span> <span class="nx">nor</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)),</span>
+    <span class="nx">carry</span><span class="p">,</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="the-full-adder">The Full Adder</h3>
+
+<p>On its own a Half Adder is unable to perform the binary addition we hope to achieve.
+To achieve this we can use a <a href="https://en.wikipedia.org/wiki/Adder_(electronics)#Full_adder">Full Adder</a> which is able to handle a subsquent third bit within the input - this being the Carry from a previous operation.
+This Adder can be constructed by using two Half Adders like so.</p>
+
+<p><a href="https://www.electronicshub.org/half-adder-and-full-adder-circuits/#Full_Adder"><img src="/uploads/binary-addition-using-half-and-full-adders-within-typescript/full-adder.jpg" alt="The Full Adder" /></a></p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">FullAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">b</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">,</span> <span class="nx">c</span><span class="p">:</span> <span class="nx">Bit</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Addition</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">fullAdder</span> <span class="o">=</span> <span class="p">(</span><span class="nx">halfAdder</span><span class="p">:</span> <span class="nx">HalfAdder</span><span class="p">):</span> <span class="nx">FullAdder</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">ab</span> <span class="o">=</span> <span class="nx">halfAdder</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">abc</span> <span class="o">=</span> <span class="nx">halfAdder</span><span class="p">(</span><span class="nx">ab</span><span class="p">.</span><span class="nx">sum</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">sum</span><span class="p">:</span> <span class="nx">abc</span><span class="p">.</span><span class="nx">sum</span><span class="p">,</span>
+    <span class="na">carry</span><span class="p">:</span> <span class="nx">or</span><span class="p">(</span><span class="nx">ab</span><span class="p">.</span><span class="nx">carry</span><span class="p">,</span> <span class="nx">abc</span><span class="p">.</span><span class="nx">carry</span><span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="binary-addition">Binary Addition</h3>
+
+<p>With this tooling in-place we can then construct an addition function.
+Based on a Bit result width size, we supply Partials of this Bit width and in-turn use the Full Adder to calculate the final result.
+Leveraging the type system we are able to ensure that we do permit inputs that are larger than the allocated return type.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">add</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fullAdder</span><span class="p">:</span> <span class="nx">FullAdder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="o">&lt;</span><span class="nx">N</span> <span class="kd">extends</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">size</span><span class="p">:</span> <span class="nx">N</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
+  <span class="nx">a</span><span class="p">:</span> <span class="nx">PartialBits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span><span class="p">,</span>
+  <span class="nx">b</span><span class="p">:</span> <span class="nx">PartialBits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span>
+<span class="p">):</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="na">carry</span><span class="p">:</span> <span class="nx">Bit</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Bit</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">size</span><span class="p">)</span> <span class="k">as</span> <span class="nx">Bits</span><span class="o">&lt;</span><span class="nx">N</span><span class="o">&gt;</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">size</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">({</span> <span class="na">sum</span><span class="p">:</span> <span class="nx">result</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">carry</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">fullAdder</span><span class="p">(</span><span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">||</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">b</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">||</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">carry</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Finally, we can test out this implementation like so.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">addInt8</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="nx">fullAdder</span><span class="p">(</span><span class="nx">halfAdder</span><span class="p">))(</span><span class="mi">8</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">addInt16</span> <span class="o">=</span> <span class="nx">add</span><span class="p">(</span><span class="nx">fullAdder</span><span class="p">(</span><span class="nx">halfAdderUsingNand</span><span class="p">))(</span><span class="mi">16</span><span class="p">);</span>
+
+<span class="nx">addInt8</span><span class="p">(</span><span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]));</span> <span class="c1">// 01001000</span>
+<span class="nx">addInt8</span><span class="p">(</span><span class="nx">Int16</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]));</span> <span class="c1">// invalid</span>
+<span class="nx">addInt16</span><span class="p">(</span><span class="nx">Int16</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="nx">Int8</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]));</span> <span class="c1">// 0011000001000000</span>
+</code></pre></div></div>
+
+<p>Notice the type system again helping to enforce width rules with regards to Bits in the second example.
+If you are interested in experimenting with the demonstration you can visit <a href="https://www.typescriptlang.org/play?ts=4.1.0-beta#code/C4TwDgpgBAQglsKBeKAGKAfKBGA3AKFElgQGcAeAOSggA9gIA7AE1KkYFcBbAIwgCcAfMijU6DFm2oB+KAApOvATXpNWoqLPjAA2gF0oALigB9bRUoAaKPsEBKI+wgA3AQSLQzZKionrFfPzWAEq+amzatiLBOgBEADZMAObAABaxBuLhGrKhxl7AFtY62tYAdBXBeoLu4NAACgCG-MBwjfHmPlmS7NyBwihNLW3x5J2UgjX4+ADGAPaMpIjmIl2qPQECgnKkcABeEMaUDkjCcjxkxkOt7eP2xnfIwgDe+FBQiYj8EKQc8YgoACC-H4jRAYwQ212BwcjQi3gmBDeUAAZnN+PJPlA4CJULhsVByFBoRB8XAANTkhyvd7vb6-f46OAGFAXQpMgwYLB45EAX2mdIgwA4-EYUHpf2ABF5SPmi0QAElGMAABwicxyFV2AhypZQJXAbAANnVZDkxu1011iEaLBEckaDwQ1h4TuAdjdT3kjWQSBQ2CgADJA1AeL7-ZocI5UJbrVB0fbHSRgC63R7k16HeGo1zQ9mA7IA8YYzqFnq4IxXC1E2nPadvZH0MZsLGy4hGLbmDXk6nk+ntF6K1XgA6WA6XXZW-L2AmUA63b3tP2EIPKwIR+jx6HJ6Xp7RZ96F6Haxn6525JvGhPrB2x1ft5bCHUoIDmMwEHAFiIacTuG6CO8MzNPwID-vgMrTB4UAABLtCir7MMoc5JqUx59l6CEfgssptlAqRwQhAjGLB8TwW+SHehOmY-r8XDGPu-BbjwdiWMiQEgqBUDnvezGsbyj5xvhpGEfwACquyMEklCdsRBHkRiyFUfWP5xo0YYoLezBMZagrCqKUA-u8tHGJpCjcTw1iNCx7DmROLHIoBwGcaZamWbxfLSjh05CWRiFiRJUnorJwnyYmSkvGxuHsSBIiMJucWMfeVk3puFkPgB4pCiKYqGb+dEzox0UgCliV2axtJQEV5VQBBEFPsQABifzxCJ3aoa6PaVWmGFvlhjBeXqKLNa1c4+SJwW+QI6ZNfELWhfWTHWDMJwRYBuFqSIY3ydpGWqTwMybXJfkOjwZS0UtOmZXpOUOXlxhqTMZ3cNVjkccYl6nVVXH7WURX2e8tUDTab72kNs3jVAM1zX5K2EmI6z+H0Ww7PshyiLDcjIkm1wjHc1UdTjtwIoI+DLoUVADKtHxCpVTl1mgGVYhK-wiMCoLgtoUKo7C8Lk4iAqogmchYjiKB4gSRIkmSlLUrdcjPHdmUMrozJLU5NUiGD0MCA6HKYNyLp67mqBqxxO58gL3zXUrkqeVa61vgaaooI0b5yFrIlyFtMN2JqU56q7zAGsaIiB+7w3bd7AjiRWUmdpO5pGgJZZzIkv2JM0cj+6nEBlPEcxJA6jvKiqchO3IOjYNYJs4NY2B6NZ5eV9XdcN+buo53nBdF0HyrGmXfdGhXVdoHXY+1xPI9Tw31hN1P4-15OlpAA">this TypeScript playground</a>.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

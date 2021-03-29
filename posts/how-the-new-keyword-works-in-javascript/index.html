@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Demystifying how the 'new' keyword works under-the-hood in JavaScript">
+
+    <title>How the 'new' keyword works in JavaScript &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">How the 'new' keyword works in JavaScript</h1>
+    <time datetime="2015-09-03T00:00:00-05:00" class="post-date">03 Sep 2015</time>
+    <p>The <code class="highlighter-rouge">new</code> keyword in JavaScript can sometimes slip up new and experienced programmers alike.
+We typically associate this word with Classical-based Object-oriented languages (such as Java etc.), where as in JavaScript it works a little different.
+
+In fact due to the languages prototypical behavior any function can be used as a constructor call, which adds more fuel to the confusion.
+To demystify the process that occurs this article will take you through the four operations that occur when the <code class="highlighter-rouge">new</code> keyword is invoked on a Function.
+After describing these steps we will then work through codifying a user-land function that mimics its’ behavior.</p>
+
+<ol>
+  <li>It creates a plain ol’ object</li>
+  <li>It assigns the supplied Functions <code class="highlighter-rouge">prototype</code> object property as the new objects <code class="highlighter-rouge">[[prototype]]</code> link. All Functions are created with a prototype object property which initially just has a constructor member which links back to the Function itself.</li>
+  <li>It invokes the Function constructor (with supplied arguments), binding <code class="highlighter-rouge">this</code> to the newly created object.</li>
+  <li>It checks to see if a non-primitive value has been returned from the function call, if so it will disregard the created object and return this, else the newly formed object is returned.</li>
+</ol>
+
+<h2 id="user-land-solution">User-land Solution</h2>
+
+<p>Now that we know the basic steps that occur when the <code class="highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimic this behavior.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">isObj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">new_</span><span class="p">(</span><span class="nx">cons</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">cons</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> <span class="c1">// step 1 and 2</span>
+  <span class="kd">let</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">cons</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> <span class="c1">// step 3</span>
+  <span class="k">return</span> <span class="nx">isObj</span><span class="p">(</span><span class="nx">ret</span><span class="p">)</span> <span class="p">?</span> <span class="nx">ret</span> <span class="p">:</span> <span class="nx">obj</span><span class="p">;</span> <span class="c1">// step 4</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

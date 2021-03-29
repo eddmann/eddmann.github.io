@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring the clojure.core library by implementing the QuickSort algorithm">
+
+    <title>QuickSort in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">QuickSort in Clojure</h1>
+    <time datetime="2016-01-11T00:00:00-06:00" class="post-date">11 Jan 2016</time>
+    <p>This past weekend I had the chance to delve more into Clojure’s <a href="https://clojuredocs.org/clojure.core">core library</a>.
+I experimented with some interesting aspects of the library by implementing the QuickSort algorithm in a couple of different ways.
+</p>
+
+<h2 id="random-number-generation">Random Number Generation</h2>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">numbers</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">take</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">(</span><span class="nf">repeatedly</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">rand-int</span><span class="w"> </span><span class="mi">100</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Using the above function we are able to take advantage of lazy sequences to create an infinite list of random integers.
+This infinite list is made finite (using <code class="highlighter-rouge">take</code>) when supplying the function with the desired amount of numbers required.</p>
+
+<h2 id="solution-1">Solution 1</h2>
+
+<p>The first implementation documented declaratively describes the QuickSort algorithm, using collection filtering to split the input based on the selected pivot.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">quick-sort</span><span class="w"> </span><span class="p">[[</span><span class="n">pivot</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">coll</span><span class="p">]]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">pivot</span><span class="w">
+    </span><span class="p">(</span><span class="nb">concat</span><span class="w"> </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="p">(</span><span class="nb">filter</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">pivot</span><span class="p">)</span><span class="w"> </span><span class="n">coll</span><span class="p">))</span><span class="w">
+            </span><span class="p">[</span><span class="n">pivot</span><span class="p">]</span><span class="w">
+            </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="p">(</span><span class="nb">filter</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">&gt;=</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">pivot</span><span class="p">)</span><span class="w"> </span><span class="n">coll</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="solution-2">Solution 2</h2>
+
+<p>The second implementation removes the duplication created by the two filtering predicates, specifying a single <code class="highlighter-rouge">greater?</code> function which is used by both filtering and subsequently removing (the inverse) from the supplied collection.
+We also employ the use of the lazy concatenation function which returns a lazy sequence which is only evaluated when required.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">quick-sort</span><span class="w"> </span><span class="p">[[</span><span class="n">pivot</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">coll</span><span class="p">]]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">pivot</span><span class="w">
+    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">greater?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">pivot</span><span class="p">)]</span><span class="w">
+      </span><span class="p">(</span><span class="nb">lazy-cat</span><span class="w"> </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="p">(</span><span class="nb">remove</span><span class="w"> </span><span class="n">greater?</span><span class="w"> </span><span class="n">coll</span><span class="p">))</span><span class="w">
+                </span><span class="p">[</span><span class="n">pivot</span><span class="p">]</span><span class="w">
+                </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="p">(</span><span class="nb">filter</span><span class="w"> </span><span class="n">greater?</span><span class="w"> </span><span class="n">coll</span><span class="p">))))))</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="solution-3">Solution 3</h2>
+
+<p>The final implementation uses the <code class="highlighter-rouge">group-by</code> function provided by the core library.
+Using this function neatly allows us to partition the collection into two separate lists in an extremely expressive manner.
+We are then able to destructure the returned map, assigning the true and false values to more clearly named lesser and greater variables.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">quick-sort</span><span class="w"> </span><span class="p">[[</span><span class="n">pivot</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">coll</span><span class="p">]]</span><span class="w">
+  </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">pivot</span><span class="w">
+    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[{</span><span class="n">lesser</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="n">greater</span><span class="w"> </span><span class="n">true</span><span class="p">}</span><span class="w"> </span><span class="p">(</span><span class="nf">group-by</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">pivot</span><span class="p">)</span><span class="w"> </span><span class="n">coll</span><span class="p">)]</span><span class="w">
+      </span><span class="p">(</span><span class="nb">lazy-cat</span><span class="w"> </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="n">lesser</span><span class="p">)</span><span class="w">
+                </span><span class="p">[</span><span class="n">pivot</span><span class="p">]</span><span class="w">
+                </span><span class="p">(</span><span class="nf">quick-sort</span><span class="w"> </span><span class="n">greater</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

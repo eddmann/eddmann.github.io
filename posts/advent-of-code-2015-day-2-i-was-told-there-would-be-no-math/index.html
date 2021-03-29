@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 2 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 2 - I Was Told There Would Be No Math &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 2 - I Was Told There Would Be No Math</h1>
+    <time datetime="2021-01-26T00:00:00-06:00" class="post-date">26 Jan 2021</time>
+    <p>The second day of Advent of Code 2015 brings us a small Math problem by-way of Elves <em>running-low</em> on wrapping paper.
+With the Present dimensions (perfect right rectangular prisms) provided we are answer several related questions.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Based on the supplied Present dimensions we are required to calculate how much square-feet of wrapping paper should be ordered to wrap these presents.
+We are also asked to include <em>alittle extra</em> (the area of the smallest side) per present included.</p>
+
+<p>Similiar to Day 1 we will start of by parsing the provided input, this time into tuples.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">PresentDimensions</span> <span class="o">=</span> <span class="p">[</span><span class="nx">length</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">height</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">parsePresentDimensions</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">PresentDimensions</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span>
+    <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">)</span> <span class="k">as</span> <span class="nx">PresentDimensions</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>I have decided to be alittle more relaxed with my parsing validation this time around, instead opting to assume that each input line will be of the correct form.
+This allows me to just map over the resulting split, converting each dimension into an integer using a small helper method.</p>
+
+<p>With the input now parsed we can go about calculating how much wrapping paper we will require.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">parsePresentDimensions</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(([</span><span class="nx">l</span><span class="p">,</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">h</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">area</span> <span class="o">=</span> <span class="p">[</span><span class="nx">l</span> <span class="o">*</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">w</span> <span class="o">*</span> <span class="nx">h</span><span class="p">,</span> <span class="nx">h</span> <span class="o">*</span> <span class="nx">l</span><span class="p">];</span>
+      <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">area</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">)</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(...</span><span class="nx">area</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Mapping over each of the dimensions we are able to calculate how much wrapping paper is required (the surface area) per present, including the desired additional extra paper.
+With this mapped result we can then sum these together (using another helper method I have included to help aid clarity in the solutions) to produce the desired answer 🌟.
+We could have alternatively achieved this with a single <em>reduce</em> but I opted for the initial <em>map</em> for readability.</p>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>With the same input we are now instead asked to determine the total feet of ribben the Elves should order to tie and bow a ribben around all the provided presents.
+The total feet required per present is equal to the cubic feet of volume of the given dimensions.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">parsePresentDimensions</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">dimensions</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">]</span> <span class="o">=</span> <span class="nx">dimensions</span><span class="p">.</span><span class="nx">sort</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">);</span>
+      <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">y</span><span class="p">)</span> <span class="o">+</span> <span class="nx">dimensions</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">product</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Using a similar <em>map</em> we are able to calculate the required ribben per present and then <em>reduce</em> this into the total sum required 🌟.</p>
+
+<p>Alternatively, as there are three dimensions and we wish to find the sum of the smallest two - we can add all the dimensions together and subtract the maximum dimension value.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">parsePresentDimensions</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">d</span> <span class="o">=&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="nx">d</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">)</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">d</span><span class="p">))</span> <span class="o">+</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">product</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This removes the need to perform the sort and produces a succinct one-liner.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 24 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 24 - It Hangs in the Balance &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 24 - It Hangs in the Balance</h1>
+    <time datetime="2021-02-19T00:00:00-06:00" class="post-date">19 Feb 2021</time>
+    <p>On the twenty fourth day of Advent of Code 2015 we are asked to help Santa balance his sleigh based on all the presents he has to carry.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are told that the presents need to be evenly divided into three groups based on their weight (which is provided as input).
+Along with this, we are required to ensure that the first grouping (which goes in the passenger compartment of the sleigh) needs to include the minimal amount of packages possible.
+So as to resolve conflict upon multiple package combinations meeting the first groupings critieria, we are to consider the grouping which has the smallest <em>quantum entanglement</em> (aka product of their weights) to be the winner.
+For part one we are required to determine what the <em>quantum entanglement</em> of the first group will be based on this criteria.</p>
+
+<p>To begin we will parse the provide package weights into a form we can process hence forth.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Weight</span> <span class="o">=</span> <span class="kr">number</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">parsePackageWeights</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Weight</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>From here, we will create a function which based on a given total weight and available packages yields all the possible matching groups.
+This function will return groupings in size order, for example, all groupings of two will be yielded before any groups of three are considered (this is important for the final solution).</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Group</span> <span class="o">=</span> <span class="nx">Weight</span><span class="p">[];</span>
+
+<span class="kd">const</span> <span class="nx">groupsOfWeight</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span> <span class="p">(</span>
+  <span class="nx">packages</span><span class="p">:</span> <span class="nx">Weight</span><span class="p">[],</span>
+  <span class="nx">weightPerGroup</span><span class="p">:</span> <span class="nx">Weight</span>
+<span class="p">):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="nx">Group</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">groupSize</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">groupSize</span> <span class="o">&lt;=</span> <span class="nx">packages</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">groupSize</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">group</span> <span class="k">of</span> <span class="nx">combinations</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">groupSize</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">group</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">===</span> <span class="nx">weightPerGroup</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">yield</span> <span class="nx">group</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With the ability to now determine valid package groupings, we will create a function which recursively validates that based on a supplied total group weight and available packages that the number of groups can be met.
+This will be required to ensure that once we have determined a candidate compartment package grouping, that the remaining packages can be split evenly within the remaining groupings.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">sub</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">xs</span><span class="p">:</span> <span class="nx">T</span><span class="p">[],</span> <span class="nx">ys</span><span class="p">:</span> <span class="nx">T</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="nx">xs</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="nx">ys</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">x</span><span class="p">));</span>
+
+<span class="kd">const</span> <span class="nx">canGroup</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">packages</span><span class="p">:</span> <span class="nx">Weight</span><span class="p">[],</span>
+  <span class="nx">numOfGroups</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span>
+  <span class="nx">weightPerGroup</span><span class="p">:</span> <span class="nx">Weight</span>
+<span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">numOfGroups</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nx">packages</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">group</span> <span class="k">of</span> <span class="nx">groupsOfWeight</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">weightPerGroup</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">canGroup</span><span class="p">(</span><span class="nx">sub</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">group</span><span class="p">),</span> <span class="nx">numOfGroups</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">weightPerGroup</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>This now leads us to being able to determine what the <em>ideal</em> first grouping will be.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">idealFirstGroupQE</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">packages</span><span class="p">:</span> <span class="nx">Weight</span><span class="p">[],</span>
+  <span class="nx">numOfGroups</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">weightPerGroup</span> <span class="o">=</span> <span class="nx">packages</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nx">numOfGroups</span><span class="p">;</span>
+
+  <span class="kd">let</span> <span class="nx">minQE</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">prevGroupSize</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">group</span> <span class="k">of</span> <span class="nx">groupsOfWeight</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">weightPerGroup</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">minQE</span> <span class="o">!==</span> <span class="kc">Infinity</span> <span class="o">&amp;&amp;</span> <span class="nx">prevGroupSize</span> <span class="o">&lt;</span> <span class="nx">group</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+
+    <span class="kd">const</span> <span class="nx">candidateQE</span> <span class="o">=</span> <span class="nx">group</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">product</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span>
+      <span class="nx">candidateQE</span> <span class="o">&lt;</span> <span class="nx">minQE</span> <span class="o">&amp;&amp;</span>
+      <span class="nx">canGroup</span><span class="p">(</span><span class="nx">sub</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">group</span><span class="p">),</span> <span class="nx">numOfGroups</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">weightPerGroup</span><span class="p">)</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">minQE</span> <span class="o">=</span> <span class="nx">candidateQE</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">prevGroupSize</span> <span class="o">=</span> <span class="nx">group</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">minQE</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Using the characteristics discussed above surrounding the yielded package grouping sizes, we first determine what the <em>weight per group</em> will have to be.
+From here we iterate through possible groupings, checking that the remaining available packages can be evenly distributed into the other groups.
+So as to not have to needlessly perform this check, we only do so if the groupings <em>quantum entanglement</em> is less than the one we have already recorded.
+Once we have found a minimum <em>quantum entanglement</em> and the yielded group size increases, we can decern that this is the smallest possible value.</p>
+
+<p>Finally, we can put all these building blocks together and return the desired answer we are looking for 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">idealFirstGroupQE</span><span class="p">(</span><span class="nx">parsePackageWeights</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are required to cater for an additional package grouping (four groupings as opposed to the original three).
+Based on how our solution has been modeled we can simply supply an updated <code class="highlighter-rouge">numOfGroups</code> and return this revised value 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">idealFirstGroupQE</span><span class="p">(</span><span class="nx">parsePackageWeights</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">4</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="alternative-solution">Alternative Solution</h3>
+
+<p>The solution above provides a <em>belt n’ braces</em> approach to handling the provided package weight input.
+It considers all possible combinations based on a given group sizing, and that the remaining packages can be grouped up correctly.
+However, experimenting with the input brought me to an additional solution that returns the correct answers, but without the need for this additional validation.</p>
+
+<p>Based on the input supplied we do not need to consider the above concerns and can instead simply return the first grouping that we see.
+This returns the correct answer for both parts; but as this takes advantage of the provided input (as opposed to handling any arbitrary input) I do not feel this is a desired solution.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">idealFirstGroupQE</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">packages</span><span class="p">:</span> <span class="nx">Weight</span><span class="p">[],</span>
+  <span class="nx">numOfGroups</span><span class="p">:</span> <span class="kr">number</span>
+<span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">weightPerGroup</span> <span class="o">=</span> <span class="nx">packages</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nx">numOfGroups</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">group</span> <span class="k">of</span> <span class="nx">groupsOfWeight</span><span class="p">(</span><span class="nx">packages</span><span class="p">,</span> <span class="nx">weightPerGroup</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">group</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">product</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

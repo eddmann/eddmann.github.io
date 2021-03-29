@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 22 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 22 - Wizard Simulator 20XX &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 22 - Wizard Simulator 20XX</h1>
+    <time datetime="2021-02-17T00:00:00-06:00" class="post-date">17 Feb 2021</time>
+    <p>On the twenty second day of Advent of Code 2015 we are asked to help ‘Little Henry Case’ beat the boss in another video game he is stuck on.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Like the <a href="https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/">previous day</a> the game is turn-based, however, this time we are able to spend <em>mana</em> in-exchnage for spells we can cast per-round.
+Certain spells have the ability to cause effects which can last between rounds.
+Due to this, we are unable to formulise the battle into a single calculation, so instead must simulate a given battle in its entirety.
+For part one, we are asked to work out what is the minimum about of <em>mana</em> we can spend and still win the battle.</p>
+
+<p>Based on the rules laid out within the <a href="https://adventofcode.com/2015/day/22">problem specification</a>, we begin by modeling how spells will be represented.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Spell</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">cost</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">damage</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">armor</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">heal</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">mana</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">turns</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">spells</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Magic Missile</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">53</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">heal</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">mana</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Drain</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">73</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">heal</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="na">mana</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="mi">1</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Shield</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">113</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="na">heal</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">mana</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="mi">6</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Poison</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">173</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">heal</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">mana</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="mi">6</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Recharge</span><span class="dl">'</span><span class="p">,</span> <span class="na">cost</span><span class="p">:</span> <span class="mi">229</span><span class="p">,</span> <span class="na">damage</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">armor</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">heal</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">mana</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="mi">5</span> <span class="p">},</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<p>This approaches opts to normalise all the possible spell behaviours, creating no-op actions by-way of zero values.
+From here, we model how we wish to store the state of a battle throughout game play.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleState</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">playerHp</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">playerMana</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">playerArmor</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">bossHp</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">bossDamage</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">manaSpent</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="nl">activeEffects</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">[];</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>There are a couple of rules around which spells are available for a player to cast at a given point in the battle.
+These include if they have enough mana to purchase the spell, and if the spell is an effect that it is either not active or on its last turn.
+We will next translate these rules into a function which we can supply the current <code class="highlighter-rouge">BattleState</code> to and return the possible <code class="highlighter-rouge">Spell</code> listing.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">hasBattleEnded</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">state</span><span class="p">.</span><span class="nx">bossHp</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">getAvailableSpells</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">):</span> <span class="nx">Spell</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="k">return</span> <span class="p">[];</span>
+
+  <span class="k">return</span> <span class="nx">spells</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">spell</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">active</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">effect</span> <span class="o">=&gt;</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="nx">effect</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">cost</span> <span class="o">&lt;=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerMana</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="nx">active</span> <span class="o">||</span> <span class="nx">active</span><span class="p">.</span><span class="nx">turns</span> <span class="o">===</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>This leads us onto being able to start codifying the steps that a given battle round takes.
+We will start by building out all the desired steps as isolated immutable state transitions.
+First we will handle how we apply effects before each particpants turn.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleTransition</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">BattleState</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">enactEffects</span><span class="p">:</span> <span class="nx">BattleTransition</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="k">return</span> <span class="nx">state</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
+    <span class="na">playerMana</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerMana</span> <span class="o">+</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">,</span> <span class="dl">'</span><span class="s1">mana</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">playerArmor</span><span class="p">:</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">,</span> <span class="dl">'</span><span class="s1">armor</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">bossHp</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">bossHp</span> <span class="o">-</span> <span class="nx">sumProp</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">,</span> <span class="dl">'</span><span class="s1">damage</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">activeEffects</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">(</span><span class="nx">effects</span><span class="p">,</span> <span class="nx">effect</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">effect</span><span class="p">.</span><span class="nx">turns</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">?</span> <span class="p">[...</span><span class="nx">effects</span><span class="p">,</span> <span class="p">{</span> <span class="p">...</span><span class="nx">effect</span><span class="p">,</span> <span class="na">turns</span><span class="p">:</span> <span class="nx">effect</span><span class="p">.</span><span class="nx">turns</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">}]</span> <span class="p">:</span> <span class="nx">effects</span><span class="p">,</span>
+      <span class="p">[]</span>
+    <span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We have used the same <code class="highlighter-rouge">sumProp</code> function found in the <a href="https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/">previous days</a> solution to help tally a collections property values.
+Next, we will handle how a player’s turn updates the battle state.
+We supply a given <code class="highlighter-rouge">Spell</code> we wish the player to cast for this round, and return a <code class="highlighter-rouge">BattleTransition</code> similiar to enacting effects.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">playerTurn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">spell</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">):</span> <span class="nx">BattleTransition</span> <span class="o">=&gt;</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="k">return</span> <span class="nx">state</span><span class="p">;</span>
+
+  <span class="kd">const</span> <span class="nx">isSpellEffect</span> <span class="o">=</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">turns</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
+    <span class="na">playerHp</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">+</span> <span class="p">(</span><span class="nx">isSpellEffect</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">heal</span><span class="p">),</span>
+    <span class="na">playerMana</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerMana</span> <span class="o">-</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">cost</span><span class="p">,</span>
+    <span class="na">bossHp</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">bossHp</span> <span class="o">-</span> <span class="p">(</span><span class="nx">isSpellEffect</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">damage</span><span class="p">),</span>
+    <span class="na">manaSpent</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">manaSpent</span> <span class="o">+</span> <span class="nx">spell</span><span class="p">.</span><span class="nx">cost</span><span class="p">,</span>
+    <span class="na">activeEffects</span><span class="p">:</span> <span class="nx">isSpellEffect</span> <span class="p">?</span> <span class="p">[...</span><span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">,</span> <span class="nx">spell</span><span class="p">]</span> <span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">activeEffects</span><span class="p">,</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Following on from the players turn we can now model how a bosses turn updates the battle state.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">bossTurn</span><span class="p">:</span> <span class="nx">BattleTransition</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="k">return</span> <span class="nx">state</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
+    <span class="na">playerHp</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">-</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">bossDamage</span> <span class="o">-</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerArmor</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>With the core steps in-place, modeled uniformly as <code class="highlighter-rouge">BattleTransition</code> types we can begin to think about how we wish stitch these together.
+When reading the problem definition I thought it would be an ideal fit to employ composable state transitions.
+To wire these together I’ve opted to use a small <code class="highlighter-rouge">pipe</code> helper function which works in the opposite mannor to a conventional <code class="highlighter-rouge">compose</code>.
+Instead of being called <em>right-to-left</em>, the pipe function composes the provided functions <em>left-to-right</em>, which reads more naturally.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">pipe</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">R</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">fn1</span><span class="p">:</span> <span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">R</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">R</span><span class="p">,</span> <span class="p">...</span><span class="nx">fns</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="p">(</span><span class="nx">a</span><span class="p">:</span> <span class="nx">R</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">R</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">fns</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">prevFn</span><span class="p">,</span> <span class="nx">nextFn</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">value</span> <span class="o">=&gt;</span> <span class="nx">nextFn</span><span class="p">(</span><span class="nx">prevFn</span><span class="p">(</span><span class="nx">value</span><span class="p">)),</span> <span class="nx">fn1</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Using this <code class="highlighter-rouge">pipe</code> function we can build up the steps required to complete a <em>round</em>.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleRound</span> <span class="o">=</span> <span class="p">(</span><span class="nx">spell</span><span class="p">:</span> <span class="nx">Spell</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">BattleTransition</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">roundOfBattle</span><span class="p">:</span> <span class="nx">BattleRound</span> <span class="o">=</span> <span class="nx">spell</span> <span class="o">=&gt;</span>
+  <span class="nx">pipe</span><span class="p">(</span><span class="nx">enactEffects</span><span class="p">,</span> <span class="nx">playerTurn</span><span class="p">(</span><span class="nx">spell</span><span class="p">),</span> <span class="nx">enactEffects</span><span class="p">,</span> <span class="nx">bossTurn</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>With the round simulation modeled, we can go about working on a solution to how we determine the minimum mana required to win the battle.
+To do this we will use a recursive function which takes in a <code class="highlighter-rouge">BattleConfiguration</code> and <code class="highlighter-rouge">BattleRound</code> function like so.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">BattleConfiguration</span> <span class="o">=</span> <span class="nb">Pick</span><span class="o">&lt;</span><span class="nx">BattleState</span><span class="p">,</span> <span class="dl">'</span><span class="s1">playerHp</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">playerMana</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">bossHp</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">bossDamage</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">isPlayerWinner</span> <span class="o">=</span> <span class="p">(</span><span class="nx">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">hasBattleEnded</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">minManaSpent</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">configuration</span><span class="p">:</span> <span class="nx">BattleConfiguration</span><span class="p">,</span>
+  <span class="nx">round</span><span class="p">:</span> <span class="nx">BattleRound</span>
+<span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">minMana</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+
+  <span class="kd">const</span> <span class="nx">recur</span> <span class="o">=</span> <span class="p">(</span><span class="na">state</span><span class="p">:</span> <span class="nx">BattleState</span><span class="p">):</span> <span class="k">void</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">state</span><span class="p">.</span><span class="nx">manaSpent</span> <span class="o">&gt;</span> <span class="nx">minMana</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">getAvailableSpells</span><span class="p">(</span><span class="nx">state</span><span class="p">).</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">isPlayerWinner</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="nx">minMana</span> <span class="o">=</span> <span class="nx">state</span><span class="p">.</span><span class="nx">manaSpent</span><span class="p">;</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">spell</span> <span class="k">of</span> <span class="nx">getAvailableSpells</span><span class="p">(</span><span class="nx">state</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">recur</span><span class="p">(</span><span class="nx">round</span><span class="p">(</span><span class="nx">spell</span><span class="p">)(</span><span class="nx">state</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+
+  <span class="nx">recur</span><span class="p">({</span>
+    <span class="p">...</span><span class="nx">configuration</span><span class="p">,</span>
+    <span class="na">playerArmor</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="na">manaSpent</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="na">activeEffects</span><span class="p">:</span> <span class="p">[],</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">minMana</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">BattleConfiguration</code> is a <a href="https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys">subset type</a> of the <code class="highlighter-rouge">BattleState</code>, allowing us to supply the battle properties that define the participants characteristics.
+The <code class="highlighter-rouge">BattleRound</code> function allows us to supply the <code class="highlighter-rouge">roundOfBattle</code> function we created earlier, to simulate each given rounds state transition.
+To locate the minimum amount of mana required we store the current minium mana for a winning battle and <em>prune</em> out any branches that exceed this amount until no enactable branches are remaining.
+This allows us to limit the scope of the problem greatly, as upon the first winning game we have ourselves a baseline to <em>prune</em> out any game that exceeds that mana spent.</p>
+
+<p>With this in-place we can parse the bosses characteristics from the supplied input and execute the <code class="highlighter-rouge">minManaSpent</code> function to find the desired answer 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">bossHp</span><span class="p">,</span> <span class="nx">bossDamage</span><span class="p">]</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/gm</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">minManaSpent</span><span class="p">(</span>
+    <span class="p">{</span> <span class="na">playerHp</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="na">playerMana</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="nx">bossHp</span><span class="p">,</span> <span class="nx">bossDamage</span> <span class="p">},</span>
+    <span class="nx">roundOfBattle</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are required to expand upon the game we created in part one.
+We are to now create a <em>Hard Mode</em>, in-which at the start of each round the players health is now reduced by one HP.
+Based on this addition we need to work out what the revised minimum mana spent can be to still win the battle.</p>
+
+<p>We will first create the additional <code class="highlighter-rouge">BattleTransition</code> step, defining how the Hard Mode modifies the battle state.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">applyHardMode</span><span class="p">:</span> <span class="nx">BattleTransition</span> <span class="o">=</span> <span class="nx">state</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="p">...</span><span class="nx">state</span><span class="p">,</span>
+  <span class="na">playerHp</span><span class="p">:</span> <span class="nx">state</span><span class="p">.</span><span class="nx">playerHp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>From this, we can create a new <em>round of battle</em> function which pipes the <code class="highlighter-rouge">BattleState</code> to the <code class="highlighter-rouge">applyHardMode</code> function before continuing on with the original game.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">hardRoundOfBattle</span><span class="p">:</span> <span class="nx">BattleRound</span> <span class="o">=</span> <span class="nx">spell</span> <span class="o">=&gt;</span>
+  <span class="nx">pipe</span><span class="p">(</span><span class="nx">applyHardMode</span><span class="p">,</span> <span class="nx">roundOfBattle</span><span class="p">(</span><span class="nx">spell</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>We can then use the same setup as we did for part one, instead supplying the new <code class="highlighter-rouge">hardRoundOfBattle</code> function instead.
+In doing so we get the desired answer to the question 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">bossHp</span><span class="p">,</span> <span class="nx">bossDamage</span><span class="p">]</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/gm</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">minManaSpent</span><span class="p">(</span>
+    <span class="p">{</span> <span class="na">playerHp</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="na">playerMana</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="nx">bossHp</span><span class="p">,</span> <span class="nx">bossDamage</span> <span class="p">},</span>
+    <span class="nx">hardRoundOfBattle</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>I found today’s core-problem to not take too long to devise (the minimum pruning technique), however, simulating the game took the majority of the time.
+As mentioned when reading the problem definition I felt there could be a means to provide an elegant composable solution to representing the steps required to perform a round of battle.
+I’m happy with how the <code class="highlighter-rouge">BattleTransition</code> type has been employed, lending itself well to the <code class="highlighter-rouge">pipe</code> operation.
+Reading both the <code class="highlighter-rouge">roundOfBattle</code> and <code class="highlighter-rouge">hardRoundOfBattle</code> functions clearly express their intent and the stages of a round.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

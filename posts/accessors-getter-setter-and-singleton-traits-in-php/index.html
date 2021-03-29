@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Using traits to implement prototype Getter/Setter and Singleton capabilities.">
+
+    <title>Accessors (Getter/Setter) and Singleton Traits in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Accessors (Getter/Setter) and Singleton Traits in PHP</h1>
+    <time datetime="2014-01-28T00:00:00-06:00" class="post-date">28 Jan 2014</time>
+    <p>Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared.
+One such instance is the reduction in boilerplate code when prototyping a new idea.
+Though these should be implemented within the project before completion, I have found using the two traits below to help speed up the development life-cycle.
+</p>
+
+<h2 id="accessors-gettersetter">Accessors (Getter/Setter)</h2>
+
+<p>With encapsulation being an incredibly important aspect of Object-oriented programming, accessors and mutator methods provide the user with an interface to interact with a class instance in an controlled manner.
+However, during the early stages of development creating these methods can be very cumbersome and time consuming.
+Sure you can let your IDE do all the boilerplate insertion, or maybe we should all move to a language such as C# which has great syntactic sugar for the these properties.
+The trait below however, dynamically sets and gets instance properties based on the common place method naming pattern.
+For example, ‘setFirstName’ will set the ‘firstName’ property, where as ‘getFirstName’ will return the instances value.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Accessors</span> <span class="p">{</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">preg_match</span><span class="p">(</span><span class="s1">'/(?P&lt;accessor&gt;set|get)(?P&lt;property&gt;[A-Z][a-zA-Z0-9]*)/'</span><span class="p">,</span> <span class="nv">$method</span><span class="p">,</span> <span class="nv">$match</span><span class="p">)</span> <span class="o">||</span>
+             <span class="o">!</span> <span class="nb">property_exists</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">,</span> <span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">lcfirst</span><span class="p">(</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]))</span>
+        <span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nc">BadMethodCallException</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span>
+                <span class="s2">"'%s' does not exist in '%s'."</span><span class="p">,</span> <span class="nv">$method</span><span class="p">,</span> <span class="nb">get_class</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">)</span>
+            <span class="p">));</span>
+        <span class="p">}</span>
+
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'accessor'</span><span class="p">])</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="s1">'get'</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]};</span>
+            <span class="k">case</span> <span class="s1">'set'</span><span class="o">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$args</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">throw</span> <span class="k">new</span> <span class="nc">InvalidArgumentException</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s2">"'%s' requires an argument value."</span><span class="p">,</span> <span class="nv">$method</span><span class="p">));</span>
+                <span class="p">}</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]}</span> <span class="o">=</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Looking at the code above you will notice that we use PHP’s ‘__call’ magic method to see if the users invoked method is of interest to us.
+To keep control of this traits ‘magic’, the call only looks for properties that exist within the class that the trait has been used in.
+You are however able to replace ‘__CLASS__’ with ‘$this’ to provide the entire classes properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
+Below is an example use-case for including this trait.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">User</span> <span class="p">{</span>
+    <span class="kn">use</span> <span class="nc">Accessors</span><span class="p">;</span>
+    <span class="k">private</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$age</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="p">();</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">setName</span><span class="p">(</span><span class="s1">'Joe Bloggs'</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">setAge</span><span class="p">(</span><span class="mi">24</span><span class="p">);</span>
+
+<span class="nb">sprintf</span><span class="p">(</span><span class="s2">"Name: %s, Age: %s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">(),</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">getAge</span><span class="p">());</span> <span class="c1">// Name: Joe Bloggs, Age: 24</span>
+</code></pre></div></div>
+
+<h2 id="singleton">Singleton</h2>
+
+<p>Another trait that I have found very useful in the initial stages of development is for implementing the <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton pattern</a>.
+Below is an example implementation which on the first ‘getInstance’ invocation creates a class instance with the provided arguments.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Singleton</span> <span class="p">{</span>
+
+    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$instance</span><span class="p">;</span>
+
+    <span class="k">final</span> <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">getInstance</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">isset</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="nv">$instance</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$class</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReflectionClass</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">);</span>
+            <span class="k">self</span><span class="o">::</span><span class="nv">$instance</span> <span class="o">=</span> <span class="nv">$class</span><span class="o">-&gt;</span><span class="nf">newInstanceArgs</span><span class="p">(</span><span class="nb">func_get_args</span><span class="p">());</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nv">$instance</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">final</span> <span class="k">private</span> <span class="k">function</span> <span class="n">__clone</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
+
+    <span class="k">final</span> <span class="k">private</span> <span class="k">function</span> <span class="n">__wakeup</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The code snippet above uses the <a href="http://www.php.net/manual/en/class.reflectionclass.php">ReflectionClass</a> provided by PHP to enable classes it is incorporated into still define a unique constructor method.
+Below is an example that highlights the trait in action.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Logger</span> <span class="p">{</span>
+    <span class="kn">use</span> <span class="nc">Singleton</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$init</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$init</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">init</span> <span class="o">=</span> <span class="nv">$init</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">getInitTime</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="nv">$logger</span> <span class="o">=</span> <span class="nc">Logger</span><span class="o">::</span><span class="nf">getInstance</span><span class="p">(</span><span class="nb">time</span><span class="p">());</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="nf">getInitTime</span><span class="p">();</span> <span class="c1">// 1390901816</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

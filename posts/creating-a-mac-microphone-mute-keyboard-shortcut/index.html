@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AppleScript and Automator input device mute-toggle keyboard shortcut.">
+
+    <title>Creating a Mac Microphone Mute Keyboard Shortcut &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Creating a Mac Microphone Mute Keyboard Shortcut</h1>
+    <time datetime="2014-01-19T00:00:00-06:00" class="post-date">19 Jan 2014</time>
+    <p>When recording our <a href="http://threedevsandamaybe.com/">podcast</a> there is nothing more annoying than playing it back only to find hearing yourself banging away on the keyboard when someone else is speaking.
+Within Skype there is functionality to mute your microphone input device during an active call, however, the location and size of the button can be a challenge to find throughout a full podcast recording.
+
+I also discovered upon listening back to our previous recording that with the transition to <a href="http://www.rogueamoeba.com/audiohijackpro/">Audio Hijack Pro</a> (which is amazing) the user recording the conversation losses the ability when muting their microphone in Skype to also occur recording.
+This is due to Audio Hijack Pro recording and mixing both the audio output from Skype and the local users input device.
+To get around this I found that muting the input source from within System Preferences did the trick.
+Below is a step-by-step guide using a simple <a href="http://www.macosxautomation.com/applescript/">AppleScript</a> and <a href="http://en.wikipedia.org/wiki/Automator_(software)">Automator</a> Service to create a keyboard shortcut mute-toggle.</p>
+
+<h2 id="applescript-and-automator">AppleScript and Automator</h2>
+
+<p>The first step is to open up Automator located in ‘/Applications’ and create a new ‘Service’.
+From here we can then locate and add a ‘Run AppleScript’ action from the middle panel.
+With this added replace the template content with the script found below, which simple toggles between full input volume level and muted.</p>
+
+<div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="w"> </span><span class="nv">input</span><span class="w"> </span><span class="na">volume</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="p">(</span><span class="nb">get volume settings</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w">
+    </span><span class="k">set</span><span class="w"> </span><span class="na">level</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">100</span><span class="w">
+</span><span class="k">else</span><span class="w">
+    </span><span class="k">set</span><span class="w"> </span><span class="na">level</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">0</span><span class="w">
+</span><span class="k">end</span><span class="w"> </span><span class="k">if</span><span class="w">
+
+</span><span class="nb">set volume</span><span class="w"> </span><span class="nv">input</span><span class="w"> </span><span class="na">volume</span><span class="w"> </span><span class="na">level</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With this added we now need to set the Service receives to ‘no input’ and in ‘any application’.
+Finally, save the service with a meaningful name.
+Following these instructions should result in a similar output to the screenshot provided below.</p>
+
+<p><img src="/uploads/creating-a-mac-microphone-mute-keyboard-shortcut/automator.png" alt="Automator" /></p>
+
+<h2 id="binding-to-a-keyboard-shortcut">Binding to a Keyboard Shortcut</h2>
+
+<p>With the service now saved we can navigate to the Keyboards Shortcuts tab within the System Preferences panel and locate the Service under ‘General’.
+All that is required now is for you to active the service using the checkbox and define a unique shortcut which will be used to call it.
+Similar to the Automator example following these instructions should result in a similar output to the screenshot below.</p>
+
+<p><img src="/uploads/creating-a-mac-microphone-mute-keyboard-shortcut/keyboard.png" alt="Keyboard" /></p>
+
+<p>You are now able to toggle the input volume using the defined keyboard shortcut.
+Unfortunately there is no visual indication of the current state of the input devices volume, so I tend to keep the System Preferences input device screen open.
+Another snag that I am still trying to find a workaround for is the requirement to be focused on ‘Finder’ when calling the keyboard shortcut, I hope to investigate this issue further.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

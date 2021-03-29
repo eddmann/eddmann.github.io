@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An example of the coalescing operation in PHP, useful for default values.">
+
+    <title>Coalescing operation in PHP (for default values) &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Coalescing operation in PHP (for default values)</h1>
+    <time datetime="2013-11-28T00:00:00-06:00" class="post-date">28 Nov 2013</time>
+    <p>Over the past week or so I have been reading discussions on the <a href="http://news.php.net/php.internals">PHP internals</a> mailing-list about proposed updates to what the ?: operator currently does.
+If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator.
+
+It however is a simple example of syntaxic sugar to cut down on code noise, allowing you to specify an alternative (default) value if the supplied variable is <a href="http://php.net/manual/en/language.types.boolean.php">falsey</a>.
+In effect, assuming a null defined variable ‘$a’, the examples below will all equate to the same result ‘b’.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="nv">$a</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
+<span class="nv">$a</span> <span class="o">||</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
+<span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>However, issues arise when the variable has not already been declared, in such a case notice messages will be displayed.
+This is due to attempting to use the non-existent variable out right, without checking with the ‘is_set’ or ‘empty’ functions first.
+This is one of the key areas being addressed in the proposed update.
+The examples below, more verbosely than desired, address this issue at present.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="nb">empty</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
+<span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
+<span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>In regard to the middle one, we are taking advantage of OR/AND’s lower <a href="http://php.net/manual/en/language.operators.precedence.php">operator precedence</a>, removing the need for brackets (found in the last one).
+I should point out however, that mixing the two can be a recipe for debug-hell, and it would be best practise to maintain expressing such statements using &amp;&amp; and ||.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

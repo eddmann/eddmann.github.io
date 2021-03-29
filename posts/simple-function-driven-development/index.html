@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sometimes it pays-off to keep development simple.">
+
+    <title>Simple Function Driven-Development &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Simple Function Driven-Development</h1>
+    <time datetime="2013-12-09T00:00:00-06:00" class="post-date">09 Dec 2013</time>
+    <p>I recently had the chance to rewrite the backend of my <a href="http://github.com/eddmann/eddmann">personal website</a>.
+I was surprised at how accustom I had become to using heavy-weight web frameworks (with plenty of accompanying depencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
+As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read.
+I find myself sometimes being blinded by the need to abstract everything with the Object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
+Simple, single purpose functions that can be used for multiple use-cases within your application is a very good mind-set to try and incorporate.
+In this post I wish to discuss a couple of the functions that I created to keep the file so simple.
+</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>This function was inspired by Laravel’s ability to parse associative arrays using dot notation i.e. (‘foo.bar’ -&gt; $arr[‘foo’][‘bar’]).
+As you can see this is an extremely easy to read function that simply requires the supplied configuration file once (using a static variable).
+It then attempts to split up the supplied key, traversing through the configuration array to end at the result.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">config</span><span class="p">(</span><span class="nv">$key</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$file</span> <span class="o">=</span> <span class="s1">'config.php'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="nv">$config</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$config</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$config</span> <span class="o">=</span> <span class="k">require</span> <span class="nv">$file</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$parsed</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
+
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="nv">$parsed</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$result</span><span class="p">[</span><span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">)];</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="cache">Cache</h2>
+
+<p>Being a file-based blogging platform with meta-data and Markdown content to parse, caching the results is a very desired process to include.
+Again, a very general implementation has been implemented for greater flexibility.
+The key is hashed and it’s value stored in a file of that name.
+If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and result stored in the described file.
+Provided is also a check to make sure a false boolean was not returned, allowing us to have control within the closure of whether to cache the result or not.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">cache</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$value</span><span class="p">,</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./cache/'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="o">!</span> <span class="nb">is_dir</span><span class="p">(</span><span class="nv">$directory</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$directory</span><span class="p">);</span>
+
+    <span class="nv">$path</span> <span class="o">=</span> <span class="nv">$directory</span> <span class="mf">.</span> <span class="s1">'/'</span> <span class="mf">.</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span> <span class="o">!==</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="template">Template</h2>
+
+<p>This simple function allows you to easily parse template files with the provided available variables.
+I have found this to be very useful in splitting-up business logic from complex presentations (separation of concerns) in multiple examples.
+I have been alittle relaxed with my use of the dreaded ‘eval’ function but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">tmpl</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$vars</span> <span class="o">=</span> <span class="p">[],</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./templates/'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">ob_start</span><span class="p">();</span>
+
+    <span class="nb">extract</span><span class="p">(</span><span class="nv">$vars</span><span class="p">);</span>
+
+    <span class="k">eval</span><span class="p">(</span><span class="s1">'?&gt;'</span> <span class="mf">.</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$directory</span> <span class="mf">.</span> <span class="nv">$file</span><span class="p">));</span>
+
+    <span class="k">return</span> <span class="nb">ob_get_clean</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="example">Example</h2>
+
+<p>To piece all these functions together into a collective example I have decided to demonstrate with a cached fibonacci calculatation, the desired number being stored in a configuration file.
+Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th fibonacci number.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># config.php</span>
+
+<span class="k">return</span> <span class="p">[</span>
+    <span class="s1">'fibonacci'</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="s1">'calculate'</span> <span class="o">=&gt;</span> <span class="mi">50</span>
+    <span class="p">]</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<p>The below template is a simple example of splitting the presentation from code-logic.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fibonacci.tmpl.php</span>
+
+<span class="k">echo</span> <span class="s2">"The </span><span class="nv">$n</span><span class="s2"> fibonacci number is: </span><span class="nv">$result</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Finally, to piece it all together we fetch the desired number from the configuration file and return the result from the cache (calling the value closure on the initial cache miss).
+The last step is to simply pass the template the two variables for displaying.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$n</span> <span class="o">=</span> <span class="nf">config</span><span class="p">(</span><span class="s1">'fibonacci.calculate'</span><span class="p">);</span>
+
+<span class="nv">$result</span> <span class="o">=</span> <span class="nf">cache</span><span class="p">(</span><span class="s1">'fibonacci_'</span> <span class="mf">.</span> <span class="nv">$n</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;=</span> <span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
+        <span class="nv">$b</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="nv">$a</span> <span class="o">=</span> <span class="nv">$result</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="k">echo</span> <span class="nf">tmpl</span><span class="p">(</span><span class="s1">'fibonacci.tmpl.php'</span><span class="p">,</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">'n'</span><span class="p">,</span> <span class="s1">'result'</span><span class="p">));</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

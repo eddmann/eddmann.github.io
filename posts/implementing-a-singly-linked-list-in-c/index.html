@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple C implementation of a Singly Linked-List.">
+
+    <title>Implementing a Singly Linked-List in C &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing a Singly Linked-List in C</h1>
+    <time datetime="2013-12-30T00:00:00-06:00" class="post-date">30 Dec 2013</time>
+    <p>Over the past couple of days I have become very interested in brushing up on my limited C knowledge.
+As I discussed in my previous <a href="/posts/experimenting-with-the-xor-swap-method-in-java/">post</a> on using the XOR swap method, everyday languages are becoming very high-level, and as a result taking away some of the fun.
+In the next couple of posts I wish to implement some of the common place data-structures found in development, but unlike previous attempts, these will be in straight C.
+
+The first such data-structure I wish to discuss is the common place singly linear linked-list.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+</span>
+<span class="k">struct</span> <span class="n">node</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">item</span><span class="p">;</span>
+    <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
+<span class="p">}</span> <span class="o">*</span><span class="n">head</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">node</span><span class="o">*</span> <span class="nf">insert</span><span class="p">(</span><span class="kt">int</span> <span class="n">item</span><span class="p">,</span> <span class="n">bool</span> <span class="n">at_tail</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">node</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">node</span><span class="p">));</span>
+    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">;</span>
+    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">at_tail</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">ptr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">delete</span><span class="p">(</span><span class="n">bool</span> <span class="n">from_tail</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">from_tail</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">head</span> <span class="o">==</span> <span class="n">tail</span><span class="p">)</span> <span class="k">return</span> <span class="n">delete</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+        <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">!=</span> <span class="n">tail</span><span class="p">)</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
+        <span class="n">tail</span><span class="o">-&gt;</span><span class="n">next</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
+        <span class="n">head</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+        <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">list</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
+
+    <span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">ptr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%d "</span><span class="p">,</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">);</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see from the implementation above, both insertion and removal methods allow the user to specify if they wish to effect the head or tail.
+Surprisingly, it was not until the ISO-C99 standard that C got a native boolean data type (_Bool).
+The ‘stdbool.h’ header file defines library macros (true, false) which resolve to the _Bool type.
+With the above implementation we are also able to print out the contents of the full linked-list at that present time.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">);</span>
+
+    <span class="n">list</span><span class="p">();</span> <span class="c1">// 10 9 8 7 6 1 2 3 4 5</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">delete</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">);</span>
+
+    <span class="n">list</span><span class="p">();</span> <span class="c1">// 8 7 6 1 2 3</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The above method bootstraps the implementation together, providing us with an example of inserting items initially at the tail and then at the head.
+We then delete four items from the list, in a similar manner to the insertion step, deleting half from the tail and the other half from the head.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gcc linkedlist.c <span class="nt">-o</span> linkedlist <span class="o">&amp;&amp;</span> ./linkedlist
+</code></pre></div></div>
+
+<p>We can then use the command above, which simply compiles the file and subsequently executes it.</p>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://stackoverflow.com/questions/1921539/using-boolean-values-in-c">Using boolean values in C</a></li>
+  <li><a href="http://stackoverflow.com/questions/1608318/is-bool-a-native-c-type/1608350">Is bool a native C type?</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

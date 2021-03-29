@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Implementing a memoization method in PHP, with simple and recursive examples.">
+
+    <title>Implementing and Using Memoization in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing and Using Memoization in PHP</h1>
+    <time datetime="2014-01-13T00:00:00-06:00" class="post-date">13 Jan 2014</time>
+    <p>Memoization is a simple optimisation technique to understand and in most cases implement.
+The base idea is to speed up function calls by avoiding the re-calculation of previously processed input results (very cache-like).
+Storing these results in a key-value lookup store can result in major speed increases when repetitive function calls occur.
+
+<a href="http://en.wikipedia.org/wiki/Dynamic_programming">Dynamic programming</a> algorithms such as the <a href="http://en.wikipedia.org/wiki/Knapsack_problem">Knapsack problem</a> benefit greatly from using this technique.
+However, the trade off is that due to its caching underpinnings, functions with side-effects and reliance on external factors such as the current time may return incorrect results.
+Having spent sometime looking into languages such as <a href="http://groovy.codehaus.org/">Groovy</a> which include this <a href="http://mrhaki.blogspot.co.uk/2011/05/groovy-goodness-cache-closure-results.html">functionality</a> out of the box, I wished to see if it was possible to create an implementation in PHP.
+Further research found <a href="http://github.com/arraypad/php-memoize">php-memoize</a> which looks like a great C module, showing promise in implementing the concept at a language library level.
+Though I am impressed with the discussed module I wished to see if it was possible to create an implementation in PHP userspace.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Below depicts a simple example implementation of a memoization function which takes advantage of PHP’s first-class function support.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$memoize</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$func</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$func</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="nv">$cache</span> <span class="o">=</span> <span class="p">[];</span>
+
+        <span class="nv">$args</span> <span class="o">=</span> <span class="nb">func_get_args</span><span class="p">();</span>
+        <span class="nv">$key</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span><span class="nb">serialize</span><span class="p">(</span><span class="nv">$args</span><span class="p">));</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$cache</span><span class="p">[</span><span class="nv">$key</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="nv">$cache</span><span class="p">[</span><span class="nv">$key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$cache</span><span class="p">[</span><span class="nv">$key</span><span class="p">];</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Using a static ‘cache’ array allows us to keep a persistent lookup table between calls of the returned function.
+In conjunction with this, hashing the serialised arguments array allows us to create a unique key we can set and lookup in the associative array per call.
+The method supports either anonymous or string identified functions, using the ‘call_user_func_array’ method.</p>
+
+<h2 id="profiling">Profiling</h2>
+
+<p>Now that we have an implementation it is time to benchmark its performance, to see the resulting gains.
+Below is a simple function which prints out the resulting time duration taken for the supplied function to run.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$timer</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$func</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$func</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$start</span> <span class="o">=</span> <span class="nb">microtime</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nb">func_get_args</span><span class="p">());</span>
+        <span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">"%f</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nb">microtime</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="o">-</span> <span class="nv">$start</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We can now use the above function to benchmark the performance of the side-effect free ‘sleepz’ function declared below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">sleepz</span><span class="p">(</span><span class="nv">$time</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">sleep</span><span class="p">(</span><span class="nv">$time</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nv">$sleepz</span> <span class="o">=</span> <span class="nv">$timer</span><span class="p">(</span><span class="s1">'sleepz'</span><span class="p">);</span>
+
+<span class="c1">// No Memoize</span>
+<span class="nv">$sleepz</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// 1.001020</span>
+
+<span class="nv">$sleepz</span> <span class="o">=</span> <span class="nv">$timer</span><span class="p">(</span><span class="nv">$memoize</span><span class="p">(</span><span class="s1">'sleepz'</span><span class="p">));</span>
+
+<span class="c1">// 1st Memoize</span>
+<span class="nv">$sleepz</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// 1.001016</span>
+
+<span class="c1">// 2nd Memoize</span>
+<span class="nv">$sleepz</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// 0.000028</span>
+</code></pre></div></div>
+
+<p>As you can deduce from the output, the second call to the memoized function is significantly quicker than the first.
+Comparing the non-memoized and first memoized function calls results in very similar time duration, as they are doing the same work.
+Once the function calls result has been stored in the memoized cache, the second call simply needs to lookup the result hit and return the contents.
+At an API level this call looks the same as any other, but thanks to the cache, performance gains occur.</p>
+
+<h2 id="recursive-calls">Recursive Calls</h2>
+
+<p>One issue that appears when you spend a little time with the above implementation are recursive function calls.
+Unlike other languages this high-level implementation is unable to rewrite internal function calls, however, to get around this we are able to use PHP’s first-class function support.
+Declaring use of a reference to the function assignment variable successfully allows us to recursively call the memoized implementation.
+This detail now requires the code logic be present in an anonymous function.
+As this is a thought exercise rather than a production ready implementation I am happy with the capabilities currently available in the language.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$factorial</span> <span class="o">=</span> <span class="nv">$memoize</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$factorial</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">?</span> <span class="mi">1</span> <span class="o">:</span> <span class="nv">$n</span> <span class="o">*</span> <span class="nv">$factorial</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nv">$memoize</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$fibonacci</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">?</span> <span class="nv">$n</span> <span class="o">:</span> <span class="nv">$fibonacci</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$fibonacci</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$factorial</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="c1">// 3628800</span>
+
+<span class="nv">$fibonacci</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="c1">// 55</span>
+</code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://en.wikipedia.org/wiki/Memoization">Memoization</a></li>
+  <li><a href="http://en.wikipedia.org/wiki/Dynamic_programming">Dynamic programming</a></li>
+  <li><a href="http://github.com/arraypad/php-memoize">php-memoize</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

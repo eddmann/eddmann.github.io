@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Creating and configuring self-signed certificates with Nginx and Apache.">
+
+    <title>Self-Signed SSL Certificates with Nginx and Apache &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Self-Signed SSL Certificates with Nginx and Apache</h1>
+    <time datetime="2014-04-05T00:00:00-05:00" class="post-date">05 Apr 2014</time>
+    <p>Since having the opportunity to discuss web application security (<a href="http://threedevsandamaybe.com/posts/web-application-security-part-1/">part 1</a>, <a href="http://threedevsandamaybe.com/posts/web-application-security-part-2/">part 2</a>) recently on the podcast, I thought it was a good time to have a deeper look into SSL/TLS (Transport Layer Security).
+There are plenty of good resources online discussing the <a href="http://www.youtube.com/watch?v=iQsKdtjwtYI">technical side</a> of the topic, however, at a high-level point-to-point encryption and server identification are the two problems it attempts to solve.
+</p>
+
+<p>Self-signed SSL certificates are an inexpensive (free) means of taking advantage of point-to-point encryption on non-production, development server setups.
+The caveat to this is that visiting browsers will warn the user that the certificate should not be trusted, as it has been self-signed.
+If you require a trusted certificate for a production application, you are required to purchase a certificate from a reputable CA (Certificate Authority) to verify your identity.</p>
+
+<h2 id="creating-the-self-signed-certificate">Creating the Self-Signed Certificate</h2>
+
+<p>The examples in this post will directed at a CentOS setup, however, they should not differ much for other distributions.
+First we are required to create a private key to sign the certificate that will be used for visiting users.
+I have decided to use strong encryption (4096 bits, this can be lowered) and make the certificate valid for a year from creation.
+So as to allow the command to run in non-interactive mode I have supplied the certificate details that are required using the ‘subj’ option.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>openssl req <span class="nt">-newkey</span> rsa:4096 <span class="nt">-days</span> 365 <span class="nt">-nodes</span> <span class="nt">-x509</span> <span class="se">\</span>
+    <span class="nt">-subj</span> <span class="s2">"/C=GB/ST=London/L=Fulham/O=Local/OU=Development/CN=local.dev/emailAddress=email@local.dev"</span> <span class="se">\</span>
+    <span class="nt">-keyout</span> local.dev.key <span class="se">\</span>
+    <span class="nt">-out</span> local.dev.crt
+</code></pre></div></div>
+
+<p>We can now move the certificate and private key to the desired location and tighten up file permissions on the two files.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp </span>local.dev.crt /etc/ssl/certs/
+<span class="nv">$ </span><span class="nb">cp </span>local.dev.key /etc/ssl/private/
+<span class="nv">$ </span><span class="nb">chmod </span>600 /etc/ssl/certs/local.dev.crt /etc/ssl/private/local.dev.key
+</code></pre></div></div>
+
+<h2 id="apache-configuration">Apache Configuration</h2>
+
+<p>Now that we have generated the private key and certificate we must next make sure that the SSL module is present and enabled in the Apache installation.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>mod_ssl
+</code></pre></div></div>
+
+<p>With the prerequisites out of the way we are now able to direct access through port 443 (HTTPS) to use the generated certificate.</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;<span class="n">VirtualHost</span> *:<span class="m">443</span>&gt;
+
+    <span class="n">SSLEngine</span> <span class="n">On</span>
+    <span class="n">SSLCertificateFile</span> /<span class="n">etc</span>/<span class="n">ssl</span>/<span class="n">certs</span>/<span class="n">local</span>.<span class="n">dev</span>.<span class="n">crt</span>
+    <span class="n">SSLCertificateKeyFile</span> /<span class="n">etc</span>/<span class="n">ssl</span>/<span class="n">private</span>/<span class="n">local</span>.<span class="n">dev</span>.<span class="n">key</span>
+
+    <span class="c"># ...
+</span>
+&lt;/<span class="n">VirtualHost</span>&gt;
+</code></pre></div></div>
+
+<p>Optional, we can also force all traffic sent and received be over HTTPS by redirecting HTTP requests to use the secure connection.</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;<span class="n">VirtualHost</span> *:<span class="m">80</span>&gt;
+
+   <span class="n">Redirect</span> <span class="n">permanent</span> / <span class="n">https</span>://<span class="n">www</span>.<span class="n">example</span>.<span class="n">com</span>/
+
+   <span class="c"># ...
+</span>
+&lt;/<span class="n">VirtualHost</span>&gt;
+</code></pre></div></div>
+
+<h2 id="nginx-configuration">Nginx Configuration</h2>
+
+<p>With a similar process as the Apache configuration we can configure Nginx to use the generated certificate when accessed over port 443.</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+
+    <span class="kn">listen</span> <span class="mi">443</span><span class="p">;</span>
+
+    <span class="kn">ssl</span> <span class="no">on</span><span class="p">;</span>
+    <span class="kn">ssl_certificate</span> <span class="n">/etc/ssl/certs/local.dev.crt</span><span class="p">;</span>
+    <span class="kn">ssl_certificate_key</span> <span class="n">/etc/ssl/private/local.dev.key</span><span class="p">;</span>
+
+    <span class="c1"># ...</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Optional, if you wish all traffic to be transported through HTTPS we can setup a permanent redirect on port 80.</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">server</span> <span class="p">{</span>
+
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+
+    <span class="kn">return</span> <span class="mi">301</span> <span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

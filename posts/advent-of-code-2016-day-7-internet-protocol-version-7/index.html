@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 7 puzzle using Python">
+
+    <title>Advent of Code 2016 - Day 7 - Internet Protocol Version 7 &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 7 - Internet Protocol Version 7</h1>
+    <time datetime="2021-03-29T00:00:00-05:00" class="post-date">29 Mar 2021</time>
+    <p>On the seventh day of Advent of Code 2016 we are required to work out which IPv7 addresses support TLS (transport-layer snooping) and SSL (super-secret listening).</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are supplied a list of IPv7 addresses which consist of supernets (sequences outside square brackets) and hypernets (sequences within square brackets).
+For part one we are required to tally up how many IPv7 addresses support TLS.</p>
+
+<blockquote>
+  <p>An IP supports TLS if it has an Autonomous Bridge Bypass Annotation, or ABBA.
+An ABBA is any four-character sequence which consists of a pair of two different characters followed by the reverse of that pair, such as xyyx or abba.
+However, the IP also must not have an ABBA within any hypernet sequences, which are contained by square brackets.</p>
+</blockquote>
+
+<p>We will begin by parsing the IPv7 addresses into a form we can process going forward.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_ips</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parse_ip</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+        <span class="n">supernets</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s">"\[[^\]]+\]"</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+        <span class="n">hypernets</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s">"\[([^\]]+)\]"</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">supernets</span><span class="p">,</span> <span class="n">hypernets</span>
+    <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="n">parse_ip</span><span class="p">,</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>Now having access to a structured tuple which includes all the supernets and hypernets for a given address, we can now construct a predicate function which asserts if the IP supports TLS.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_tls_support</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="n">supernets</span><span class="p">,</span> <span class="n">hypernets</span> <span class="o">=</span> <span class="n">ip</span>
+    <span class="n">abba</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"(.)((?!\1).)\2\1"</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="n">abba</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">supernets</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="n">abba</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypernets</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We construct a regular expression which captures an initial character (<em>a</em>), followed by a different character (<em>b</em>), and then ensures that the sequence then follows the captured groupings <em>b</em> then <em>a</em>.
+This expression can then be searched for within both the IP supernets and hypernets - ensuring that it is present in at least one supernet, but no hypernets.
+With this predicate function now in-place we can map over all the parsed IP addresses and tally up all the ones that support TLS.
+In doing so we have answered part one of today’s puzzle 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">has_tls_support</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">parse_ips</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are instead asked to tally up how many of these parsed IPv7 addresses support SSL.</p>
+
+<blockquote>
+  <p>An IP supports SSL if it has an Area-Broadcast Accessor, or ABA, anywhere in the supernet sequences (outside any square bracketed sections), and a corresponding Byte Allocation Block, or BAB, anywhere in the hypernet sequences.
+An ABA is any three-character sequence which consists of the same character twice with a different character between them, such as xyx or aba.
+A corresponding BAB is the same characters but in reversed positions: yxy and bab, respectively.</p>
+</blockquote>
+
+<p>In a similiar fashion to how we checked for TLS support, we will create a small predicate function which handles the base-case of a single IP.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">has_ssl_support</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
+    <span class="n">supernets</span><span class="p">,</span> <span class="n">hypernets</span> <span class="o">=</span> <span class="n">ip</span>
+    <span class="n">aba</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ab</span>
+               <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">supernets</span>
+               <span class="k">for</span> <span class="n">ab</span> <span class="ow">in</span> <span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s">"(?=(.)((?!\1).)\1)"</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">b</span> <span class="o">+</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">h</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">aba</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hypernets</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We use a regular expression again to find all occurrences of <em>aba</em> within the provided subnets, returning the captured <em>a</em> and <em>b</em> values from each match.
+These values are then used to check if a hypernet is present which includes the pattern <em>bab</em>.
+We are required to wrap the expression in a positive lookahead so as to cater for overlapping matches such as <code class="highlighter-rouge">zazbz</code> which contains both <code class="highlighter-rouge">zaz</code> and <code class="highlighter-rouge">zbz</code>.
+This highlights the power of Python’s list comprehension capabilities.</p>
+
+<p>Finally, we can tweak the part one solution to filter down the IP address listing to tally up all the addresses that support SSL.
+In doing so we have answered part two of today’s puzzle 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">has_ssl_support</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">parse_ips</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

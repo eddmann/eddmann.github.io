@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Using FUSE and SSHFS to locally mount a remote SSH directory.">
+
+    <title>Mounting an OSX SSH Volume using FUSE and SSHFS &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Mounting an OSX SSH Volume using FUSE and SSHFS</h1>
+    <time datetime="2014-02-17T00:00:00-06:00" class="post-date">17 Feb 2014</time>
+    <p><a href="http://osxfuse.github.io/">FUSE for OSX</a> is a Mac OSX port of the popular <a href="http://en.wikipedia.org/wiki/Filesystem_in_Userspace">Filesystem in Userspace</a> (FUSE) software, and a successor to MacFUSE.
+Once installed you have the ability to mount many different types of remote and local file-system in userland, without the need to alter the kernel.
+An example filesystem that I have found to be very useful is <a href="http://en.wikipedia.org/wiki/SSHFS">SSHFS</a>, which allows you to interact with files located on a remote server, via the SSH protocol.
+Once mounted the specified remote directory can be accessed as if it were a local volume.
+</p>
+
+<h2 id="example-usage">Example Usage</h2>
+
+<p>With both FUSE for OSX and SSHFS installed, you can simply add a new mounted volume in the terminal using the command below.
+An issue that you have surely encountered is OSX’s love of polluting directories with .DS_Store files.
+We can disable this however, on a mount-by-mount basis by including the ‘noappledouble’ option.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir</span> ~/example
+<span class="nv">$ </span>sshfs user@host:/example ~/example <span class="nt">-oauto_cache</span>,reconnect,defer_permissions,negative_vncache,noappledouble,volname<span class="o">=</span>Example
+</code></pre></div></div>
+
+<p>Looking at the example command above you will notice that we must first create the directory (‘example’) we wish to mount the remote filesystem to.
+Finally, once we are done with the volume we can by unmount it using the command below.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>umount ~/example
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

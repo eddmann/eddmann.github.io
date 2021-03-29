@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Using the concept of a Trampoline to maintain a single call stack frame in Clojure">
+
+    <title>Recursive Functions using a Trampoline in Clojure &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Recursive Functions using a Trampoline in Clojure</h1>
+    <time datetime="2016-01-07T00:00:00-06:00" class="post-date">07 Jan 2016</time>
+    <p>Following on from yesterdays post that discussed <a href="/posts/recursive-functions-using-a-trampoline-in-javascript/">‘Trampolining’ in JavaScript</a>, I thought it would be interesting to see what Clojure has to offer.
+</p>
+
+<h2 id="odd-and-even">Odd and Even</h2>
+
+<p>Using a mutually recursive algorithm such as the odd/even value checker below shows that we are still faced with stack-overflow issues when supplying a sufficiently sized input.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">declare</span><span class="w"> </span><span class="n">is-even?</span><span class="p">)</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">is-odd?</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+    </span><span class="n">false</span><span class="w">
+    </span><span class="p">(</span><span class="nf">is-even?</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">is-even?</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+    </span><span class="n">true</span><span class="w">
+    </span><span class="p">(</span><span class="nf">is-odd?</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">is-odd?</span><span class="w"> </span><span class="mi">10000</span><span class="p">)</span><span class="w">
+</span><span class="c1">; Caused by: java.lang.StackOverflowError: null</span><span class="w">
+</span></code></pre></div></div>
+
+<p>However, with a little function wrapper addition and the use of the ‘trampoline’ we are able to return back to a single call stack-frame being used, as opposed to the O(n) memory complexity faced at this time.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">declare</span><span class="w"> </span><span class="n">is-even?</span><span class="p">)</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">is-odd?</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+    </span><span class="n">false</span><span class="w">
+    </span><span class="o">#</span><span class="p">(</span><span class="nf">is-even?</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">is-even?</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w">
+    </span><span class="n">true</span><span class="w">
+    </span><span class="o">#</span><span class="p">(</span><span class="nf">is-odd?</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">trampoline</span><span class="w"> </span><span class="p">(</span><span class="nf">is-odd?</span><span class="w"> </span><span class="mi">10000</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Thanks to the anonymous function shorthand macro and core ‘trampoline’ function there is not a lot of boilerplate that is required to make this algorithm more efficient.</p>
+
+<h2 id="factorial">Factorial</h2>
+
+<p>We can also take advantage of the trampoline when faced with self-recursive tail-position calls in an environment which does not implicitly optimise for such a case.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">factorial</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="o">'</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">)))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="mi">10000</span><span class="p">)</span><span class="w">
+</span><span class="c1">; Caused by: java.lang.StackOverflowError: null</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It should be noted that with such a large input value you may face an integer overflow exception before any stack-overflow occurs, to accommodate for this the use of a BigInt (using the <code class="highlighter-rouge">*'</code> function) has been incorporated.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">factorial</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="o">'</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">)))))</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">trampoline</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="mi">10000</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Clojure does not provide implicit tail-call optimisation like other languages hosted on the JVM (Scala).
+However, you are able to assist the compiler in explicitly specifying such a need with the use of the <code class="highlighter-rouge">recur</code> function.
+The implementation below is very similar to the original, differing only in its use of ‘recur’ over the explicit function name in the tail-call positioned recursive call.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">factorial</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">
+  </span><span class="p">([</span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="p">(</span><span class="nb">dec</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="o">'</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">acc</span><span class="p">)))))</span><span class="w">
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 9 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 9 - All in a Single Night &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 9 - All in a Single Night</h1>
+    <time datetime="2021-02-02T00:00:00-06:00" class="post-date">02 Feb 2021</time>
+    <p>On the ninth day of Advent of Code 2015 Santa wants us to examine some new locations (and distances) he is required to visit.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are provided a list of distances between locations that Santa wishes to visit exactly once, starting and finishing at any location.
+For part one we are asked to determine what the shortest distance is for the shortest route that meets this criteria.
+Like before, we start off by parsing the provided input into a structure that we can use going forward.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Location</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Distance</span> <span class="o">=</span> <span class="kr">number</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Distances</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">locations</span><span class="p">:</span> <span class="nb">Set</span><span class="o">&lt;</span><span class="nx">Location</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nl">distances</span><span class="p">:</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Location</span><span class="p">,</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Location</span><span class="p">,</span> <span class="nx">Distance</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">parseLocationsAndDistances</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Distances</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">({</span> <span class="nx">distances</span><span class="p">,</span> <span class="nx">locations</span> <span class="p">},</span> <span class="nx">line</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">[,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">distance</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+        <span class="sr">/</span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr"> to </span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr"> = </span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/</span>
+      <span class="p">);</span>
+
+      <span class="nx">distances</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span>
+        <span class="k">from</span><span class="p">,</span>
+        <span class="p">(</span><span class="nx">distances</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="k">from</span><span class="p">)</span> <span class="o">||</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">()).</span><span class="kd">set</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">distance</span><span class="p">))</span>
+      <span class="p">);</span>
+      <span class="nx">distances</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span>
+        <span class="nx">to</span><span class="p">,</span>
+        <span class="p">(</span><span class="nx">distances</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">to</span><span class="p">)</span> <span class="o">||</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">()).</span><span class="kd">set</span><span class="p">(</span><span class="k">from</span><span class="p">,</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">distance</span><span class="p">))</span>
+      <span class="p">);</span>
+      <span class="nx">locations</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="k">from</span><span class="p">);</span>
+      <span class="nx">locations</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+
+      <span class="k">return</span> <span class="p">{</span> <span class="nx">distances</span><span class="p">,</span> <span class="nx">locations</span> <span class="p">};</span>
+    <span class="p">},</span>
+    <span class="p">{</span> <span class="na">locations</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Set</span><span class="p">(),</span> <span class="na">distances</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">()</span> <span class="p">}</span> <span class="k">as</span> <span class="nx">Distances</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<p>From this function we are returned a Set of all the unique locations that Santa wishes to visit - along with a Map of all the distances (weights) between each of these locations.
+My initial thought was this was possibly a form of <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling salesman problem</a> and that we would need to employ such an algorithm to achieve the end result.
+However, upon inspection of the input we can see that all locations are directly accessable from each other, and that the listing is small.
+With this in-mind we can instead opt to calculate the distances of all possible <em>permutations</em> of the location listing with minimal computational overhead.</p>
+
+<p>JavaScript does not provide permutation functionality <em>out of the box</em> like languages such as Python do.
+As such, we are required to roll our own; I opted to leverage Generators in the below implementation.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">permutations</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">col</span><span class="p">:</span> <span class="nx">T</span><span class="p">[]):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">yield</span> <span class="nx">col</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="p">[</span><span class="nx">first</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">col</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">permutation</span> <span class="k">of</span> <span class="nx">permutations</span><span class="p">(</span><span class="nx">rest</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">col</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">yield</span> <span class="p">[</span>
+        <span class="p">...</span><span class="nx">permutation</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">i</span><span class="p">),</span>
+        <span class="nx">first</span><span class="p">,</span>
+        <span class="p">...</span><span class="nx">permutation</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span><span class="p">),</span>
+      <span class="p">];</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Using this function we are then able to create a higher-order function which aggregates all the possible trip distances into a final reduced value, using a supplied <code class="highlighter-rouge">reducer</code> function.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">aggregateTripDistances</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span>
+  <span class="p">{</span> <span class="nx">locations</span><span class="p">,</span> <span class="nx">distances</span> <span class="p">}:</span> <span class="nx">Distances</span><span class="p">,</span>
+  <span class="nx">initialValue</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span>
+  <span class="nx">reducer</span><span class="p">:</span> <span class="p">(</span><span class="nx">accumulator</span><span class="p">:</span> <span class="nx">T</span><span class="p">,</span> <span class="nx">distance</span><span class="p">:</span> <span class="nx">Distance</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">T</span>
+<span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">accumulator</span> <span class="o">=</span> <span class="nx">initialValue</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">first</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span><span class="p">]</span> <span class="k">of</span> <span class="nx">permutations</span><span class="p">([...</span><span class="nx">locations</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">distance</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rest</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">([</span><span class="nx">distance</span><span class="p">,</span> <span class="nx">previous</span><span class="p">],</span> <span class="nx">location</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="nx">distance</span> <span class="o">+</span> <span class="nx">distances</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">previous</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="nx">location</span><span class="p">),</span>
+        <span class="nx">location</span><span class="p">,</span>
+      <span class="p">],</span>
+      <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nx">first</span><span class="p">]</span> <span class="k">as</span> <span class="p">[</span><span class="nx">Distance</span><span class="p">,</span> <span class="nx">Location</span><span class="p">]</span>
+    <span class="p">);</span>
+    <span class="nx">accumulator</span> <span class="o">=</span> <span class="nx">reducer</span><span class="p">(</span><span class="nx">accumulator</span><span class="p">,</span> <span class="nx">distance</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">accumulator</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Finally, we can answer part one by calling this function, supplying the <code class="highlighter-rouge">Math.min</code> aggregate function to keep track of the shortest distance we have seen 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">aggregateTripDistances</span><span class="p">(</span>
+    <span class="nx">parseLocationsAndDistances</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span>
+    <span class="kc">Infinity</span><span class="p">,</span>
+    <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are instead asked to determine what the longest distance for the longest route is based on the same location listing.
+Using the same building blocks provided for part one’s solution, we can instead supply the <code class="highlighter-rouge">Math.max</code> aggregate function to return the desired answer 🌟.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">aggregateTripDistances</span><span class="p">(</span>
+    <span class="nx">parseLocationsAndDistances</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span>
+    <span class="o">-</span><span class="kc">Infinity</span><span class="p">,</span>
+    <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span>
+  <span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="alternative-solution">Alternative Solution</h3>
+
+<p>Instead of designing an aggregate function which applies a given reduction function, we could instead take the approach below.
+First we generate a list of all the possible trip distance totals, based on permutations of the location set.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">calcTripDistances</span> <span class="o">=</span> <span class="p">({</span>
+  <span class="nx">locations</span><span class="p">,</span>
+  <span class="nx">distances</span><span class="p">,</span>
+<span class="p">}:</span> <span class="nx">Distances</span><span class="p">):</span> <span class="kr">number</span><span class="p">[]</span> <span class="o">=&gt;</span>
+  <span class="p">[...</span><span class="nx">permutations</span><span class="p">([...</span><span class="nx">locations</span><span class="p">])].</span><span class="nx">map</span><span class="p">(([</span><span class="nx">first</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">distance</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rest</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+      <span class="p">([</span><span class="nx">distance</span><span class="p">,</span> <span class="nx">previous</span><span class="p">],</span> <span class="nx">location</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[</span>
+        <span class="nx">distance</span> <span class="o">+</span> <span class="nx">distances</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">previous</span><span class="p">).</span><span class="kd">get</span><span class="p">(</span><span class="nx">location</span><span class="p">),</span>
+        <span class="nx">location</span><span class="p">,</span>
+      <span class="p">],</span>
+      <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nx">first</span><span class="p">]</span> <span class="k">as</span> <span class="p">[</span><span class="nx">Distance</span><span class="p">,</span> <span class="nx">Location</span><span class="p">]</span>
+    <span class="p">);</span>
+    <span class="k">return</span> <span class="nx">distance</span><span class="p">;</span>
+  <span class="p">});</span>
+</code></pre></div></div>
+
+<p>Then we can supply this list as arguments to both the <code class="highlighter-rouge">Math.min</code> and <code class="highlighter-rouge">Math.max</code> functions.
+Using this approach works well for this input, however, we should be considerate that as all arguments are required to be put on the call stack within the chosen JavaScript VM, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#using_apply_and_built-in_functions">there is a limit</a> to how many list items this will cater for.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(...</span><span class="nx">calcTripDistances</span><span class="p">(</span><span class="nx">parseLocationsAndDistances</span><span class="p">(</span><span class="nx">input</span><span class="p">)));</span>
+</code></pre></div></div>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">calcTripDistances</span><span class="p">(</span><span class="nx">parseLocationsAndDistances</span><span class="p">(</span><span class="nx">input</span><span class="p">)));</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

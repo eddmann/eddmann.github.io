@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Understanding and using basic Shell Job Control in Unix.">
+
+    <title>Basic Shell Job Control in Unix &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Basic Shell Job Control in Unix</h1>
+    <time datetime="2014-01-31T00:00:00-06:00" class="post-date">31 Jan 2014</time>
+    <p>Within Unix-based operating-systems the concept of <a href="http://en.wikipedia.org/wiki/Job_control_(Unix)">Job Control</a> provides you with the ability to manage multiple ‘batch jobs’.
+Appending a single ampersand (&amp;) to a command instructs the shell to fork and execute the action in a separate sub-shell.
+
+This creates a background job, providing asynchronous, parallel computation to take place.
+Once the job has been created the shell returns an immediate success signal, allowing for further script command execution or returning the focus of the cursor back to the user.
+The forked background process will still be attached to its parent, meaning any resulting output will still be displayed in the terminal.
+The process ID (PID) of this new job is stored in a special variable called ‘$!’, allowing you to easily refer back to it at a later date.
+Below is an example of sending a copy command to a background process.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> /path/to/file /path/to/destination/file &amp;
+<span class="o">[</span>1] 50024 <span class="c"># example returned PID</span>
+</code></pre></div></div>
+
+<p>You are able to list the currently active jobs within the shell instance using the command ‘jobs’.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">jobs</span>
+<span class="o">[</span>1]+  Running  <span class="nb">cp</span> /path/to/file /path/to/destination/file &amp;
+</code></pre></div></div>
+
+<p>You can return to a background process by requesting it be transfered to the foreground, using the ‘fg’ command.
+Using the ‘jobs’ output we are able to specify a job number as an argument to the command, or by default it will act upon the job with a ‘+’ supplied.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">fg</span> %1 <span class="c"># optional job number</span>
+</code></pre></div></div>
+
+<p>From here you are able to issue any desired kill (Ctrl-C) or suspend (Ctrl-Z) commands.
+If you forget or now wish to run the current command in the background, you can suspend (pause) the action and then run ‘bg’.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> /path/to/file /path/to/destination/file
+<span class="o">[</span>1]+  Stopped  <span class="nb">cp</span> /path/to/file /path/to/destination/file
+<span class="nv">$ </span><span class="nb">bg</span>
+<span class="o">[</span>1]+  Running  <span class="nb">cp</span> /path/to/file /path/to/destination/file
+</code></pre></div></div>
+
+<p>Finally you can kill a job without having to bring it back to the foreground by calling the ‘kill’ command and optionally specifying a number (similar to the ‘fg’ command).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">kill</span> %1 <span class="c"># optional job number</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

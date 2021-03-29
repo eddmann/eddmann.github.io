@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 7 puzzle using TypeScript">
+
+    <title>Advent of Code 2015 - Day 7 - Some Assembly Required &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2015 - Day 7 - Some Assembly Required</h1>
+    <time datetime="2021-01-31T00:00:00-06:00" class="post-date">31 Jan 2021</time>
+    <p>On the seventh day of Advent of Code 2015 we are tasked with helping little Bobby Tables assemble a circuit (wires and bitwise logic gates) that Santa brought him for Christmas.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>Our input is an instruction booklet which describes how to connect these parts together.
+Based on following the instructions laid out in the booklet we are asked to provide what signal is ultimately provided to wire <code class="highlighter-rouge">a</code>.
+Like before, we will start off by parsing the input into a useable form within our solution.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Wire</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Instruction</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Circuit</span> <span class="o">=</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Wire</span><span class="p">,</span> <span class="nx">Instruction</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">parseCircuit</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Circuit</span> <span class="o">=&gt;</span>
+  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">circuit</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">instruction</span><span class="p">,</span> <span class="nx">wire</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1"> -&gt; </span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">circuit</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">);</span>
+  <span class="p">},</span> <span class="k">new</span> <span class="nb">Map</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>The parser above converts the instruction listing into a <code class="highlighter-rouge">Circuit</code> mapping between the defined <code class="highlighter-rouge">Wire</code> and associated actionable <code class="highlighter-rouge">Instruction</code> (i.e. bitwise operation, assignment).
+With the input now parsed we can move on to working out how we wish to emulate this circuit and record the outputted signals.
+Reviewing the input leads us to the conclusion that we can not expect the instructions to be in dependency order like the provided example is - i.e. <code class="highlighter-rouge">b</code> is declared and assigned almost at the end of the listing, but is referenced many times before this.
+Taking this on board, and as we only wish to work out what a single wire signal is; my initial solution is to begin at wire <code class="highlighter-rouge">a</code>’s instruction and recursively build up the resulting signal result.
+In doing so this will cater for the unsorted ordering, and only perform the instructions that are required to answer the question.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getEmulatedSignal</span> <span class="o">=</span> <span class="p">(</span><span class="nx">circuit</span><span class="p">:</span> <span class="nx">Circuit</span><span class="p">,</span> <span class="nx">wire</span><span class="p">:</span> <span class="nx">Wire</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">emulate</span> <span class="o">=</span> <span class="nx">memoize</span><span class="p">((</span><span class="na">wire</span><span class="p">:</span> <span class="nx">Wire</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="sr">/^</span><span class="se">(\d)</span><span class="sr">+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">wire</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">wire</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="nx">instruction</span> <span class="o">=</span> <span class="nx">circuit</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">wire</span><span class="p">).</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">);</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">AND</span><span class="dl">'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+      <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">OR</span><span class="dl">'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+      <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">LSHIFT</span><span class="dl">'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+      <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">RSHIFT</span><span class="dl">'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;&gt;</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+      <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">NOT</span><span class="dl">'</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">~</span><span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xffff</span><span class="p">;</span>
+      <span class="nl">default</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">wire</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Based on the currently supplied wire identifier we provide a base-case of asserting that if the string value is an number that we simply return the integer equivalent.
+All instructions laid out will eventually hit this base-case, ensuring that the recursion will stop and the callstack tails can be evaluated.
+Upon experimentation with this apppoach I noticed that performance was a big issue when attempting to run this on the actual input instruction booklet.
+Upon review, due to naively recursing over all instructions, there was the case that seen instructions would be required to be re-evaluated down many different branches.
+To resolve this I employed a small generic <a href="https://en.wikipedia.org/wiki/Memoization">memoization</a> function which wrapped the closure and opaquely provided a caching mechanism for subsequent calls to the same resolved wire signal.</p>
+
+<p>You will also notice the use of a <code class="highlighter-rouge">0xffff</code> mask when applying the <em>NOT</em> operation on the value.
+As explained in the question the signals are unsigned 16-bit values, however, JavaScript bitwise operators use 32-bits.
+So as to produce the desired results we are required to only consider the 16-bit mask supplied.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+  <span class="nx">getEmulatedSignal</span><span class="p">(</span><span class="nx">parseCircuit</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>With the logic in-place we can combine the two functions together and determine what the resulting signal is from wire <code class="highlighter-rouge">a</code> 🌟.</p>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are required to replace the original inputs wire <code class="highlighter-rouge">b</code> value with the resulting signal that we emulated in part one for wire <code class="highlighter-rouge">a</code>.
+From this, we are the asked to determine what the resulting signal is now from wire <code class="highlighter-rouge">a</code>.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">circuit</span> <span class="o">=</span> <span class="nx">parseCircuit</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
+  <span class="nx">circuit</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="nx">getEmulatedSignal</span><span class="p">(</span><span class="nx">circuit</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">).</span><span class="nx">toString</span><span class="p">());</span>
+  <span class="k">return</span> <span class="nx">getEmulatedSignal</span><span class="p">(</span><span class="nx">circuit</span><span class="p">,</span> <span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Splitting out and modifying the parsed circuit mapping before getting the newly emulated signal provides us with the desired answer 🌟.</p>
+
+<h3 id="alternative-solution">Alternative Solution</h3>
+
+<p>Since solving this problem, I re-evaluated the provided input and noticed that it did not include any <a href="https://en.wikipedia.org/wiki/Circular_dependency">circular dependencies</a>!
+As such, it could be treated as a <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed acyclic graph</a> (DAG) of which we then would be able to perform a <a href="https://en.wikipedia.org/wiki/Topological_sorting">Topological Sort</a> on to return the correctly ordered instruction listing.
+This would allows us to emulate the circuit without the need for recursion.
+I set out to re-implement the solution using this new found knowledge and approach.</p>
+
+<p>I began by creating the below function which parses the instruction listing in a very different manor than before.
+Instead of simply returning the parsed instructions in an unordered map back to the callee, this function returns an array of the <em>correctly</em> ordered instruction execution.
+Correctness in this case means that all required wire signal values will have already been emulated before attempting to evaluate the given wire instruction.
+As such, we can just iterate through the instruction listing once to return the entire signal value outputs.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Wire</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
+<span class="kd">type</span> <span class="nx">Instruction</span> <span class="o">=</span> <span class="kr">string</span><span class="p">[];</span>
+
+<span class="kd">const</span> <span class="nx">createInstructionExecutionOrder</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">input</span><span class="p">:</span> <span class="kr">string</span>
+<span class="p">):</span> <span class="p">[</span><span class="nx">Wire</span><span class="p">,</span> <span class="nx">Instruction</span><span class="p">][]</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">dependencies</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Wire</span><span class="p">,</span> <span class="nx">Wire</span><span class="p">[]</span><span class="o">&gt;</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Wire</span><span class="p">,</span> <span class="nx">Instruction</span><span class="o">&gt;</span><span class="p">();</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">line</span> <span class="k">of</span> <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">instruction</span><span class="p">,</span> <span class="nx">wire</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1"> -&gt; </span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">dependencies</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">([</span><span class="sr">a-z</span><span class="se">]</span><span class="sr">+</span><span class="se">)</span><span class="sr">/g</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]);</span>
+    <span class="nx">instructions</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="nx">visited</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Set</span><span class="o">&lt;</span><span class="nx">Wire</span><span class="o">&gt;</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="na">ordered</span><span class="p">:</span> <span class="nx">Wire</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span>
+
+  <span class="p">[...</span><span class="nx">dependencies</span><span class="p">.</span><span class="nx">keys</span><span class="p">()].</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="nx">dfs</span><span class="p">(</span><span class="na">wire</span><span class="p">:</span> <span class="nx">Wire</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">visited</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">wire</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span>
+    <span class="nx">visited</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">wire</span><span class="p">);</span>
+    <span class="nx">dependencies</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">wire</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">dfs</span><span class="p">);</span>
+    <span class="nx">ordered</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">wire</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">ordered</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">wires</span><span class="p">,</span> <span class="nx">wire</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[...</span><span class="nx">wires</span><span class="p">,</span> <span class="p">[</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instructions</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">wire</span><span class="p">)]],</span>
+    <span class="p">[]</span>
+  <span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Treating the instruction booklet as a DAG allows us to perform the Topological Sort (optting for the <a href="https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search">Depth-First Search approach</a>) and return the ordered instructions.
+With this in hand we now need a means to emulate and return the signal value for a given wires instruction - based on the signal mapping that we have built up to that point.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Signals</span> <span class="o">=</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="nx">Wire</span><span class="p">,</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">emulate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">signals</span><span class="p">:</span> <span class="nx">Signals</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">:</span> <span class="nx">Instruction</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="kd">get</span> <span class="o">=</span> <span class="p">(</span><span class="na">token</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
+    <span class="nx">signals</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">?</span> <span class="nx">signals</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">token</span><span class="p">);</span>
+
+  <span class="k">switch</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">AND</span><span class="dl">'</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">OR</span><span class="dl">'</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">|</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">LSHIFT</span><span class="dl">'</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;&lt;</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">RSHIFT</span><span class="dl">'</span><span class="p">):</span>
+      <span class="k">return</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;&gt;</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+    <span class="k">case</span> <span class="nx">instruction</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="dl">'</span><span class="s1">NOT</span><span class="dl">'</span><span class="p">):</span>
+      <span class="k">return</span> <span class="o">~</span><span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;</span> <span class="mh">0xffff</span><span class="p">;</span>
+    <span class="nl">default</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kd">get</span><span class="p">(</span><span class="nx">instruction</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We use a local <code class="highlighter-rouge">get</code> helper function to attempt to retrieve the instruction identifier value from the signal mapping, else fallback to assuming if not present it must be an integer value with must parse.
+From here, we can then perform a single reduction over the instruction execution listing, building up the resulting signal mapping along the way.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="na">signals</span><span class="p">:</span> <span class="nx">Signals</span> <span class="o">=</span> <span class="nx">createInstructionExecutionOrder</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">signals</span><span class="p">,</span> <span class="p">[</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">])</span> <span class="o">=&gt;</span>
+      <span class="nx">signals</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">signals</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">)),</span>
+    <span class="k">new</span> <span class="nb">Map</span><span class="p">()</span>
+  <span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">signals</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>It is then from this built map that we can get the signal value which has been emulated for wire <code class="highlighter-rouge">a</code>.
+Likewise we can solve part two in a similar mannor, except we must first replace the signal value of wire <code class="highlighter-rouge">b</code> with part ones answer.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">instructions</span> <span class="o">=</span> <span class="nx">createInstructionExecutionOrder</span><span class="p">(</span>
+    <span class="nx">input</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^</span><span class="se">\d</span><span class="sr">+ -&gt; b$/gm</span><span class="p">,</span> <span class="s2">`</span><span class="p">${</span><span class="nx">part1</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">toString</span><span class="p">()}</span><span class="s2"> -&gt; b`</span><span class="p">)</span>
+  <span class="p">);</span>
+  <span class="kd">const</span> <span class="na">signals</span><span class="p">:</span> <span class="nx">Signals</span> <span class="o">=</span> <span class="nx">instructions</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">signals</span><span class="p">,</span> <span class="p">[</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">])</span> <span class="o">=&gt;</span>
+      <span class="nx">signals</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">wire</span><span class="p">,</span> <span class="nx">emulate</span><span class="p">(</span><span class="nx">signals</span><span class="p">,</span> <span class="nx">instruction</span><span class="p">)),</span>
+    <span class="k">new</span> <span class="nb">Map</span><span class="p">()</span>
+  <span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">signals</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>I really enjoyed exploring the Topological Sorting algorithm to implment the second solution to today’s problem.
+In performing this initial ordering we are able to greatly simplify the emulation logic and remove the need for any memoization/recursive calls.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Multiple implementations to encode and decode Caesar Cipher based messages.">
+
+    <title>Implementing ROT13 and ROT(n) Caesar Ciphers in Python &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Implementing ROT13 and ROT(n) Caesar Ciphers in Python</h1>
+    <time datetime="2014-04-12T00:00:00-05:00" class="post-date">12 Apr 2014</time>
+    <p>The Caesar cipher (shift cipher) is an extremely simple encryption technique.
+Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
+The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.
+</p>
+
+<p>ROT13 (aka. rotate by 13 places) is an implementation of this cipher, replacing each letter with the letter 13 positions after it in the given symbol table (typically the alphabet).
+As the basic Latin alphabet is 26 letters long, the same algorithm implementation can be used to decode an encoded subject matter.</p>
+
+<h2 id="basic-implementation">Basic Implementation</h2>
+
+<p>Using Python 3.4 as the implementation language we are able to simply use the provided (<em>batteries included</em>) ‘encode’ method as shown below.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot13</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">codecs</span> <span class="kn">import</span> <span class="n">encode</span>
+    <span class="k">return</span> <span class="n">encode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">'rot13'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="mapping-implementation">Mapping Implementation</h2>
+
+<p>The above implementation is extremely useful, however, it does not give us a feel for how the algorithm works from first principles.
+The example below highlights the same functionality (limited to the Latin alphabet) by way of a mapping over each character in the subject string.
+Each character is passed into the ‘lookup’ function that returns the valid replacement value, not altering non-alphabet characters.
+I would like to point out Python’s ability to succinctly express the between conditions, using a standard math-chaining comparison syntax.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot13_alpha</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="n">o</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">v</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">'a'</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="s">'m'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">o</span> <span class="o">+</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">'n'</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="s">'z'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">o</span> <span class="o">-</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">lookup</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+
+<span class="n">rot13_alpha</span><span class="p">(</span><span class="s">'Hello World'</span><span class="p">)</span> <span class="c1"># Uryyb Jbeyq
+</span></code></pre></div></div>
+
+<h2 id="generic-alphabet-shift-implementation">Generic Alphabet Shift Implementation</h2>
+
+<p>Using Python’s string translation functionality I was able to make a more generic implementation, allowing you to specify the position length.
+I decided on using partial function application to allow for rotation functions to be composed and reused.
+For example the use-case below follows a single invocation of the initially implemented function.
+We could have instead assigned this function to a variable (say ‘rot13’) and call at will.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot_alpha</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">ascii_lowercase</span> <span class="k">as</span> <span class="n">lc</span><span class="p">,</span> <span class="n">ascii_uppercase</span> <span class="k">as</span> <span class="n">uc</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">lc</span> <span class="o">+</span> <span class="n">uc</span><span class="p">,</span> <span class="n">lc</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span> <span class="o">+</span> <span class="n">lc</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> <span class="o">+</span> <span class="n">uc</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span> <span class="o">+</span> <span class="n">uc</span><span class="p">[:</span><span class="n">n</span><span class="p">])</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">.</span><span class="n">translate</span><span class="p">(</span><span class="n">lookup</span><span class="p">)</span>
+
+<span class="n">rot_alpha</span><span class="p">(</span><span class="mi">13</span><span class="p">)(</span><span class="s">'Hello World'</span><span class="p">)</span> <span class="c1"># Uryyb Jbeyq
+</span></code></pre></div></div>
+
+<h2 id="generic-shift-implementation">Generic Shift Implementation</h2>
+
+<p>The final fixed piece of the implementation is that it only handles Latin alphabet symbols.
+Say we would like to use ROT5 for number encoding, this would require an individual implementation.
+The example below removes this constraint, allowing the user to pass in each of the symbol strings they wish to permit for encoding.
+These passed in values are used to create an encoded lookup table, based on the position length (similar to the previous example).
+Finally, the lookup table is used by Python’s string translation method to return the processed value.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot</span><span class="p">(</span><span class="o">*</span><span class="n">symbols</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_rot</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">sy</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span> <span class="o">+</span> <span class="n">sy</span><span class="p">[:</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">sy</span> <span class="ow">in</span> <span class="n">symbols</span><span class="p">)</span>
+        <span class="n">lookup</span> <span class="o">=</span> <span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">symbols</span><span class="p">),</span> <span class="n">encoded</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="p">.</span><span class="n">translate</span><span class="p">(</span><span class="n">lookup</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_rot</span>
+</code></pre></div></div>
+
+<p>Below highlights the discussed number encoding by five positions.
+We are able to compose a new function based on the partial application nature of the ‘rot’ function.
+Latin alphabet encoding is also present with the five position length invariant.
+I would like to note that a separate decode implementation is required (-N), as unlike ROT13 the encode algorithm is not it’s own inverse.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rot5_num</span> <span class="o">=</span> <span class="n">rot</span><span class="p">(</span><span class="s">'0123456789'</span><span class="p">)(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">rot5_num</span><span class="p">(</span><span class="s">'1234'</span><span class="p">)</span> <span class="c1"># 6789
+</span>
+<span class="n">rot_alpha</span> <span class="o">=</span> <span class="n">rot</span><span class="p">(</span><span class="n">ascii_lowercase</span><span class="p">,</span> <span class="n">ascii_uppercase</span><span class="p">)</span>
+<span class="n">rot5_alpha_enc</span> <span class="o">=</span> <span class="n">rot_alpha</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">rot5_alpha_dec</span> <span class="o">=</span> <span class="n">rot_alpha</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">enc</span> <span class="o">=</span> <span class="n">rot5_alpha_enc</span><span class="p">(</span><span class="s">'Hello World'</span><span class="p">)</span> <span class="c1"># Mjqqt Btwqi
+</span><span class="n">rot5_alpha_dec</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span> <span class="c1"># Hello World
+</span></code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

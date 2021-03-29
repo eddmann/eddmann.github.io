@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Step-by-step guide to get you started.">
+
+    <title>Installing Nginx/Apache, MySQL, PHP 5.5 (LAMP) stack on CentOS 6.4 &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Installing Nginx/Apache, MySQL, PHP 5.5 (LAMP) stack on CentOS 6.4</h1>
+    <time datetime="2013-11-29T00:00:00-06:00" class="post-date">29 Nov 2013</time>
+    <p>With the wide-spread appeal and flexibility of an <a href="http://en.wikipedia.org/wiki/Virtual_private_server">VPS</a> and <a href="http://www.vagrantup.com/">Vagrant</a>, a shift from mear FTP access to setting up a fresh installation from scratch has taken effect.
+Tools like <a href="http://puppetlabs.com/">Puppet</a> and <a href="http://www.opscode.com/chef/">Chef</a> are great for certain use-cases (i.e. large deployments, dev-ops teams) but to start with the terminal is your best-friend.
+In this post I will take you through the process of setting up a trival LAMP stack on CentOS 6.4, with the option to use either <a href="http://httpd.apache.org/">Apache</a> or <a href="http://nginx.com/">Nginx</a>.
+Both will take advantage of the features PHP-FPM provides you, via FastCGI.
+</p>
+
+<p>The first step is to make sure we are currently the ‘root’ user (this saves on tedious sudoing through the installation).
+We then add the <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> and <a href="http://rpms.famillecollet.com/">Remi</a> YUM repositories, providing us with easy access to updated MySQL and PHP pre-compiled builds.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>su -
+<span class="nv">$ </span>rpm <span class="nt">-Uvh</span> http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+<span class="nv">$ </span>rpm <span class="nt">-Uvh</span> http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
+</code></pre></div></div>
+
+<h2 id="mysql">MySQL</h2>
+
+<p>Installation of the MySQL server and client is the next step, followed by configuring the associated daemon to run on start-up.
+It is then good practise to run the ‘secure installation’ script, which guides you through changing the root password etc.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">--enablerepo</span><span class="o">=</span>remi <span class="nb">install</span> <span class="nt">-y</span> mysql mysql-server
+<span class="nv">$ </span>chkconfig <span class="nt">--levels</span> 235 mysqld on
+<span class="nv">$ </span>/etc/init.d/mysqld start
+<span class="nv">$ </span>/usr/bin/mysql_secure_installation
+</code></pre></div></div>
+
+<h2 id="php">PHP</h2>
+
+<p>Next we are going to install PHP 5.5 along with a host of useful packages (i.e. the new Zend OPcache).
+Running the second command is useful if you wish to find other available packages.
+Finally, we run a couple of commands which use ‘sed’ to quickly alter highlighted configuration in PHP.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">--enablerepo</span><span class="o">=</span>remi-php55,remi <span class="nb">install</span> <span class="nt">-y</span> <span class="se">\</span>
+    php php-fpm php-common php-cli php-opcache php-pecl-xdebug <span class="se">\</span>
+    php-pear php-mysqlnd php-pdo php-gd php-mbstring <span class="se">\</span>
+    php-mcrypt php-xml
+<span class="nv">$ </span>yum <span class="nt">--enablerepo</span><span class="o">=</span>remi-php55 list php-<span class="k">*</span> <span class="c"># list available modules</span>
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\;</span><span class="s2">date</span><span class="se">\.</span><span class="s2">timezone.*</span><span class="nv">$/</span><span class="s2">date</span><span class="se">\.</span><span class="s2">timezone = </span><span class="se">\"</span><span class="s2">Europe</span><span class="se">\/</span><span class="s2">London</span><span class="se">\"</span><span class="s2">/g"</span> /etc/php.ini
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\e</span><span class="s2">xpose_php.*</span><span class="nv">$/</span><span class="s2">expose_php = Off/g"</span> /etc/php.ini
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\u</span><span class="s2">pload_max_filesize.*</span><span class="nv">$/</span><span class="s2">upload_max_filesize = 10M/g"</span> /etc/php.ini
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\p</span><span class="s2">ost_max_size.*</span><span class="nv">$/</span><span class="s2">post_max_size = 10M/g"</span> /etc/php.ini
+</code></pre></div></div>
+
+<p>We are then tasked with configuring the previously installed PHP-FPM, along with adding it to run on start-up.
+If you wish to install Nginx you must also execute the last two commands, which correct the desired user/group settings used.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>chkconfig <span class="nt">--levels</span> 235 php-fpm on
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\l</span><span class="s2">isten.*</span><span class="nv">$/</span><span class="s2">listen = </span><span class="se">\/</span><span class="s2">tmp</span><span class="se">\/</span><span class="s2">php5-fpm.sock/g"</span> /etc/php-fpm.d/www.conf
+<span class="c"># if you wish to use nginx, also execute</span>
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\u</span><span class="s2">ser.*</span><span class="nv">$/</span><span class="s2">user = nginx/g"</span> /etc/php-fpm.d/www.conf
+<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\g</span><span class="s2">roup.*</span><span class="nv">$/</span><span class="s2">group = nginx/g"</span> /etc/php-fpm.d/www.conf
+</code></pre></div></div>
+
+<h2 id="option-1-nginx">Option 1: Nginx</h2>
+
+<p>I am a huge fan of Nginx and would definitely recommend it over Apache even if just for its exceptional low-memory footprint.
+First we must add the YUM repository and then install/configure Nginx to run at start-up.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>rpm <span class="nt">-Uvh</span> http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
+<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> nginx
+<span class="nv">$ </span>chkconfig <span class="nt">--levels</span> 235 nginx on
+</code></pre></div></div>
+
+<p>We can then replace the inital configuration file provided at ‘/etc/nginx/conf.d/default.conf’ with the one below.
+This is a trivial configuration that should help you get up-and-running, I would recommend however, that you take a look at the great work <a href="http://github.com/h5bp/server-configs-nginx">here</a> for more ideas.</p>
+
+<div class="language-nginx highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># /etc/nginx/conf.d/default.conf</span>
+
+<span class="k">server</span> <span class="p">{</span>
+    <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
+    <span class="kn">server_name</span> <span class="s">localhost</span><span class="p">;</span>
+    <span class="kn">charset</span> <span class="s">utf-8</span><span class="p">;</span>
+    <span class="kn">root</span> <span class="n">/srv/www/</span><span class="p">;</span>
+    <span class="kn">index</span> <span class="s">index.php</span> <span class="s">index.html</span> <span class="s">index.htm</span><span class="p">;</span>
+    <span class="kn">location</span> <span class="p">~</span> <span class="sr">\.php$</span> <span class="p">{</span>
+        <span class="kn">fastcgi_pass</span>            <span class="s">unix:/tmp/php5-fpm.sock</span><span class="p">;</span>
+        <span class="kn">fastcgi_index</span>           <span class="s">index.php</span><span class="p">;</span>
+        <span class="kn">fastcgi_split_path_info</span> <span class="s">^(.+</span><span class="err">\</span><span class="s">.php)(.*)</span>$<span class="p">;</span>
+        <span class="kn">include</span>                 <span class="n">/etc/nginx/fastcgi_params</span><span class="p">;</span>
+        <span class="kn">fastcgi_param</span>           <span class="s">SCRIPT_FILENAME</span> <span class="nv">$document_root$fastcgi_script_name</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="option-2-apache">Option 2: Apache</h2>
+
+<p>Alternatively, you may prefer the extra modules and familiarity of Apache.
+Below we are simply installing the Apache package provided in the official repository, along with enabling it at start-up.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> httpd
+<span class="nv">$ </span>chkconfig <span class="nt">--levels</span> 235 httpd on
+</code></pre></div></div>
+
+<p>We have to go through one extra step to successfully get Apache to use PHP-FPM.
+To achieve this we must install the ‘mod_fastcgi’ module along with safely disabeling a couple of default configuration files.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>rpm <span class="nt">-Uvh</span> http://pkgs.repoforge.org/rpmforge-release/rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm
+<span class="nv">$ </span>yum <span class="nt">--enablerepo</span><span class="o">=</span>rpmforge-extras <span class="nb">install</span> <span class="nt">-y</span> mod_fastcgi
+<span class="nv">$ </span><span class="nb">mv</span> /etc/httpd/conf.d/php.conf /etc/httpd/conf.d/php.conf.old <span class="c"># disable mod_php</span>
+<span class="nv">$ </span><span class="nb">mv</span> /etc/httpd/conf.d/fastcgi.conf /etc/httpd/conf.d/fastcgi.conf.old
+<span class="nv">$ </span><span class="nb">mkdir</span> /usr/lib/cgi-bin/
+</code></pre></div></div>
+
+<p>We can then create a new file ‘/etc/httpd/conf.d/default.conf’ with the contents below to get up-and-running.
+This configuration is very trivial, I would recommend that you take a look at the great work <a href="http://github.com/h5bp/server-configs-apache">here</a> for more ideas.</p>
+
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># /etc/httpd/conf.d/default.conf
+</span>
+<span class="c"># FastCGI
+</span><span class="n">User</span> <span class="n">apache</span>
+<span class="n">Group</span> <span class="n">apache</span>
+<span class="n">LoadModule</span> <span class="n">fastcgi_module</span> <span class="n">modules</span>/<span class="n">mod_fastcgi</span>.<span class="n">so</span>
+<span class="n">FastCgiIpcDir</span> /<span class="n">var</span>/<span class="n">run</span>/<span class="n">mod_fastcgi</span>
+<span class="n">FastCgiWrapper</span> <span class="n">Off</span>
+<span class="n">FastCgiConfig</span> -<span class="n">idle</span>-<span class="n">timeout</span> <span class="m">20</span> -<span class="n">maxClassProcesses</span> <span class="m">1</span>
+<span class="n">FastCgiExternalServer</span> /<span class="n">usr</span>/<span class="n">lib</span>/<span class="n">cgi</span>-<span class="n">bin</span>/<span class="n">php5</span>-<span class="n">fcgi</span> -<span class="n">socket</span> /<span class="n">tmp</span>/<span class="n">php5</span>-<span class="n">fpm</span>.<span class="n">sock</span> -<span class="n">pass</span>-<span class="n">header</span> <span class="n">Authorization</span>
+<span class="n">AddHandler</span> <span class="n">php5</span>-<span class="n">fcgi</span> .<span class="n">php</span>
+<span class="n">Action</span> <span class="n">php5</span>-<span class="n">fcgi</span> /<span class="n">php5</span>-<span class="n">fcgi</span>
+<span class="n">Alias</span> /<span class="n">php5</span>-<span class="n">fcgi</span> /<span class="n">usr</span>/<span class="n">lib</span>/<span class="n">cgi</span>-<span class="n">bin</span>/<span class="n">php5</span>-<span class="n">fcgi</span>
+
+<span class="c"># Default VirtualHost
+</span><span class="n">NameVirtualHost</span> *:<span class="m">80</span>
+&lt;<span class="n">VirtualHost</span> *:<span class="m">80</span>&gt;
+    <span class="n">ServerName</span> <span class="s2">"*"</span>
+    <span class="n">DocumentRoot</span> /<span class="n">srv</span>/<span class="n">www</span>/
+    <span class="n">DirectoryIndex</span> <span class="n">index</span>.<span class="n">php</span> <span class="n">index</span>.<span class="n">html</span> <span class="n">index</span>.<span class="n">htm</span>
+    &lt;<span class="n">Directory</span> /<span class="n">srv</span>/<span class="n">www</span>/&gt;
+        <span class="n">Options</span> <span class="n">All</span>
+        <span class="n">AllowOverride</span> <span class="n">All</span>
+    &lt;/<span class="n">Directory</span>&gt;
+&lt;/<span class="n">VirtualHost</span>&gt;
+</code></pre></div></div>
+
+<h2 id="web-directory">Web Directory</h2>
+
+<p>I tend to store my web content under ‘/srv/www’, and the example configuration files use this preference.
+If you have another preference remember to update the configuration files accordingly.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir</span> /srv/www
+<span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"&lt;?php phpinfo();"</span> <span class="o">&gt;</span> /srv/www/index.php
+</code></pre></div></div>
+
+<h2 id="firewall">Firewall</h2>
+
+<p>It is very important to have a well configured firewall that meets you business-domain needs, the below configuration is a good start.
+I will not go through each line but this helps handle common script-kiddie attacks along with accepting activity on ports 80/443/22 (http, https and ssh).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>iptables <span class="nt">-F</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--tcp-flags</span> ALL NONE <span class="nt">-j</span> DROP <span class="c"># null packets</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="o">!</span> <span class="nt">--syn</span> <span class="nt">-m</span> state <span class="nt">--state</span> NEW <span class="nt">-j</span> DROP <span class="c"># syn-flood attacks</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--tcp-flags</span> ALL ALL <span class="nt">-j</span> DROP <span class="c"># xmas packets</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-i</span> lo <span class="nt">-j</span> ACCEPT <span class="c"># allow localhost interface</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">-m</span> tcp <span class="nt">--dport</span> 80 <span class="nt">-j</span> ACCEPT  <span class="c"># http</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">-m</span> tcp <span class="nt">--dport</span> 443 <span class="nt">-j</span> ACCEPT <span class="c"># https</span>
+<span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">-m</span> tcp <span class="nt">--dport</span> 22 <span class="nt">-j</span> ACCEPT <span class="c"># ssh</span>
+<span class="nv">$ </span>iptables <span class="nt">-I</span> INPUT <span class="nt">-m</span> state <span class="nt">--state</span> ESTABLISHED,RELATED <span class="nt">-j</span> ACCEPT <span class="c"># vps, run s/w updates</span>
+<span class="nv">$ </span>iptables <span class="nt">-P</span> OUTPUT ACCEPT <span class="c"># allow outgoing</span>
+<span class="nv">$ </span>iptables <span class="nt">-P</span> INPUT DROP <span class="c"># block other</span>
+<span class="nv">$ </span>iptables-save | <span class="nb">sudo tee</span> /etc/sysconfig/iptables
+<span class="nv">$ </span>service iptables restart
+<span class="nv">$ </span>iptables <span class="nt">-L</span> <span class="nt">-n</span> <span class="c"># display rules</span>
+</code></pre></div></div>
+
+<h2 id="composer">Composer</h2>
+
+<p>Who in the PHP world can now live without Composer?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /tmp
+<span class="nv">$ </span>curl <span class="nt">-sS</span> https://getcomposer.org/installer | php
+<span class="nv">$ </span><span class="nb">mv </span>composer.phar /usr/local/bin/composer
+</code></pre></div></div>
+
+<h2 id="3-2-1-go">3, 2, 1, Go…</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>/etc/init.d/php-fpm start
+<span class="nv">$ </span>/etc/init.d/httpd start <span class="c"># apache</span>
+<span class="nv">$ </span>/etc/init.d/nginx start <span class="c"># nginx</span>
+</code></pre></div></div>
+
+<p>I hope that this brief overview has helped you get accustom with configuring a base installation, allowing you to take advantage of the flexibility gains.
+I have purposely omitted detailed discussion on logging and advanced web-server configuration, as I feel they deserve their own posts and hope to fulfil this in the near future.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

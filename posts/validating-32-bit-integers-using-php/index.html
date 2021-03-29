@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Platform-agnostic validation of 32-bit signed integers in PHP">
+
+    <title>Validating 32-bit Integers using PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Validating 32-bit Integers using PHP</h1>
+    <time datetime="2016-04-19T00:00:00-05:00" class="post-date">19 Apr 2016</time>
+    <p>Last week I was required to validate that a supplied integer would fit correctly into a 32-bit address space.
+The available size of an integer within PHP is platform dependent, and could either be 32 or 64 bits based on the architecture you are using.
+This function had to cater for these differences and as such I decided to explore a couple of different options for producing this validation.
+</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">is_32bit_signed_int</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'min_range'</span> <span class="o">=&gt;</span> <span class="o">-</span><span class="mi">2147483647</span><span class="p">,</span> <span class="s1">'max_range'</span> <span class="o">=&gt;</span> <span class="mi">2147483647</span><span class="p">];</span>
+
+    <span class="k">return</span> <span class="kc">false</span> <span class="o">!==</span> <span class="nb">filter_var</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="no">FILTER_VALIDATE_INT</span><span class="p">,</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">'options'</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The first implementation uses the <code class="highlighter-rouge">filter_var</code> function to validate that the provided input can be correctly coerced into an integer.
+So as to apply the size restrictions, we make sure that the value is bounded within the range that a valid signed 32-bit integer can hold.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">is_32bit_signed_int</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x7FFFFFFF</span><span class="p">)</span> <span class="o">===</span> <span class="nb">abs</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The first solution works well but I wished to explore how would I go about performing this operation using a form of bitmask.
+Taking into consideration how PHP represents negative values (using two’s complement) and endianness we bitmask the absolute representation of the value within the max size that a signed 32-bit can handle.
+If this value is identical to the absolute representation without the bitmask applied then we can be assured that the value is able to correctly fit into a 32-bit integer.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

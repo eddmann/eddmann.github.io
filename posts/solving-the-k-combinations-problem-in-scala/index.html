@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the N-choose-k problem different ways in Scala.">
+
+    <title>Solving the k-combinations problem in Scala &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Solving the k-combinations problem in Scala</h1>
+    <time datetime="2013-12-03T00:00:00-06:00" class="post-date">03 Dec 2013</time>
+    <p>More often than not there are many different ways to solve a particular task.
+I found this trait present when coding up a solution to the k-combinations (N-choose-k) problem.
+A <a href="http://en.wikipedia.org/wiki/Combination">combination</a> is the action of selecting a set amount of elements from a larger group, where order is not considered (dissimilar to a <a href="http://en.wikipedia.org/wiki/Permutation">permutation</a>).
+An example of a combination is in the cards you are dealt in a poker-hand, out of the possible 52 cards you are drawn 5 (52 choose 5).
+We are able to calculate the unique hand offerings in many different ways, allowing us to predict how likely it is for an individual card to be dealt.
+In this post I will be showing examples solving the 10 choose 2 problem.
+</p>
+
+<p>The first implementation uses a brute-force approach, generating all the pair-combinations and then returning the total length.
+This is the most naive solution, however, it is a good example of how useful Scala’s ranges and for-expressions are.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">combinations</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+    <span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span>
+    <span class="n">j</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="n">i</span>
+<span class="o">}</span> <span class="nf">yield</span> <span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">j</span><span class="o">))</span> <span class="n">length</span>
+</code></pre></div></div>
+
+<p>The second example I developed uses recursion, by identifying the simple observation that there are only two possible outcomes when you choose k elements from N items.
+Either, you choose a particular element or your do not, with this simple assertion you are able to code a succinct <a href="http://en.wikipedia.org/wiki/Binomial_coefficient#Recursive_formula">recursive algorithm</a>.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">choose</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">k</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span>
+    <span class="nf">if</span> <span class="o">(</span><span class="n">k</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">k</span> <span class="o">==</span> <span class="n">n</span><span class="o">)</span> <span class="mi">1</span>
+    <span class="k">else</span> <span class="nf">choose</span><span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="o">,</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">+</span> <span class="nf">choose</span><span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="o">,</span> <span class="n">k</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="nv">combinations</span> <span class="k">=</span> <span class="nf">choose</span><span class="o">(</span><span class="mi">10</span><span class="o">,</span> <span class="mi">2</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>The final example uses an implicit class which provides Ints with the ability to call the method in the typical fashion we express it (52 choose 5).
+I was able to use Scala’s foldLeft to define the factorial calculation without the typical use of recursion, which I found very interesting.
+Using this private method I was able to write the ‘choose’ method based on the well known <a href="http://en.wikipedia.org/wiki/Binomial_coefficient#Factorial_formula">mathematical equation</a>.
+Finally, I also provided access to the factorial calculation by way of the ‘!’ method.
+There is no real requirement for this in the described example but highlights well Scala’s flexiable method naming capabilities.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">implicit</span> <span class="k">class</span> <span class="nc">Combinations</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">private</span> <span class="k">def</span> <span class="nf">fact</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="o">(</span><span class="mi">1</span> <span class="n">to</span> <span class="n">n</span><span class="o">).</span><span class="py">foldLeft</span><span class="o">(</span><span class="mi">1</span><span class="o">)(</span><span class="k">_</span> <span class="o">*</span> <span class="k">_</span><span class="o">)</span>
+    <span class="k">def</span> <span class="nf">!</span> <span class="k">=</span> <span class="nf">fact</span><span class="o">(</span><span class="n">n</span><span class="o">)</span> <span class="c1">// allows 10!</span>
+    <span class="k">def</span> <span class="nf">choose</span><span class="o">(</span><span class="n">k</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="nf">fact</span><span class="o">(</span><span class="n">n</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="nf">fact</span><span class="o">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="o">)</span> <span class="o">*</span> <span class="nf">fact</span><span class="o">(</span><span class="n">k</span><span class="o">))</span>
+<span class="o">}</span>
+
+<span class="k">val</span> <span class="nv">combinations</span> <span class="k">=</span> <span class="mi">10</span> <span class="n">choose</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+<p>To check that all these examples returned the same result I used the basic observation that a Set of all the results will not include duplicates, so the size must equal one.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">if</span> <span class="o">(</span><span class="nc">Set</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">,</span> <span class="n">c</span><span class="o">).</span><span class="py">size</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="s">"Woot!"</span> <span class="k">else</span> <span class="s">"Nope!"</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

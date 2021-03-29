@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Example usage of the Iterative deepening depth-first algorithm.">
+
+    <title>Using Iterative deepening depth-first search in Python &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using Iterative deepening depth-first search in Python</h1>
+    <time datetime="2014-03-06T00:00:00-06:00" class="post-date">06 Mar 2014</time>
+    <p>Iterative deepening depth-first search (IDDFS) is an extension to the ‘vanilla’ depth-first search algorithm, with an added constraint on the total depth explored per iteration.
+This addition produces equivalent results to what can be achieved using breadth-first search, without suffering from the large memory costs.
+Due to BFS’s storage of fringe vertices in memory, Od^b memory space may be required (b = branching factor), this is a stark contrast to IDDFS’s O(bd) worst-case memory requirements.
+On a per-iteration interval vertex successors at the depth-cap level are ignored, and if the goal has not been found, the maximum level is increased (by one) and the processes repeated.
+Similarly to BFS, it has the guarantee to find an optimal path between two subject vertices, as the shallowest goal vertex will be the depth-cap first, resulting in no exploration of subsequent, unnecessary branches.
+</p>
+
+<h2 id="n-puzzle-example">n-Puzzle example</h2>
+
+<p>Within the field of Artificial Intelligence the <a href="http://en.wikipedia.org/wiki/15_puzzle">sliding puzzle</a> problem is a great way to explore the effectiveness of different searching algorithms.
+Consisting of a superficial border with symboled tiles in a random order and one tile missing, the objective is to rearrange the puzzle in the least amount of moves to a goal state (typically natural order).
+The border must be taken into consideration upon each move, with only a maximum of four possible legal moves available (up, down, left and right).</p>
+
+<p>Below is an example of the IDDFS algorithm, implemented to help solve the discussed puzzle problem.
+Providing the user with the requirement to specify a ‘get_moves’ function enables the ability to use the same implementation for different puzzle problems.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">id_dfs</span><span class="p">(</span><span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">get_moves</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">itertools</span>
+
+    <span class="k">def</span> <span class="nf">dfs</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">goal</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">route</span>
+        <span class="k">for</span> <span class="n">move</span> <span class="ow">in</span> <span class="n">get_moves</span><span class="p">(</span><span class="n">route</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">move</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">route</span><span class="p">:</span>
+                <span class="n">next_route</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">(</span><span class="n">route</span> <span class="o">+</span> <span class="p">[</span><span class="n">move</span><span class="p">],</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">next_route</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">next_route</span>
+
+    <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="n">itertools</span><span class="p">.</span><span class="n">count</span><span class="p">():</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="n">dfs</span><span class="p">([</span><span class="n">puzzle</span><span class="p">],</span> <span class="n">depth</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">route</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">route</span>
+</code></pre></div></div>
+
+<p>Looking at the sample code above you will notice the use of ‘itertools’ infinite counter (starting from zero).
+The depth will continue to increment until a successful path is generated and returned to the user.</p>
+
+<h3 id="number-matrix">Number Matrix</h3>
+
+<p>The first problem we will solve with the above implementation is the common place numbered (3x3) 8-puzzle.
+Using the method below we are able generate the specified sized puzzle and goal matrices, which is useful to testing.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">num_matrix</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">random</span>
+
+    <span class="n">nums</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span><span class="p">))</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">goal</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">rows</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">),</span> <span class="n">rows</span><span class="p">)</span> <span class="p">]</span>
+
+    <span class="n">get_moves</span> <span class="o">=</span> <span class="n">num_moves</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span>
+    <span class="n">puzzle</span> <span class="o">=</span> <span class="n">goal</span>
+    <span class="k">for</span> <span class="n">steps</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">puzzle</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">get_moves</span><span class="p">(</span><span class="n">puzzle</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span>
+</code></pre></div></div>
+
+<p>So as to make sure that the algorithm checks for only legal moves in our problem domain, the function below has been created that returns a partially-applied ‘get_moves’ method, based on the grid size and discussed restraints.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">num_moves</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_moves</span><span class="p">(</span><span class="n">subject</span><span class="p">):</span>
+        <span class="n">moves</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">zrow</span><span class="p">,</span> <span class="n">zcol</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">swap</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">copy</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">copy</span><span class="p">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">zrow</span><span class="p">][</span><span class="n">zcol</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">col</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">zrow</span><span class="p">][</span><span class="n">zcol</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">s</span>
+
+        <span class="c1"># north
+</span>        <span class="k">if</span> <span class="n">zrow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zrow</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">zcol</span><span class="p">))</span>
+        <span class="c1"># east
+</span>        <span class="k">if</span> <span class="n">zcol</span> <span class="o">&lt;</span> <span class="n">cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zrow</span><span class="p">,</span> <span class="n">zcol</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># south
+</span>        <span class="k">if</span> <span class="n">zrow</span> <span class="o">&lt;</span> <span class="n">rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zrow</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">zcol</span><span class="p">))</span>
+        <span class="c1"># west
+</span>        <span class="k">if</span> <span class="n">zcol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zrow</span><span class="p">,</span> <span class="n">zcol</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">moves</span>
+    <span class="k">return</span> <span class="n">get_moves</span>
+</code></pre></div></div>
+
+<p>We are now able to use all three of these functions to solve and return the optimal path to a contrived puzzle and goal state.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span> <span class="o">=</span> <span class="n">num_matrix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># ([[1, 5, 2], [4, 8, 0], [7, 6, 3]], [[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+</span><span class="n">solution</span> <span class="o">=</span> <span class="n">id_dfs</span><span class="p">(</span><span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">num_moves</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span> <span class="c1"># 8
+</span></code></pre></div></div>
+
+<h3 id="string-matrix">String Matrix</h3>
+
+<p>Now that we are confident that the implementation is working correctly we can now move onto creating a solution to the string matrix problem.
+Similar to the problem above we are still keeping hold of the border property, however, this time we are going to add the requirement to store and compare the subject paths in string format (compared to a multi-dimensional list).
+We first create a function which generate a contrived puzzle and goal state for us to then solve.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">str_matrix</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">random</span><span class="p">,</span> <span class="n">string</span>
+
+    <span class="n">goal</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">ascii_lowercase</span><span class="p">[:</span><span class="n">rows</span> <span class="o">*</span> <span class="n">cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s">'*'</span>
+
+    <span class="n">get_moves</span> <span class="o">=</span> <span class="n">str_moves</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)</span>
+    <span class="n">puzzle</span> <span class="o">=</span> <span class="n">goal</span>
+    <span class="k">for</span> <span class="n">steps</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">puzzle</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">get_moves</span><span class="p">(</span><span class="n">puzzle</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span>
+</code></pre></div></div>
+
+<p>With this function now in place we then provide the ability to return valid present moves, based on a subject position.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">str_moves</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_moves</span><span class="p">(</span><span class="n">subject</span><span class="p">):</span>
+        <span class="n">moves</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">zero</span> <span class="o">=</span> <span class="n">subject</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="s">'*'</span><span class="p">)</span>
+        <span class="n">zrow</span> <span class="o">=</span> <span class="n">zero</span> <span class="o">//</span> <span class="n">cols</span>
+        <span class="n">zcol</span> <span class="o">=</span> <span class="n">zero</span> <span class="o">%</span> <span class="n">cols</span>
+
+        <span class="k">def</span> <span class="nf">swap</span><span class="p">(</span><span class="n">idx</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">subject</span><span class="p">)</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">zero</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">zero</span><span class="p">]</span>
+            <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># north
+</span>        <span class="k">if</span> <span class="n">zrow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zero</span> <span class="o">-</span> <span class="n">cols</span><span class="p">))</span>
+        <span class="c1"># east
+</span>        <span class="k">if</span> <span class="n">zcol</span> <span class="o">&lt;</span> <span class="n">cols</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zero</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># south
+</span>        <span class="k">if</span> <span class="n">zrow</span> <span class="o">&lt;</span> <span class="n">rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zero</span> <span class="o">+</span> <span class="n">cols</span><span class="p">))</span>
+        <span class="c1"># west
+</span>        <span class="k">if</span> <span class="n">zcol</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">moves</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">swap</span><span class="p">(</span><span class="n">zero</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">moves</span>
+    <span class="k">return</span> <span class="n">get_moves</span>
+</code></pre></div></div>
+
+<p>Finally, we can produce a similar example to the number matrix example to see the solution in action.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span> <span class="o">=</span> <span class="n">str_matrix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># (aebhg*dfc, abcdefgh*)
+</span><span class="n">solution</span> <span class="o">=</span> <span class="n">id_dfs</span><span class="p">(</span><span class="n">puzzle</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">str_moves</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span> <span class="c1"># 12
+</span></code></pre></div></div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://en.wikipedia.org/wiki/15_puzzle">15 puzzle</a></li>
+  <li><a href="http://stackoverflow.com/questions/7395992/iterative-deepening-vs-depth-first-search">Iterative deepening vs depth first search</a></li>
+  <li><a href="http://www.stanford.edu/~msirota/soco/inter.html">Iterative deepening</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

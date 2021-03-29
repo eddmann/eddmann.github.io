@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring how to transform common-place imperative code, with these higher-order functions.">
+
+    <title>Mapping, Filtering and Reducing in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Mapping, Filtering and Reducing in PHP</h1>
+    <time datetime="2016-03-02T00:00:00-06:00" class="post-date">02 Mar 2016</time>
+    <p>Over the past couple of years I have transitioned from boilerplate-heavy, imperative code, to begin using the more intuitive <code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">filter</code> and <code class="highlighter-rouge">reduce</code> higher-order functions.
+In this article I hope to highlight the transformation that occurs, along with simplification, when moving away from the imperative and onto the declarative.
+We shall be performing a simple process which transforms a collection of user entries into a filtered collection of their names.
+Although trivial in nature, it is a great place to highlight the power of the paradigm shift.
+</p>
+
+<p>Below you will find the initial collection of user entires we wish to process.
+The objective is to create a function which returns only the users names, excluding however, the one associated to a supplied id.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$users</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span> <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Joe'</span> <span class="p">],</span>
+    <span class="p">[</span> <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Bob'</span> <span class="p">],</span>
+    <span class="p">[</span> <span class="s1">'id'</span> <span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">'name'</span> <span class="o">=&gt;</span> <span class="s1">'Sally'</span> <span class="p">],</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<h3 id="imperative-approach">Imperative Approach</h3>
+
+<p>Looking at this problem with an imperative mindset leads us to iterating through the collection, adding names to a temporary collection which match the desired predicate.
+This boilerplate code is sprinkled throughout many code-bases, and although correct, I feel can be improved upon in its intent and expression.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getNames</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$users</span><span class="p">,</span> <span class="nv">$excludeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$names</span> <span class="o">=</span> <span class="p">[];</span>
+
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$users</span> <span class="k">as</span> <span class="nv">$u</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$u</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">!=</span> <span class="nv">$excludeId</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$names</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">];</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$names</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="mapping-and-filtering">Mapping and Filtering</h3>
+
+<p>The first higher-order functions we shall be using to tackle this problem are the <code class="highlighter-rouge">map</code> and <code class="highlighter-rouge">filter</code>.
+As their names suggests, mapping over a collection applies the given function to each of its’ elements, were as filtering returns the matching elements based on a supplied predicate function.
+Using these two functions we are able to break apart the problem very clearly into its two individual pieces.
+Unfortunately however, within PHP we do have to provide quiet verbose declarations, but the intent I feel is still more clearly highlighted.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getNames</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$users</span><span class="p">,</span> <span class="nv">$excludeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$filtered</span> <span class="o">=</span> <span class="nb">array_filter</span><span class="p">(</span><span class="nv">$users</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$u</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$excludeId</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$u</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">!=</span> <span class="nv">$excludeId</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$u</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">];</span> <span class="p">},</span> <span class="nv">$filtered</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="reducing">Reducing</h3>
+
+<p>The solution above is a significant improvement in my opinion, but can be made even better with the introduction of <code class="highlighter-rouge">reduce</code>.
+Simply put <code class="highlighter-rouge">reduce</code> can be considered the backbone of both <code class="highlighter-rouge">map</code> and <code class="highlighter-rouge">filter</code>, as both functions can be created from it.
+In this instance the supplied function is applied to each of the elements in the collection.
+This may sound similar to a <code class="highlighter-rouge">map</code>, however the addition of an accumulator value (initial value supplied) which is supplied and returned upon each element application, allows you to craft the result you desire.
+Using this higher-order function provides you with far more flexibility in the resulting transformation.
+Were as mapping focuses on transforming individual elements, and filtering removes elements from the collection, reducing can do both and so much more.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getNames</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$users</span><span class="p">,</span> <span class="nv">$excludeId</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">array_reduce</span><span class="p">(</span><span class="nv">$users</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$acc</span><span class="p">,</span> <span class="nv">$u</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$excludeId</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$u</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">==</span> <span class="nv">$excludeId</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$acc</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nb">array_merge</span><span class="p">(</span><span class="nv">$acc</span><span class="p">,</span> <span class="p">[</span> <span class="nv">$u</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="p">]);</span>
+    <span class="p">},</span> <span class="p">[]);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Again sadly PHP’s syntax leaves a lot to be desired in regard to declaration of lambda functions and immutable arrays.
+However, again the intent of the code to me has been significantly improved from the original imperative solution.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

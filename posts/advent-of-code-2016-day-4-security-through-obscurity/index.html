@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 4 puzzle using Python">
+
+    <title>Advent of Code 2016 - Day 4 - Security Through Obscurity &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 4 - Security Through Obscurity</h1>
+    <time datetime="2021-03-26T00:00:00-05:00" class="post-date">26 Mar 2021</time>
+    <p>On the fourth day of Advent of Code 2016 we are asked to validate and decrypt a listing of room names.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>The input consists of a listing of encrypted room names, each with a sector id and accompanying checksum.
+For part one we are required to filter down to only the valid rooms (based on their checkum) and return the sum of these sector ids.
+A room is <em>real</em> (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetization.</p>
+
+<p>We will begin by parsing each room entry into a tuple, consisting of the room name (without any <code class="highlighter-rouge">-</code>), sector id (as an integer) and checksum.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">name</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'-'</span><span class="p">,</span> <span class="s">''</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="n">checksum</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span> <span class="ow">in</span> <span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s">'([a-z\-]+)(\d+)\[([a-z]+)\]'</span><span class="p">,</span> <span class="nb">input</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>With the rooms now parsed, we can continue on to validating if a subject room is real or a decoy.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">is_real_room</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">checksum</span><span class="p">):</span>
+    <span class="n">generated</span> <span class="o">=</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">Counter</span><span class="p">(</span><span class="n">name</span><span class="p">).</span><span class="n">most_common</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+    <span class="k">return</span> <span class="n">generated</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">checksum</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The function above uses the <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter collection</a> provided within Python to tally up the letter occurrences present in the room name.
+From here we then sort the listing, initially based on occurrence <code class="highlighter-rouge">-o[1]</code>, and then ties based on alphabetization <code class="highlighter-rouge">o[0]</code>.
+As we have generated the checksum for the entire room name we only wish to assert that this value starts with the provided checksum.</p>
+
+<p>Finally, we can combine these two functions together to <em>filter-map</em> the listing down to the valid room sector ids.
+The sum of these sector ids can then be returned to result in the desired answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">id</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">is_real_room</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">checksum</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are required to now deduce the sector id for the decoded room name which contains <em>northpole</em>.
+The encrypted room names have been constructed using a <a href="https://en.wikipedia.org/wiki/Caesar_cipher">Caesar cipher</a> - based on cycling each letter forward through the alphabet a number of times equal to the room’s sector id.
+This can be achieved using Python’s string character translation support like so.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="n">az</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">ascii_lowercase</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="nb">id</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">str</span><span class="p">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">az</span><span class="p">,</span> <span class="n">az</span><span class="p">[</span><span class="n">shift</span><span class="p">:]</span> <span class="o">+</span> <span class="n">az</span><span class="p">[:</span><span class="n">shift</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<p>Alternatively, we could also achieve the same result by calculating the resulting ASCII character number per letter, like so.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(((</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="nb">ord</span><span class="p">(</span><span class="s">'a'</span><span class="p">))</span> <span class="o">+</span> <span class="nb">id</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="s">'a'</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Using this new function we can now iterate through the rooms, decoding each name as we go, until we finally land on the one that includes <em>northpole</em>.
+From here, we can return this rooms sector id and answer the second part of today’s problem 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">id</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s">'northpole'</span> <span class="ow">in</span> <span class="n">decode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">))</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

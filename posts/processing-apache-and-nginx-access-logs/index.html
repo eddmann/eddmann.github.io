@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gathering useful information from the data stored in Apache and Nginx access logs.">
+
+    <title>Processing Apache and Nginx Access Logs &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Processing Apache and Nginx Access Logs</h1>
+    <time datetime="2013-12-21T00:00:00-06:00" class="post-date">21 Dec 2013</time>
+    <p>Tools such as <a href="http://awstats.sourceforge.net/">AWStats</a> and <a href="http://code.google.com/p/logstalgia/">Logstalgia</a> are great, but sometimes they can be over-kill for the problem we are trying to solve.
+It turns out that with a couple of simple Unix commands we can gather a lot of useful information from the data stored in our the access logs.
+Both Apache and Nginx by default use the <a href="http://httpd.apache.org/docs/1.3/logs.html#combined">combined</a> log format which I will be basing this posts examples on.
+Below are two different methods of accessing either an uncompressed single file or multiple compressed files (following the supplied wild-card pattern).
+</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log <span class="c"># uncompressed file</span>
+<span class="nv">$ </span>zcat access.log-<span class="k">*</span>.gz <span class="c"># compressed files i.e. access.log-20131221.gz</span>
+</code></pre></div></div>
+
+<h2 id="log-data-to-information">Log Data to Information</h2>
+
+<p>404 Request Responses</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'($9 ~ /404/)'</span> | <span class="nb">awk</span> <span class="s1">'{ print $7 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
+</code></pre></div></div>
+
+<p>Using ‘awk’ we are able to filter the access log entires down to only the ones that include the 404 status code.
+In this case we are then displaying the most requested pages of this type, in descending order.</p>
+
+<p>Request User Agents</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="nt">-F</span><span class="se">\"</span> <span class="s1">'{ print $6 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-frn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
+</code></pre></div></div>
+
+<p>The command above displays the top 25 user agents (browser, operating system) that have requested a resource from the web server.
+The ‘awk’ command in this instance uses a defined field separator of “ to successfully parse the user agent string.</p>
+
+<p>Request IP Addresses</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
+<span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25 | <span class="se">\</span>
+    <span class="nb">awk</span> <span class="s1">'{ printf("%5d\t%-15s\t", $1, $2); system("geoiplookup " $2 " | cut -d \\: -f2 ") }'</span>
+</code></pre></div></div>
+
+<p>Above are two examples of displaying the top 25 IP addresses based on total requests.
+The second command uses the GeoIP package to include the country the IP address originates from.
+This package can be installed on a CentOS setup using the <a href="https://fedoraproject.org/wiki/EPEL">EPEL</a> repository.</p>
+
+<p>Count Unique Visits</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">wc</span> <span class="nt">-l</span>
+<span class="c"># or today</span>
+<span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">grep</span> <span class="sb">`</span><span class="nb">date</span> <span class="s1">'+%e/%b/%G'</span><span class="sb">`</span> | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">wc</span> <span class="nt">-l</span>
+<span class="c"># or this month</span>
+<span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">grep</span> <span class="sb">`</span><span class="nb">date</span> <span class="s1">'+%b/%G'</span><span class="sb">`</span> | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">wc</span> <span class="nt">-l</span>
+</code></pre></div></div>
+
+<p>The commands above will provide you with a total count of unique visits based on IP address.
+You are also able to run the log file through the ‘grep’ command before processing, to only include entries that have occurred today or this month.</p>
+
+<p>Ranked by Response Codes</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $9 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span>
+</code></pre></div></div>
+
+<p>This simple command is very useful to quickly observe the total counts based on returned response code.</p>
+
+<p>Most Popular URLS</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $7 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
+</code></pre></div></div>
+
+<p>A trivial replacement for some Google Analytics statistics, reporting how many hits the top 25 resources have tallied.</p>
+
+<p>Real-time IP-Page Requests</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tailf access.log | <span class="nb">awk</span> <span class="s1">'{ printf("%-15s\t%s\t%s\t%s\n", $1, $6, $9, $7) }'</span>
+<span class="nv">$ </span>tailf access.log | <span class="nb">awk</span> <span class="s1">'{
+    "geoiplookup " $1 " | cut -d \\: -f2 " | getline geo
+    printf("%-15s\t%s\t%s\t%-20s\t%s\n", $1, $6, $9, geo, $7);
+  }'</span>
+</code></pre></div></div>
+
+<p>The final two commands are most likely my favorite as they provide me with real-time access information.
+These commands report on each IP address, request and response that have recently occurred on the server.
+Using <a href="http://linuxcommand.org/man_pages/tailf1.html">tailf</a> instead of a typical ‘tail -f’ has the benefit of not accessing the file when it is not growing.</p>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="http://www.the-art-of-web.com/system/logs/">System: Analyzing Apache Log Files</a></li>
+  <li><a href="https://rtcamp.com/tutorials/nginx/log-parsing/">Parsing access.log and error.logs using linux commands</a></li>
+  <li><a href="http://stackoverflow.com/questions/16128472/how-to-gather-ip-and-user-agent-info-from-web-log-with-awk">How to gather IP and User Agent info from web log with AWK?</a></li>
+</ul>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

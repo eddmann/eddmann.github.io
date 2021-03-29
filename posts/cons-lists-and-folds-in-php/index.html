@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Looking into implementing Cons cell Lists and Fold operations in PHP">
+
+    <title>Cons Lists and Folds in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Cons Lists and Folds in PHP</h1>
+    <time datetime="2015-01-02T00:00:00-06:00" class="post-date">02 Jan 2015</time>
+    <p>Cons cells are used to (cons)truct a data object which represents an ordered pair.
+The elements in this pair can be identified as ‘car’ and ‘cdr’ accordingly.
+Using this simple representation we are able to not only hold ordered pairs, but also create more complex data-structures, such as a List.
+
+Below is an example interface that we will be using to implement the two different kinds of Cons cell required to create this List data-structure.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">interface</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">head</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">tail</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldr</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldl</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see we have also included a couple of other useful methods that will be used to traverse the list.
+Providing a defined closure which will be invoked on each element returning either a predicate or new value.</p>
+
+<h2 id="nil">Nil</h2>
+
+<p>The first such type of cell that is used to represent this structure is the empty list.
+Commonly called Nil, it is treated as a <a href="http://en.wikipedia.org/wiki/Sentinel_node">sentinel</a> node, distinguishing the end of the list and used as a recursive base-case.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">head</span><span class="p">()</span> <span class="p">{</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">RuntimeException</span><span class="p">(</span><span class="s1">'No head present'</span><span class="p">);</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">tail</span><span class="p">()</span> <span class="p">{</span> <span class="k">throw</span> <span class="k">new</span> <span class="nc">RuntimeException</span><span class="p">(</span><span class="s1">'No tail present'</span><span class="p">);</span> <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldr</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$acc</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldl</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$acc</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="cons">Cons</h2>
+
+<p>The other type of cell that is required stores the first element in its left-hand value (‘car’) and the next Cons cell in its right (‘cdr’).
+In this implementation we use alternative, more meaningful names for the ‘car’ and ‘cdr’ values.
+Following the head and tail naming convention instead.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Cons</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$head</span><span class="p">,</span> <span class="nv">$tail</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="kt">ConsCell</span> <span class="nv">$tail</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="nv">$head</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nv">$tail</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">head</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">tail</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldr</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$fn</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">head</span><span class="p">(),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">foldr</span><span class="p">(</span><span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">foldl</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">foldl</span><span class="p">(</span><span class="nv">$fn</span><span class="p">,</span> <span class="nv">$fn</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">head</span><span class="p">(),</span> <span class="nv">$acc</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">foldr</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$fn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">Cons</span><span class="p">(</span><span class="nv">$fn</span><span class="p">(</span><span class="nv">$head</span><span class="p">),</span> <span class="nv">$acc</span><span class="p">);</span>
+        <span class="p">},</span> <span class="k">new</span> <span class="nc">Nil</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">Closure</span> <span class="nv">$fn</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">foldr</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$fn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$fn</span><span class="p">(</span><span class="nv">$head</span><span class="p">)</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">Cons</span><span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="o">:</span> <span class="nv">$acc</span><span class="p">;</span>
+        <span class="p">},</span> <span class="k">new</span> <span class="nc">Nil</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">from</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$xs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nv">$x</span> <span class="o">=</span> <span class="nb">array_shift</span><span class="p">(</span><span class="nv">$xs</span><span class="p">))</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">Cons</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nc">Cons</span><span class="o">::</span><span class="nf">from</span><span class="p">(</span><span class="nv">$xs</span><span class="p">))</span> <span class="o">:</span> <span class="k">new</span> <span class="nc">Nil</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see, the Cons implementation does the majority of the work in-regards to the methods we use to traverse the list.
+After supplying how each of the different folds are to be implemented, we are able to use these to create the map and filter methods.
+A fold is used to analyse a recursive data-structure and create a returning value from this completed process.
+The ‘foldr’ method is used to do the more common action of iterating over each element in the list (in order) from left to right.
+The ‘foldl’ method on the other hand can be considered the opposite, going right to left instead.
+These methods can be typically achieved using ‘array_reduce’ in PHP, with ‘array_reverse’ invoked first in the case of ‘foldl’.</p>
+
+<h2 id="other-use-cases">Other Use-cases</h2>
+
+<p>We are able to use the ‘foldl’ method to easily add a ‘reverse’ method to our List implementation, as shown below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="c1">// ..</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">reverse</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">Cons</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="c1">// ..</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">reverse</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">foldl</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nc">Cons</span><span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">);</span>
+        <span class="p">},</span> <span class="k">new</span> <span class="nc">Nil</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can also implement a ‘toArray’ method which converts the List representation into an PHP array - which makes it easier to reason about the resulting output.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="c1">// ..</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">toArray</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[];</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">Cons</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
+<span class="p">{</span>
+    <span class="c1">// ..</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">toArray</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">array_merge</span><span class="p">([</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">head</span><span class="p">()],</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">toArray</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="examples">Examples</h2>
+
+<p>Lets first try out a combination of a couple of the List methods, invoked via chaining.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
+<span class="nv">$starify</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"*</span><span class="nv">$x</span><span class="s2">*"</span><span class="p">;</span> <span class="p">};</span>
+
+<span class="nc">Cons</span><span class="o">::</span><span class="nf">from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$isEven</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">map</span><span class="p">(</span><span class="nv">$starify</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">reverse</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="nf">toArray</span><span class="p">();</span> <span class="c1">// ['*10*','*8*','*6*','*4*','*2*']</span>
+</code></pre></div></div>
+
+<p>In the example above we are creating a Cons list which represents the numbers from 1 to 10.
+We then subsequently filter out any elements that are not even, apply some pretty printing to each of the resulting elements and then reverse this output.
+Finally, we convert the Cons representation into an array to be easily output.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isFibonacci</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$isWholeNumber</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="nv">$y</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="nv">$y</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.0001</span><span class="p">;</span> <span class="p">};</span>
+
+    <span class="k">return</span>
+        <span class="nv">$isWholeNumber</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">))</span> <span class="o">||</span>
+        <span class="nv">$isWholeNumber</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">));</span>
+<span class="p">};</span>
+<span class="nv">$count</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$acc</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="nv">$acc</span><span class="p">;</span> <span class="p">};</span>
+
+<span class="nc">Cons</span><span class="o">::</span><span class="nf">from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$isFibonacci</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">foldr</span><span class="p">(</span><span class="nv">$count</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// 10</span>
+</code></pre></div></div>
+
+<p>The example above tallies up the total number of Fibonacci numbers there are between 1 and 100.
+Using the ‘filter’ method with a supplied predicate function and the ‘foldr’ reduce method, we are correctly returned the total of 10.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

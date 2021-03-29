@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 2 puzzle using Python">
+
+    <title>Advent of Code 2016 - Day 2 - Bathroom Security &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 2 - Bathroom Security</h1>
+    <time datetime="2021-03-24T00:00:00-05:00" class="post-date">24 Mar 2021</time>
+    <p>On the second day of Advent of Code 2016 we are asked to work out what a bathroom code is based on the supplied instructions.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>For part one we are required to follow our input (instructions <em>UDLR</em> per keycode) based on a <em>3x3 1-9</em> keypad.
+We begin by generating a dictionary lookup of the supplied keypad based on <em>x, y</em> cordinates to their related key.
+In a similiar mannor to how we used Complex numbers to represent x, y coordinates in the previous solution, we will be doing the same here.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">generate_keypad</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="nb">complex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="n">key</span>
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s">'.'</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>So as to correctly handle any intentional whitespace going forward we will represent this intent using a <code class="highlighter-rouge">.</code>.
+From here, we can then create a function which will take in the keypad, along with the initial key position and instructions and return the resulting keycode.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'U'</span><span class="p">:</span> <span class="mi">0</span><span class="o">+-</span><span class="mf">1j</span><span class="p">,</span> <span class="s">'D'</span><span class="p">:</span> <span class="mi">0</span><span class="o">+</span><span class="mf">1j</span><span class="p">,</span> <span class="s">'L'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mf">0j</span><span class="p">,</span> <span class="s">'R'</span><span class="p">:</span> <span class="mi">1</span><span class="o">+</span><span class="mf">0j</span><span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">calc_keycode</span><span class="p">(</span><span class="n">keypad</span><span class="p">,</span> <span class="n">initial_key</span><span class="p">,</span> <span class="n">instructions</span><span class="p">):</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keypad</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">initial_key</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="s">''</span>
+
+    <span class="k">for</span> <span class="n">instruction</span> <span class="ow">in</span> <span class="n">instructions</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">direction</span> <span class="ow">in</span> <span class="n">instruction</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">next_pos</span> <span class="p">:</span><span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">DIRECTIONS</span><span class="p">[</span><span class="n">direction</span><span class="p">])</span> <span class="ow">in</span> <span class="n">keypad</span><span class="p">):</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="n">next_pos</span>
+        <span class="n">code</span> <span class="o">+=</span> <span class="n">keypad</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">code</span>
+</code></pre></div></div>
+
+<p>Using an <a href="https://www.python.org/dev/peps/pep-0572/">assignment expression</a> we are able to succinctly express that we only wish to apply positional moves that are within the supplied keypad bounds.
+Once we have exhausted the given code instructions directions we append this to the resulting code.
+Finally, we return the complete code to the callee.</p>
+
+<p>With these building block in-place we can compose them together to produce the desired answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">keypad</span> <span class="o">=</span> <span class="n">generate_keypad</span><span class="p">(</span><span class="s">"""1 2 3
+                                4 5 6
+                                7 8 9"""</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">calc_keycode</span><span class="p">(</span><span class="n">keypad</span><span class="p">,</span> <span class="n">initial_key</span><span class="o">=</span><span class="s">"5"</span><span class="p">,</span> <span class="n">instructions</span><span class="o">=</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two we are required to instead discern what the keycode will be based on a revised keypad.
+Fortunatly, based on the building blocks we already have in-place we can simply update the <code class="highlighter-rouge">generate_keypad</code> argument.
+In doing so we produce the answer we desire to complete part two 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">keypad</span> <span class="o">=</span> <span class="n">generate_keypad</span><span class="p">(</span><span class="s">""". . 1 . .
+                                . 2 3 4 .
+                                5 6 7 8 9
+                                . A B C .
+                                . . D . ."""</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">calc_keycode</span><span class="p">(</span><span class="n">keypad</span><span class="p">,</span> <span class="n">initial_key</span><span class="o">=</span><span class="s">"5"</span><span class="p">,</span> <span class="n">instructions</span><span class="o">=</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h3 id="alternative-solution">Alternative Solution</h3>
+
+<p>Instead of representing the coordinate as a Complex number, I additionally explored creating a more aptly modelled value object which managed this state in an immutable manor.
+Using <a href="https://docs.python.org/3/library/dataclasses.html">Data Classes</a> and the <code class="highlighter-rouge">__add__</code> dunder method I was able to design the following:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Point2D</span><span class="p">:</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Point2D</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">NotImplemented</span>
+        <span class="k">return</span> <span class="n">Point2D</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">other</span><span class="p">.</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The only other aspects of the original solution that required modification were in the instantiation of these objects.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'U'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s">'D'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+              <span class="s">'L'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s">'R'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
+
+
+<span class="k">def</span> <span class="nf">generate_keypad</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">Point2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="n">key</span>
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s">'.'</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>Providing such a model is preferred over <em>piggy-backing</em> on Complex numbers, as this clearly expresses its purpose and intent.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

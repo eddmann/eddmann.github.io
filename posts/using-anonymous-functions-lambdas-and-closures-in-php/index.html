@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explanation and example-usage of the two concepts in PHP.">
+
+    <title>Using Anonymous Functions (Lambdas) and Closures in PHP &middot; Edd Mann</title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using Anonymous Functions (Lambdas) and Closures in PHP</h1>
+    <time datetime="2014-03-17T00:00:00-05:00" class="post-date">17 Mar 2014</time>
+    <p>Having spent some significant time with more functional-oriented languages such as Scala, I have been keen to explore and take advantage of some of these concepts in my current day-to-day language (PHP).
+Delving into the subject however seems to highlight some confusion between the to two discussed concepts.
+An anonymous function (aka. lambda) originating from the <a href="http://en.wikipedia.org/wiki/Lambda_calculus">Lambda calculus</a>, is a function that has no assigned name and can be considered a value in itself.
+Functions of this category are first-class value types, on par with integers, booleans etc, allowing you to pass them as arguments or returned by functions (aka. higher-order functions).
+A closure on the other hand is a function that captures the state of the surrounding context/environment upon definition, retaining these references even if the variable falls out of lexical scope.
+Both do not depend on the other on an implementation level, however, you typically see the two used in conjunction.
+
+Below is an example of a trivial addition lambda and use-case.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$add</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nb">get_class</span><span class="p">(</span><span class="nv">$add</span><span class="p">);</span> <span class="c1">// Closure</span>
+
+<span class="nv">$add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// 3</span>
+</code></pre></div></div>
+
+<p>Upon inspection of the resulting instances class type it may look incorrect.
+However, in PHP it can be a little confusing to disambiguate between the differences of lambdas and closures, as both create an object of the type ‘Closure’.
+Initially this was an implementation detail that could change in future releases, however, as time has past this fact can now be relied upon.
+Below is an example of using a Closure to implement increment functionality.
+Take notice of the inclusion of the ‘use’ keyword which allows us to disambiguate between the two concepts in code.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">inc</span><span class="p">(</span><span class="nv">$step</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$inc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$inc</span><span class="p">,</span> <span class="nv">$step</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$inc</span> <span class="o">+=</span> <span class="nv">$step</span><span class="p">;</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="nv">$inc</span> <span class="o">=</span> <span class="nf">inc</span><span class="p">();</span>
+
+<span class="nb">get_class</span><span class="p">(</span><span class="nv">$inc</span><span class="p">);</span> <span class="c1">// Closure</span>
+
+<span class="nv">$inc</span><span class="p">();</span> <span class="c1">// 1</span>
+</code></pre></div></div>
+
+<p>In the above case we create a ‘regular’ function which is supplied with the desired incremental step.
+When called, a new closure is returned which keeps a referential hold on the ‘$inc’ value and specified step.
+‘$inc’ and ‘$step’ are local function variables that are bound/closed over the returned closure function to retain the reference.</p>
+
+<h2 id="validation-library-example">Validation Library Example</h2>
+
+<p>These trivial examples are all well and good for an article example, but what may help is a concrete use-case where the power of the two concepts can be truly understood.
+Combined, the two provide you with the ability to allow clients to easily extend a defined implementation, supplying their own behavior, without the overhead of exploiting OO inheritance.</p>
+
+<p>So as to provide a real-life use case I have abstracted out the dynamic method implementation into a trait that can then be reused.
+Simplify explained the following example allows a user to register a lambda/closure with the specified instance, which is invoked if no concrete method of the same name exists within the class.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">DynamicMethod</span> <span class="p">{</span>
+
+    <span class="k">private</span> <span class="nv">$methods</span> <span class="o">=</span> <span class="p">[];</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">register</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="kt">Closure</span> <span class="nv">$closure</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">methods</span><span class="p">[</span><span class="nv">$name</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$closure</span><span class="o">-&gt;</span><span class="nf">bindTo</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="nb">get_class</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__call</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="kt">array</span> <span class="nv">$args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">methods</span><span class="p">[</span><span class="nv">$name</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">methods</span><span class="p">[</span><span class="nv">$name</span><span class="p">],</span> <span class="nv">$args</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">throw</span> <span class="k">new</span> <span class="nc">BadFunctionCallException</span><span class="p">(</span><span class="s2">"'</span><span class="nv">$name</span><span class="s2">' does not exist."</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The use of object binding (‘bindTo’) allows us (similar to JavaScript) to give the function a context, making sure ‘$this’ and ‘static’ access the correct environment.
+Below is the example validation library that uses the trait above, allowing the client to expand the rules available on an instance basis (works well with a singleton IoC).
+Note the used validation ‘isRuleName’ pattern, and ability to validate the negation of a specified rule.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Validate</span> <span class="p">{</span>
+    <span class="kn">use</span> <span class="nc">DynamicMethod</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$rules</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">check</span><span class="p">(</span><span class="nv">$subject</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span> <span class="o">=</span> <span class="nv">$subject</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">rules</span> <span class="o">=</span> <span class="p">[];</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">is</span><span class="p">(</span><span class="cm">/* $rules... */</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">rules</span> <span class="o">=</span> <span class="nb">array_merge</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">rules</span><span class="p">,</span> <span class="nb">func_get_args</span><span class="p">());</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">valid</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">rules</span> <span class="k">as</span> <span class="nv">$rule</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">list</span><span class="p">(</span><span class="nv">$bool</span><span class="p">,</span> <span class="nv">$name</span><span class="p">)</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="nf">process</span><span class="p">(</span><span class="nv">$rule</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$bool</span> <span class="o">!=</span> <span class="nb">call_user_func_array</span><span class="p">([</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$name</span> <span class="p">],</span> <span class="p">[]))</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">function</span> <span class="n">process</span><span class="p">(</span><span class="nv">$rule</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$rule</span><span class="p">,</span> <span class="s1">'!'</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$rule</span> <span class="o">=</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$rule</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="nv">$bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$rule</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="nb">ucwords</span><span class="p">(</span><span class="nb">str_replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">,</span> <span class="nv">$rule</span><span class="p">)));</span>
+
+        <span class="k">return</span> <span class="p">[</span> <span class="nv">$bool</span><span class="p">,</span> <span class="s1">'is'</span> <span class="mf">.</span> <span class="nv">$rule</span> <span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isPresent</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="o">!!</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isAlpha</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">preg_match</span><span class="p">(</span><span class="s1">'/^[A-z]+$/'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">isNumber</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">preg_match</span><span class="p">(</span><span class="s1">'/^[0-9]+$/'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+
+<span class="nv">$v</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Validate</span><span class="p">;</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="nf">check</span><span class="p">(</span><span class="s1">'1234'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">is</span><span class="p">(</span><span class="s1">'present'</span><span class="p">,</span> <span class="s1">'number'</span><span class="p">,</span> <span class="s1">'!alpha'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">valid</span><span class="p">();</span> <span class="c1">// bool(true)</span>
+</code></pre></div></div>
+
+<p>The library above provides a very minimalist set of validation rules that any real-world use-case would soon demand more from.
+Typically, the OO hat would come on, and you would continue to extend the class definition with your own custom validaters.
+However, with the inclusion of the ‘DynamicMethod’ trait we are able to simply extend the functionality through use of functions.
+Below shows an example of creating email validation functionality by way of registering a lambda with the instance.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$v</span><span class="o">-&gt;</span><span class="nf">register</span><span class="p">(</span><span class="s1">'isEmail'</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">filter_var</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span><span class="p">,</span> <span class="no">FILTER_VALIDATE_EMAIL</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="nf">check</span><span class="p">(</span><span class="s1">'joe@bloggs.com'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">is</span><span class="p">(</span><span class="s1">'present'</span><span class="p">,</span> <span class="s1">'email'</span><span class="p">,</span> <span class="s1">'!number'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">valid</span><span class="p">();</span> <span class="c1">// bool(true)</span>
+</code></pre></div></div>
+
+<p>As you can see, we are able to access the instance variables/environment in a similar manner to methods that are defined in the class itself.
+We are also able to run the validation check in a similar manner too.
+We are then able to expand on this example by using a closure which uses the current states ‘$domains’ array to not only run the previous check but also make sure that the domain is present in a specified white-list.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$domains</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">'bloggs.com'</span><span class="p">,</span> <span class="s1">'bloggs.co.uk'</span> <span class="p">];</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="nf">register</span><span class="p">(</span><span class="s1">'isPermittedEmail'</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$domains</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isEmail</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">list</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$domain</span><span class="p">)</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'@'</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">subject</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nb">in_array</span><span class="p">(</span><span class="nv">$domain</span><span class="p">,</span> <span class="nv">$domains</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="nf">check</span><span class="p">(</span><span class="s1">'joe@bloggs.co.uk'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">is</span><span class="p">(</span><span class="s1">'present'</span><span class="p">,</span> <span class="s1">'permitted_email'</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="nf">valid</span><span class="p">();</span> <span class="c1">// bool(true)</span>
+</code></pre></div></div>
+
+<p>Looking at the example library above I hope that you are able to notice some of the strengths that come from taking advantage of these concepts.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

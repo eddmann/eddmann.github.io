@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 24 - It Hangs in the Balance'
 meta: 'Solving the Advent of Code 2015 Day 24 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the twenty fourth day of Advent of Code 2015 we are asked to help Santa balance his sleigh based on all the presents he has to carry.

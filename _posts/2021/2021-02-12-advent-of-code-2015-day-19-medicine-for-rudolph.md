@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 19 - Medicine for Rudolph'
 meta: 'Solving the Advent of Code 2015 Day 19 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the nineteenth day of Advent of Code 2015 Rudolph is sick and we have been tasked to help develop the _custom-made_ medicine required.

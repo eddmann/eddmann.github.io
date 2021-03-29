@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 2 - I Was Told There Would Be No Math'
 meta: 'Solving the Advent of Code 2015 Day 2 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 The second day of Advent of Code 2015 brings us a small Math problem by-way of Elves _running-low_ on wrapping paper.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 13 - Knights of the Dinner Table'
 meta: 'Solving the Advent of Code 2015 Day 13 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the thirteenth day of Advent of Code 2015 we are tasked with finding the optimal seating arrangement for our family _holiday feast_.

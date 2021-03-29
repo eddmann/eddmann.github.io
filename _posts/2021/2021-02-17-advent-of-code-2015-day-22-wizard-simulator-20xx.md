@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 22 - Wizard Simulator 20XX'
 meta: 'Solving the Advent of Code 2015 Day 22 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the twenty second day of Advent of Code 2015 we are asked to help 'Little Henry Case' beat the boss in another video game he is stuck on.

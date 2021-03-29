@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 17 - No Such Thing as Too Much'
 meta: 'Solving the Advent of Code 2015 Day 17 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the seventeenth day of Advent of Code 2015 the elves bought 150 litres of eggnog that we are asked to fit in the supplied containers for refrigeration.

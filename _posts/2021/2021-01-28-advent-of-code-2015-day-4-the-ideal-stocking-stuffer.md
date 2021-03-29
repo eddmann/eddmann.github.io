@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 4 - The Ideal Stocking Stuffer'
 meta: 'Solving the Advent of Code 2015 Day 4 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the fourth day of Advent of Code 2015 Santa needs help mining some AdventCoins 💵.

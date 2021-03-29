@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 23 - Opening the Turing Lock'
 meta: 'Solving the Advent of Code 2015 Day 23 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the twenty third day of Advent of Code 2015 we are asked to help 'Little Jane Marie' run a program on a computer she got for Christmas.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 9 - All in a Single Night'
 meta: 'Solving the Advent of Code 2015 Day 9 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the ninth day of Advent of Code 2015 Santa wants us to examine some new locations (and distances) he is required to visit.

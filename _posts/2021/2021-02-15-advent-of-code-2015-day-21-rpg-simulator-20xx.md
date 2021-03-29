@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 21 - RPG Simulator 20XX'
 meta: 'Solving the Advent of Code 2015 Day 21 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the twenty first day of Advent of Code 2015 we are asked to help 'Little Henry Case' beat the boss in a new video game he got for Christmas.

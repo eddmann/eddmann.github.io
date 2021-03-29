@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 14 - Reindeer Olympics'
 meta: 'Solving the Advent of Code 2015 Day 14 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the fourteen day of Advent of Code 2015 Santa wants to find out who is the fastest reindeer.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 8 - Matchsticks'
 meta: 'Solving the Advent of Code 2015 Day 8 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the eighth day of Advent of Code 2015 Santa wants to know how much space his newly digitised list will take up when stored.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Implementing a Compound Set in TypeScript'
 meta: 'Exploring how we can use a Map to implement a Set data-structure which handles Compound data-types in TypeScript'
+tags: typescript
 ---
 
 Since being introduced to Advent of Code, one feature missing from JavaScript that I have seen available in other languages (such as Python and Clojure) are Sets which hande [Compound data-types](https://www.oreilly.com/library/view/javascript-design/0735711674/0735711674_ch03lev1sec3.html).

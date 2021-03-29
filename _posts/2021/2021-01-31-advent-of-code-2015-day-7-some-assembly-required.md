@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 7 - Some Assembly Required'
 meta: 'Solving the Advent of Code 2015 Day 7 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the seventh day of Advent of Code 2015 we are tasked with helping little Bobby Tables assemble a circuit (wires and bitwise logic gates) that Santa brought him for Christmas.

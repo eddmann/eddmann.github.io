@@ -2,6 +2,7 @@
 layout: post
 title: "Advent of Code 2015 - Day 5 - Doesn't He Have Intern-Elves For This?"
 meta: 'Solving the Advent of Code 2015 Day 5 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the fifth day of Advent of Code 2015 Santa needs help figuring out which strings in his text file are _naughty or nice_ - a.k.a best load up a [Regular Expression tester](https://regex101.com/)!

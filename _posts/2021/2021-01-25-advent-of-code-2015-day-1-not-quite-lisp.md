@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 1 - Not Quite Lisp'
 meta: 'Solving the Advent of Code 2015 Day 1 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015
 ---
 
 This past Decemeber a [fellow colleague](https://github.com/tomcant) introduced us to [Advent of Code](https://adventofcode.com/).

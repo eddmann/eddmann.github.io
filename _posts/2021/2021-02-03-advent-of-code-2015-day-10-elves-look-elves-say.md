@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 10 - Elves Look, Elves Say'
 meta: 'Solving the Advent of Code 2015 Day 10 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the tenth day of Advent of Code 2015 the Elves are playing a game of [look-and-say](https://en.wikipedia.org/wiki/Look-and-say_sequence), of which we are asked to find several terms in the sequence.

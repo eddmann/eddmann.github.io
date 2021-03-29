@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 18 - Like a GIF For Your Yard'
 meta: 'Solving the Advent of Code 2015 Day 18 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the eighteenth day of Advent of Code 2015 we are asked to re-arrange the light show we created on [a previous day](https://eddmann.com/posts/advent-of-code-2015-day-6-probably-a-fire-hazard/).

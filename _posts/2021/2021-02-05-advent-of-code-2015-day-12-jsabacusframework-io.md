@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 12 - JSAbacusFramework.io'
 meta: 'Solving the Advent of Code 2015 Day 12 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the twelfth day of Advent of Code 2015 Santa's Accounting-Elves need help balancing the books after a recent order.

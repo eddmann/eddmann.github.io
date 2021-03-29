@@ -2,6 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 15 - Science for Hungry People'
 meta: 'Solving the Advent of Code 2015 Day 15 puzzle using TypeScript'
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 On the fifteen day of Advent of Code 2015 we are tasked with finding the right balance of ingredients to make the perfect milk-dunking cookie recipe.

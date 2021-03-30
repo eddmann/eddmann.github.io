@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 8 puzzle using Python">
+
+    <title>
+        
+            Advent of Code 2016 - Day 8 - Two-Factor Authentication &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 8 - Two-Factor Authentication</h1>
+    <time datetime="2021-03-30T00:00:00+00:00" class="post-date">30 Mar 2021</time>
+    <p>On the eighth day of Advent of Code 2016 we are required to work out what a <em>smashed</em> LCD screen would have displayed.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>The magnetic strip on the card we have <em>swiped</em> encodes a series of instructions for the screen; these instructions are our puzzle input.
+We are told that the screen is 50 pixels wide and 6 pixels tall, all of which begin in the off state.
+For part one we are required to work out how many pixels would be <em>lit</em> based on applying the given instructions.</p>
+
+<p>To begin we will create small function that will return a boolean two-dimensional matrix we can use to represent the LCD screen in code.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">empty_screen</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">6</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="bp">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">width</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">height</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>From here, we can then go about building the logic surrounding the three operations that can be applied to the screen.</p>
+
+<blockquote>
+  <p>rect AxB turns on all of the pixels in a rectangle at the top-left of the screen which is A wide and B tall.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rect</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+    <span class="n">rect</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">height</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">width</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="p">[[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">rect</span> <span class="ow">or</span> <span class="n">col</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">screen</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>rotate row y=A by B shifts all of the pixels in row A (0 is the top row) right by B pixels.
+Pixels that would fall off the right end appear at the left end of the row.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rotate_row</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">row_y</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="n">screen</span><span class="p">[</span><span class="n">y</span><span class="p">][(</span><span class="n">x</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">screen</span><span class="p">[</span><span class="n">row_y</span><span class="p">])]</span> <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="n">row_y</span> <span class="k">else</span> <span class="n">col</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">screen</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>rotate column x=A by B shifts all of the pixels in column A (0 is the left column) down by B pixels.
+Pixels that would fall off the bottom appear at the top of the column.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rotate_col</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">col_x</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[[</span><span class="n">screen</span><span class="p">[(</span><span class="n">y</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">screen</span><span class="p">)][</span><span class="n">col_x</span><span class="p">]</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">col_x</span> <span class="k">else</span> <span class="n">col</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">)]</span>
+            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">screen</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>Thanks to Python’s list comprehension capabilities we are able to represent this behaviour in an immutable fashion, passing in the current screen and being returned a new representation with the operation applied.
+With these operations now available we can create an <code class="language-plaintext highlighter-rouge">apply</code> function, which based on an instruction string delegates to the desired operation passing in all provided arguments.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">instruction</span><span class="p">):</span>
+    <span class="n">action</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s">'(rect|rotate (?:r|c))[^\d]+(\d+)[^\d]+(\d+)'</span><span class="p">,</span> <span class="n">instruction</span><span class="p">).</span><span class="n">groups</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">'rect'</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rect</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">'rotate r'</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotate_row</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">'rotate c'</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rotate_col</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'Unable to handle {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Given that we now have the ability to apply a single operation on a screen input, we can expand upon this with a <em>reduction</em> and reduce the instruction listing down to the final screen output.
+With this screen output we can then tally up all the pixels that are <em>lit</em> (aka <code class="language-plaintext highlighter-rouge">True</code>) and return the desired answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="nb">apply</span><span class="p">,</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">(),</span> <span class="n">empty_screen</span><span class="p">())</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">screen</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are required to display and interpret the code that is present within the final screen output we produced in part one.
+Thanks again to Python’s list comprehensions this is a trivial exercise allowing us to represent <em>lit</em> pixels as <code class="language-plaintext highlighter-rouge">#</code> and <em>off</em> as <code class="language-plaintext highlighter-rouge">.</code>.
+When we display this output within the terminal we can see the code that the screen is trying to display 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">screen</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="nb">apply</span><span class="p">,</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">(),</span> <span class="n">empty_screen</span><span class="p">())</span>
+    <span class="k">return</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s">'#'</span> <span class="k">if</span> <span class="n">c</span> <span class="k">else</span> <span class="s">'.'</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">screen</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>I really enjoyed today’s problem, especially the surprise in part two where we were able to see the code being displayed.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

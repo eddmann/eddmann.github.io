@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 10 puzzle using Python">
+
+    <title>
+        
+            Advent of Code 2016 - Day 10 - Balance Bots &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 10 - Balance Bots</h1>
+    <time datetime="2021-04-03T00:00:00+00:00" class="post-date">03 Apr 2021</time>
+    <p>On the tenth day of Advent of Code 2016 we come across a factory in which many robots are zooming around handing small microchips to each other.</p>
+
+
+
+<p>Upon entry into the factory we notice that each bot only proceeds when it has two microchips, and once it does, it gives each one to a different bot or puts it in a marked <em>output</em> bin.
+Sometimes, bots take microchips from <em>input</em> bins, too.</p>
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are supplied the bot instructions as our input, and are required to work out what numbered bot is responsible for comparing value-61 microchips with value-17 microchips?
+To begin we will provide the functionality to parse the input (value) and bot/output allocation instructions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_values</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="n">val</span><span class="p">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">instructions</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="p">:</span><span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">'value (\d+) goes to (bot \d+)'</span><span class="p">,</span> <span class="n">line</span><span class="p">))]</span>
+</code></pre></div></div>
+
+<p>This allows us to return input (value) instructions as a tuple, containing the value and bot number to supply this to.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_allocations</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">alloc</span><span class="p">.</span><span class="n">groups</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">instructions</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">alloc</span> <span class="p">:</span><span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">'(bot \d+) gives low to (\w+ \d+) and high to (\w+ \d+)'</span><span class="p">,</span> <span class="n">line</span><span class="p">))]</span>
+</code></pre></div></div>
+
+<p>This allows us to return high/low value allocations as a tuple, containing the sender bot and output/bot high and low microchip recipients.</p>
+
+<p>With the ability to now parse the instruction set into a form we can process, we can begin to model how we wish to process each bot allocation.
+I initially modelled this as a queue in which we processed each valid instruction and subsequent allocations, until there where no more actions to take place.
+This worked well, however, since the initial solution I thought it would be interesting to explore taking advantage of partial function application instead.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setup_bins</span><span class="p">(</span><span class="n">allocations</span><span class="p">):</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">collections</span><span class="p">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">config_bot</span><span class="p">(</span><span class="n">low_recipient</span><span class="p">,</span> <span class="n">high_recipient</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">awaiting_first_chip</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">awaiting_second_chip</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+                <span class="n">l</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
+                <span class="n">bins</span><span class="p">[</span><span class="n">low_recipient</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">low_recipient</span><span class="p">](</span><span class="n">l</span><span class="p">)</span>
+                <span class="n">bins</span><span class="p">[</span><span class="n">high_recipient</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">high_recipient</span><span class="p">](</span><span class="n">h</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">awaiting_second_chip</span>
+        <span class="k">return</span> <span class="n">awaiting_first_chip</span>
+
+    <span class="k">for</span> <span class="n">bot</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="ow">in</span> <span class="n">allocations</span><span class="p">:</span>
+        <span class="n">bins</span><span class="p">[</span><span class="n">bot</span><span class="p">]</span> <span class="o">=</span> <span class="n">config_bot</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bins</span>
+</code></pre></div></div>
+
+<p>So as to simplify the design we store both outputs and bots in the same Dictionary called <em>bins</em>.
+Each entry consists of a single-arity function which returns either a value (the bot has performed their allocation) or a subsequent single-arity function which needs to be applied in a later action.
+We use Python’s default Dictionary capabilities to return an identity function on non-exist keys, to uniformly <em>apply</em> the output bin allocations.
+All bot allocation instructions are translated into <em>configured bots</em> within the Dictionary, and this is then returned to the callee.</p>
+
+<p>From here, we are then able to setup the bins and provide all the initial value instructions to the bots.
+Subsequently, all the bot allocation functions will be applied as stated, and we will be returned with a final bin representation.
+This final bin representation can then be inspected to see which bot compares bot-17 and bot-61’s microchips 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">instructions</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">setup_bins</span><span class="p">(</span><span class="n">parse_allocations</span><span class="p">(</span><span class="n">instructions</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">bot</span> <span class="ow">in</span> <span class="n">parse_values</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+        <span class="n">bins</span><span class="p">[</span><span class="n">bot</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">bot</span><span class="p">](</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">bot</span> <span class="k">for</span> <span class="n">bot</span><span class="p">,</span> <span class="n">allocated</span> <span class="ow">in</span> <span class="n">bins</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">allocated</span> <span class="o">==</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">61</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are are required to instead multiply together the values of one chip in each of outputs 0, 1, and 2?
+This can be achieved using the same initial process as in part one, expect now we inspect the bins for the resulting <code class="language-plaintext highlighter-rouge">output N</code> values.
+These values are then multiplied and this value leads to our answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="n">instructions</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">setup_bins</span><span class="p">(</span><span class="n">parse_allocations</span><span class="p">(</span><span class="n">instructions</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">bot</span> <span class="ow">in</span> <span class="n">parse_values</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
+        <span class="n">bins</span><span class="p">[</span><span class="n">bot</span><span class="p">]</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">bot</span><span class="p">](</span><span class="n">val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">math</span><span class="p">.</span><span class="n">prod</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="s">'output {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

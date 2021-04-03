@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 9 puzzle using Python">
+
+    <title>
+        
+            Advent of Code 2016 - Day 9 - Explosives in Cyberspace &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Advent of Code 2016 - Day 9 - Explosives in Cyberspace</h1>
+    <time datetime="2021-04-02T00:00:00+00:00" class="post-date">02 Apr 2021</time>
+    <p>On the ninth day of Advent of Code 2016 we are asked to calculate the decompressed length of a file.</p>
+
+
+
+<h3 id="part-1">Part 1</h3>
+
+<p>We are supplied with a compressed file format as our input, of which we are required to calculate what the decompressed length is.
+The format is structured as such:</p>
+
+<blockquote>
+  <p>The format compresses a sequence of characters.
+Whitespace is ignored.
+To indicate that some sequence should be repeated, a marker is added to the file, like (10x2).
+To decompress this marker, take the subsequent 10 characters and repeat them 2 times.
+Then, continue reading the file after the repeated data.
+The marker itself is not included in the decompressed output.</p>
+</blockquote>
+
+<p>Based on these rules we can now create a function that goes about calculating the length based on a supplied file.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">acc</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">file</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">"^\((\d+)x(\d+)\)"</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">marker</span><span class="p">:</span>
+        <span class="n">length</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">marker</span><span class="p">.</span><span class="n">groups</span><span class="p">())</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">marker</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">marker</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">+</span> <span class="n">length</span>
+        <span class="k">return</span> <span class="n">times</span> <span class="o">*</span> <span class="n">acc</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span> <span class="o">+</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="n">end</span><span class="p">:],</span> <span class="n">acc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">acc</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The function above recursively decompresses the file, applying the provided accumulator function based on any markers that it encounters.
+Once the file has been exhausted the function call-stack will bubble up, and we will return the total decompressed file length.</p>
+
+<p>Using the above implementation we can supply the in-built <code class="language-plaintext highlighter-rouge">len</code> function as our acculator to be applied upon the occurance of markers.
+In doing so we will be returned with the desired answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="nb">len</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="part-2">Part 2</h3>
+
+<p>For part two, we are required to expand upon part one’s decompression implementation and cater for an <em>improved</em> compression format.
+In version two, the only difference is that markers within decompressed data are decompressed.
+So instead of simply computing the length of a marker sub-section we are required to decompress this string as well.</p>
+
+<p>Fortunaly, as we supply how we wish to acculate markers within the <code class="language-plaintext highlighter-rouge">decompressed_length</code> function, we can instead supply a means of recursively decompressing the file until we reach the final length.
+With this new <code class="language-plaintext highlighter-rouge">recursive_len</code> function we can now calculate the decompressed length again, returning the desired answer 🌟.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">recursive_len</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">recursive_len</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">recursive_len</span><span class="p">)</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

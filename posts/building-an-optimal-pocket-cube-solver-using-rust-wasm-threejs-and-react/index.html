@@ -60,8 +60,9 @@ However, before solving a 3x3x3 Rubik Cube, I thought it would be beneficial to 
 The Pocket Cube consists of 8 <em>cubies</em>, each with three colour stickers on them.
 Any permutation of the <em>cubies</em> is possible, with seven of these being able to be independently oriented in three ways.
 If we fix one of these <em>cubies</em> to a chosen position and orientation (essential deeming it to be in a solved state); we can permit any permutation of the remaining seven <em>cubies</em> and any orientation of six <em>cubies</em>.
-This results in their only being <code class="language-plaintext highlighter-rouge">7! * 3^6 = 3674160</code> possible unique states.
-To ensure that we fix the given ‘solved’ <em>cubie</em>, we are only required to implement three of the possible six moves, these being Up, Right and Front in my case - resulting in the Down-Bottom-Left <code class="language-plaintext highlighter-rouge">DBL</code> <em>cubie</em> staying in-place at all times.
+This results in their only being <code class="language-plaintext highlighter-rouge">7! * 3^6 = 3674160</code> possible unique states.</p>
+
+<p>To ensure that we fix the given ‘solved’ <em>cubie</em>, we are only required to implement three of the possible six moves, these being Up, Right and Front in my case - resulting in the Down-Bottom-Left <code class="language-plaintext highlighter-rouge">DBL</code> <em>cubie</em> staying in-place at all times.
 In fixing a single <em>cubie</em> we have managed to reduce the number of valid states, and as such employing a convention <a href="https://en.wikipedia.org/wiki/Graph_traversal">Graph search algorithm</a> over the search space provides us with a efficent means to reach the optimal solution move sequence.
 I was able to model <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs">this representation</a> of a Pocket Cube in Rust taking advantage of the ability to inline tests within the same file to provide additional confidence.</p>
 

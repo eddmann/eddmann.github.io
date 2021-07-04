@@ -63,8 +63,9 @@ If we fix one of these <em>cubies</em> to a chosen position and orientation (ess
 This results in their only being <code class="language-plaintext highlighter-rouge">7! * 3^6 = 3674160</code> possible unique states.</p>
 
 <p>To ensure that we fix the given ‘solved’ <em>cubie</em>, we are only required to implement three of the possible six moves, these being Up, Right and Front in my case - resulting in the Down-Bottom-Left <code class="language-plaintext highlighter-rouge">DBL</code> <em>cubie</em> staying in-place at all times.
-In fixing a single <em>cubie</em> we have managed to reduce the number of valid states, and as such employing a convention <a href="https://en.wikipedia.org/wiki/Graph_traversal">Graph search algorithm</a> over the search space provides us with a efficent means to reach the optimal solution move sequence.
-I was able to model <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs">this representation</a> of a Pocket Cube in Rust taking advantage of the ability to inline tests within the same file to provide additional confidence.</p>
+In fixing a single <em>cubie</em> we have managed to reduce the number of valid states, and as such employing a convention <a href="https://en.wikipedia.org/wiki/Graph_traversal">Graph search algorithm</a> over the search space provides us with a efficent means to reach the optimal solution move sequence.</p>
+
+<p>I was able to model <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs">this representation</a> of a Pocket Cube in Rust taking advantage of the ability to inline tests within the same file to provide additional confidence.</p>
 
 <h3 id="using-a-bidirectional-search">Using a Bidirectional search</h3>
 
@@ -83,8 +84,9 @@ I had a lot of fun implementing <a href="https://github.com/eddmann/pocket-cube-
 
 <p>Now that I was able to optimally solve a given cube state in the Browser via WASM, next was to provide a pleasing visualisation which could be followed along using a real Pocket Cube.
 For this I decided to build the client in React using <a href="https://threejs.org/">Three.js</a>, <a href="https://github.com/pmndrs/react-three-fiber">react-three-fiber</a> and TypeScript.
-I have had little experience till now using Three.js, but thought it would be interesting to explore constructing such models in a declarative manner using React.
-I found this to be a very rewarding experience, using a Facelet representation of the cube state to communicate between the client and the solver.
+I have had little experience till now using Three.js, but thought it would be interesting to explore constructing such models in a declarative manner using React.</p>
+
+<p>I found this to be a very rewarding experience, using a Facelet representation of the cube state to communicate between the client and the solver.
 The cube component itself took adavanteg of React Hooks to manage the state transitions and <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/client/src/Cube/rotation.ts">rotation animations</a>.</p>
 
 <p><a href="https://eddmann.com/pocket-cube-solver/"><img src="/uploads/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/solution.gif" alt="Visualising the Solution" /></a></p>

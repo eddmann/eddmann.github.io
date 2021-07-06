@@ -17,6 +17,8 @@ However, in the case of a 3x3x3 Rubik Cube this is not the case, thanks in large
 The cube itself has _43 quintillion, 252 quadrillion, 3 trillion, 274 billion, 489 million, 856 thousand_ different valid states, which in itself makes it computational infeasible to visit each possible move sequence in an adequate time.
 However, [research](http://www.cube20.org/) has been conducted to prove that God's Number for a Rubik's Cube is twenty - that proving that any initial state can be solved in twenty moves or less.
 
+![Characteristics of a Rubik Cube](/uploads/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube.jpg)
+
 ### Solving the Cube
 
 Along with conventional [Layer by Layer](https://en.wikipedia.org/wiki/Layer_by_Layer) approaches that _eventually_ get you to the solved state, there has been much research in the space of producing algorithms that perform this result more efficiently.
@@ -52,6 +54,7 @@ I also applied the same level of design to the [cube](https://github.com/eddmann
 I decided that the first algorithm to implement (and what is finished at the time of writing this) would be Pochmann's algorithm.
 This allowed me to borrow much of the learnings and implementation I had built from the 2x2x2 cube solver.
 Using the Rubik Cube model built I was able to apply a trivial represenation translation allowing me to reference plenty of the original C++ implementation.
+The only addition included from this reference implementation was to simplify [multi-face turn moves](https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs#L302) which could incur between phases.
 Once the solver was [implemented](https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs) and adequately tested, I could continue on to visualising the solution to the client.
 
 ### Visualising the Solution

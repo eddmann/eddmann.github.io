@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Investigating how to build a 2FA TOTP generator device using a Raspberry Pi Pico and MicroPython">
+
+    <title>
+        
+            Building a 2FA TOTP generator using a Raspberry Pi Pico and MicroPython &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building a 2FA TOTP generator using a Raspberry Pi Pico and MicroPython</h1>
+    <time datetime="2021-10-20T00:00:00+00:00" class="post-date">20 Oct 2021</time>
+    <p>I have recently become very interested in microcontrollers, in particular the <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a>.
+Not only is it ridiculously affordable (just over £3), it provides so much scope to be used in many different projects.
+One such project I wanted to explore was building an independent <a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">Time-based One-time password</a> (TOTP) device.</p>
+
+
+
+<p>I have been using the likes of Google Authenticator and Authy for many years, but really wanted to gain a deeper understanding for the specific building blocks that Time-based One-time password’s are built upon.
+This led me to investigate the viability of building such a solution using a Raspberry Pi Pico - combined with <a href="https://micropython.org/">MicroPython</a> and the <a href="https://shop.pimoroni.com/products/pico-display-pack">Pico Display Pack</a>.
+Thanks to some <a href="https://datatracker.ietf.org/doc/html/rfc2104">great</a> <a href="https://datatracker.ietf.org/doc/html/rfc6238">resources</a> I was able to do just that.</p>
+
+<p><a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.gif" /></a></p>
+
+<h3 id="features">Features</h3>
+
+<p>Below is a list of the feature-set that the built device provides:</p>
+
+<ul>
+  <li>Complete <a href="https://github.com/eddmann/pico-2fa-totp/tree/main/totp">MicroPython implementation</a> of the TOTP specification (and underlying HMAC-SHA1, Base32 dependencies).</li>
+  <li>Customisable background colours per TOTP.</li>
+  <li>Progress bar to present how long till the TOTP is about to expire.</li>
+  <li>Flashing alert LED when the TOTP is about to expire.</li>
+  <li>Initial configuration screen to set the current UTC time - to correct the Raspberry Pi Pico’s RTC.</li>
+</ul>
+
+<h3 id="usage">Usage</h3>
+
+<p>Once you have downloaded the project from <a href="https://github.com/eddmann/pico-2fa-totp">GitHub</a>, you can the follow the instructions below to get the device setup.</p>
+
+<ul>
+  <li>Connect the <a href="https://shop.pimoroni.com/products/pico-display-pack">Pico Display Pack</a> to the Raspberry Pi Pico.</li>
+  <li>Create a <code class="language-plaintext highlighter-rouge">codes.json</code> file (based on <code class="language-plaintext highlighter-rouge">codes.json.example</code>) which includes the desired TOTP keys.</li>
+  <li>Flash the Raspberry Pi Pico with the latest <a href="https://github.com/pimoroni/pimoroni-pico/releases/latest">MicroPython with Pimoroni Libs</a>.</li>
+  <li>Copy the codebase to the Raspberry Pi Pico.</li>
+  <li>Upon boot, you will be required to specify the current UTC time (clicking <code class="language-plaintext highlighter-rouge">B</code> once set).</li>
+  <li>Now you can cycle through your TOTP’s using the <code class="language-plaintext highlighter-rouge">X</code> button.</li>
+</ul>
+
+<p><a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.jpg" /></a></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>I have been amazed at how easy it is for someone like myself (coming from a high-level programming background), to pick up MicroPython and build non-trivial systems using microcontrollers.
+I found researching and implementing the functionality that performed HMAC-SHA1 to be alot of fun, allowing me to demystify what can seem to be a very <em>magical</em> process.
+Additionally, investigating how to set the Pico’s RTC was an interesting aside, combined with presenting this correction using a purpose-built configuration display screen.</p>
+
+<p>Having success in completing this project has already sparked other ideas that I will discuss in upcoming articles!</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

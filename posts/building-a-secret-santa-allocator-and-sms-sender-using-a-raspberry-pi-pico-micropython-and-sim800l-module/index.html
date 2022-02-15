@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documenting how to build a Secret Santa allocator and SMS sender using a Raspberry Pi Pico/MicroPython and SIM800L module">
+
+    <title>
+        
+            Building a Secret Santa allocator and SMS sender using a Raspberry Pi Pico/MicroPython and SIM800L module &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building a Secret Santa allocator and SMS sender using a Raspberry Pi Pico/MicroPython and SIM800L module</h1>
+    <time datetime="2021-11-03T00:00:00+00:00" class="post-date">03 Nov 2021</time>
+    <p>Over the past couple of years I have explored <a href="https://eddmann.com/posts/allocating-secret-santas-with-a-substitution-cipher-using-clojure/">several</a> <a href="https://eddmann.com/posts/allocating-and-notifying-secret-santas-via-email-using-clojure/">different</a> ways in which to solve the problem of allocating Secret Santa’s for members of my family.
+Having spent a couple of months recently interested in microcontrollers, I decided that this year I would send out automatically allocated Secret Santas via SMS using a Raspberry Pi Pico/MicroPython and <a href="https://lastminuteengineers.com/sim800l-gsm-module-arduino-tutorial/">SIM800L GSM module</a>.</p>
+
+
+
+<p><img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/begin.jpg" /></p>
+
+<h3 id="the-build">The build</h3>
+
+<p>The system I designed comprised of a display (that I had used in a <a href="https://eddmann.com/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/">previous project</a>), the Raspberry Pi Pico and a <a href="https://lastminuteengineers.com/sim800l-gsm-module-arduino-tutorial/">SIM800L GSM module</a>.
+Upon boot the system reads in the supplied <a href="https://github.com/eddmann/pico-secret-santa/blob/main/participants.json.example"><code class="language-plaintext highlighter-rouge">participants.json</code></a> file which contains the participants names and phone numbers.
+Once allocation commences all participants are assigned a Secret Santa, with the resulting allocation notifications being sent out via SMS.
+The display is used to report the current status throughout both the allocation and notification phases.
+The final solution can be found on <a href="https://github.com/eddmann/pico-secret-santa">GitHub</a>, with additional usage instructions included.</p>
+
+<h3 id="the-allocation-process">The allocation process</h3>
+
+<p>I decided to use the same technique I had employed in a previous years solution to allocate the Secret Santas.
+This method applied a brute-force approach which uniformly shuffled the given participants into pairs, returning the allocations if all pairs met the desired criteria (i.e. not oneself or within an exclusion listing).
+Looking through the MicroPython documentation however, I noticed that no array shuffle functionality was present.
+As such, I opted to implement my own <a href="https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle">Fisher–Yates shuffle</a> algorithm which performed these capabilities of which were lacking from the standard library.
+MicroPython does however provide some of the high-level Python constructs I have grown accustom to (such as <code class="language-plaintext highlighter-rouge">zip</code> and <code class="language-plaintext highlighter-rouge">all</code>) which produced a very succinct <a href="https://github.com/eddmann/pico-secret-santa/blob/main/allocator.py">end solution</a>.</p>
+
+<p><img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/allocation.jpg" /></p>
+
+<h3 id="sending-the-sms">Sending the SMS</h3>
+
+<p>The most interesting part of the entire project was exploring how you could send SMS using the Pico.
+The SIM800L module is a GSM cellular chip which communicates with the microcontroller via <a href="https://docs.micropython.org/en/latest/library/machine.UART.html">UART</a>.
+I opted to build a <a href="https://github.com/eddmann/pico-secret-santa/blob/main/sim800l.py">small abstraction</a> within MicroPython around communication with the SIM800L via <code class="language-plaintext highlighter-rouge">AT</code> commands.
+This abstraction handled the necessary initial configuration setup and connection to the mobile network provider.
+Further more, it encapsulated the behaviour required to send an SMS to a given phone number.</p>
+
+<p><img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/breadboard.jpg" style="margin:0 auto;width:350px;" /></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>This was by-far my most enjoyable Secret Santa allocation system to design and build to date.
+Having the ability to begin the allocation process using a physical button, and subsequently see progress reported on the display was very pleasing.
+I really look forward to exploring other ways in which I can use mobile network communication within projects such as this in the time to come.</p>
+
+<p><img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/complete.jpg" /></p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

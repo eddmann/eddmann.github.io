@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documents a recent Serverless Framework plugin I have built to aid in bridging the gap between running behaviour within both AWS Lambda and AWS Fargate compute platforms">
+
+    <title>
+        
+            Managing long-running AWS Fargate ECS tasks within your Serverless project &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Managing long-running AWS Fargate ECS tasks within your Serverless project</h1>
+    <time datetime="2022-03-16T00:00:00+00:00" class="post-date">16 Mar 2022</time>
+    <p>I am a big proponent of the Serverless movement.
+The ability to concentrate efforts on only the code and infrastructure concerns which directly add business value is very powerful.
+Function-as-a-Service (FaaS) offerings like AWS Lambda impose limitations which help aid in designing more fault tolerant/scalable systems; leaning towards event-driven architectures.
+However, there are times when we need to execute behaviour which exceed common-place FaaS duration limits (i.e. AWS Lambda’s 15-minute limit).
+In this case we ideally do not want to resort to a lower-level of compute (i.e. a VPS such as EC2), but instead be able to define and run such behaviour alongside our FaaS counterparts.
+In this post I would like to discuss a <a href="https://github.com/eddmann/serverless-fargate">Serverless Framework plugin</a> I have written which aids in bridging this gap, by-way of ECS and <a href="https://aws.amazon.com/fargate/">AWS Fargate</a>.</p>
+
+
+
+<h3 id="why">Why?</h3>
+
+<p>Over the past couple of weeks I have been working on a personal project with some behaviour that by-design does not fit into the 15-minute duration limit imposed by AWS Lambda.
+Instead of being able to reengineer the problem into an event-driven architecture, it still is required to be run as a long-polling background process.
+In a conventional compute setting you would employ a <a href="https://kubernetes.io/docs/concepts/services-networking/service/">service</a>/<a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">daemon</a> (by-way of your choice of container orchestration platform) or possibly even manage an EC2 instance which runs a process control system such as <a href="http://supervisord.org/">Supervisor</a>.
+In doing so however, you lose the level of abstraction you are gifted by Serverless and the Serverless Framework.
+With the desire to maintain this level of abstraction I investigated the possibility of using ECS/AWS Fargate, building additional functionality into the Serverless Framework (by-way of a plugin) to bridge the divide between defining FaaS and container-based compute.</p>
+
+<h3 id="what-is-aws-fargate">What is AWS Fargate?</h3>
+
+<p>Fargate is a service offered by AWS which allows you to run containerised workloads at a similar level of abstraction as AWS Lambda does for functions.
+In the case of AWS Lambda you provide the code (or more recently even a container image), where-as in the case of AWS Fargate you provide the container image you wish to run.
+This then provides you with all the same Serverless benefits; a pay-as-you-go model, no up-front capacity planning and built-in host-level VM separation for security concerns.</p>
+
+<p>This level of compute is able to be used for both <a href="https://aws.amazon.com/ecs/">ECS</a> and <a href="https://aws.amazon.com/eks/">EKS</a> container orchestration platforms.
+Upon review, I opted to use ECS and this seemed to impose the least friction in both means of definition and execution of the desired behaviour.
+Before we delve into the Serverless plugin itself, it would be useful to provide an overview of the consistent building blocks that are used to construct it.</p>
+
+<ul>
+  <li><strong>Cluster</strong> - an isolated logical grouping of tasks or services which comprise your application.</li>
+  <li><strong>Task definition</strong> - defines one or more containers (with port, parameter configuration) that form your application.</li>
+  <li><strong>Task</strong> - instance(s) of a <em>Task definition</em>.</li>
+  <li><strong>Service</strong> - manages the desired amount of a given task you wish to ensure are running at any one time.</li>
+  <li><strong>Scheduled task</strong> - handles executing a <em>Task</em> at a given time using <a href="https://aws.amazon.com/eventbridge/">AWS EventBridge</a>.</li>
+</ul>
+
+<h3 id="the-serverless-plugin">The Serverless plugin</h3>
+
+<p>Based on my new understanding of how ECS and Fargate worked, I chose to take a step back and decide how (as an end user) I would like to declare a given <em>task</em> at the level of the Serverless Framework.
+I wanted to take advantage of how the Serverless Framework was able to push built images to ECR, thanks to their <a href="https://www.serverless.com/blog/container-support-for-lambda">Lambda container-runtime support</a>.
+This meant that we could delegate this responsibility to the Framework, and reference images in a similar manner to how the user has grown accustom to.
+I also wanted to ensure that the execution task role created for the <em>tasks</em> honoured any <code class="language-plaintext highlighter-rouge">iamManagedPolicies</code> and <code class="language-plaintext highlighter-rouge">iamRoleStatements</code> declarations found within the provider, again, adding parity with provisioned Lambda functions.
+The resulting definition can be found within the <a href="https://github.com/eddmann/serverless-fargate#example">GitHub repository</a>, detailing all the available configuration options.</p>
+
+<p>The completed Serverless Framework plugin takes the declared <em>service/scheduled tasks</em> and generates the underlying CloudFormation resources needed to provision the compute upon deployment.
+Using the Framework definition validation (backed by <a href="https://json-schema.org/">JSON Schema</a>) I was able to validate complex configuration which has been supplied with ease.
+Upon deployment both the Lambda functions and Fargate tasks are provisioned within a single CloudFormation <em>stack</em>, with <em>task</em> ARN’s being returned as outputs for extended use elsewhere.</p>
+
+<h3 id="example-usage">Example usage</h3>
+
+<p>To highlight all the capabilities of the plugin, I created a <a href="https://github.com/eddmann/serverless-fargate/tree/main/example">contrived example</a> which is present within the Serverless plugin repository.
+This documents how you can create three separate runtimes (PHP, Node and Python) and run long-running behaviour alongside Lambda functions.
+Additionally, if you do not wish to mix container task and function layer runtimes (ensuring runtime parity), this can be achieved like so.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">serverless-fargate</span>
+
+<span class="na">provider</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">aws</span>
+  <span class="na">ecr</span><span class="pi">:</span>
+    <span class="na">images</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">./</span>
+        <span class="na">file</span><span class="pi">:</span> <span class="s">Dockerfile</span>
+
+<span class="na">plugins</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">serverless-fargate</span>
+
+<span class="na">fargate</span><span class="pi">:</span>
+  <span class="na">vpc</span><span class="pi">:</span>
+    <span class="na">securityGroups</span><span class="pi">:</span> <span class="s">sg-1234</span>
+    <span class="na">subnets</span><span class="pi">:</span> <span class="s">subnet-1234</span>
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="na">service</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">app</span>
+      <span class="na">entryPoint</span><span class="pi">:</span> <span class="s">node</span>
+      <span class="na">command</span><span class="pi">:</span> <span class="s">service.js</span>
+
+<span class="na">functions</span><span class="pi">:</span>
+  <span class="na">web</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">app</span>
+      <span class="na">command</span><span class="pi">:</span> <span class="s">web.handler</span>
+    <span class="na">events</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">httpApi</span><span class="pi">:</span> <span class="s">GET /</span>
+</code></pre></div></div>
+
+<p>Thanks to the extensible nature of the Serverless Framework plugin ecosystem the DSL we have been able to construct almost feels native.
+The above definition shows how a single application artifact image can be built, and then subsequently run, in both a Lambda function and Fargate task setting.
+For Fargate tasks, we are still able to use <a href="https://github.com/aws/aws-lambda-base-images">Lambda compatible runtime images</a>, but instead only need to override the entry point and desired command.
+This allows you to maintain parity between application behaviour that requires different execution duration characteristics.</p>
+
+<p>The only excess configuration which does not naturally fit into the Serverless model is the required VPC.
+This is optional in a Lambda function based definition, but due to AWS Fargate containers running within <code class="language-plaintext highlighter-rouge">awsvpc</code> network mode we are required to supply a relevant VPC.
+If Fargate tasks could optionally not require the need for being placed into a VPC (similar to Lambda functions) this would truly honour the same Serverless methodology.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>To conclude, I am very excited with how this plugin has progressed since its inception.
+Having been now able to employ its use in the personal project I initially had the need for, has highlighted how powerful it can be.
+Going forward I would like to add additional compute support for <a href="https://docs.aws.amazon.com/AmazonECS/latest/bestpracticesguide/ec2-and-fargate-spot.html">Fargate Spot</a> instances.
+There are a couple of interesting technicalities to handling spot instances, which could be abstracted away by means of a plugin.
+I hope to document this work in a future blog post.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

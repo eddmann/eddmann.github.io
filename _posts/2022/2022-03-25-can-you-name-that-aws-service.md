@@ -8,7 +8,7 @@ tags: aws react js
 I have always been amazed by the sheer amount of services AWS offers.
 Although I spend a lot of time working within AWS, I am always surprised to find yet another service that I did not know existed.
 Better still, is with each new service comes an associated new service icon.
-This is why I thought it would be interesting (and somewhat educational) to build a small trivia game which quiz's you on AWS service icons.
+This is why I thought it would be interesting (and somewhat educational) to build a small trivia game which quizzes you on AWS service icons.
 
 <!--more-->
 

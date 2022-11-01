@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documents my exploration into the many available Lambda runtimes, by way of orchestrating a Step Function workflow for allocating Secret Santa's">
+
+    <title>
+        
+            Allocating Secret Santa's using an AWS Step Function workflow and every available Lambda runtime &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Allocating Secret Santa's using an AWS Step Function workflow and every available Lambda runtime</h1>
+    <time datetime="2022-11-01T00:00:00+00:00" class="post-date">01 Nov 2022</time>
+    <p>Over the past several years I have taken the opportunity of allocating Secret Santa’s for members of my family as an excuse to explore different <a href="https://eddmann.com/posts/allocating-and-notifying-secret-santas-via-email-using-clojure/">programming languages</a> and <a href="https://eddmann.com/posts/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/">technologies</a>.
+This year has been no different, with me opting to <em>over-engineer</em> the problem of allocating and notifying participants by diving into <a href="https://aws.amazon.com/step-functions/">AWS Step Functions</a> and the many runtimes available on Lambda.
+In this post I wish to document how I went about designing the Step Function workflow, and breaking up the problem into many specific-purpose Lambda behaviours.
+The final implementation can be found in <a href="https://github.com/eddmann/step-function-secret-santa">this GitHub repository</a>.</p>
+
+
+
+<p>I should reiterate that this is heavily over-engineered for solving the problem at hand, with the main driver being to provide me with enough of a problem domain to explore the many different features/states (i.e. Map, Choice, Parallel) of Step Functions, and runtimes available on Lambda.</p>
+
+<h3 id="step-function-workflows">Step Function workflows?</h3>
+
+<p>I have had the opportunity to explore employing an Step Function workflow for several personal projects over the years, providing a high-level of orchestration/durability between task/state transitions.
+One of the key elements I have found is when to model such decisions/execution at the workflow level, or leave it within the code itself.
+Fortunately, this problem could be broken up into several logically separate problems (parsing, allocating, notifying) which allowed me to experiment with handling <a href="https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html">failure</a> and <a href="https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html">mapping</a> input in <a href="https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-parallel-state.html">parallel</a> with <a href="https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html">choice</a> branching.</p>
+
+<h3 id="lambda-runtimes">Lambda runtimes?</h3>
+
+<p>I am a big proponent of Lambda, but due to the languages and runtimes I have been exposed to in the past I have not had the opportunity to explore many of the available runtimes Lambda has to offer.
+Breaking up this problem into many Lambda behaviours felt like a great opportunity to change that.</p>
+
+<p>However, with the availability of the <a href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html">Custom Runtime API</a> the list of <em>available</em> runtimes is <strong>endless</strong>, as such, I decided to limit the scope to all six distinct <a href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">supported runtimes</a> AWS has to offer, along with a single custom runtime hosted on <code class="language-plaintext highlighter-rouge">provided.al2</code>.
+This gave me the chance to experience and implement functionality in each language runtime using more than just a simple <em>Hello world</em> example has to offer.</p>
+
+<h4 id="custom-runtime">Custom runtime</h4>
+
+<p>Instead of using a pre-built custom runtime, I opted to additionally take the opportunity of integrating my <a href="https://github.com/eddmann/santa-lang-ts">own person language</a> I have been developing over the year into a Lambda context.
+I am sure I will be discussing my experience developing this language more in later posts; but at a high-level it is a tree-walking interpreted programming language that is targeted primarily at solving Advent of Code problems.
+The current working implementation is hosted on NodeJS.
+Due to this, I was able to garner inspiration from other custom runtime <a href="https://github.com/lambci/node-custom-lambda/blob/master/v12.x/bootstrap.js">boostrap processes</a>, and how they handle the Lambda request lifecycle.
+I was able to package up the <a href="https://github.com/eddmann/santa-lang-ts/blob/main/src/lambda/src/index.ts">boostrap</a> into a single executable thanks to <a href="https://www.npmjs.com/package/pkg">pkg</a> and distribute it as a <a href="https://github.com/eddmann/santa-lang-ts/blob/main/Makefile#L50">layer</a> for my workflow to use.</p>
+
+<p>This <em>side-project</em> provided me with a great appreciation for the Custom Runtime API that AWS has developed, using HTTP as the common denominator for communication between the desired execution and host Lambda environment.</p>
+
+<h3 id="the-workflow">The workflow</h3>
+
+<p>For managing and deploying the workflow I opted to use the <a href="https://www.serverless.com/">Severless Framework</a> and the de-facto <a href="https://www.serverless.com/plugins/serverless-step-functions">Serverless Step Functions</a> plugin.
+This allowed me to co-locate the workflow and Lambda definitions, which I felt was very beneficial.</p>
+
+<p>The resulting allocation and notification process was built-up as follows:</p>
+
+<p><a href="https://github.com/eddmann/step-function-secret-santa"><img src="/uploads/allocating-secret-santas-using-an-aws-step-function-workflow-and-every-available-lambda-runtime/workflow.svg" alt="The Step Function workflow" /></a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Purpose</th>
+      <th>Language</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/parse-participants/">Parse Participants</a></td>
+      <td>Converts the CSV input supplied by the clients API Gateway request into a JSON form used throughout the workflow.</td>
+      <td>C# <code class="language-plaintext highlighter-rouge">dotnet6</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/validate-participants/">Validate Participants</a></td>
+      <td>Ensures that all supplied participant data is present and valid.</td>
+      <td>JavaScript <code class="language-plaintext highlighter-rouge">nodejs16.x</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/allocate/">Allocate</a></td>
+      <td>Allocates each participant to a random recipient.</td>
+      <td><a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/lambda">santa-lang</a> <code class="language-plaintext highlighter-rouge">provided.al2</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/validate-allocations/">Validate Allocations</a></td>
+      <td>Ensures that the supplied allocations are valid, taking into consideration participant exclusions.</td>
+      <td>Java <code class="language-plaintext highlighter-rouge">java11</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/store-allocations/">Store Allocations</a></td>
+      <td>Stores the allocations within an plain-text file S3 object for review.</td>
+      <td>Go <code class="language-plaintext highlighter-rouge">go1.x</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/notify-email/">Notify Email</a></td>
+      <td>Sends an email (via Mailgun) to the given participant with their allocated recipient name in.</td>
+      <td>Python <code class="language-plaintext highlighter-rouge">python3.9</code></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/eddmann/step-function-secret-santa/tree/main/src/notify-sms/">Notify SMS</a></td>
+      <td>Sends an SMS (via Twilio) to the given participant with their allocated recipient name in.</td>
+      <td>Ruby <code class="language-plaintext highlighter-rouge">ruby2.7</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Many of the runtimes required their own specific packaging steps, either for pulling down dependencies and/or compilation.
+As such, I opted to define/document these within <a href="https://github.com/eddmann/step-function-secret-santa/blob/main/Makefile">Makefile targets</a> which use Docker as the primary means of providing the required execution environment to deterministically package the artifacts.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>I really enjoyed building out this behaviour using AWS Step Functions and Lambda runtimes.
+In the time frame I gave myself I was unable to develop a sufficient local execution environment to test the workflow using <a href="https://docs.aws.amazon.com/step-functions/latest/dg/sfn-local.html">Step Functions Local</a>, but in future projects I hope to explore this further.</p>
+
+<p>The more I explored Step Functions and the available features/integrations - I realised that much of the behaviour that I wished to achieve could be developed using high-level integrations that are already provided, instead of relying solely on Lambda.
+For example, I could instead possibly store the allocations within S3 using the built-in <a href="https://docs.aws.amazon.com/step-functions/latest/dg/supported-services-awssdk.html">AWS SDK support</a>, and send the SMS and email’s via SNS and SES alike.</p>
+
+<p>As the intent of this project was a combination of exploring Step Functions and Lambda runtimes, leaning on Lambda and a runtime to achieve these tasks felt right.
+However, in a future incarnation perhaps the goal could be to just leverage Step Functions all together. There is always next year… 😉</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

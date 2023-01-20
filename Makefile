@@ -9,7 +9,7 @@ install: ## Install dependencies
 
 .PHONY: start
 start: ## Start local development environment
-	$(DOCKER) -p 4000:4000 $(IMAGE) jekyll serve --host 0.0.0.0 --port 4000
+	$(DOCKER) -p 4000:4000 $(IMAGE) jekyll serve --host 0.0.0.0 --port 4000 --future
 
 .PHONY: build
 build: ## Build static-site for deployment

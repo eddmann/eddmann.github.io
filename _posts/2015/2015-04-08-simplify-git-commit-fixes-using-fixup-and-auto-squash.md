@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Simplify Git commit fixes using fixup and auto-squash'
-link: https://tech.mybuilder.com/simplify-git-commit-fixes-using-fixup-and-auto-squash/
+canonical: https://tech.mybuilder.com/simplify-git-commit-fixes-using-fixup-and-auto-squash/
 meta: "Use fixup and auto-squash commands to manage 'fix' commits in Git"
 ---
 

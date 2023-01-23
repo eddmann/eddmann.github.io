@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Using Homebrew to Manage Project Development Scripts'
-link: https://tech.mybuilder.com/using-homebrew-to-manage-project-development-scripts/
+canonical: https://tech.mybuilder.com/using-homebrew-to-manage-project-development-scripts/
 meta: 'Looking into using Homebrew to Manage Project Development Scripts'
 ---
 

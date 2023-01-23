@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Insertion, Removal and Inversion Operations on Binary (Search) Trees in PHP'
-link: https://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/
+canonical: https://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/
 meta: 'Exploration into Binary (Search) Trees and implementing common-place operations using PHP'
 ---
 

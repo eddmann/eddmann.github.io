@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
-link: https://tech.mybuilder.com/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/
 meta: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
 ---
 

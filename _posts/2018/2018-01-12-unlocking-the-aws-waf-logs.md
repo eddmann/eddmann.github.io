@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Unlocking the AWS WAF Logs'
-link: https://tech.mybuilder.com/unlocking-the-aws-waf-logs/
+canonical: https://tech.mybuilder.com/unlocking-the-aws-waf-logs/
 meta: 'Unlocking the AWS WAF Logs using Serverless, Lambda and AWS SDK'
 ---
 

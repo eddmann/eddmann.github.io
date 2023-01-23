@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "'Memes as a Service' using Lambda, Serverless and ImageMagick"
-link: https://tech.mybuilder.com/memes-as-a-service-using-lambda-serverless-and-imagemagick/
+canonical: https://tech.mybuilder.com/memes-as-a-service-using-lambda-serverless-and-imagemagick/
 meta: "Creating a 'Memes as a Service' using Lambda, Serverless and ImageMagick"
 ---
 

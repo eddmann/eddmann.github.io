@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"
-link: https://tech.mybuilder.com/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/
+canonical: https://tech.mybuilder.com/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/
 meta: "Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"
 ---
 

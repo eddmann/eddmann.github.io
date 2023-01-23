@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Using GitHub Actions to send Gone Live release notes via Email and Slack'
-link: https://tech.mybuilder.com/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/
+canonical: https://tech.mybuilder.com/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/
 meta: 'Using GitHub Actions to send Gone Live release notes via Email and Slack'
 ---
 

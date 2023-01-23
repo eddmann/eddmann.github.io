@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Scheduling EC2 Instances using Lambda and CloudWatch Events'
-link: https://tech.mybuilder.com/scheduling-ec2-instances-using-lambda-and-cloudwatch-events/
+canonical: https://tech.mybuilder.com/scheduling-ec2-instances-using-lambda-and-cloudwatch-events/
 meta: 'Looking into Scheduling EC2 Instances using Lambda and CloudWatch Events'
 ---
 

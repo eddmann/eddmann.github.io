@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Insight into Site Reliability Engineering with Niall Murphy'
-link: https://tech.mybuilder.com/insight-into-site-reliability-engineering-with-niall-murphy/
+canonical: https://tech.mybuilder.com/insight-into-site-reliability-engineering-with-niall-murphy/
 meta: 'Insight into Site Reliability Engineering with Niall Murphy'
 ---
 

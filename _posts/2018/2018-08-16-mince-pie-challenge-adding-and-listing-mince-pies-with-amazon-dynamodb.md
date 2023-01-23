@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
-link: https://tech.mybuilder.com/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/
 meta: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Creating a Command Line Application to Fetch URL Titles in Go'
-link: https://tech.mybuilder.com/creating-a-command-line-application-to-fetch-url-titles-in-go/
+canonical: https://tech.mybuilder.com/creating-a-command-line-application-to-fetch-url-titles-in-go/
 meta: 'Creating a Command Line Application to Fetch URL Titles in Go'
 ---
 

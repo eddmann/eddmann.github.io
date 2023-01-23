@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
-link: https://tech.mybuilder.com/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/
 meta: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
 ---
 

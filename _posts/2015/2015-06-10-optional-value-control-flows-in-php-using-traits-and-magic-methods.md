@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Optional Value Control-flows in PHP using Traits and Magic-methods'
-link: https://tech.mybuilder.com/optional-value-control-flows-in-php-using-traits-and-magic-methods/
+canonical: https://tech.mybuilder.com/optional-value-control-flows-in-php-using-traits-and-magic-methods/
 meta: 'Exploring optional value control-flows using multiple PHP features'
 ---
 

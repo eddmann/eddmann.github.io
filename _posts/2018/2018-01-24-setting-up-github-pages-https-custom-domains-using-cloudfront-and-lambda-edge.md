@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge'
-link: https://tech.mybuilder.com/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/
+canonical: https://tech.mybuilder.com/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/
 meta: 'Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge'
 ---
 

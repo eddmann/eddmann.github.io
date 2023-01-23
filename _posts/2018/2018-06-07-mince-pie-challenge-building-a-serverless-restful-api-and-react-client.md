@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
-link: https://tech.mybuilder.com/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/
 meta: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
 ---
 

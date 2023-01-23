@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript'
-link: https://tech.mybuilder.com/building-a-babel-plugin-adding-a-function-composition-operator-and-auto-curried-functions-to-javascript/
+canonical: https://tech.mybuilder.com/building-a-babel-plugin-adding-a-function-composition-operator-and-auto-curried-functions-to-javascript/
 meta: 'Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript'
 ---
 

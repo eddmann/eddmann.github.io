@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
-link: https://tech.mybuilder.com/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/
 meta: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
 ---
 

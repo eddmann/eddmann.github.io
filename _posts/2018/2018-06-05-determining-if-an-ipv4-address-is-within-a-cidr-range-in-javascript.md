@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Determining if an IPv4 address is within a CIDR range in JavaScript'
-link: https://tech.mybuilder.com/determining-if-an-ipv4-address-is-within-a-cidr-range-in-javascript/
+canonical: https://tech.mybuilder.com/determining-if-an-ipv4-address-is-within-a-cidr-range-in-javascript/
 meta: 'Determining if an IPv4 address is within a CIDR range in JavaScript'
 ---
 

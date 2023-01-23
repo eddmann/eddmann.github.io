@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Handling Retries and Back-off Attempts with JavaScript Promises'
-link: https://tech.mybuilder.com/handling-retries-and-back-off-attempts-with-javascript-promises/
+canonical: https://tech.mybuilder.com/handling-retries-and-back-off-attempts-with-javascript-promises/
 meta: 'Looking into handling Retries and Back-off Attempts with JavaScript Promises'
 ---
 

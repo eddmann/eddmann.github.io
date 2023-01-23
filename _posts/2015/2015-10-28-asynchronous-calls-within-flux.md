@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Asynchronous Calls within Flux'
-link: https://tech.mybuilder.com/asynchronous-calls-within-flux/
+canonical: https://tech.mybuilder.com/asynchronous-calls-within-flux/
 meta: 'Exploration into handling asynchronous calls within the Flux architecture'
 ---
 

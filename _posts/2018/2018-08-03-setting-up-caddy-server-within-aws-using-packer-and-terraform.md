@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Setting up Caddy Server within AWS using Packer and Terraform'
-link: https://tech.mybuilder.com/setting-up-caddy-server-within-aws-using-packer-and-terraform/
+canonical: https://tech.mybuilder.com/setting-up-caddy-server-within-aws-using-packer-and-terraform/
 meta: 'Setting up Caddy Server within AWS using Packer and Terraform'
 ---
 

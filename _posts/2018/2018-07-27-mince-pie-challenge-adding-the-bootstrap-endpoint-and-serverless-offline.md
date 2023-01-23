@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
-link: https://tech.mybuilder.com/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/
 meta: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
 ---
 

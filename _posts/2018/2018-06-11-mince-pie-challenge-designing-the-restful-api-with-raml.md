@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Designing the RESTful API with RAML'
-link: https://tech.mybuilder.com/mince-pie-challenge-designing-the-restful-api-with-raml/
+canonical: https://tech.mybuilder.com/mince-pie-challenge-designing-the-restful-api-with-raml/
 meta: 'Mince Pie Challenge: Designing the RESTful API with RAML'
 ---
 

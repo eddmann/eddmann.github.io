@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Handling Time-Dependent State Recording using React'
-link: https://tech.mybuilder.com/handling-time-dependent-state-recording-using-react/
+canonical: https://tech.mybuilder.com/handling-time-dependent-state-recording-using-react/
 meta: 'Exploration into handling Time-Dependent State Recording using React'
 ---
 

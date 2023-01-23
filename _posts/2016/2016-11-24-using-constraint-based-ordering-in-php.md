@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Using Constraint-based Ordering in PHP'
-link: https://tech.mybuilder.com/using-constraint-based-ordering-in-php/
+canonical: https://tech.mybuilder.com/using-constraint-based-ordering-in-php/
 meta: 'Looking into using Constraint-based Ordering in PHP'
 ---
 

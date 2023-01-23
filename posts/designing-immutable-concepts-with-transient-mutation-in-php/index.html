@@ -1,5 +1,98 @@
 <p>In a recent project we felt it beneficial to introduce the Money pattern.
 There are many good <a href="http://martinfowler.com/eaaCatalog/money.html">resources</a> on this pattern, so I will delegate to those for further definition.
 We decided that encapsulating this into a <a href="http://hangar.runway7.net/punditry/immutability-value-objects">immutable value object</a> allowed for a cleaner API and removed the fear of any unexpected mutation bugs.
-However, we noticed a spike in memory and processor usage when wishing to perform many successive actions on such values i.e. summation.
-<!--more--></p>
+However, we noticed a spike in memory and processor usage when wishing to perform many successive actions on such values i.e. summation.</p>
+
+<!--more-->
+
+<p>In such a case, new ‘temporary’ <code class="language-plaintext highlighter-rouge">Money</code> objects would be instantiated upon each applied addition.
+As many of these objects were simply a stepping stone to generating the final result, they were just left for the Garbage collector to clean-up.</p>
+
+<h3 id="using-transient-mutation">Using Transient Mutation</h3>
+
+<p>Instead of running all the way back to mutation, we remembered a pattern found in Clojure called <a href="http://clojure.org/reference/transients">Transients</a>.</p>
+
+<blockquote>
+  <p>If a tree falls in the woods, does it make a sound?
+If a pure function mutates some local data in order to produce an immutable return value, is that ok?</p>
+</blockquote>
+
+<p>This is an interesting proposition; as long as the resulting value is immutable, is it of concern to the caller how it is derived?
+Providing we could explicitly control when mutation was permitted, we could safely reap the benefits that mutable constructs give us.
+We ended up settling on adding a single method <code class="language-plaintext highlighter-rouge">withMutation</code> to the API.
+The caller would provide a <code class="language-plaintext highlighter-rouge">callable</code> that would in-turn be passed a mutable copy of the <code class="language-plaintext highlighter-rouge">Money</code> instance.
+This allowed the user to interact with the API in a mutable manner, but the caveat being only within the scope of the callable.
+The value that was finally returned would subsequently be made immutable again.
+In respect to the caller, the action that had occurred would seem immutable in-nature.</p>
+
+<h3 id="the-implementation">The Implementation</h3>
+
+<p>Below is a trait-based generalisation of the concept we introduced into our Money pattern implementation.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">WithMutable</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$mutable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="n">isMutable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">mutable</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">withMutable</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$fn</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$x</span> <span class="o">=</span> <span class="k">clone</span> <span class="nv">$this</span><span class="p">;</span>
+
+        <span class="nv">$x</span><span class="o">-&gt;</span><span class="n">mutable</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="nv">$x</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$fn</span><span class="p">,</span> <span class="nv">$x</span><span class="p">);</span>
+        <span class="nv">$x</span><span class="o">-&gt;</span><span class="n">mutable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="nv">$x</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As you can see, we provide a <code class="language-plaintext highlighter-rouge">isMutable</code> flag to decide between (im)mutable modes.
+We are then able to use <code class="language-plaintext highlighter-rouge">withMutable</code> in any process that would benefit from explicit mutable constructs.
+Below you can see how we improved upon the performance characteristics of the <code class="language-plaintext highlighter-rouge">sum</code> example initially discussed.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Money</span>
+<span class="p">{</span>
+    <span class="kn">use</span> <span class="nc">WithMutable</span><span class="p">;</span>
+
+    <span class="k">private</span> <span class="nv">$pence</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$pence</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pence</span> <span class="o">=</span> <span class="nv">$pence</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="n">add</span><span class="p">(</span><span class="kt">Money</span> <span class="nv">$that</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">update</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pence</span> <span class="o">+</span> <span class="nv">$that</span><span class="o">-&gt;</span><span class="n">pence</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">private</span> <span class="k">function</span> <span class="n">update</span><span class="p">(</span><span class="nv">$pence</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isMutable</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">pence</span> <span class="o">=</span> <span class="nv">$pence</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">static</span><span class="p">(</span><span class="nv">$pence</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">sum</span><span class="p">(</span><span class="cm">/* Money[] */</span> <span class="p">...</span><span class="nv">$monies</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">array_pop</span><span class="p">(</span><span class="nv">$monies</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">withMutable</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$sum</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$monies</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">foreach</span> <span class="p">(</span><span class="nv">$monies</span> <span class="k">as</span> <span class="nv">$money</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$sum</span><span class="o">-&gt;</span><span class="nf">add</span><span class="p">(</span><span class="nv">$money</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="nv">$sum</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Providing such capabilities gives the user the freedom to use mutation when applicable in a controlled setting.
+This helps reduce wasted memory and processor usage, whilst keeping all mutation decisions within the abstraction.</p>

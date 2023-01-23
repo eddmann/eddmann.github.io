@@ -1,4 +1,171 @@
 <p>When writing show-notes for <a href="https://threedevsandamaybe.com/">Three Devs and a Maybe</a> it is tedious work to extract the associated show-link titles and generate a Markdown list from them.
 This is something that I have <a href="https://eddmann.com/posts/fetching-link-titles-using-promises-and-async-await-in-javascript/">documented in the past</a>, providing an automated solution to this problem.
-However, in this post I would like to discuss implementing such a command-line tool using <a href="https://golang.org/">Golang</a>, creating self-reliant executables that can be cross-compiled for Mac, Windows and Linux.
-<!--more--></p>
+However, in this post I would like to discuss implementing such a command-line tool using <a href="https://golang.org/">Golang</a>, creating self-reliant executables that can be cross-compiled for Mac, Windows and Linux.</p>
+
+<!--more-->
+
+<p>The command-line application (entitled <code class="language-plaintext highlighter-rouge">urls-to-md</code>) will read in the latest clipboard contents, and then fetch the associated titles per URL found (using concurrent <a href="https://tour.golang.org/concurrency/1">Goroutines</a>).
+It will then generate a Markdown list representation of these results and output this to the clipboard for easy inclusion into the show-notes.</p>
+
+<h3 id="setting-up-the-development-toolchain-with-docker">Setting up the Development Toolchain with Docker</h3>
+
+<p>The first step to creating this application is to setup the required development environment dependencies.
+We will be containerising this environment using Docker, allowing others to easily setup and continue development in the future.
+To start we will create a new <code class="language-plaintext highlighter-rouge">Dockerfile</code> with the following definition.</p>
+
+<div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> golang:1.10-alpine3.8</span>
+<span class="k">RUN </span>apk update<span class="p">;</span> apk upgrade
+<span class="k">RUN </span>apk add git
+<span class="k">RUN </span>go get <span class="nt">-u</span> github.com/golang/dep/cmd/dep
+<span class="k">WORKDIR</span><span class="s"> /go/src/app</span>
+<span class="k">VOLUME</span><span class="s"> ["/go/src/app"]</span>
+</code></pre></div></div>
+
+<p>This definition will create an image based on the official <code class="language-plaintext highlighter-rouge">golang:1.10-alpine3.8</code> release.
+It then ensures that all packages are up-to-date and includes <a href="https://github.com/golang/dep">dep</a> for managing dependencies within Go.
+From here we can add our first targets to a <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">IMAGE_NAME</span><span class="o">=</span>eddmann/urls-to-md
+
+<span class="nl">image</span><span class="o">:</span>
+  <span class="err">docker</span> <span class="err">build</span> <span class="err">-t</span> <span class="err">$(IMAGE_NAME)</span> <span class="err">.</span>
+
+<span class="nl">shell</span><span class="o">:</span>
+  <span class="nl">docker run --rm -v "$(PWD)"</span><span class="o">:</span><span class="nf">/go/src/app $(IMAGE_NAME) /bin/sh</span>
+</code></pre></div></div>
+
+<h3 id="writing-the-application">Writing the Application</h3>
+
+<p>With this <code class="language-plaintext highlighter-rouge">Makefile</code> present we can then execute <code class="language-plaintext highlighter-rouge">make image</code> and subsequently <code class="language-plaintext highlighter-rouge">make shell</code>.
+This will bring up a terminal session within a running container instance, allowing us to commence building our command-line application.
+Within this session we will execute <code class="language-plaintext highlighter-rouge">dep init</code>, which will create initial <code class="language-plaintext highlighter-rouge">Gopkg.lock</code> and <code class="language-plaintext highlighter-rouge">Gopkg.toml</code> files to keep our dependencies in check.</p>
+
+<p>From here, we will create the Go application within <code class="language-plaintext highlighter-rouge">urls-to-md.go</code>.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+  <span class="s">"fmt"</span>
+  <span class="s">"github.com/PuerkitoBio/goquery"</span>
+  <span class="s">"github.com/atotto/clipboard"</span>
+  <span class="s">"net/url"</span>
+  <span class="s">"strings"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">isValidUri</span><span class="p">(</span><span class="n">uri</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+  <span class="n">_</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">url</span><span class="o">.</span><span class="n">ParseRequestURI</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">err</span> <span class="o">==</span> <span class="no">nil</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">toUrlList</span><span class="p">(</span><span class="n">input</span> <span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="kt">string</span> <span class="p">{</span>
+  <span class="n">list</span> <span class="o">:=</span> <span class="n">strings</span><span class="o">.</span><span class="n">Split</span><span class="p">(</span><span class="n">strings</span><span class="o">.</span><span class="n">TrimSpace</span><span class="p">(</span><span class="n">input</span><span class="p">),</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+  <span class="n">urls</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">string</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">url</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">list</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">isValidUri</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">urls</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">urls</span>
+<span class="p">}</span>
+
+<span class="k">type</span> <span class="n">UrlTitle</span> <span class="k">struct</span> <span class="p">{</span>
+  <span class="n">idx</span>   <span class="kt">int</span>
+  <span class="n">url</span>   <span class="kt">string</span>
+  <span class="n">title</span> <span class="kt">string</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">fetchUrlTitles</span><span class="p">(</span><span class="n">urls</span> <span class="p">[]</span><span class="kt">string</span><span class="p">)</span> <span class="p">[]</span><span class="o">*</span><span class="n">UrlTitle</span> <span class="p">{</span>
+  <span class="n">ch</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="k">chan</span> <span class="o">*</span><span class="n">UrlTitle</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">))</span>
+
+  <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">urls</span> <span class="p">{</span>
+    <span class="k">go</span> <span class="k">func</span><span class="p">(</span><span class="n">idx</span> <span class="kt">int</span><span class="p">,</span> <span class="n">url</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">doc</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">goquery</span><span class="o">.</span><span class="n">NewDocument</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+      <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">ch</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="n">UrlTitle</span><span class="p">{</span><span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="s">""</span><span class="p">}</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">ch</span> <span class="o">&lt;-</span> <span class="o">&amp;</span><span class="n">UrlTitle</span><span class="p">{</span><span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">doc</span><span class="o">.</span><span class="n">Find</span><span class="p">(</span><span class="s">"title"</span><span class="p">)</span><span class="o">.</span><span class="n">Text</span><span class="p">()}</span>
+      <span class="p">}</span>
+    <span class="p">}(</span><span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">urlsWithTitles</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="o">*</span><span class="n">UrlTitle</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">))</span>
+
+  <span class="k">for</span> <span class="n">_</span> <span class="o">=</span> <span class="k">range</span> <span class="n">urls</span> <span class="p">{</span>
+    <span class="n">urlWithTitle</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="n">ch</span>
+    <span class="n">urlsWithTitles</span><span class="p">[</span><span class="n">urlWithTitle</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">urlWithTitle</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">urlsWithTitles</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">toMarkdownList</span><span class="p">(</span><span class="n">urlsWithTitles</span> <span class="p">[]</span><span class="o">*</span><span class="n">UrlTitle</span><span class="p">)</span> <span class="kt">string</span> <span class="p">{</span>
+  <span class="n">markdown</span> <span class="o">:=</span> <span class="s">""</span>
+
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">urlWithTitle</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">urlsWithTitles</span> <span class="p">{</span>
+    <span class="n">markdown</span> <span class="o">+=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"- [%s](%s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">urlWithTitle</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">urlWithTitle</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">strings</span><span class="o">.</span><span class="n">TrimSpace</span><span class="p">(</span><span class="n">markdown</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">input</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">clipboard</span><span class="o">.</span><span class="n">ReadAll</span><span class="p">()</span>
+
+  <span class="n">urls</span> <span class="o">:=</span> <span class="n">toUrlList</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span> <span class="o">==</span> <span class="m">0</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"No URLs found in clipboard."</span><span class="p">)</span>
+    <span class="k">return</span>
+  <span class="p">}</span>
+
+  <span class="n">urlsWithTitles</span> <span class="o">:=</span> <span class="n">fetchUrlTitles</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+
+  <span class="n">markdown</span> <span class="o">:=</span> <span class="n">toMarkdownList</span><span class="p">(</span><span class="n">urlsWithTitles</span><span class="p">)</span>
+
+  <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">markdown</span><span class="p">)</span>
+
+  <span class="n">clipboard</span><span class="o">.</span><span class="n">WriteAll</span><span class="p">(</span><span class="n">markdown</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This application takes advantage of a couple of third-party dependencies (<a href="https://github.com/atotto/clipboard">clipboard</a> and <a href="https://github.com/PuerkitoBio/goquery">goquery</a>), to read/write to the systems clipboard and locate the title contents from the URL response.</p>
+
+<p>We encapsulate every URL request into light-weight Goroutines, allowing these calls to occur concurrently.
+As the order in which these channels complete can not be relied upon, we ensure that the results are put back in the same order that we received them.</p>
+
+<p>With this in place we can pull-down and make the third-party dependencies available (within a <code class="language-plaintext highlighter-rouge">vendors</code> directory) by adding and executing the following target to the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">deps</span><span class="o">:</span>
+  <span class="nl">docker run --rm -v "$(PWD)"</span><span class="o">:</span><span class="nf">/go/src/app $(IMAGE_NAME) dep ensure</span>
+</code></pre></div></div>
+
+<h3 id="distributing-the-application">Distributing the Application</h3>
+
+<p>Finally, we can cross-compile this command line application for all the desired systems by adding and executing the following new target within the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">DIST_OS</span><span class="o">=</span>darwin linux windows
+<span class="nv">DIST_ARCH</span><span class="o">=</span>amd64
+
+<span class="nl">build</span><span class="o">:</span>
+  <span class="nl">docker run --rm -v "$(PWD)"</span><span class="o">:</span><span class="nf">/go/src/app $(IMAGE_NAME) /bin/sh -c ' </span>\
+<span class="nf">    rm -fr ./dist/*; </span>\
+<span class="nf">    for GOOS in $(DIST_OS); do </span>\
+<span class="nf">      for GOARCH in $(DIST_ARCH); do </span>\
+<span class="nf">        GOOS=$$GOOS GOARCH=$$GOARCH go build -o ./dist/urls-to-md-$$GOOS-$$GOARCH ./urls-to-md.go; </span>\
+<span class="nf">      done; </span>\
+<span class="nf">    done;'</span>
+</code></pre></div></div>
+
+<p>This target will compile individual executable artifacts for all the specified operating system and architecture combinations.
+We should now be able to test the relevant artifact for the host system you are currently using, in my case macOS.</p>
+
+<p><img src="/uploads/posts/creating-a-command-line-application-to-fetch-url-titles-in-go/urls-to-md-darwin-amd64.gif" alt="Command Line Application Demo" /></p>
+
+<p>I hope you have found it interesting looking into developing and distributing a trivial command-line application using Golang.
+The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this is extremely useful.</p>
+
+<p>You can find the full source-code for this application within the <a href="https://github.com/eddmann/urls-to-md">GitHub repository</a>.</p>

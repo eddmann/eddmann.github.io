@@ -1,5 +1,209 @@
 <p>In a recent Software Engineering Daily <a href="https://softwareengineeringdaily.com/2018/06/21/babel-with-henry-zhu/">podcast</a> Henry Zhu discussed the <a href="https://babeljs.io/">Babel</a> project, and shed some light into how the transpiler works under-the-hood.
 He touched upon how <a href="https://babeljs.io/docs/en/plugins.html">Plugins</a> can be created to alter the resulting compiled code.
 I was very interested in experimenting with this capability.
-In this post I wish to highlight the process in which Babel transforms your code, developing several interesting plugins along the way.
-<!--more--></p>
+In this post I wish to highlight the process in which Babel transforms your code, developing several interesting plugins along the way.</p>
+
+<!--more-->
+
+<h3 id="how-does-babel-work">How does Babel work?</h3>
+
+<p>There are three main stages to the Babel lifecycle, these are:</p>
+
+<ul>
+  <li><strong>Parse</strong> - takes the supplied code and produces an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> (AST) from it.</li>
+  <li><strong>Transform</strong> - traverses this created AST, applying any plugin modifications along the way.</li>
+  <li><strong>Generate</strong> - takes this transformed AST and converts it back into code form.</li>
+</ul>
+
+<p>As you can see, plugins target the second stage of this lifecycle.
+The AST is traversed using the <a href="https://sourcemaking.com/design_patterns/visitor">Visitor pattern</a>, which allows us to build plugins that only target specific node types, manipulating them as we desire.
+I highly recommend that you take a look at the <a href="https://github.com/jamiebuilds/babel-handbook">Babel Handbook</a> to get more-depth insight into how these underlying concepts work.</p>
+
+<p>Now we have a basic understanding of how Babel works, we can move on to building some example plugins!
+For this we will be using an awesome online <a href="https://astexplorer.net/">AST Explorer</a>, which allows us to not only build the plugin, but also inspect both the intermediate (AST) and compiled form.</p>
+
+<h3 id="adding-a-function-composition-operator">Adding a Function Composition Operator</h3>
+
+<p>In languages such as Haskell and F#, you can simply compose two functions together using infix <code class="language-plaintext highlighter-rouge">.</code> and <code class="language-plaintext highlighter-rouge">&gt;&gt;</code> operators respectively.
+In the case of F#, this allows you to visualise the call stack going left-right, as opposed to in-out.</p>
+
+<p>As it is not yet possible (by official means) to add user-defined syntax to JavaScript using Babel, we will instead replace the purpose of the infix <code class="language-plaintext highlighter-rouge">&amp;</code> bitwise AND operator token.
+Using this plugin we wish to be able to provide and generate the code example shown below.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">toUpperCase</span> <span class="o">&amp;</span> <span class="nx">trim</span> <span class="o">&amp;</span> <span class="nx">emphasise</span><span class="p">;</span>
+<span class="c1">// converts to</span>
+<span class="kd">const</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">emphasise</span><span class="p">(</span><span class="nx">trim</span><span class="p">(</span><span class="nx">toUpperCase</span><span class="p">(</span><span class="nx">x</span><span class="p">)));</span>
+</code></pre></div></div>
+
+<p>We can achieve this by using the following documented plugin.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">visitor</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nx">BinaryExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">t</span><span class="p">.</span><span class="nx">isBinaryExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">node</span><span class="p">,</span> <span class="p">{</span> <span class="na">operator</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span> <span class="p">}))</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="kd">const</span> <span class="nx">flatten</span> <span class="o">=</span> <span class="nx">node</span> <span class="o">=&gt;</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">isBinaryExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">,</span> <span class="p">{</span> <span class="na">operator</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span> <span class="p">})</span>
+          <span class="p">?</span> <span class="p">[...</span><span class="nx">flatten</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">left</span><span class="p">),</span> <span class="p">...</span><span class="nx">flatten</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">right</span><span class="p">)]</span>
+          <span class="p">:</span> <span class="p">[</span><span class="nx">node</span><span class="p">];</span>
+
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">flatten</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">node</span><span class="p">);</span>
+
+      <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">(</span>
+          <span class="p">[</span><span class="nx">t</span><span class="p">.</span><span class="nx">identifier</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">)],</span>
+          <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+            <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">call</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">call</span><span class="p">,</span> <span class="p">[</span><span class="nx">expr</span><span class="p">]),</span>
+            <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">head</span><span class="p">,</span> <span class="p">[</span><span class="nx">t</span><span class="p">.</span><span class="nx">identifier</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">)])</span>
+          <span class="p">)</span>
+        <span class="p">)</span>
+      <span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>As you can see we only wish to target <code class="language-plaintext highlighter-rouge">BinaryExpression</code> nodes which reference the <code class="language-plaintext highlighter-rouge">&amp;</code> operator.
+Once found we then traverse this expression, returning all nested expression values.
+This allows us to optimally compose many functions together, such as what is highlighted in the example use-case previously shown.
+We are then able to build a new nested <code class="language-plaintext highlighter-rouge">CallExpression</code>, and replace the <code class="language-plaintext highlighter-rouge">BinaryExpression</code> node itself with a single <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code>.</p>
+
+<p>You can see this plugin in action by visiting the accompanying <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47">AST Explorer snippet</a>.</p>
+
+<h3 id="auto-curried-functions">Auto-Curried Functions</h3>
+
+<p>Another feature that can be found in languages such as Haskell and F# is the concept of all functions (by-default) being <a href="https://en.wikipedia.org/wiki/Currying">curried</a>.
+This can be observed as all functions with multiple parameters being broken up into a chained series of single parameter functions.
+This results in the ability to easily create new functions from existing ones, with minimal boilerplate.</p>
+
+<p>We will now try and apply this idea to JavaScript.
+This will mean that all created functions (regardless of parameter arity) are internally made using a series of single parameter functions.
+From here, we will then expand upon this and cater for partial application - converting calls that provide more than one argument into their curried counterparts.
+These use-cases are best shown with examples.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// converts to</span>
+<span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">subtract</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="c1">// converts to</span>
+<span class="kd">var</span> <span class="nx">subtract</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">multiply</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
+<span class="c1">// converts to</span>
+<span class="kd">const</span> <span class="nx">multiply</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">b</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
+</code></pre></div></div>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="c1">// converts to</span>
+<span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>As you can see there are three different ways of declaring a function within JavaScript.
+We will start by addressing the first two, <code class="language-plaintext highlighter-rouge">FunctionDeclaration</code> and <code class="language-plaintext highlighter-rouge">FunctionExpression</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">visitor</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">FunctionDeclaration|FunctionExpression</span><span class="dl">'</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="kd">const</span> <span class="nx">build</span> <span class="o">=</span> <span class="p">([</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">head</span><span class="p">)</span> <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">blockStatement</span><span class="p">([</span>
+          <span class="nx">t</span><span class="p">.</span><span class="nx">returnStatement</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">functionExpression</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">],</span> <span class="nx">build</span><span class="p">(</span><span class="nx">tail</span><span class="p">))),</span>
+        <span class="p">]);</span>
+      <span class="p">};</span>
+
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">;</span>
+
+      <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span><span class="nx">t</span><span class="p">[</span><span class="nx">node</span><span class="p">.</span><span class="nx">type</span><span class="p">](</span><span class="nx">node</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">],</span> <span class="nx">build</span><span class="p">(</span><span class="nx">tail</span><span class="p">)));</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>We are able to target several different node types within the same Visitor function.
+When we encounter one of these nodes we first ensure that their is more than one parameter present within the function - as there is no need to modify it if this is not the case.
+After this check, we recursively build up a nested <code class="language-plaintext highlighter-rouge">FunctionExpression</code> which breaks each parameter up into a separate function call.
+Finally, we replace the node with one of the same type, ensuring that any function identifier is included within this declaration.</p>
+
+<p>The third way in which a function can be declared within JavaScript is with a <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code>.
+In this instance we are able to provide a simpler means of producing the intended output.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="nx">ArrowFunctionExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">reverse</span><span class="p">();</span>
+
+    <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
+      <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+        <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">param</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">([</span><span class="nx">param</span><span class="p">],</span> <span class="nx">expr</span><span class="p">),</span>
+        <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">([</span><span class="nx">head</span><span class="p">],</span> <span class="nx">node</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span>
+      <span class="p">)</span>
+    <span class="p">);</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>For this change we only need to do a single right fold over the parameters, building a new nested <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code> we can replace the current node with.</p>
+
+<p>Finally, we can now look into how we should handle the transformation of function invocations that provide more than one argument.
+Modifying these allows us to ensure that our new curried paradigm is compatible with existing code.
+We can achieve this as follows.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="nx">CallExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">isMemberExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">callee</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">arguments</span><span class="p">;</span>
+
+    <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
+      <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">arg</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="p">[</span><span class="nx">arg</span><span class="p">]),</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">callee</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">]))</span>
+    <span class="p">);</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>We first need to ensure that the <code class="language-plaintext highlighter-rouge">CallExpression</code> has more than the intended one argument.
+If this is the case, we then need to check that the call does not originate from a object member invocation (<code class="language-plaintext highlighter-rouge">object.fn()</code>) as we do not wish to modify this form.
+With these checks now complete we can simply perform a left fold over the arguments, building up a final <code class="language-plaintext highlighter-rouge">CallExpression</code> that handles one argument at a time.</p>
+
+<p>You can see this plugin in action by visiting the accompanying <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd">AST Explorer snippet</a>.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>I hope this post has given you some practical insight into how a Babel Plugin is created using AST manipulation.
+As highlighted throughout the post you can experiment with both the <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47">Function Composition Operator</a> and <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd">Auto-Curried Functions</a> plugins on AST Explorer.</p>

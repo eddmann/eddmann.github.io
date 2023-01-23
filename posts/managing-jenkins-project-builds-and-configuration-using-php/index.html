@@ -1,5 +1,150 @@
 <p>Throughout project development we use Jenkins to provide meaningful test feedback on each Git push event.
 These builds are required for a sufficient amount of confidence to be gained for merging into <em>master</em> and subsequently deployment.
 Each member of the team has their own project which they manage with the current project/branch they are working on.
-However, typically we find ourselves working on multiple branches throughout the day, and it can become cumbersome to update the projects configuration.
-<!--more--></p>
+However, typically we find ourselves working on multiple branches throughout the day, and it can become cumbersome to update the projects configuration.</p>
+
+<!--more-->
+
+<p>I decided to create a simple PHP console script that can be run (or added as a git-hook) to maintain synchronization between the branch you are working on and the branch Jenkins is building.
+Whilst developing this script, it dawned on me that many other automated use-cases could be achieved with the ability to easily update a projects configuration file.
+Due to this I have provided the full script in question at the end of the post, but wish to discuss important areas in more detail throughout.</p>
+
+<h2 id="reading-the-projects-configuration">Reading the Projects Configuration</h2>
+
+<p>Jenkins fortunately provides us with a RESTful interface to manage typical tasks and activities.
+Included in this is the ability to read the XML configuration file for a specified project.
+In this use-case we are only concerned with accessing the currently configured Git branch name.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$curl</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">(</span><span class="nf">url</span><span class="p">(</span><span class="s1">'config.xml'</span><span class="p">));</span>
+
+<span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="no">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="no">CURLOPT_HEADER</span> <span class="o">=&gt;</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="no">CURLOPT_FOLLOWLOCATION</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SimpleXMLElement</span><span class="p">(</span><span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">));</span>
+
+<span class="nv">$jobBranch</span> <span class="o">=</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="nv">$config</span><span class="o">-&gt;</span><span class="n">scm</span><span class="o">-&gt;</span><span class="n">branches</span><span class="o">-&gt;</span><span class="p">{</span><span class="s1">'hudson.plugins.git.BranchSpec'</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="writing-to-the-projects-configuration">Writing to the Projects Configuration</h2>
+
+<p>Now that we have access to the current projects configuration XML, we can update the specified branch as desired.
+To achieve this we are required to POST the updated configuration file back to the API, as shown below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$config</span><span class="o">-&gt;</span><span class="n">scm</span><span class="o">-&gt;</span><span class="n">branches</span><span class="o">-&gt;</span><span class="p">{</span><span class="s1">'hudson.plugins.git.BranchSpec'</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nv">$localBranch</span><span class="p">;</span>
+
+<span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s1">'php://memory'</span><span class="p">,</span> <span class="s1">'rw'</span><span class="p">);</span>
+<span class="nb">fwrite</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nv">$xml</span> <span class="o">=</span> <span class="nv">$config</span><span class="o">-&gt;</span><span class="nf">asXML</span><span class="p">());</span>
+<span class="nb">rewind</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+
+<span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="no">CURLOPT_HTTPHEADER</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-type: application/xml'</span><span class="p">),</span>
+    <span class="no">CURLOPT_INFILE</span> <span class="o">=&gt;</span> <span class="nv">$fh</span><span class="p">,</span>
+    <span class="no">CURLOPT_INFILESIZE</span> <span class="o">=&gt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$xml</span><span class="p">),</span>
+    <span class="no">CURLOPT_UPLOAD</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="no">CURLOPT_CUSTOMREQUEST</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="sending-a-project-build-request">Sending a Project Build Request</h2>
+
+<p>With the updated branch configuration now in-place, we can send Jenkins a request to start a new build of the project.
+This can be simply achieved by updating the current cURL instance and making a POST request to the build API endpoint.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="no">CURLOPT_URL</span> <span class="o">=&gt;</span> <span class="nf">url</span><span class="p">(</span><span class="s1">'build'</span><span class="p">),</span>
+    <span class="no">CURLOPT_CUSTOMREQUEST</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="the-full-script">The Full Script</h2>
+
+<p>Using these examples we are now able to combine them, solving the use-case laid out at the start of the post.
+Accessing a specified projects configuration file, we check to see if the branch is the same as the one we are locally using.
+If this is not the case we update the configuration XML and then ask the user if they wish to trigger a build of the project.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/usr/bin/php
+<span class="cp">&lt;?php</span>
+
+<span class="cm">/*
+.bash_profile
+export JENKINS_AUTH="username:secretkey"
+export JENKINS_JOB="Jenkins-Project"
+export JENKINS_URL="jenkins.example.com"
+*/</span>
+
+<span class="k">function</span> <span class="n">url</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">sprintf</span><span class="p">(</span>
+        <span class="s1">'http://%s@%s/job/%s/%s'</span><span class="p">,</span>
+        <span class="nb">getenv</span><span class="p">(</span><span class="s1">'JENKINS_AUTH'</span><span class="p">),</span> <span class="nb">getenv</span><span class="p">(</span><span class="s1">'JENKINS_URL'</span><span class="p">),</span> <span class="nb">getenv</span><span class="p">(</span><span class="s1">'JENKINS_JOB'</span><span class="p">),</span> <span class="nv">$path</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// read branch</span>
+
+<span class="nv">$curl</span> <span class="o">=</span> <span class="nb">curl_init</span><span class="p">(</span><span class="nf">url</span><span class="p">(</span><span class="s1">'config.xml'</span><span class="p">));</span>
+
+<span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="no">CURLOPT_RETURNTRANSFER</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="no">CURLOPT_HEADER</span> <span class="o">=&gt;</span> <span class="kc">false</span><span class="p">,</span>
+    <span class="no">CURLOPT_FOLLOWLOCATION</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SimpleXMLElement</span><span class="p">(</span><span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">));</span>
+
+<span class="nv">$localBranch</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">shell_exec</span><span class="p">(</span><span class="s1">'git rev-parse --abbrev-ref HEAD'</span><span class="p">));</span>
+<span class="nv">$jobBranch</span> <span class="o">=</span> <span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="nv">$config</span><span class="o">-&gt;</span><span class="n">scm</span><span class="o">-&gt;</span><span class="n">branches</span><span class="o">-&gt;</span><span class="p">{</span><span class="s1">'hudson.plugins.git.BranchSpec'</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$localBranch</span> <span class="o">===</span> <span class="nv">$jobBranch</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$localBranch</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+    <span class="k">goto</span> <span class="n">build</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// rename branch</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="n">scm</span><span class="o">-&gt;</span><span class="n">branches</span><span class="o">-&gt;</span><span class="p">{</span><span class="s1">'hudson.plugins.git.BranchSpec'</span><span class="p">}</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nv">$localBranch</span><span class="p">;</span>
+
+<span class="nv">$fh</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s1">'php://memory'</span><span class="p">,</span> <span class="s1">'rw'</span><span class="p">);</span>
+<span class="nb">fwrite</span><span class="p">(</span><span class="nv">$fh</span><span class="p">,</span> <span class="nv">$xml</span> <span class="o">=</span> <span class="nv">$config</span><span class="o">-&gt;</span><span class="nf">asXML</span><span class="p">());</span>
+<span class="nb">rewind</span><span class="p">(</span><span class="nv">$fh</span><span class="p">);</span>
+
+<span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="no">CURLOPT_HTTPHEADER</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-type: application/xml'</span><span class="p">),</span>
+    <span class="no">CURLOPT_INFILE</span> <span class="o">=&gt;</span> <span class="nv">$fh</span><span class="p">,</span>
+    <span class="no">CURLOPT_INFILESIZE</span> <span class="o">=&gt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$xml</span><span class="p">),</span>
+    <span class="no">CURLOPT_UPLOAD</span> <span class="o">=&gt;</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="no">CURLOPT_CUSTOMREQUEST</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">);</span>
+<span class="k">echo</span> <span class="s2">"</span><span class="nv">$jobBranch</span><span class="s2"> -&gt; </span><span class="nv">$localBranch</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+
+<span class="c1">// GOTO: eeeeewwwwww......</span>
+<span class="n">build</span><span class="o">:</span>
+
+<span class="k">echo</span> <span class="s2">"Would you like to perform a build? (y/[n]) "</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="nb">fgets</span><span class="p">(</span><span class="no">STDIN</span><span class="p">))</span> <span class="o">===</span> <span class="s1">'y'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">curl_setopt_array</span><span class="p">(</span><span class="nv">$curl</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="no">CURLOPT_URL</span> <span class="o">=&gt;</span> <span class="nf">url</span><span class="p">(</span><span class="s1">'build'</span><span class="p">),</span>
+        <span class="no">CURLOPT_CUSTOMREQUEST</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span><span class="p">,</span>
+    <span class="p">));</span>
+
+    <span class="nb">curl_exec</span><span class="p">(</span><span class="nv">$curl</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="s2">"Sent build request</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">curl_close</span><span class="p">(</span><span class="nv">$curl</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>An interesting point to highlight in-regard to the full version is the use of defined environment variables to access the current Jenkins setup.
+This is useful as it allows you to publish the script without any requirement to amend it, along with the ability to override configuration on a per-execution basis.
+Finally, the comical use of the ‘goto’ statement to change execution flow based on if the configuration file is required to be modified or not.
+This should obviously not be used in production code but within a small script such as this it has its uses.</p>

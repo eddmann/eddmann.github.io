@@ -1,3 +1,216 @@
 <p>Now that we have spent some time working out how the API is going to look, we can move on to building it!
-We will start off by configuring the initial API project, setting up a Dockerized <a href="https://serverless.com/">Serverless Framework</a> with <a href="https://webpack.js.org/">Webpack</a> and <a href="https://babeljs.io/">Babel</a> support.
-<!--more--></p>
+We will start off by configuring the initial API project, setting up a Dockerized <a href="https://serverless.com/">Serverless Framework</a> with <a href="https://webpack.js.org/">Webpack</a> and <a href="https://babeljs.io/">Babel</a> support.</p>
+
+<!--more-->
+
+<p>If you are keen to see how the finished configuration looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/01-base">API repository</a>.</p>
+
+<h3 id="serverless-framework-via-docker">Serverless Framework via Docker</h3>
+
+<p>So as to make the project easy-to-setup on many different development environments, we will employ Docker to manage the Serverless Framework and Node dependencies.
+We will take advantage of a pre-built Node 8 image and add the ability to run the Serverless Framework within it.
+For allowing us to support future Node dependencies that require <code class="language-plaintext highlighter-rouge">glibc</code> and container exploration via a Bash shell, we will also include these into our image definition.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM node:8-alpine
+RUN apk --no-cache add bash ca-certificates wget
+RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub &amp;&amp; \
+    wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.27-r0/glibc-2.27-r0.apk &amp;&amp; \
+    apk add glibc-2.27-r0.apk &amp;&amp; \
+    rm -f glibc-2.27-r0.apk
+RUN yarn global add serverless@1.28.0
+WORKDIR /opt/app
+</code></pre></div></div>
+
+<p>When the container is initiated we wish to supply the AWS credentials (<code class="language-plaintext highlighter-rouge">AWS_ACCESS_KEY_ID</code>, <code class="language-plaintext highlighter-rouge">AWS_SECRET_ACCESS_KEY</code>) required by Serverless using a given <code class="language-plaintext highlighter-rouge">.env</code> file.
+This allows us to easily control what <a href="https://serverless.com/framework/docs/providers/aws/guide/credentials/">credentials</a> are being used to deploy and maintain the application.
+We will also allow the container to access the code-base and provide a separate volume for Node dependencies to be persisted.
+Doing this allows us to isolate working dependencies targeted at the container architecture and dependencies installed for the host machine.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">3'</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="na">serverless</span><span class="pi">:</span>
+    <span class="na">build</span><span class="pi">:</span> <span class="s">.</span>
+    <span class="na">env_file</span><span class="pi">:</span> <span class="s">.env</span>
+    <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">.:/opt/app</span>
+      <span class="pi">-</span> <span class="s">app-modules:/opt/app/node_modules</span>
+
+<span class="na">volumes</span><span class="pi">:</span>
+  <span class="na">app-modules</span><span class="pi">:</span>
+</code></pre></div></div>
+
+<p>Finally, to make the process of executing the common-place actions on our host machine seamless, we shall define a simple <code class="language-plaintext highlighter-rouge">Makefile</code> which outlines these capabilities in a single place.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">install</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">npm</span> <span class="err">install</span>
+
+<span class="nl">build</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">sls</span> <span class="err">webpack</span> <span class="err">-v</span> <span class="nv">--stage</span><span class="o">=</span>dev
+
+<span class="nl">deploy</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">sls</span> <span class="err">deploy</span> <span class="err">-v</span> <span class="nv">--stage</span><span class="o">=</span>dev
+
+<span class="nl">shell</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">bash</span>
+</code></pre></div></div>
+
+<h3 id="serverless-with-babel-and-webpack">Serverless with Babel and Webpack</h3>
+
+<p>It should be noted that it is not strictly necessary to require Babel and Webpack when working with Lambda and the Serverless Framework.
+However, the ability to use all the latest JavaScript features, along with Webpack’s module bundling (inc. <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a>) are invaluable additions.
+We will start off by defining and installing the explicit development dependencies that we will need.
+Within Lambda, the <code class="language-plaintext highlighter-rouge">aws-sdk</code> dependency comes pre-baked into the runtime, so we only care about including this during development.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"mince-pie-challenge-api"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"private"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"aws-sdk"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^2.268.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-core"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^6.26.3"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-loader"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^7.1.5"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-plugin-transform-object-rest-spread"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^6.26.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"babel-preset-env"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.7.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"serverless-webpack"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.1.5"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"webpack"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^4.15.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"webpack-node-externals"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.7.2"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>From here we can <code class="language-plaintext highlighter-rouge">make install</code> and see the Docker module volume in action.
+You will notice that a <code class="language-plaintext highlighter-rouge">node_modules</code> directory has been created within the code-base but it is empty on your host machine?!
+However, if you <code class="language-plaintext highlighter-rouge">make shell</code> into the container you will notice that the container specific dependencies are present.
+This allows you to optionally install the dependencies on your host machine, without conflicting with the container.</p>
+
+<p>Now lets setup the initial <code class="language-plaintext highlighter-rouge">serverless.yml</code>, <code class="language-plaintext highlighter-rouge">webpack.config.js</code> and <code class="language-plaintext highlighter-rouge">.babelrc</code> configurations.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">mince-pie-challenge-api</span>
+
+<span class="na">provider</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">aws</span>
+  <span class="na">runtime</span><span class="pi">:</span> <span class="s">nodejs8.10</span>
+  <span class="na">stage</span><span class="pi">:</span> <span class="s">${opt:stage, 'dev'}</span>
+  <span class="na">region</span><span class="pi">:</span> <span class="s">eu-west-1</span>
+  <span class="na">environment</span><span class="pi">:</span>
+    <span class="na">GREETING</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Hello'</span>
+  <span class="na">iamRoleStatements</span><span class="pi">:</span> <span class="s">${file(./roles.yml)}</span>
+
+<span class="na">custom</span><span class="pi">:</span>
+  <span class="na">webpack</span><span class="pi">:</span>
+    <span class="na">webpackConfig</span><span class="pi">:</span> <span class="s">./webpack.config.js</span>
+    <span class="na">includeModules</span><span class="pi">:</span>
+      <span class="na">forceExclude</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">aws-sdk</span>
+
+<span class="na">plugins</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">serverless-webpack</span>
+
+<span class="na">package</span><span class="pi">:</span>
+  <span class="na">individually</span><span class="pi">:</span> <span class="no">true</span>
+
+<span class="na">resources</span><span class="pi">:</span> <span class="s">${file(./resources.yml)}</span>
+
+<span class="na">functions</span><span class="pi">:</span> <span class="s">${file(./functions.yml)}</span>
+</code></pre></div></div>
+
+<p>You can see that we have decided to break up the roles, resources and functions into separate YAML files.
+This allows us to manage these definitions in an easier manor, preventing us from creating one huge file.
+We have specified that we wish to use the latest Lambda <a href="https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/">node runtime</a> (at the time of writing), with a single global environment variable set (this will be used in a following demo).
+So as to take full advantage of Webpack we have specified that we wish each function to be packaged individually when deployed.
+This allows us to prune any unused dependencies on a per-function basis.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">slsw</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">serverless-webpack</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">nodeExternals</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">webpack-node-externals</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">entry</span><span class="p">:</span> <span class="nx">slsw</span><span class="p">.</span><span class="nx">lib</span><span class="p">.</span><span class="nx">entries</span><span class="p">,</span>
+  <span class="na">target</span><span class="p">:</span> <span class="dl">'</span><span class="s1">node</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">mode</span><span class="p">:</span> <span class="nx">slsw</span><span class="p">.</span><span class="nx">lib</span><span class="p">.</span><span class="nx">webpack</span><span class="p">.</span><span class="nx">isLocal</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">development</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">production</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">optimization</span><span class="p">:</span> <span class="p">{</span> <span class="na">minimize</span><span class="p">:</span> <span class="kc">false</span> <span class="p">},</span>
+  <span class="na">performance</span><span class="p">:</span> <span class="p">{</span> <span class="na">hints</span><span class="p">:</span> <span class="kc">false</span> <span class="p">},</span>
+  <span class="na">devtool</span><span class="p">:</span> <span class="dl">'</span><span class="s1">nosources-source-map</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">externals</span><span class="p">:</span> <span class="p">[</span><span class="nx">nodeExternals</span><span class="p">()],</span>
+  <span class="na">module</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">rules</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="na">test</span><span class="p">:</span> <span class="sr">/</span><span class="se">\.</span><span class="sr">js$/</span><span class="p">,</span>
+        <span class="na">exclude</span><span class="p">:</span> <span class="sr">/node_modules/</span><span class="p">,</span>
+        <span class="na">use</span><span class="p">:</span> <span class="p">[{</span> <span class="na">loader</span><span class="p">:</span> <span class="dl">'</span><span class="s1">babel-loader</span><span class="dl">'</span> <span class="p">}],</span>
+      <span class="p">},</span>
+    <span class="p">],</span>
+  <span class="p">},</span>
+  <span class="na">output</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">libraryTarget</span><span class="p">:</span> <span class="dl">'</span><span class="s1">commonjs2</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">path</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="dl">'</span><span class="s1">.webpack</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">filename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[name].js</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">sourceMapFilename</span><span class="p">:</span> <span class="dl">'</span><span class="s1">[file].map</span><span class="dl">'</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>We supply Webpack with a simple configuration, specifying that we are targeting Node (allowing us to <a href="https://www.npmjs.com/package/webpack-node-externals">ignore packaging</a> built-in modules) and that wish to use Babel to process our JavaScript files.
+We also define how we wish each function to be output (with their associated source mapping), and which mode to run in based on a <a href="https://github.com/dherault/serverless-offline">serverless-offline</a> flag.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"comments"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"presets"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">"env"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"targets"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"node"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8.10"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}]],</span><span class="w">
+  </span><span class="nl">"plugins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"transform-object-rest-spread"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We let Babel know that we wish to target the specific version of Node that is present within the Lambda runtime.
+This allows Babel to only include <a href="https://remysharp.com/2010/10/08/what-is-a-polyfill">pollyfilled</a> support for features that are used and do not natively exist in this version.
+One such feature that is not present within the <code class="language-plaintext highlighter-rouge">env</code> preset at this time is <a href="https://babeljs.io/docs/plugins/transform-object-rest-spread/">Object rest spread</a>, so we explicitly include this plugin.</p>
+
+<p>This is all that is required to begin developing Lambda functions using the Serverless Framework, with access to the latest JavaScript features. 🎉</p>
+
+<h3 id="the-hello-world-example">The ‘Hello World’ Example</h3>
+
+<p>Before we delve into developing the API, lets get ourselves accustom to building and deploying a trivial HTTP-based Lambda function.
+We will create a function which is invoked by an <a href="https://aws.amazon.com/api-gateway/">API Gateway</a> endpoint and returns a greeting based on the supplied name.
+The environment variable that we specified in the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file will make sense now.</p>
+
+<p>We will start off by defining the function within our <code class="language-plaintext highlighter-rouge">functions.yml</code> file, and store the implementation itself within a <code class="language-plaintext highlighter-rouge">src</code> directory.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">hello</span><span class="pi">:</span>
+  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/hello.handler</span>
+  <span class="na">events</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/hello/{name}</span>
+        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
+        <span class="na">request</span><span class="pi">:</span>
+          <span class="na">parameters</span><span class="pi">:</span>
+            <span class="na">paths</span><span class="pi">:</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<p>With this simple definition Serverless is able to create all the AWS-specific infrastructure required for us to get the endpoint up and running.
+We define a single handler which is invoked via HTTP and requires a specified name to be included with the request.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">GREETING</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="k">async</span> <span class="nx">event</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">name</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">pathParameters</span> <span class="o">||</span> <span class="p">{};</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">greeting</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">GREETING</span><span class="p">}</span><span class="s2"> </span><span class="p">${</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span> <span class="p">}),</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Once API Gateway has passed the request to our Lambda function we will use the supplied name to return a <code class="language-plaintext highlighter-rouge">200 OK</code> response with the associated greeting.</p>
+
+<p>Now that we have some actual functionality we can interact with, we can go about deploying this application to AWS.
+Simply executing <code class="language-plaintext highlighter-rouge">make deploy</code> will instruct our Dockerized Serverless Framework to package up and deploy the function, along with the required resources.
+If you are interested in a more in-depth look into this process I have created <a href="https://www.youtube.com/watch?v=ke3eQv-PUC8">several</a> <a href="https://www.youtube.com/watch?v=B0r3QdcCy8g">different</a> videos on the topic.
+Once this has completed, an API Gateway endpoint will be presented that you can then visit to test out the service.
+You can see this module installation and deployment process in-action within the following screencast.</p>
+
+<p><script src="https://asciinema.org/a/6BAfJE1YFYLoSw0StVA9jWUaN.js" id="asciicast-6BAfJE1YFYLoSw0StVA9jWUaN" async=""></script></p>
+
+<p>With the Serverless Framework configured and a sample function now deployed, we can begin the process of implementing our API.
+Join me in the next post were I will discuss the process of configuring <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>, the authentication service that will be used within our API.</p>

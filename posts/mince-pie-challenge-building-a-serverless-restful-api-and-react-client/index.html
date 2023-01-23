@@ -1,4 +1,46 @@
 <p>Since moving our infrastructure over to the AWS stack I have keen to explore how we can take advantage of the large number of services at our disposal, along with the Serverless methodology.
 In this blog-series I wish to document my experience building a complete Serverless application which harnesses as many of the AWS offerings as possible.
-We will explore building both a RESTful API and a React Client, all hosted without any Servers to maintain!
-<!--more--></p>
+We will explore building both a RESTful API and a React Client, all hosted without any Servers to maintain!</p>
+
+<!--more-->
+
+<h3 id="mince-pie-challenge">Mince Pie Challenge</h3>
+
+<p>The application itself will revolve around the responsibly of managing the ‘extremely important’ challenge of rating mince pies.
+We will provide the user with the ability to register, login, add new mince pies to the challenge (with a photo) and rate these pies.
+Although this may seem like a trivial CRUD system it will allow us to explore many different technologies and services in the process.</p>
+
+<p><img src="/uploads/posts/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/mince-pie-challenge.png" alt="Mince Pie Challenge" /></p>
+
+<p>📝 The API will demonstrate the use of:</p>
+
+<ul>
+  <li><a href="https://raml.org/">RAML</a> to design and document the API endpoints.</li>
+  <li><a href="http://stateless.co/hal_specification.html">HAL</a> to represent the API.</li>
+  <li><a href="https://serverless.com/">Serverless Framework</a> to manage the <a href="https://aws.amazon.com/lambda/">AWS Lambda</a> functions and accompanying resources.</li>
+  <li>Managing the Serverless Framework dependency using <a href="https://www.docker.com/community-edition">Docker</a> and <a href="https://docs.docker.com/compose/">Docker Compose</a>.</li>
+  <li>The latest ES6 JavaScript features will be used to implement the service, with <a href="https://webpack.js.org/">Webpack</a>, <a href="https://babeljs.io/">Babel</a> and <a href="https://flow.org/">Flow</a>.</li>
+  <li>Testing will be achieved using <a href="https://facebook.github.io/jest/">Jest</a>.</li>
+  <li>Authentication will be handled by <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a> using <a href="https://jwt.io/">JSON Web Tokens</a>.</li>
+  <li>Persistent state will be stored within <a href="https://aws.amazon.com/dynamodb/">Amazon DynamoDB</a>.</li>
+  <li>Signed <a href="https://aws.amazon.com/s3/">Amazon S3</a> URLs will be used to upload and store photos.</li>
+  <li>Thumbnails will be created using an asynchronous S3 upload trigger and AWS Lambda (inc. ImageMagick).</li>
+  <li>The custom <a href="https://aws.amazon.com/api-gateway/">Amazon API Gateway</a> domain will be managed using <a href="https://github.com/amplify-education/serverless-domain-manager">serverless-domain-manager</a>.</li>
+</ul>
+
+<p>🖥️ The Client will demonstrate the use of:</p>
+
+<ul>
+  <li><a href="https://reactjs.org/">React</a> for presentational logic.</li>
+  <li><a href="https://redux.js.org/">Redux</a> and <a href="https://github.com/gaearon/redux-thunk">redux-thunk</a> for state management.</li>
+  <li><a href="https://reacttraining.com/react-router/">React Router</a> will be used to manage URL-based navigation transitions.</li>
+  <li>The application will be managed using <a href="https://github.com/facebook/create-react-app">create-react-app</a>.</li>
+  <li>Managing the create-react-app dependency using <a href="https://www.docker.com/community-edition">Docker</a> and <a href="https://docs.docker.com/compose/">Docker Compose</a>.</li>
+  <li>Authentication will be supplied by the <a href="https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js">Amazon Cognito Identity SDK</a>.</li>
+  <li>Testing will be achieved using <a href="https://facebook.github.io/jest/">Jest</a> and <a href="http://airbnb.io/enzyme/">Enzyme</a>.</li>
+  <li><a href="https://react.semantic-ui.com/">Semantic UI</a> for component styling.</li>
+  <li><a href="https://www.terraform.io/">Terraform</a> to provision the static endpoint we will publish the resulting client to.</li>
+</ul>
+
+<p>With so much to do, we better get started!
+Join me in the next post were we will go about designing and documenting our RESTful API using RAML and HAL.</p>

@@ -1,4 +1,132 @@
 <p>I’ve recently been getting really interested in the concept of Functions as a Service (FaaS) and the <a href="https://serverless.com/">Serverless Framework</a>.
 I decided to make a little experimental AWS Lambda, to see how I could use it to manipulate images.
-For this contrived example I came up with the (silly) idea of ‘Memes as a Service’ (everything needs to be a service nowadays).
-<!--more--></p>
+For this contrived example I came up with the (silly) idea of ‘Memes as a Service’ (everything needs to be a service nowadays).</p>
+
+<!--more-->
+
+<p>The consumer will be able to supply top and bottom text, along with specifying the desired supporting image.
+Fortunately the stock Lambda Node.js environment comes equipped with support for the popular <a href="https://www.imagemagick.org/">ImageMagick</a>.
+In this blog post I wish to present how I went about solving this problem using the Serverless Framework.</p>
+
+<h3 id="setup-and-configuration">Setup and Configuration</h3>
+
+<p>I am going to assume that you already have the Serverless Framework and a AWS Access Key present on your development machine.
+With these installed we are first going to create a new Serverless application, based on the provided template.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless create <span class="nt">--template</span> aws-nodejs <span class="nt">--path</span> memes-as-a-service
+</code></pre></div></div>
+
+<p>We should now be able to go into the newly created <code class="language-plaintext highlighter-rouge">memes-as-a-service</code> directory.
+As we are wanting to interact with ImageMagick, we also need to include the <a href="http://aheckmann.github.io/gm/">suitable package</a> for Node.js.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>gm <span class="nt">--save</span>
+</code></pre></div></div>
+
+<p>The next step is to open up the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file.
+This file outlines the provider information (as the framework can handle other platforms such as <a href="https://cloud.google.com/">Google Cloud</a>), desired supporting resources and necessary function wiring.
+Replace the sample contents of this file with the YAML definition below:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">meme-as-a-service</span>
+
+<span class="na">provider</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">aws</span>
+  <span class="na">runtime</span><span class="pi">:</span> <span class="s">nodejs6.10</span>
+  <span class="na">stage</span><span class="pi">:</span> <span class="s">prod</span>
+  <span class="na">region</span><span class="pi">:</span> <span class="s">eu-west-1</span>
+  <span class="na">environment</span><span class="pi">:</span>
+    <span class="na">IMAGES_DIR</span><span class="pi">:</span> <span class="s">./images/</span>
+    <span class="na">TEXT_SIZE</span><span class="pi">:</span> <span class="m">50</span>
+    <span class="na">TEXT_PADDING</span><span class="pi">:</span> <span class="m">40</span>
+
+<span class="na">plugins</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">serverless-apigw-binary</span>
+
+<span class="na">custom</span><span class="pi">:</span>
+  <span class="na">apigwBinary</span><span class="pi">:</span>
+    <span class="na">types</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s1">'</span><span class="s">*/*'</span>
+
+<span class="na">functions</span><span class="pi">:</span>
+  <span class="na">meme</span><span class="pi">:</span>
+    <span class="na">handler</span><span class="pi">:</span> <span class="s">handler.meme</span>
+    <span class="na">events</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+          <span class="na">path</span><span class="pi">:</span> <span class="s">/</span>
+          <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
+</code></pre></div></div>
+
+<p>Within this definition we are simply configuring an AWS Lambda Node.js based container.
+We are providing a couple of environment variables which are going to be accessible within our function implementations.
+We then use a <a href="https://github.com/maciejtreder/serverless-apigw-binary">Serverless plugin</a> to correctly add the desired binary support to the API Gateway.
+Finally, we define the single function, taking advantage of how the framework works with <a href="https://aws.amazon.com/cloudformation/">CloudFormation</a> to correctly wire it up to <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>.
+Before continuing we should include the Serverless plugin we have defined as a development dependency.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>serverless-apigw-binary <span class="nt">--save-dev</span>
+</code></pre></div></div>
+
+<h3 id="implementation">Implementation</h3>
+
+<p>Now with the blueprint in-place we can go about creating the implementation.
+Replace the sample <code class="language-plaintext highlighter-rouge">handler.js</code> contents with the following:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">gm</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">gm</span><span class="dl">'</span><span class="p">).</span><span class="nx">subClass</span><span class="p">({</span> <span class="na">imageMagick</span><span class="p">:</span> <span class="kc">true</span> <span class="p">});</span>
+<span class="kd">const</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">IMAGES_DIR</span><span class="p">,</span> <span class="nx">TEXT_SIZE</span><span class="p">,</span> <span class="nx">TEXT_PADDING</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">parseText</span> <span class="o">=</span> <span class="nx">text</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">text</span> <span class="o">||</span> <span class="dl">''</span><span class="p">).</span><span class="nx">toUpperCase</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">getImages</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">IMAGES_DIR</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">parseImage</span> <span class="o">=</span> <span class="nx">image</span> <span class="o">=&gt;</span> <span class="nx">getImages</span><span class="p">().</span><span class="nx">find</span><span class="p">(</span><span class="nx">file</span> <span class="o">=&gt;</span> <span class="nx">file</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">image</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">random</span> <span class="o">=</span> <span class="nx">arr</span> <span class="o">=&gt;</span> <span class="nx">arr</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">)];</span>
+<span class="kd">const</span> <span class="nx">randomImage</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">random</span><span class="p">(</span><span class="nx">getImages</span><span class="p">());</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">meme</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">queryStringParameters</span> <span class="o">||</span> <span class="p">{};</span>
+
+  <span class="kd">const</span> <span class="nx">top</span> <span class="o">=</span> <span class="nx">parseText</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">top</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">bottom</span> <span class="o">=</span> <span class="nx">parseText</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">bottom</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">image</span> <span class="o">=</span> <span class="nx">parseImage</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">image</span><span class="p">)</span> <span class="o">||</span> <span class="nx">randomImage</span><span class="p">();</span>
+
+  <span class="kd">const</span> <span class="nx">meme</span> <span class="o">=</span> <span class="nx">gm</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">IMAGES_DIR</span><span class="p">}${</span><span class="nx">image</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
+
+  <span class="nx">meme</span><span class="p">.</span><span class="nx">size</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="p">{</span> <span class="nx">height</span> <span class="p">})</span> <span class="p">{</span>
+    <span class="nx">meme</span>
+      <span class="p">.</span><span class="nx">font</span><span class="p">(</span><span class="dl">'</span><span class="s1">./impact.ttf</span><span class="dl">'</span><span class="p">,</span> <span class="nx">TEXT_SIZE</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">fill</span><span class="p">(</span><span class="dl">'</span><span class="s1">white</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">stroke</span><span class="p">(</span><span class="dl">'</span><span class="s1">black</span><span class="dl">'</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">drawText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="nx">TEXT_PADDING</span><span class="p">),</span> <span class="nx">top</span><span class="p">,</span> <span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">drawText</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="nx">TEXT_PADDING</span><span class="p">,</span> <span class="nx">bottom</span><span class="p">,</span> <span class="dl">'</span><span class="s1">center</span><span class="dl">'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">toBuffer</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
+          <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+          <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">image/jpeg</span><span class="dl">'</span> <span class="p">},</span>
+          <span class="na">body</span><span class="p">:</span> <span class="nx">buffer</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="dl">'</span><span class="s1">base64</span><span class="dl">'</span><span class="p">),</span>
+          <span class="na">isBase64Encoded</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="p">});</span>
+      <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>The function simply takes in the query string input from the client and uses ImageMagick to add the provided text at the top and bottom of the desired image.
+The Lambda itself contains a directory (specified within the environment) of all the available images that the client can choose from.
+We also include the font in the distribution that we want to print the text as.
+An interesting piece is the action of Base-64 encoding the image response.
+API Gateway supports <a href="https://aws.amazon.com/about-aws/whats-new/2016/11/binary-data-now-supported-by-api-gateway/">binary responses</a>, but to enable this we must provide the <code class="language-plaintext highlighter-rouge">isBase64Encoded</code> flag along with the desired <code class="language-plaintext highlighter-rouge">Content-Type</code>.
+We have previously configured the media types that we wish to be treated as binary within API Gateway, using the added plugin.
+As by-default the framework configures each API Gateway route to be in proxy mode, this is all that is required from us to return the generated contents.</p>
+
+<h3 id="deployment">Deployment</h3>
+
+<p>Finally, we are now able to try out this service by running:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless deploy <span class="nt">-v</span>
+</code></pre></div></div>
+
+<p>I always tend to provide the <code class="language-plaintext highlighter-rouge">verbose</code> flag as it gives you good insight into what is happening within the framework under-the-hood.
+With this now deployed you can visit the resulting API Gateway endpoint and begin experimenting with generating your own memes!
+You can find the code in its entirety, along with supporting assets in <a href="https://github.com/eddmann/memes-as-a-service-serverless">this</a> GitHub repository.</p>
+
+<p><img src="/uploads/posts/memes-as-a-service/memes.jpg" alt="Memes as a Service" /></p>

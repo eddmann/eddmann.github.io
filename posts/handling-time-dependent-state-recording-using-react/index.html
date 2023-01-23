@@ -1,5 +1,125 @@
 <p>Sometimes you look at a feature request and think that it maybe a very tricky implementation to develop.
 I felt this way in regard to recording input fields in an recent application I have been working on.
 The idea was to be able to record a user’s interaction with a HTML component (in this case a textarea), and be able to replay these events (in real-time) at a later date.
-Thinking about how I would go about creating such an implementation in trivial JavaScript, with all the browser nuances and user input differences, was not very appealing.
-<!--more--></p>
+Thinking about how I would go about creating such an implementation in trivial JavaScript, with all the browser nuances and user input differences, was not very appealing.</p>
+
+<!--more-->
+
+<h2 id="enter-react">Enter React</h2>
+
+<p>Fortunately, we have recently added React into our stack, which when applied to a problem domain such as this made codifying a solution a breeze.
+Instead of thinking of each intricate DOM event, I was able to reason about the problem on a higher level, alternatively thinking in the manner of state changes.
+All the boilerplate required to handle <code class="language-plaintext highlighter-rouge">onChange</code> events was already provided within the library, and instead, I was able to take advantage of how React handles components’ internal state for my own extra requirements.
+The recording component documented below is really just logging each of the intermittent states that the component is in during its lifetime, in respect to its present value.
+These state changes (‘events’) are stored along with their respective timestamp, so as to provide the possibility for later time-dependent processing.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">RecordableTextArea</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="dl">''</span><span class="p">,</span> <span class="na">events</span><span class="p">:</span> <span class="p">[]</span> <span class="p">};</span>
+
+  <span class="nx">clear</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">value</span><span class="p">:</span> <span class="dl">''</span><span class="p">,</span> <span class="na">events</span><span class="p">:</span> <span class="p">[]</span> <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="nx">getEvents</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">events</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">_addEvent</span> <span class="o">=</span> <span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="na">value</span><span class="p">:</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+      <span class="na">events</span><span class="p">:</span> <span class="p">[...</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">events</span><span class="p">,</span> <span class="p">[</span><span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()]],</span>
+    <span class="p">});</span>
+  <span class="p">};</span>
+
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">textarea</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">value</span><span class="p">}</span> <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">_addEvent</span><span class="p">}</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span> <span class="sr">/&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="handling-playback">Handling Playback</h2>
+
+<p>Now that we had a log of the state the textarea was in throughout its lifetime, the next step was to be able to replay these events.
+To achieve this a small amount of processing needed to occur in transforming the events timestamps into relative durations, which could be used within the implementation.
+With this in place, playback of each sequential event could be achieved by a simple <code class="language-plaintext highlighter-rouge">setTimeout</code> call which applied the associated state change to the playback value output.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">EventPlayback</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">timer</span><span class="p">;</span>
+  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="dl">''</span> <span class="p">};</span>
+
+  <span class="nx">componentDidMount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_play</span><span class="p">(</span><span class="nx">EventPlayback</span><span class="p">.</span><span class="nx">_process</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">events</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="nx">componentWillUnmount</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_stop</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="nx">componentWillReceiveProps</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_stop</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">_play</span><span class="p">(</span><span class="nx">EventPlayback</span><span class="p">.</span><span class="nx">_process</span><span class="p">(</span><span class="nx">nextProps</span><span class="p">.</span><span class="nx">events</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="kd">static</span> <span class="nx">_process</span> <span class="o">=</span> <span class="nx">events</span> <span class="o">=&gt;</span>
+    <span class="nx">events</span><span class="p">.</span><span class="nx">map</span><span class="p">(([</span><span class="nx">value</span><span class="p">,</span> <span class="nx">timestamp</span><span class="p">],</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">events</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">[,</span> <span class="nx">nextTimestamp</span><span class="p">]</span> <span class="o">=</span> <span class="nx">events</span><span class="p">[</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">||</span> <span class="p">[,</span> <span class="nx">timestamp</span><span class="p">];</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">value</span><span class="p">,</span> <span class="nx">nextTimestamp</span> <span class="o">-</span> <span class="nx">timestamp</span><span class="p">];</span>
+    <span class="p">});</span>
+
+  <span class="nx">_play</span> <span class="o">=</span> <span class="nx">events</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">events</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="p">[[</span><span class="nx">value</span><span class="p">,</span> <span class="nx">duration</span><span class="p">],</span> <span class="p">...</span><span class="nx">rest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">events</span><span class="p">;</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="nx">value</span> <span class="p">});</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">timer</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">_play</span><span class="p">(</span><span class="nx">rest</span><span class="p">),</span> <span class="nx">duration</span><span class="p">);</span>
+  <span class="p">};</span>
+
+  <span class="nx">_stop</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">clearTimeout</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timer</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="p">{...</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">value</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/div&gt;</span><span class="err">;
+</span>  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="putting-it-all-together">Putting It All Together</h2>
+
+<p>So as to highlight how simple the implementation truly is, you can wire-up the two components using the following component (demoable in <a href="http://output.jsbin.com/mupucu">this JSBin</a>) and experiment with how it works.
+This implementation is really a proof-of-concept in many regards, and further work could be done to make a more generic component that could handle all kinds of time-dependent state logging and eventual playback.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">Demo</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
+  <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="na">events</span><span class="p">:</span> <span class="p">[]</span> <span class="p">};</span>
+
+  <span class="nx">_onPlayback</span> <span class="o">=</span> <span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">record</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">;</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span> <span class="na">events</span><span class="p">:</span> <span class="nx">record</span><span class="p">.</span><span class="nx">getEvents</span><span class="p">()</span> <span class="p">});</span>
+
+    <span class="nx">record</span><span class="p">.</span><span class="nx">clear</span><span class="p">();</span>
+  <span class="p">};</span>
+
+  <span class="nx">render</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span>
+      <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">RecordableTextArea</span> <span class="nx">ref</span><span class="o">=</span><span class="dl">"</span><span class="s2">record</span><span class="dl">"</span> <span class="o">/&gt;</span>
+        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">_onPlayback</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Playback</span><span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
+</span>        <span class="o">&lt;</span><span class="nx">EventPlayback</span> <span class="nx">events</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">events</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
+</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span>    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><img src="/uploads/posts/handling-time-dependent-state-recording-using-react/state-recording.gif" style="width:auto;" /></p>

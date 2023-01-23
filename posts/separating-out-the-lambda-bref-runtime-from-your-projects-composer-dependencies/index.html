@@ -2,3 +2,33 @@
 However, we noticed when attempting to migrate over one application in particular, that we could not use the latest release of <a href="https://bref.sh/">Bref</a> (the PHP runtime) due to a conflict between required Symfony <a href="https://symfony.com/doc/current/components/process.html">Process component</a> versions.</p>
 
 <!--more-->
+
+<p>Thanks to the responsive <a href="https://bref.sh/#enterprise">enterprise support</a> that Matthieu provides, we discussed a possible solution which involved using a <a href="https://bref.sh/docs/environment/php.html#custom-vendor-path">separate custom autoloader</a> for use with the Bref runtime.
+Looking through the Bref codebase, we noticed that as we only use the FPM and console runtimes, <a href="https://github.com/brefphp/bref/blob/master/runtime/layers/fpm/bootstrap#L35">both</a> <a href="https://github.com/brefphp/bref/blob/master/runtime/layers/console/bootstrap#L49">variants</a> spawn separate PHP processes to handle the actual request.
+This means that the project autoloader does not need to be aware of Bref, and as such, we can isolate away this runtime concern from the project entirely.</p>
+
+<p>The project in question packages the release as a <a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html">container image</a>.
+As such, we were able to create a multi-stage Docker build (as shown below) which handles our desired outcome.</p>
+
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> composer:2.2.5 AS runtime</span>
+
+<span class="k">RUN </span><span class="nb">mkdir</span> <span class="nt">-p</span> /tmp/runtime <span class="se">\
+</span> <span class="o">&amp;&amp;</span> composer require <span class="nt">-d</span> /tmp/runtime bref/bref:1.5.3
+
+<span class="k">FROM</span><span class="s"> bref/php-81-fpm:1.5.3</span>
+
+<span class="k">COPY</span><span class="s"> --from=runtime /tmp/runtime/vendor /opt/runtime/vendor</span>
+<span class="k">ENV</span><span class="s"> BREF_AUTOLOAD_PATH /opt/runtime/vendor/autoload.php</span>
+
+<span class="k">COPY</span><span class="s"> . $LAMBDA_TASK_ROOT</span>
+</code></pre></div></div>
+
+<p>Using the Composer Docker image as a base, we were able to build a <code class="language-plaintext highlighter-rouge">vendor</code> directory which included only the desired Bref dependencies.
+We were then able to copy this directory into our Lambda container image, making the Bref bootstrap script aware of the custom autoloader path by way of the <code class="language-plaintext highlighter-rouge">BREF_AUTOLOAD_PATH</code> environment variable.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>Although we have only demonstrated this for our own use-case (using a container image), the same idea could be applied for layer-based Lambda functions too.
+Sadly, this approach will not work for <a href="https://bref.sh/docs/runtimes/function.html">PHP functions</a> due to the means in which the handler is pulled in within the bootstrap script.
+However, thanks to both the FPM and console layer abstractions we are able to remove these runtime concerns from our project.
+This gives us the ability to maintain the runtime and project requirements separately, allowing us to use the latest Bref release in a project that has dependency conflicts.</p>

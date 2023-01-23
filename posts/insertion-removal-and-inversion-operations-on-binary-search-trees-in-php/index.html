@@ -1,5 +1,292 @@
 <p>Recently Max Howell (creator of <a href="http://brew.sh/">Homebrew</a>) posted an interesting <a href="https://twitter.com/mxcl/status/608682016205344768">tweet</a> in regard to Google’s interview process.
 In this tweet he mentioned how one of the proposed questions was to white-board a solution to invert a binary tree.
 Over the past couple of years I have been interested in exploring fundamental Computer Science data-structures and algorithms.
-As a result, I thought it would be interesting to explore this structure and associated operations in more depth - using immutable and mutable PHP implementations to clearly highlight the benefits garnered from each approach.
-<!--more--></p>
+As a result, I thought it would be interesting to explore this structure and associated operations in more depth - using immutable and mutable PHP implementations to clearly highlight the benefits garnered from each approach.</p>
+
+<!--more-->
+
+<p>Binary trees are a form of tree data-structure, comprised of nodes with assigned values and at-most two child nodes (left and right).
+To expand on this problem I will be documenting the creation of an <a href="https://en.wikipedia.org/wiki/Binary_search_tree">Binary Search Tree</a>, which has the additional invariant that any left child be less than, and any right child be greater than, the current nodes value.
+This allows us to perform unambiguous node deletion from the structure.</p>
+
+<h2 id="node-representation">Node Representation</h2>
+
+<p>Throughout all these examples I leaned towards a simple function, as opposed to class-based approach, relying on namespaces to infer relation.
+The following function can be used to create a simple object representation of a tree node.
+Providing a value and optional left and right nodes, it simply returns the aggregate.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">Node</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$left</span> <span class="o">=</span> <span class="kc">null</span><span class="p">,</span> <span class="nv">$right</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">object</span><span class="p">)</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">'value'</span><span class="p">,</span> <span class="s1">'left'</span><span class="p">,</span> <span class="s1">'right'</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="insertion">Insertion</h2>
+
+<p>Now that we are able to represent tree nodes, the next logical step is to provide insertion capabilities.
+Accessible from the root tree node (initially NULL), we are able to recursively traverse the structure until we either find a leaf or the node already present.
+To decide which child to traverse down we use the discussed comparator invariant.
+Below is a small diagram depicting the insertion of a value within an existing tree.</p>
+
+<p style="text-align:center;">
+    <img src="/uploads/posts/binary-search-trees-in-php/insertion.png" style="width:220px;" alt="Binary Search Tree Insertion" />
+</p>
+
+<h3 id="mutable">Mutable</h3>
+
+<p>The first implementation provides a mutable means of insertion.
+Notice the explicit reassignment of the right and left child node references.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">===</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&gt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="nf">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="nf">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="immutable">Immutable</h3>
+
+<p>Below is an immutable implementation of the insertion process starting from a rooted tree node.
+As opposed to modifying pre-existing state, we instead build up a modified representation, creating new nodes when required.
+This allows us to the use both the new and old tree representations simultaneously.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">===</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&gt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="nf">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="nf">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">),</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="removal">Removal</h2>
+
+<p>With the ability to now insert nodes into the tree, we can expand on this by performing the inverse operation, that being removal.
+When removing a node from the tree, there are three different use-cases that need to be addressed.
+The first two are relativity simple cases, met when the node in question has zero or one child.
+When no children are present we are able to just remove the reference to the node.
+However, in the case of a single child node we can replace the nodes parent reference with its child node.
+The third case is a little more tricky, requiring us to rearrange the structure to find a new node to replace this one, maintaining the desired invariant.</p>
+
+<p>There are two common techniques to achieve this, either finding the in-order successor or in-order predecessor and replacing the current node with this result.
+In these examples I have opted for the in-order successor, which requires us to find the minimal value of the current nodes right tree.
+This operation can be succinctly codified recursively as shown below.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">minValue</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nf">minValue</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Below is a small diagram depicting the removal of a node which meets the third use-case.</p>
+
+<p style="text-align:center;">
+    <img src="/uploads/posts/binary-search-trees-in-php/removal.png" style="width:338px" alt="Binary Search Tree Removal" />
+</p>
+
+<h3 id="mutable-1">Mutable</h3>
+
+<p>In a similar fashion to how mutable insertion can be carried out, we reassign both the nodes right and left references when required.
+We also replace the current nodes value, if the operation falls into the described third use-case.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&gt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&lt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$value</span> <span class="o">=</span> <span class="nf">minValue</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+
+    <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+
+    <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="immutable-1">Immutable</h3>
+
+<p>In the immutable instance we instead return new nodes in place of the reassignment that would have occurred in the mutable version.
+This allows us to maintain and access the entire original tree structure, whilst reusing unmodified references in the new tree.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&gt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&lt;</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">),</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$value</span> <span class="o">=</span> <span class="nf">minValue</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="nf">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="inversion">Inversion</h2>
+
+<p>Now that we have the ability to insert and remove nodes from a binary tree, another operation which can be performed is inversion (like the tweet mentioned).
+I should note that this operation does not typically occur on Binary Search Trees as it violates the additional invariant.</p>
+
+<h3 id="mutable-2">Mutable</h3>
+
+<p>From a mutable perspective we are able to invert the tree in a memory efficient manner, with only references being altered.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">invert</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$tmp</span> <span class="o">=</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">;</span>
+    <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span> <span class="o">=</span> <span class="nf">invert</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">);</span>
+    <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span> <span class="o">=</span> <span class="nf">invert</span><span class="p">(</span><span class="nv">$tmp</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="immutable-2">Immutable</h3>
+
+<p>In the case of immutability, an entirely new tree is required to be built.
+As to maintain the ability to reuse the current tree we are not able to manipulate any of the existing nodes references.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">invert</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$root</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nf">Node</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">,</span> <span class="nf">invert</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">),</span> <span class="nf">invert</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="example">Example</h2>
+
+<p>Now that we have these operations in place we can use the following function to generate a tree from an array representation.
+Notice the use of the mutable insert operation to save on memory costs.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">fromArray</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$values</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$tree</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$values</span> <span class="k">as</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$tree</span> <span class="o">=</span> <span class="nf">BinaryTree\Mutable\insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$tree</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nv">$tree</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We can then visualise the generated tree by using the following render function.
+This function displays the tree from left to right, as opposed to the typical top down approach.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">render</span><span class="p">(</span><span class="nv">$root</span><span class="p">,</span> <span class="nv">$depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$root</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">str_repeat</span><span class="p">(</span><span class="s2">"</span><span class="se">\t</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$depth</span><span class="p">)</span> <span class="mf">.</span> <span class="s2">"~</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span>
+        <span class="nf">render</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">right</span><span class="p">,</span> <span class="nv">$depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="mf">.</span>
+        <span class="nb">str_repeat</span><span class="p">(</span><span class="s2">"</span><span class="se">\t</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$depth</span><span class="p">)</span> <span class="mf">.</span> <span class="nv">$root</span><span class="o">-&gt;</span><span class="n">value</span> <span class="mf">.</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="mf">.</span>
+        <span class="nf">render</span><span class="p">(</span><span class="nv">$root</span><span class="o">-&gt;</span><span class="n">left</span><span class="p">,</span> <span class="nv">$depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Finally, we are able to use all these operations and helper functions in conjunction, for a contrived example.</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="nf">BinaryTree\fromArray</span><span class="p">([</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span> <span class="p">]);</span>
+
+<span class="nv">$b</span> <span class="o">=</span> <span class="nf">BinaryTree\Immutable\remove</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nv">$a</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nf">BinaryTree\render</span><span class="p">(</span><span class="nv">$a</span><span class="p">);</span>
+
+<span class="cm">/*
+                        ~
+                4
+                        ~
+        3
+                ~
+2
+                ~
+        1
+                ~
+
+*/</span>
+
+<span class="nf">BinaryTree\Mutable\invert</span><span class="p">(</span><span class="nv">$b</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nf">BinaryTree\render</span><span class="p">(</span><span class="nv">$b</span><span class="p">);</span>
+
+<span class="cm">/*
+                ~
+        1
+                ~
+3
+                ~
+        4
+                ~
+*/</span>
+</code></pre></div></div>

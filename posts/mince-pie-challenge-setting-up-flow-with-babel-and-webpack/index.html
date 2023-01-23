@@ -1,4 +1,223 @@
-<p>We have now settled on how our application will perform <a href="https://tech.mybuilder.com/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/">user authentication</a>.
+<p>We have now settled on how our application will perform <a href="https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/">user authentication</a>.
 I now wish to take a step back and help improve upon our code confidence, by-way of adding the static type checker <a href="https://flow.org/">Flow</a>.
-In this article I will document the process of configuring Flow with Babel and Webpack, expanding upon our previous example by adding sufficient typing.
-<!--more--></p>
+In this article I will document the process of configuring Flow with Babel and Webpack, expanding upon our previous example by adding sufficient typing.</p>
+
+<!--more-->
+
+<p>If you are keen to see how the finished example looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/03-flow">API repository</a>.</p>
+
+<p>Developed by Facebook, Flow adds the ability to provide an incremental <a href="https://en.wikipedia.org/wiki/Type_system">type system</a> to your JavaScript application.
+In doing so we garner the benefits of using a type system - helping catch errors early, improving code readability and enabling better tooling.
+Facebook provides a well written <a href="https://flow.org/en/docs/lang/">article</a> on the rationale for developing such a tool, which I highly recommend you read.</p>
+
+<h3 id="setting-up-flow-with-babel-and-webpack">Setting up Flow with Babel and Webpack</h3>
+
+<p>The first step to configuring Flow within the project is to add the following development dependencies to the <code class="language-plaintext highlighter-rouge">package.json</code>.
+You should also add the new <code class="language-plaintext highlighter-rouge">scripts</code> definition, which will allow us to validate types within the project by simply running <code class="language-plaintext highlighter-rouge">npm run flow</code>.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"babel-preset-flow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^6.23.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"flow-babel-webpack-plugin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.1.1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"flow-bin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^0.73.0"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"flow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"flow"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The JavaScript runtime is unaware of Flow type definitions and would assume them to be simply syntax errors (which is not very helpful).
+As a result, once validated by Flow, we are required to strip them within Babel’s <a href="https://en.wikipedia.org/wiki/Source-to-source_compiler">transpilation</a> process.</p>
+
+<p>With these installed we can now add the <a href="https://babeljs.io/docs/en/babel-preset-flow.html">Flow preset</a> to our <code class="language-plaintext highlighter-rouge">.babelrc</code>, and configure the <a href="https://www.npmjs.com/package/flow-webpack-plugin">Webpack plugin</a> within <code class="language-plaintext highlighter-rouge">webpack.config.js</code>.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"presets"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="s2">"env"</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"targets"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"node"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8.10"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}],</span><span class="w"> </span><span class="s2">"flow"</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">FlowBabelWebpackPlugin</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">flow-babel-webpack-plugin</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="c1">// ..</span>
+  <span class="na">plugins</span><span class="p">:</span> <span class="p">[</span><span class="k">new</span> <span class="nx">FlowBabelWebpackPlugin</span><span class="p">()],</span>
+  <span class="c1">// ..</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Adding this Webpack plugin allows Flow to be ran before a build is started.
+If any issues are highlighted by Flow, you will be alerted and the build will not succeed.</p>
+
+<p>Finally, we need to ensure that we have initialised our Flow configuration (an empty <code class="language-plaintext highlighter-rouge">.flowconfig</code> will be generated) and define a new <code class="language-plaintext highlighter-rouge">Makefile</code> target which will run Flow for us.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-compose run <span class="nt">--rm</span> serverless npm run flow init
+</code></pre></div></div>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">flow</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">npm</span> <span class="err">run</span> <span class="err">flow</span>
+</code></pre></div></div>
+
+<p>With this setup now complete, we can go about slowly incorporating types into our project.</p>
+
+<h3 id="adding-types-to-the-project">Adding Types to the Project</h3>
+
+<p>In the <a href="https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/#constructing-handlers-with-user-authentication">last article</a> we documented a handler abstraction that provided assurances on user authentication and authorisation.
+We will now go about adding suitable typing to this abstraction, to help improve code clarity and aid in preventing any future bugs.</p>
+
+<p>The first step is to add the following development dependency to the <code class="language-plaintext highlighter-rouge">package.json</code>.
+This <a href="https://www.npmjs.com/package/flow-aws-lambda">package</a> will allow us to type against the Lambda environment abstractions that are present.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"flow-aws-lambda"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.0.3"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With this now installed we will start off by creating a single file within <code class="language-plaintext highlighter-rouge">src/types/index.js</code>, were we will define all our custom types.
+Here we will make Flow aware that we wish to process this file using the <code class="language-plaintext highlighter-rouge">// @flow</code> annotation, and import some of the types that the dependency provides to us.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">APIGatewayEvent</span><span class="p">,</span> <span class="nx">Context</span><span class="p">,</span> <span class="nx">ProxyResult</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">flow-aws-lambda</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">Response</span> <span class="o">=</span> <span class="nx">ProxyResult</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>We have decided to use a <a href="https://flow.org/en/docs/types/aliases/">type alias</a> and export the <code class="language-plaintext highlighter-rouge">ProxyResult</code> as simply <code class="language-plaintext highlighter-rouge">Response</code>.
+We can then use this new type within our <code class="language-plaintext highlighter-rouge">unauthorised</code> function located in <code class="language-plaintext highlighter-rouge">src/helpers/http.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Response</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">unauthorised</span> <span class="o">=</span> <span class="p">(</span><span class="nx">detail</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nx">Response</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="c1">// ..</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>This now ensures that upon invocation of the function only a <code class="language-plaintext highlighter-rouge">string</code> can be supplied, and a <code class="language-plaintext highlighter-rouge">Response</code> object will be returned.
+We will now move on to document (within <code class="language-plaintext highlighter-rouge">src/types/index.js</code>) the structure of how a user token authenticator service should look.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Token</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="nx">type</span> <span class="nx">UserId</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">UserTokenAuthenticator</span> <span class="o">=</span> <span class="nx">Token</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="p">?</span><span class="nx">UserId</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Again, we are using type aliases to help document the code’s intent - along with defining how the authenticator service function should work (returning an optional <code class="language-plaintext highlighter-rouge">UserId</code> encapsulated in a <code class="language-plaintext highlighter-rouge">Promise</code>).
+We can then employ this type definition within <code class="language-plaintext highlighter-rouge">src/services/userTokenAuthenticator.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">UserTokenAuthenticator</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="p">(</span><span class="nx">poolId</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nx">UserTokenAuthenticator</span> <span class="o">=&gt;</span>
+  <span class="k">async</span> <span class="nx">token</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// ..</span>
+  <span class="p">};</span>
+</code></pre></div></div>
+
+<p>With these types in place we will move on to adding type definitions (within <code class="language-plaintext highlighter-rouge">src/types/index.js</code>) for the handler abstraction.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">type</span> <span class="nx">Services</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">[</span><span class="na">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">]:</span> <span class="nb">Function</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="nx">type</span> <span class="nx">OptionalUserParameters</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">event</span><span class="p">:</span> <span class="nx">APIGatewayEvent</span><span class="p">,</span>
+  <span class="na">context</span><span class="p">:</span> <span class="nx">Context</span><span class="p">,</span>
+  <span class="na">services</span><span class="p">:</span> <span class="nx">Services</span><span class="p">,</span>
+  <span class="nx">userId</span><span class="p">?:</span> <span class="p">?</span><span class="nx">UserId</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="nx">type</span> <span class="nx">AuthenticatedUserParameters</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">event</span><span class="p">:</span> <span class="nx">APIGatewayEvent</span><span class="p">,</span>
+  <span class="na">context</span><span class="p">:</span> <span class="nx">Context</span><span class="p">,</span>
+  <span class="na">services</span><span class="p">:</span> <span class="nx">Services</span><span class="p">,</span>
+  <span class="na">userId</span><span class="p">:</span> <span class="nx">UserId</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="nx">type</span> <span class="nx">Parameters</span> <span class="o">=</span> <span class="nx">OptionalUserParameters</span> <span class="o">|</span> <span class="nx">AuthenticatedUserParameters</span><span class="p">;</span>
+
+<span class="nx">type</span> <span class="nx">Handler</span> <span class="o">=</span> <span class="nx">Parameters</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Response</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">HandlerWithServices</span> <span class="o">=</span> <span class="nx">Handler</span> <span class="o">=&gt;</span> <span class="nx">Services</span> <span class="o">=&gt;</span> <span class="p">(</span>
+  <span class="nx">APIGatewayEvent</span><span class="p">,</span>
+  <span class="nx">Context</span>
+<span class="p">)</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Response</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="nx">type</span> <span class="nx">UserHandlerMiddleware</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">:</span> <span class="nx">Parameters</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">((</span><span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Response</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Handler</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">OptionalUserHandlerMiddleware</span> <span class="o">=</span> <span class="nx">UserHandlerMiddleware</span><span class="o">&lt;</span><span class="nx">OptionalUserParameters</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">AuthenticatedUserHandlerMiddlware</span> <span class="o">=</span> <span class="nx">UserHandlerMiddleware</span><span class="o">&lt;</span><span class="nx">AuthenticatedUserParameters</span><span class="o">&gt;</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>There are several interesting aspects to this above example.
+The first of which is that we lay out the expected structure of the <code class="language-plaintext highlighter-rouge">Services</code> <a href="https://flow.org/en/docs/types/objects/#toc-objects-as-maps">object as a map</a>, with <code class="language-plaintext highlighter-rouge">string</code> keys and <code class="language-plaintext highlighter-rouge">Function</code> values.
+Secondly, we define two different <code class="language-plaintext highlighter-rouge">Parameters</code> types; ensuring by-way of a <a href="https://flow.org/en/docs/types/unions/">union</a> that the supplied value matches one of these structures.
+From here, we define how a typical handler is constructed using the <code class="language-plaintext highlighter-rouge">createHandler</code> paradigm we have devised.</p>
+
+<p>We then go one step further and define how user middleware should work using a <a href="https://flow.org/en/docs/types/generics/">Generic</a> <code class="language-plaintext highlighter-rouge">UserHandlerMiddleware</code> type.
+Explicitly specifying the desired <code class="language-plaintext highlighter-rouge">Parameters</code> structure, we can be certain that any underlying handler that is supplied to the middleware has the necessary <code class="language-plaintext highlighter-rouge">userId</code> requirements.
+For example, any handler that is supplied to the <code class="language-plaintext highlighter-rouge">OptionalUserHandlerMiddleware</code> must be equipped to handle a <code class="language-plaintext highlighter-rouge">userId</code> value that is not present.</p>
+
+<p>We can then use these type definitions within the <code class="language-plaintext highlighter-rouge">src/helpers/handlers.js</code> implementation.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span>
+  <span class="nx">HandlerWithServices</span><span class="p">,</span>
+  <span class="nx">OptionalUserHandlerMiddleware</span><span class="p">,</span>
+  <span class="nx">AuthenticatedUserHandlerMiddlware</span><span class="p">,</span>
+<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">unauthorised</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./http</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">createHandler</span><span class="p">:</span> <span class="nx">HandlerWithServices</span> <span class="o">=</span> <span class="nx">handler</span> <span class="o">=&gt;</span> <span class="nx">services</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">handler</span><span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span> <span class="p">});</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">withOptionalHttpAuthentication</span><span class="p">:</span> <span class="nx">OptionalUserHandlerMiddleware</span> <span class="o">=</span>
+  <span class="nx">handler</span> <span class="o">=&gt;</span>
+  <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">userId</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">services</span><span class="p">.</span><span class="nx">getUserIdFromToken</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">Authorization</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">handler</span><span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span><span class="p">,</span> <span class="nx">userId</span> <span class="p">});</span>
+  <span class="p">};</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">withStrictHttpAuthentication</span><span class="p">:</span> <span class="nx">AuthenticatedUserHandlerMiddlware</span> <span class="o">=</span>
+  <span class="nx">handler</span> <span class="o">=&gt;</span>
+  <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">userId</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">services</span><span class="p">.</span><span class="nx">getUserIdFromToken</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">Authorization</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">userId</span>
+      <span class="p">?</span> <span class="nx">handler</span><span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span><span class="p">,</span> <span class="nx">userId</span> <span class="p">})</span>
+      <span class="p">:</span> <span class="nx">unauthorised</span><span class="p">(</span><span class="dl">'</span><span class="s1">Service requires an authenticated user</span><span class="dl">'</span><span class="p">);</span>
+  <span class="p">};</span>
+</code></pre></div></div>
+
+<p>Finally, to ensure that we pass the Flow checks, we must make certain that our <code class="language-plaintext highlighter-rouge">src/auth.js</code> handler file caters for the event that the environment variable <a href="https://github.com/facebook/flow/issues/1192#issuecomment-165326717">is not present</a>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">USER_POOL_ID</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">USER_POOL_ID</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_POOL_ID is not present</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">getUserIdFromToken</span> <span class="o">=</span> <span class="nx">createUserTokenAuthenticator</span><span class="p">(</span><span class="nx">USER_POOL_ID</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Now if we invoke <code class="language-plaintext highlighter-rouge">make flow</code> or attempt a <code class="language-plaintext highlighter-rouge">make deploy</code>, we will see that our types get validated by Flow and successfully pass! 🎉</p>
+
+<h3 id="better-feedback-from-flow">Better Feedback from Flow</h3>
+
+<p>Although we are able to run Flow when desired using <code class="language-plaintext highlighter-rouge">make flow</code>, I have found it beneficial to gain instant feedback within my editor using a project such as <a href="https://atom.io/packages/flow-ide">Flow-IDE</a> for Atom.
+In doing so we are able to get real-time Flow analysis, which makes it easier to manage the project and introduce typing to the code-base.</p>
+
+<p><img src="/uploads/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/flow-ide.png" alt="Flow IDE" /></p>
+
+<p>With Flow now configured, I wish to increase our code confidence even more so by adding the unit testing framework <a href="https://jestjs.io/">Jest</a> into the project.
+Join me in the next post were we will look into testing the application using Jest, and add continuous integration via <a href="https://travis-ci.org/">Travis CI</a>.</p>

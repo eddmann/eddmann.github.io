@@ -1,3 +1,290 @@
-<p>Following on from <a href="https://tech.mybuilder.com/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/">adding Flow</a> to the API project, I now wish to garner further confidence in the code by adding tests.
-In this post I will document the process of setting up the test-runner <a href="https://jestjs.io/">Jest</a>, and adding suitable test coverage to the current authentication example.
-<!--more--></p>
+<p>Following on from <a href="https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/">adding Flow</a> to the API project, I now wish to garner further confidence in the code by adding tests.
+In this post I will document the process of setting up the test-runner <a href="https://jestjs.io/">Jest</a>, and adding suitable test coverage to the current authentication example.</p>
+
+<!--more-->
+
+<p>If you are keen to see how the finished example looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/04-jest">API repository</a>.</p>
+
+<p>Developed by Facebook, Jest is a unit testing framework that prides itself on minimal setup and configuration overhead.
+This claim is aided by the assertion library, rich mocking support and <a href="https://jestjs.io/docs/en/snapshot-testing">snapshot testing</a> that is provided out-of-the-box.
+Following several standard conventions, such as placing tests within a <code class="language-plaintext highlighter-rouge">__tests__</code> directory, Jest is able to automatically locate tests and run them in parallel for speed.</p>
+
+<p>One source of confusion when looking at Jest is the misrepresentation that it can only target React-based applications.
+This is not the case, and is highlighted as such in their own documentation.</p>
+
+<blockquote>
+  <p>Although Jest may be considered React-specific test runner, in fact it is a universal testing platform, with the ability to adapt to any JavaScript library or framework.
+You can use Jest to test any JavaScript code.</p>
+</blockquote>
+
+<p>This is great, as it means we can take advantage of the awesome features discussed, regardless of the JavaScript application we are building.</p>
+
+<h3 id="setting-up-jest">Setting up Jest</h3>
+
+<p>Now we have familiarised ourselves with what Jest can do, lets begin by getting it setup within the project.
+The first step is to add the following configuration to the <code class="language-plaintext highlighter-rouge">package.json</code> file.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"jest"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^23.1.0"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"test"</span><span class="p">:</span><span class="w"> </span><span class="s2">"jest"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"jest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"rootDir"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./src"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cacheDirectory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"./node_modules/.cache/jest"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Along with the expected development dependency, we add the new script definition which will allow us to execute the test-suite by simply running <code class="language-plaintext highlighter-rouge">npm test</code>.
+Finally, we configure several Jest specific options, the first of which is to specify the root location to search for tests.
+We also configure where Jest should store any cached items (to speed up test execution), opting for within <code class="language-plaintext highlighter-rouge">node_modules</code> as the Docker setup stores this within a stateful volume.</p>
+
+<p>We can now add a new target to the <code class="language-plaintext highlighter-rouge">Makefile</code> to easily invoke desired test invocations.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">test</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">npm</span> <span class="err">test</span>
+</code></pre></div></div>
+
+<p>As we are using Jest in an application that does not include external assets (such as images or stylesheets), we do not need worry about further <a href="https://jestjs.io/docs/en/webpack">configuring Webpack</a> in this use-case.</p>
+
+<h3 id="separating-the-domain-logic-from-the-delivery-mechanism">Separating the Domain Logic from the Delivery Mechanism</h3>
+
+<p>In the <a href="https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/">previous article</a> we delved into adding types to the user authentication handler abstraction.
+We will now expand upon this and provide sufficient test coverage to each of the three handler options.
+To do this we must first break out each handler type into separate modules, where we will define the handler up till the point that we require the concrete services.
+We will leave this responsibility to the specific delivery mechanism, in this instance that will be specified in <code class="language-plaintext highlighter-rouge">src/auth.js</code>.</p>
+
+<p>First, we shall create a new file <code class="language-plaintext highlighter-rouge">src/handlers/public.js</code>, which will contain the ‘public’ handler definition.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">userId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span> <span class="p">}),</span>
+<span class="p">});</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">handler</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This handler is relativity simple, as we do not expect a <code class="language-plaintext highlighter-rouge">userId</code> to be supplied it can simply return a static ‘N/A’.
+We will follow this by creating another new file <code class="language-plaintext highlighter-rouge">src/handlers/optional.js</code>, which will contain the ‘optional’ handler definition.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span><span class="p">,</span> <span class="nx">withOptionalHttpAuthentication</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">userId</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="nx">userId</span> <span class="p">}),</span>
+<span class="p">});</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">withOptionalHttpAuthentication</span><span class="p">(</span><span class="nx">handler</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>In this case we have to cater for the possibility that the <code class="language-plaintext highlighter-rouge">userId</code> is optionally supplied to the underlying handler implementation.
+Finally, we shall create a new file <code class="language-plaintext highlighter-rouge">src/handlers/strict.js</code>, which will contain the ‘strict’ handler definition.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span><span class="p">,</span> <span class="nx">withStrictHttpAuthentication</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">userId</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="nx">userId</span> <span class="p">}),</span>
+<span class="p">});</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">withStrictHttpAuthentication</span><span class="p">(</span><span class="nx">handler</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>In this case we can be confident in our assumption that a valid <code class="language-plaintext highlighter-rouge">userId</code> will be supplied at all times to the underlying handler implementation.
+With the handlers now defined we can update the <code class="language-plaintext highlighter-rouge">src/auth.js</code> delivery implementation, which wires the handlers and service dependencies together.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">publicHandler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/public</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">optionalHandler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/optional</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">strictHandler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/strict</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">createUserTokenAuthenticator</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./services/userTokenAuthenticator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">USER_POOL_ID</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">USER_POOL_ID</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_POOL_ID is not present</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">getUserIdFromToken</span> <span class="o">=</span> <span class="nx">createUserTokenAuthenticator</span><span class="p">(</span><span class="nx">USER_POOL_ID</span><span class="p">);</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">public_</span> <span class="o">=</span> <span class="nx">publicHandler</span><span class="p">({});</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">optional</span> <span class="o">=</span> <span class="nx">optionalHandler</span><span class="p">({</span> <span class="nx">getUserIdFromToken</span> <span class="p">});</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">strict</span> <span class="o">=</span> <span class="nx">strictHandler</span><span class="p">({</span> <span class="nx">getUserIdFromToken</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<p>We could have just as easily provided these concrete handlers in separate files, but as this is only an example (and two require the <code class="language-plaintext highlighter-rouge">getUserIdFromToken</code> service) this will suffice.
+If we now run <code class="language-plaintext highlighter-rouge">make deploy</code> with this updated implementation, we should see that no externally visible behaviour has changed.
+What we have done however, is clearly separate the domain logic from the delivery mechanism.
+This means that we can now easily test the handler domain in isolation, without the need for a concrete Cognito-backed <code class="language-plaintext highlighter-rouge">getUserIdFromToken</code> service or API Gateway request.</p>
+
+<h3 id="testing-the-domain-logic">Testing the Domain Logic</h3>
+
+<p>We can now begin providing test coverage to the three handler implementations, to ensure that we are confident in their roles.
+To do this we will first extend the global test environment that Jest provides the tests with.
+We will do this by adding a small helper function that will be used to parse the response returned from the handlers.
+This can be achieved by adding a <a href="https://jestjs.io/docs/en/configuration.html#setupfiles-array">setupFiles</a> entry to the <code class="language-plaintext highlighter-rouge">package.json</code> file.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"jest"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"setupFiles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"./jestSetup.js"</span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With this now defined, we can add the <code class="language-plaintext highlighter-rouge">src/jestSetup.js</code> file as follows.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">global</span><span class="p">.</span><span class="nx">parseResponse</span> <span class="o">=</span> <span class="nx">response</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">).</span><span class="nx">toMatchSnapshot</span><span class="p">();</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">body</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">response</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>You can see that the helper performs a snapshot assertion based on the response input, before doing any transformations.
+Snapshot testing is a very powerful way of ensuring that a desired structure (React component, Object) does not unexpectedly change.
+With this helper now available within our test environment, we can move on to testing the public handler use-case within <code class="language-plaintext highlighter-rouge">src/__tests__/public.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/public</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">successfully responds with no user id</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span><span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({},</span> <span class="p">{}));</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">userId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">successfully responds with no user id when access token found</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">)</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">userId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Within each test-case we are able to take advantage of <code class="language-plaintext highlighter-rouge">async/await</code> syntax to succinctly handle the asynchronous handlers response.
+Due to how we have delayed the inclusion of any service within the handler, we are able to easily provide any <a href="https://martinfowler.com/bliki/TestDouble.html">test doubles</a> we see fit.
+With the concrete handler now created, we only need to supply the API Gateway Event and Context objects.
+If we wished to further distance ourselves from the AWS Lambda specifics, we could provide an interface that each delivery must implement to normalise the handler requirements.
+Finally, we inspect the parsed response and assert that it matches our intended state.</p>
+
+<p>If we now run <code class="language-plaintext highlighter-rouge">make test</code>, we can see that the first test-cases are now successfully executed.
+Upon this first execution you will notice that a <code class="language-plaintext highlighter-rouge">src/__tests__/__snapshots__</code> directory is created.
+This stores the expected state based on the snapshot assertions we have included in the <code class="language-plaintext highlighter-rouge">parseResponse</code> function.
+We can now carry on and test the optional handlers behaviour within <code class="language-plaintext highlighter-rouge">src/__tests__/optional.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/optional</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">successfully responds with no user id when access token not found</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">userId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">successfully responds with a user id when access token found</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">)</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">userId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>These test-cases follow the similar <a href="http://wiki.c2.com/?ArrangeActAssert">Arrange, Act, Assert</a> pattern that is found in the previous one.
+Finally, we can test the strict handler behaviour within <code class="language-plaintext highlighter-rouge">src/__tests__/strict.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">fails to respond when access token not found</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">401</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">title</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unauthorized</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">successfully responds with a user id when access token found</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">)</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">userId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>With all three handlers now covered by tests we can re-run <code class="language-plaintext highlighter-rouge">make test</code> and assert that the code behaves as intended.</p>
+
+<h3 id="adding-continuous-integration-using-travis-ci">Adding Continuous Integration using Travis CI</h3>
+
+<p>We have now spent some time introducing a type-system and test coverage to our project.
+All would be in vain however, if they were not ran on a regular basis.
+With this in mind, we will introduce <a href="https://travis-ci.org/">Travis CI</a> into the project, which is a <a href="https://martinfowler.com/articles/continuousIntegration.html">Continuous Integration</a> service which integrates with GitHub.</p>
+
+<p>Our goal will be to re-run both the type checks and test coverage upon each new commit to the remote GitHub repository.
+In doing so the service will alert us to any <a href="https://en.wikipedia.org/wiki/Regression_testing">test regressions</a> along the way.
+As Travis CI integrates seamlessly with GitHub, it is very easy to <a href="https://docs.travis-ci.com/user/getting-started">connect</a> and provide a repository configuration by-way of a root <code class="language-plaintext highlighter-rouge">.travis.yml</code> file.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">sudo</span><span class="pi">:</span> <span class="s">required</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">docker</span>
+
+<span class="na">env</span><span class="pi">:</span>
+  <span class="na">DOCKER_COMPOSE_VERSION</span><span class="pi">:</span> <span class="s">1.21.1</span>
+
+<span class="na">before_install</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">sudo rm /usr/local/bin/docker-compose</span>
+  <span class="pi">-</span> <span class="s">curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` &gt; docker-compose</span>
+  <span class="pi">-</span> <span class="s">chmod +x docker-compose</span>
+  <span class="pi">-</span> <span class="s">sudo mv docker-compose /usr/local/bin</span>
+  <span class="pi">-</span> <span class="s">docker-compose --version</span>
+
+<span class="na">script</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">cp .env.example .env</span>
+  <span class="pi">-</span> <span class="s">docker-compose run --rm serverless npm install</span>
+  <span class="pi">-</span> <span class="s">docker-compose run --rm serverless npm run flow</span>
+  <span class="pi">-</span> <span class="s">docker-compose run --rm serverless npm test</span>
+</code></pre></div></div>
+
+<p>Looking at the configuration above you will see that we take advantage of Docker, running the container commands as we would in our local environment.
+Docker comes as standard within the Travis CI environment, but Docker Compose does not.
+As a result, we must first ensure that we have the desired version present for use.
+We can then setup a dummy <code class="language-plaintext highlighter-rouge">.env</code> file (which is required by our Docker Compose configuration), and then test the build.
+If any command returns a non-zero response, Travis CI assumes this to be an issue and will fail the build.
+You can see how a successful build looks in the screenshot below.</p>
+
+<p><img src="/uploads/posts/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/travis-ci.png" alt="Travis CI" /></p>
+
+<p>We now have a well equipped Continuous Integration pipeline in place.
+Join me in the next post were we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using <a href="https://github.com/dherault/serverless-offline">Serverless Offline</a>.</p>

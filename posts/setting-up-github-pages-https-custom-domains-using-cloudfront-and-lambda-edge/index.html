@@ -1,4 +1,60 @@
 <p>We recently wished to switch over our sites hosted on <a href="https://pages.github.com/">GitHub Pages</a> to be soley HTTPS.
 However, although you are able to supply a <a href="https://help.github.com/articles/using-a-custom-domain-with-github-pages/">custom domain</a> or support <a href="https://github.com/blog/2186-https-for-github-pages">HTTPS traffic</a> you are not able to do both.
-In this article I would like to guide you through the process of how we went about achieving this using <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>, <a href="https://aws.amazon.com/route53/">Route 53</a> and <a href="https://aws.amazon.com/lambda/edge/">Lambda@Edge</a>.
-<!--more--></p>
+In this article I would like to guide you through the process of how we went about achieving this using <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>, <a href="https://aws.amazon.com/route53/">Route 53</a> and <a href="https://aws.amazon.com/lambda/edge/">Lambda@Edge</a>.</p>
+
+<!--more-->
+
+<h3 id="setting-up-the-cloudfront-distribution">Setting up the CloudFront Distribution</h3>
+
+<p>To get around the fact that we can only route plain HTTP traffic using custom domains within GitHub Pages, we decided to add a CloudFront distribution in-between the client and origin.
+Doing so allowed us to supply our own SSL certificate and custom domain secure connection.
+Below is a high-level diagram depicting the approach we took.</p>
+
+<p><img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/architecture.png" alt="Architecture" /></p>
+
+<p>We first setup a new distribution which was associated with a certificate supplied by <a href="https://aws.amazon.com/certificate-manager/">AWS Certificate Manager</a>.</p>
+
+<p><img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/distribution.png" alt="Distribution Settings" /></p>
+
+<p>Following this we created a new origin which routed traffic to the specified <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
+We ensured that only HTTPS via TLS 1.2 was used for requests to the origin server for security concerns.</p>
+
+<p><img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/origin.png" alt="Distribution Origin" /></p>
+
+<p>With this origin in-place we then created a default cache behaviour which enforced HTTPS traffic (redirecting HTTP traffic if found).</p>
+
+<p><img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/cache.png" alt="Default Cache Dehaviour" /></p>
+
+<h3 id="handling-github-page-redirects">Handling Github Page Redirects</h3>
+
+<p>One issue we faced with routing traffic through CloudFront was if GitHub attempted to return a redirect response to the client (i.e for missing trailing slashes).
+As GitHub is unaware of the custom domain, it attempts to route traffic to the <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
+To get around this we took advantage of a <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-updating-http-responses.html">Origin Response Lambda</a> which simply replaced any such responses <code class="language-plaintext highlighter-rouge">Location</code> header with the desired custom domain.</p>
+
+<p>To ensure that CloudFront had access to this Lambda we had to define it within the <code class="language-plaintext highlighter-rouge">us-east-1</code> region.
+Using the simple handler below we published a new version of the Lambda and copied the ARN into the CloudFront Distribution settings.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">handler</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Records</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">cf</span><span class="p">.</span><span class="nx">response</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">301</span><span class="dl">'</span> <span class="o">||</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">302</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span>
+      <span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">location</span><span class="dl">'</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+      <span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">location</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">'</span><span class="s1">USERNAME.github.io</span><span class="dl">'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">location</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="dl">'</span><span class="s1">location</span><span class="dl">'</span><span class="p">][</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span>
+        <span class="dl">'</span><span class="s1">USERNAME.github.io</span><span class="dl">'</span><span class="p">,</span>
+        <span class="dl">'</span><span class="s1">custom.domain</span><span class="dl">'</span>
+      <span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p><img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/lambda.png" alt="Origin Response Lambda" /></p>
+
+<p>Once this was complete we setup an <code class="language-plaintext highlighter-rouge">ALIAS</code> record for the custom domain within Route 53 and all GitHub Pages traffic could now be accessed from the custom domain over HTTPS.</p>

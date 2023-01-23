@@ -1,2 +1,398 @@
-<p>Now that we are aware of what needs to be done, we can go about designing the RESTful API that will be used to process and persist those vital mince pies.
-<!--more--></p>
+<p>Now that we are aware of what needs to be done, we can go about designing the RESTful API that will be used to process and persist those vital mince pies.</p>
+
+<!--more-->
+
+<h3 id="rest-and-hal">REST and HAL</h3>
+
+<p>Before we jump in to the design phase, I would first like to briefly discuss the thought-process behind how we will be designing this API.
+We will be using <a href="https://restfulapi.net/">REST</a> (Representational State Transfer), which is a flexible architectural style for distributed hypertext-driven systems.
+Following this approach allows for clear client/server separation (different rates-of-change), encapsulated state transitions and increased discoverability (via <a href="https://restfulapi.net/hateoas/">HATEOAS</a>).
+The server dictates what data/actions to return and how to react to desired client action requests - while the client is tasked with presenting this data and actions to the user.</p>
+
+<p>We will also be using <a href="http://stateless.co/hal_specification.html">HAL</a> (Hypertext Application Language), which is a simple format for providing hyperlinks between resources.
+This enables your API to be discoverable to both humans and machines alike.</p>
+
+<p>If you wish to learn more, I have had the good fortune to discuss both REST and HAL at length with <a href="http://threedevsandamaybe.com/designing-apis-with-camille-baldock/">knowledgeable</a> <a href="http://threedevsandamaybe.com/api-ramblings-with-phil-sturgeon/">guests</a> on past episodes of my podcast.</p>
+
+<h3 id="raml">RAML</h3>
+
+<p><a href="https://raml.org/">RAML</a> (RESTful API Modeling Language) is a language to easily describe RESTful APIs.
+Following this format allows us to easily map out how an API will work and respond to a consumer, before a line of code needs to be written.
+At MyBuilder we have found it highly beneficial to use an API design tool such as RAML at the start of building a new API.
+In doing so, we are able to flush out the requirements in a more concrete manor, whilst still maintaining quick feedback loops.</p>
+
+<h3 id="bootstrap">Bootstrap</h3>
+
+<p>Every story has a beginning and our APIs is the bootstrap request.
+As a client, all I am initially aware of is a single endpoint and the protocol that we wish to communicate over.
+So as to help aid the client in discovering more about our service, we will respond with all the available actions and some key configuration information for setting up <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/</span><span class="pi">:</span>
+  <span class="na">get</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="pi">|</span>
+      <span class="s">Provides available actions and Cognito authentication pool identifiers.</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">200</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/hal+json</span><span class="pi">:</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"_links": {</span>
+                  <span class="s">"self": { "href": "/" },</span>
+                  <span class="s">"list": { "href": "/pies" },</span>
+                  <span class="s">"add": { "href": "/pies" },</span>
+                  <span class="s">"view": { "href": "/pies/{id}", "templated": true }</span>
+                <span class="s">},</span>
+                <span class="s">"cognito": {</span>
+                  <span class="s">"poolId": "eu-west-1_BXXROsWOu",</span>
+                  <span class="s">"clientId": "3qf6pqo467hr1tcbm3kf5sn2v3"</span>
+                <span class="s">},</span>
+                <span class="s">"baseEndpointUrl": "https://api.mincepiechallenge.com"</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>Adding this additional layer of indirection in providing these actions allows us to remain in control over what the client is able to do (and how) at any given time.
+This provides us with a valuable form of decoupling, with the ability to change endpoints and actions at a later date without any input from the consumer.</p>
+
+<h3 id="authentication">Authentication</h3>
+
+<p>This service will delegate authenticating the client to Amazon Cognito and <a href="https://jwt.io/">JSON Web Tokens</a>.
+This alleviates us from having to cater for user signup and login activities within the API.
+Instead we are required to only ensure that a given client is authorised and meets the desired authorisation in-place.
+The different forms of endpoint we will be using are as follows:</p>
+
+<ul>
+  <li><strong>Public</strong> - accessible to any client request.</li>
+  <li><strong>Optional Authentication</strong> - the response may differ based on if the client is authenticated or not.</li>
+  <li><strong>Strict Authentication</strong> - the endpoint requires the client to be authenticated.</li>
+</ul>
+
+<p>We have already seen a public endpoint in the form of the bootstrap resource, which is available to any client request.
+To permit the other two forms we will be using JSON Web Tokens.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">securitySchemes</span><span class="pi">:</span>
+  <span class="na">optional-jwt</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Optionally provide a valid JSON Web Token.</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">x-jwt</span>
+    <span class="na">describedBy</span><span class="pi">:</span>
+      <span class="na">headers</span><span class="pi">:</span>
+        <span class="na">Authorization</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Used to send a JSON Web Token with the request.</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+          <span class="na">required</span><span class="pi">:</span> <span class="no">false</span>
+
+  <span class="na">strict-jwt</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Requires a valid JSON Web Token be provided.</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">x-jwt</span>
+    <span class="na">describedBy</span><span class="pi">:</span>
+      <span class="na">headers</span><span class="pi">:</span>
+        <span class="na">Authorization</span><span class="pi">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Used to send a JSON Web Token with the request.</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+          <span class="na">required</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">responses</span><span class="pi">:</span>
+        <span class="na">401</span><span class="pi">:</span>
+          <span class="na">body</span><span class="pi">:</span>
+            <span class="s">application/problem+json</span><span class="pi">:</span>
+              <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+              <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+                <span class="s">{</span>
+                  <span class="s">"title": "Unauthorized",</span>
+                  <span class="s">"detail": "Service requires an authenticated user"</span>
+                <span class="s">}</span>
+</code></pre></div></div>
+
+<p>RAML allows us to document how the process works, detailing the client request requirements and possible authentication related responses.</p>
+
+<h3 id="managing-the-pies">Managing the Pies</h3>
+
+<p>Now that we have validated who we are to the API, we can go about documenting how we expect to add and remove pies within the challenge.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies</span><span class="pi">:</span>
+  <span class="na">post</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Add a new mince pie to the challenge.</span>
+    <span class="na">securedBy</span><span class="pi">:</span> <span class="s">strict-jwt</span>
+    <span class="na">body</span><span class="pi">:</span>
+      <span class="s">application/json</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+        <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">{ "name": "Awesome Mince Pie" }</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">201</span><span class="pi">:</span>
+        <span class="na">headers</span><span class="pi">:</span>
+          <span class="na">Location</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="s1">'</span><span class="s">/pies/9d197f40'</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/hal+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"_links": {</span>
+                  <span class="s">"self": { "href": "/pies/9d197f40" },</span>
+                  <span class="s">"photo": { "href": "/pies/9d197f40/photo" }</span>
+                <span class="s">},</span>
+                <span class="s">"id": "9d197f40",</span>
+                <span class="s">"name": "Awesome Mince Pie",</span>
+                <span class="s">"addedAt": "2018-06-11T12:00:00.000Z",</span>
+                <span class="s">"rating": { "avg": 0, "total": 0 }</span>
+              <span class="s">}</span>
+      <span class="na">400</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Bad Request",</span>
+                <span class="s">"detail": "Invalid request body",</span>
+                <span class="s">"errors": [</span>
+                  <span class="s">{ "name": "name", "reason": "You must supply the pie's name." }</span>
+                <span class="s">]</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies/{id}</span><span class="pi">:</span>
+  <span class="na">delete</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Remove a specified mince pie from the challenge.</span>
+    <span class="na">securedBy</span><span class="pi">:</span> <span class="s">strict-jwt</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">204</span><span class="pi">:</span>
+        <span class="na">description</span><span class="pi">:</span> <span class="s">Successfully deleted the mince pie.</span>
+      <span class="na">403</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Forbidden",</span>
+                <span class="s">"detail": "This mince pie does not belong to you."</span>
+              <span class="s">}</span>
+      <span class="na">404</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Not Found",</span>
+                <span class="s">"detail": "Unable to find the specified mince pie."</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>We expect the authenticated client (denoted using <code class="language-plaintext highlighter-rouge">securedBy</code>) to provide us with a valid pie to add to the challenge, else we will return a sufficient error (following <a href="https://tools.ietf.org/html/rfc7807">Problem Details for HTTP APIs</a>).
+In a similar manor we are able to remove a specified pie, providing that the client is authorised to do so (the pie owner).</p>
+
+<h3 id="uploading-a-photo">Uploading a Photo</h3>
+
+<p>We wish to delegate the responsibility of uploading and persisting the clients pie photos to <a href="https://aws.amazon.com/s3/">Amazon S3</a>.
+To do so, we need a process in which to allow the client to request a given unique endpoint to upload these to.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies/{id}/photo</span><span class="pi">:</span>
+  <span class="na">put</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Request a new photo upload URL.</span>
+    <span class="na">securedBy</span><span class="pi">:</span> <span class="s">strict-jwt</span>
+    <span class="na">body</span><span class="pi">:</span>
+      <span class="s">application/json</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+        <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">{</span>
+            <span class="s">"fileExtension": "jpg",</span>
+            <span class="s">"contentType": "image/jpg"</span>
+          <span class="s">}</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">201</span><span class="pi">:</span>
+        <span class="na">headers</span><span class="pi">:</span>
+          <span class="na">Location</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="s1">'</span><span class="s">http://s3.com/upload/9d197f40'</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/hal+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"_links": {</span>
+                  <span class="s">"self": { "href": "http://s3.com/upload/9d197f40" }</span>
+                <span class="s">},</span>
+                <span class="s">"url": "http://s3.com/upload/9d197f40"</span>
+              <span class="s">}</span>
+      <span class="na">400</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Bad Request",</span>
+                <span class="s">"detail": "Invalid request body",</span>
+                <span class="s">"errors": [</span>
+                  <span class="s">{ "name": "fileExtension", "reason": "You must supply the file extension." },</span>
+                  <span class="s">{ "name": "contentType", "reason": "You must supply the content-type." }</span>
+                <span class="s">]</span>
+              <span class="s">}</span>
+      <span class="na">403</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">examples</span><span class="pi">:</span>
+              <span class="na">not-owner</span><span class="pi">:</span> <span class="pi">|</span>
+                <span class="s">{</span>
+                  <span class="s">"title": "Forbidden",</span>
+                  <span class="s">"detail": "This mince pie does not belong to you."</span>
+                <span class="s">}</span>
+              <span class="na">photo-present</span><span class="pi">:</span> <span class="pi">|</span>
+                <span class="s">{</span>
+                  <span class="s">"title": "Forbidden",</span>
+                  <span class="s">"detail": "This mince pie already has a photo."</span>
+                <span class="s">}</span>
+      <span class="na">404</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Not Found",</span>
+                <span class="s">"detail": "Unable to find the specified mince pie."</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>Providing the authenticated client owns the specified pie we accept the desired photos extension and content-type.
+From this we return a unique endpoint that the client can upload the expected file to.
+This allows us to remain in control of what content gets uploaded, but without the need to actually manage the upload process itself.</p>
+
+<h3 id="viewing-the-pies">Viewing the Pies</h3>
+
+<p>So as to allow the client to browse all the available pies, we will provide a listing which partially embeds all the pie resources (saving on many HTTP requests).
+Although this is not strictly allowed within the HAL specification (it should be the entire sub-resource), we have found no negative impact in following this practise, ‘filling in the rest’ upon subsequent client requests to the specific resource.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies</span><span class="pi">:</span>
+  <span class="na">get</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">List all available mince pie's in the challenge.</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">200</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/hal+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"_links": {</span>
+                  <span class="s">"self": { "href": "/pies" }</span>
+                <span class="s">},</span>
+                <span class="s">"_embedded": {</span>
+                  <span class="s">"pies": [</span>
+                    <span class="s">{</span>
+                      <span class="s">"_links": {</span>
+                        <span class="s">"self": { "href": "/pies/9d197f40" }</span>
+                      <span class="s">},</span>
+                      <span class="s">"id": "9d197f40",</span>
+                      <span class="s">"name": "Awesome Mince Pie",</span>
+                      <span class="s">"thumbnail": "http://s3.com/9d197f40.jpg",</span>
+                      <span class="s">"rating": { "avg": 5, "total": 1 }</span>
+                    <span class="s">}</span>
+                  <span class="s">]</span>
+                <span class="s">},</span>
+                <span class="s">"total": 1</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>In the case of a detailed pie view, we wish to provide the client with the possible actions that are available to them.
+These will differ based on if they are authenticated and/or the owner of the specified pie.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies/{id}</span><span class="pi">:</span>
+  <span class="na">get</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">View a specified mince pie.</span>
+    <span class="na">securedBy</span><span class="pi">:</span> <span class="s">optional-jwt</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">200</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/hal+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"_links": {</span>
+                  <span class="s">"self": { "href": "/pies/9d197f40" },</span>
+                  <span class="s">"photo?": { "href": "/pies/9d197f40/photo" },</span>
+                  <span class="s">"rate?": { "href": "/pies/9d197f40/rate" },</span>
+                  <span class="s">"remove?": { "href": "/pies/9d197f40" }</span>
+                <span class="s">},</span>
+                <span class="s">"id": "9d197f40",</span>
+                <span class="s">"name": "Awesome Mince Pie",</span>
+                <span class="s">"addedAt": "2018-06-11T012:00:00.000Z",</span>
+                <span class="s">"photo": "http://s3.com/original/9d197f40.jpg",</span>
+                <span class="s">"thumbnail": "http://s3.com/9d197f40.jpg",</span>
+                <span class="s">"rating": { "avg": 0, "total": 0 }</span>
+              <span class="s">}</span>
+      <span class="na">404</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Not Found",</span>
+                <span class="s">"detail": "Unable to find the specified mince pie."</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>We specify that the <code class="language-plaintext highlighter-rouge">rate</code>, <code class="language-plaintext highlighter-rouge">remove</code> and <code class="language-plaintext highlighter-rouge">photo</code> actions could be optionally present.
+This is due to the imposed restrictions on who can remove/upload a photo for the pie (the owner), and if the authenticated client has already given a rating to this pie.</p>
+
+<h3 id="rating-the-pies">Rating the Pies</h3>
+
+<p>Finally, there would be no challenge if we were not able to actually rate the pies.
+Providing that the authenticated client has not already rated the pie, we allow them to submit a desired rating.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">/pies/{id}/rate</span><span class="pi">:</span>
+  <span class="na">put</span><span class="pi">:</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Rate a specified mince pie.</span>
+    <span class="na">securedBy</span><span class="pi">:</span> <span class="s">strict-jwt</span>
+    <span class="na">body</span><span class="pi">:</span>
+      <span class="s">application/json</span><span class="pi">:</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+        <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">{ "rating": 5 }</span>
+    <span class="na">responses</span><span class="pi">:</span>
+      <span class="na">204</span><span class="pi">:</span>
+        <span class="na">description</span><span class="pi">:</span> <span class="s">Successfully rated the mince pie.</span>
+      <span class="na">400</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Bad Request",</span>
+                <span class="s">"detail": "Invalid request body",</span>
+                <span class="s">"errors": [</span>
+                  <span class="s">{ "name": "rating", "reason": "You must supply a valid pie rating." }</span>
+                <span class="s">]</span>
+              <span class="s">}</span>
+      <span class="na">403</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Forbidden",</span>
+                <span class="s">"detail": "You have already rated this mince pie."</span>
+              <span class="s">}</span>
+      <span class="na">404</span><span class="pi">:</span>
+        <span class="na">body</span><span class="pi">:</span>
+          <span class="s">application/problem+json</span><span class="pi">:</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+            <span class="na">example</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">{</span>
+                <span class="s">"title": "Not Found",</span>
+                <span class="s">"detail": "Unable to find the specified mince pie."</span>
+              <span class="s">}</span>
+</code></pre></div></div>
+
+<p>If the rating does not meet the requirements we return a sufficient error to the client, else we signify success based on the returned HTTP status code.</p>
+
+<h3 id="exploring-the-api">Exploring the API</h3>
+
+<p>We are now able to experiment with this API, using proposed user-stories and exploring how the state transitions work.
+There are many <a href="https://github.com/mulesoft/osprey">different</a> <a href="https://github.com/RePoChO/raml-mocker">tools</a> available to bring this API to life, allowing you to handle mock service calls.</p>
+
+<p>I have found it beneficial to produce clear, easy-to-read documentation from the specification using <a href="https://github.com/raml2html/raml2html">raml2html</a>.
+You can explore this <a href="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.html">documentation</a> and the complete underlying <a href="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.raml">specification</a> at your leisure.</p>
+
+<p><a href="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.html"><img src="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api-documentation.png" alt="API Documentation" /></a></p>
+
+<p>With the API design now finalised we can move on to actually building it!
+Join me in the next post were we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.</p>

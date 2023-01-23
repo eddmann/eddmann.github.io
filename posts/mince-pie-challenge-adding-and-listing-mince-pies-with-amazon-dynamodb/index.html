@@ -1,5 +1,555 @@
-<p>In the <a href="https://tech.mybuilder.com/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/">previous post</a> we began to implement the API endpoints, starting off with creating the bootstrap response.
+<p>In the <a href="https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/">previous post</a> we began to implement the API endpoints, starting off with creating the bootstrap response.
 We did this in a manor that catered for both online and offline development access.
 In this post we will incorporate the ability to add and list mince pies, persisting the state within <a href="https://aws.amazon.com/dynamodb/">Amazon DynamoDB</a>.
-Following this, we will enrich our offline development process by setting up a <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html">Amazon DynamoDB Local</a> instance using Docker.
-<!--more--></p>
+Following this, we will enrich our offline development process by setting up a <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html">Amazon DynamoDB Local</a> instance using Docker.</p>
+
+<!--more-->
+
+<p>If you are keen to see how the finished example looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/06-add-list-pies">API repository</a>.</p>
+
+<h3 id="adding-pies-with-amazon-dynamodb">Adding Pies with Amazon DynamoDB</h3>
+
+<p>If we again look back at the API <a href="https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#managing-the-pies">RAML definition</a>, we can see that we wish to provide the client with the ability to add a new mince pie to the challenge by making a <code class="language-plaintext highlighter-rouge">POST</code> request with the specific pie name.
+If successful, the new pie resource will be returned back to the client.</p>
+
+<p>To persist the pie resources and associated ratings we shall be using the fully-managed NoSQL Amazon DynamoDB solution.
+A deep-dive into the specifics of DynamoDB is outside the scope of this series, but I would urge you to checkout <a href="https://acloud.guru/learn/aws-dynamodb">these</a> <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.html">great</a> <a href="https://www.youtube.com/watch?v=bCW3lhsJKfw">resources</a> on the subject.
+We shall start off by defining the desired table within <code class="language-plaintext highlighter-rouge">resources.yml</code>, and grant access to the table for each of the present Lambda functions within <code class="language-plaintext highlighter-rouge">roles.yml</code>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Resources</span><span class="pi">:</span>
+  <span class="na">PieTable</span><span class="pi">:</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">AWS::DynamoDB::Table</span>
+    <span class="na">Properties</span><span class="pi">:</span>
+      <span class="na">TableName</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):tableName}</span>
+      <span class="na">AttributeDefinitions</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">AttributeName</span><span class="pi">:</span> <span class="s">Id</span>
+          <span class="na">AttributeType</span><span class="pi">:</span> <span class="s">S</span>
+      <span class="na">KeySchema</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">AttributeName</span><span class="pi">:</span> <span class="s">Id</span>
+          <span class="na">KeyType</span><span class="pi">:</span> <span class="s">HASH</span>
+      <span class="na">ProvisionedThroughput</span><span class="pi">:</span>
+        <span class="na">ReadCapacityUnits</span><span class="pi">:</span> <span class="m">1</span>
+        <span class="na">WriteCapacityUnits</span><span class="pi">:</span> <span class="m">1</span>
+
+<span class="na">Outputs</span><span class="pi">:</span>
+  <span class="na">PieTableName</span><span class="pi">:</span>
+    <span class="na">Value</span><span class="pi">:</span>
+      <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieTable</span>
+</code></pre></div></div>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
+  <span class="na">Action</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">dynamodb:*</span>
+  <span class="na">Resource</span><span class="pi">:</span> <span class="s1">'</span><span class="s">arn:aws:dynamodb:${self:provider.region}:*:table/${file(./config.${self:provider.stage}.yml):tableName}'</span>
+</code></pre></div></div>
+
+<p>This table includes a unique <code class="language-plaintext highlighter-rouge">Id</code> attribute which will be used as the record key.
+At this time we have statically specified some rather low <a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ProvisionedThroughput.html">throughput units</a>, when we enter production these should be tuned accordingly.
+We assign each Lambda function a role that grants access to perform all available actions on this table, this could be restricted in the future for security concerns.
+In a similar manor to how we have defined stage specific parameters in the past, we shall specify the desired table name per <code class="language-plaintext highlighter-rouge">config.{stage}.yml</code> file like so.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">tableName</span><span class="pi">:</span> <span class="s1">'</span><span class="s">dev-mince-pie-challenge'</span>
+</code></pre></div></div>
+
+<p>With the table now present we can move on to providing the ability to add new mince pies to the challenge.
+Each pie is uniquely distinguishable based on an associated UUID, to generate these identifiers we must include a new runtime dependency within <code class="language-plaintext highlighter-rouge">package.json</code>.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.3.2"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>With this dependency available, we will now create a new service within <code class="language-plaintext highlighter-rouge">src/services/dynamoDBPieStore.js</code> which will be tasked with managing interaction between the handler and persistent state.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Pie</span><span class="p">,</span> <span class="nx">UserId</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="nx">uuid</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">uuid/v4</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">AWS</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">aws-sdk</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">addPie</span> <span class="o">=</span>
+  <span class="p">(</span><span class="nx">tableName</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="p">(</span><span class="nx">userId</span><span class="p">:</span> <span class="nx">UserId</span><span class="p">,</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Pie</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">pie</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">Id</span><span class="p">:</span> <span class="nx">uuid</span><span class="p">(),</span>
+      <span class="na">UserId</span><span class="p">:</span> <span class="nx">userId</span><span class="p">,</span>
+      <span class="na">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+      <span class="na">AvgRating</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">PhotoUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">ThumbnailUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">Ratings</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="na">AddedAt</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">(),</span>
+    <span class="p">};</span>
+
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">DynamoDB</span><span class="p">.</span><span class="nx">DocumentClient</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">put</span><span class="p">({</span> <span class="na">TableName</span><span class="p">:</span> <span class="nx">tableName</span><span class="p">,</span> <span class="na">Item</span><span class="p">:</span> <span class="nx">pie</span> <span class="p">})</span>
+      <span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">pie</span><span class="p">);</span>
+  <span class="p">};</span>
+</code></pre></div></div>
+
+<p>At this time we simply expose an <code class="language-plaintext highlighter-rouge">addPie</code> function which allows us to partially apply it with the desired stages table name.
+Once invoked, we build up the initial pie structure, persist it to the DynamoDB table and finally return it to the caller.
+This pie structure is typed by Flow, and as such needs to be added to <code class="language-plaintext highlighter-rouge">src/types/index.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">type</span> <span class="nx">UserId</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="nx">type</span> <span class="nx">URL</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="nx">type</span> <span class="nx">UUID</span> <span class="o">=</span> <span class="nx">string</span><span class="p">;</span>
+
+<span class="k">export</span> <span class="nx">type</span> <span class="nx">Pie</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">Id</span><span class="p">:</span> <span class="nx">UUID</span><span class="p">,</span>
+  <span class="na">UserId</span><span class="p">:</span> <span class="nx">UserId</span><span class="p">,</span>
+  <span class="na">Name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="na">AvgRating</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>
+  <span class="na">PhotoUrl</span><span class="p">:</span> <span class="p">?</span><span class="nx">URL</span><span class="p">,</span>
+  <span class="nx">ThumbnailUrl</span><span class="p">:</span> <span class="p">?</span><span class="nx">URL</span><span class="p">,</span>
+  <span class="nx">Ratings</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">UserId</span><span class="p">]:</span> <span class="nx">number</span> <span class="p">},</span>
+  <span class="na">AddedAt</span><span class="p">:</span> <span class="nx">number</span><span class="p">,</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>Now we have the ability to persist new pies, we can move on to creating the internal handler (<code class="language-plaintext highlighter-rouge">src/handlers/add.js</code>) which will encapsulate this functionality.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">badRequest</span><span class="p">,</span> <span class="nx">created</span><span class="p">,</span> <span class="nx">json</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/http</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span><span class="p">,</span> <span class="nx">withStrictHttpAuthentication</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Resource</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">hal</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">add</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">userId</span><span class="p">,</span> <span class="na">services</span><span class="p">:</span> <span class="p">{</span> <span class="nx">addPie</span> <span class="p">}</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="p">{</span> <span class="nx">name</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">json</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">badRequest</span><span class="p">(</span><span class="dl">'</span><span class="s1">Invalid request body</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">name</span><span class="dl">'</span><span class="p">,</span> <span class="na">reason</span><span class="p">:</span> <span class="dl">"</span><span class="s2">You must supply the pie's name.</span><span class="dl">"</span> <span class="p">},</span>
+    <span class="p">]);</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="nx">pie</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">addPie</span><span class="p">(</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">name</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">resource</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Resource</span><span class="p">(</span>
+    <span class="p">{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">Id</span><span class="p">,</span>
+      <span class="na">name</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">Name</span><span class="p">,</span>
+      <span class="na">rating</span><span class="p">:</span> <span class="p">{</span> <span class="na">avg</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">total</span><span class="p">:</span> <span class="mi">0</span> <span class="p">},</span>
+      <span class="na">addedAt</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">pie</span><span class="p">.</span><span class="nx">AddedAt</span><span class="p">).</span><span class="nx">toISOString</span><span class="p">(),</span>
+    <span class="p">},</span>
+    <span class="s2">`/pies/</span><span class="p">${</span><span class="nx">pie</span><span class="p">.</span><span class="nx">Id</span><span class="p">}</span><span class="s2">`</span>
+  <span class="p">);</span>
+
+  <span class="nx">resource</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="dl">'</span><span class="s1">photo</span><span class="dl">'</span><span class="p">,</span> <span class="s2">`/pies/</span><span class="p">${</span><span class="nx">pie</span><span class="p">.</span><span class="nx">Id</span><span class="p">}</span><span class="s2">/photo`</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">created</span><span class="p">(</span><span class="nx">resource</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">withStrictHttpAuthentication</span><span class="p">(</span><span class="nx">add</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>This handler simply ensures that a name has been supplied within the requests JSON body, and then proceeds to add it to the challenge.
+We ensure that only authenticated clients have access to this behaviour (by-way of <code class="language-plaintext highlighter-rouge">withStrictHttpAuthentication</code>) and return a newly specified <code class="language-plaintext highlighter-rouge">created</code> response.
+As we are expanding our HTTP language we need to add these functions to <code class="language-plaintext highlighter-rouge">src/helpers/http.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">created</span> <span class="o">=</span> <span class="p">(</span><span class="nx">resource</span><span class="p">:</span> <span class="nx">HALResource</span><span class="p">):</span> <span class="nx">Response</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">201</span><span class="p">,</span>
+  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">Access-Control-Allow-Origin</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">Access-Control-Allow-Credentials</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/hal+json</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">Location</span><span class="p">:</span> <span class="nx">resource</span><span class="p">.</span><span class="nx">_links</span><span class="p">.</span><span class="nb">self</span><span class="p">.</span><span class="nx">href</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">resource</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()),</span>
+<span class="p">});</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">badRequest</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="nx">detail</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span>
+  <span class="nx">errors</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="na">reason</span><span class="p">:</span> <span class="nx">string</span> <span class="p">}</span><span class="o">&gt;</span>
+<span class="p">):</span> <span class="nx">Response</span> <span class="o">=&gt;</span> <span class="p">({</span>
+  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">Access-Control-Allow-Origin</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">Access-Control-Allow-Credentials</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/problem+json</span><span class="dl">'</span><span class="p">,</span>
+  <span class="p">},</span>
+  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Bad Request</span><span class="dl">'</span><span class="p">,</span> <span class="nx">detail</span><span class="p">,</span> <span class="nx">errors</span> <span class="p">}),</span>
+<span class="p">});</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">json</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="p">?</span><span class="nx">string</span><span class="p">):</span> <span class="p">{</span> <span class="p">[</span><span class="nx">string</span><span class="p">]:</span> <span class="nx">any</span> <span class="p">}</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">input</span> <span class="p">?</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">:</span> <span class="p">{};</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{};</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>This internal handler is called from the parent <code class="language-plaintext highlighter-rouge">src/add.js</code> handler, which provides us with the concrete user authentication and pie addition services.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">add</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/add</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">addPie</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./services/dynamoDBPieStore</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">createUserTokenAuthenticator</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./services/userTokenAuthenticator</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">TABLE_NAME</span><span class="p">,</span> <span class="nx">USER_POOL_ID</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">TABLE_NAME</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">TABLE_NAME is not present</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">USER_POOL_ID</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_POOL_ID is not present</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="nx">add</span><span class="p">({</span>
+  <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="nx">createUserTokenAuthenticator</span><span class="p">(</span><span class="nx">USER_POOL_ID</span><span class="p">),</span>
+  <span class="na">addPie</span><span class="p">:</span> <span class="nx">addPie</span><span class="p">(</span><span class="nx">TABLE_NAME</span><span class="p">),</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>With the implementation in-place, we can then wire up the handler within <code class="language-plaintext highlighter-rouge">functions.yml</code>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">add-pie</span><span class="pi">:</span>
+  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/add.handler</span>
+  <span class="na">events</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/pies</span>
+        <span class="na">method</span><span class="pi">:</span> <span class="s">post</span>
+        <span class="na">cors</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<p>As we define the table name ‘per stage’ and access to this resource is common, we shall include the table name within the <code class="language-plaintext highlighter-rouge">serverless.yml</code> global environment configuration.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">provider</span><span class="pi">:</span>
+  <span class="na">environment</span><span class="pi">:</span>
+    <span class="na">TABLE_NAME</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):tableName}</span>
+</code></pre></div></div>
+
+<p>Like the previous bootstrap endpoint, we shall add some suitable test coverage within <code class="language-plaintext highlighter-rouge">src/__tests__/add.js</code>, which will verify the intended behaviour of the service.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/add</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">requires an authenticated user</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">()</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span><span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">''</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{}));</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="mi">401</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">requires a pie name</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span> <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">)</span> <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">}</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="mi">400</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">adds a new mince pie</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">getUserIdFromToken</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">),</span>
+    <span class="na">addPie</span><span class="p">:</span> <span class="nx">jest</span><span class="p">.</span><span class="nx">fn</span><span class="p">((</span><span class="nx">userId</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">({</span>
+      <span class="na">Id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">123456</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+      <span class="na">UserId</span><span class="p">:</span> <span class="nx">userId</span><span class="p">,</span>
+      <span class="na">AddedAt</span><span class="p">:</span> <span class="mi">12345678</span><span class="p">,</span>
+    <span class="p">})),</span>
+  <span class="p">};</span>
+  <span class="kd">const</span> <span class="nx">body</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Mince Pie</span><span class="dl">'</span> <span class="p">});</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span>
+    <span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({</span> <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="na">Authorization</span><span class="p">:</span> <span class="dl">'</span><span class="s1">TOKEN</span><span class="dl">'</span> <span class="p">},</span> <span class="nx">body</span> <span class="p">},</span> <span class="p">{})</span>
+  <span class="p">);</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="mi">201</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">services</span><span class="p">.</span><span class="nx">addPie</span><span class="p">).</span><span class="nx">toHaveBeenCalledWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">Mince Pie</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>As discussed in a previous post, we have intentionally split the domain logic out from the external dependencies.
+This allows us to easily incorporate test doubles within our tests, allowing us to inspect that the <code class="language-plaintext highlighter-rouge">addPie</code> service function is being invoked as expected.</p>
+
+<p>If we now <code class="language-plaintext highlighter-rouge">make deploy</code> we shall see a new endpoint appear within the deployment summary.
+We can now <code class="language-plaintext highlighter-rouge">POST</code> to this endpoint as described within the RAML documentation, and see that the expected responses are returned.
+However, without going into the AWS console and viewing the table records, the client is unable to actually see any of the pies they have added.
+We will address this in the next section.</p>
+
+<p><img src="/uploads/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/aws-console-dynamodb.png" alt="DynamoDB AWS Console" /></p>
+
+<h3 id="listing-pies-with-amazon-dynamodb">Listing Pies with Amazon DynamoDB</h3>
+
+<p>Now we have the ability to add new pies, we will move on to granting the client access to list all pies present within the challenge.
+We will start off by adding a new function to <code class="language-plaintext highlighter-rouge">src/services/dynamoDBPieStore.js</code>, which will return all the pies present.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">allPies</span> <span class="o">=</span> <span class="p">(</span><span class="nx">tableName</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Pie</span><span class="o">&gt;&gt;</span> <span class="o">=&gt;</span>
+  <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">DynamoDB</span><span class="p">.</span><span class="nx">DocumentClient</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">scan</span><span class="p">({</span> <span class="na">TableName</span><span class="p">:</span> <span class="nx">tableName</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Items</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>From here we can implement the internal handler within <code class="language-plaintext highlighter-rouge">src/handler/list.js</code>, which will be used to generate the collection resource response.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ok</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/http</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">Resource</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">hal</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">list</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="na">services</span><span class="p">:</span> <span class="p">{</span> <span class="nx">allPies</span> <span class="p">}</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">pies</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="nx">allPies</span><span class="p">()).</span><span class="nx">map</span><span class="p">(</span>
+    <span class="nx">pie</span> <span class="o">=&gt;</span>
+      <span class="k">new</span> <span class="nx">Resource</span><span class="p">(</span>
+        <span class="p">{</span>
+          <span class="na">id</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">Id</span><span class="p">,</span>
+          <span class="na">name</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">Name</span><span class="p">,</span>
+          <span class="na">thumbnail</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">ThumbnailUrl</span><span class="p">,</span>
+          <span class="na">rating</span><span class="p">:</span> <span class="p">{</span> <span class="na">avg</span><span class="p">:</span> <span class="nx">pie</span><span class="p">.</span><span class="nx">AvgRating</span><span class="p">,</span> <span class="na">total</span><span class="p">:</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">pie</span><span class="p">.</span><span class="nx">Ratings</span><span class="p">).</span><span class="nx">length</span> <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">`/pies/</span><span class="p">${</span><span class="nx">pie</span><span class="p">.</span><span class="nx">Id</span><span class="p">}</span><span class="s2">`</span>
+      <span class="p">)</span>
+  <span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">resource</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Resource</span><span class="p">({</span> <span class="na">total</span><span class="p">:</span> <span class="nx">pies</span><span class="p">.</span><span class="nx">length</span> <span class="p">},</span> <span class="dl">'</span><span class="s1">/pies</span><span class="dl">'</span><span class="p">);</span>
+
+  <span class="nx">resource</span><span class="p">.</span><span class="nx">embed</span><span class="p">(</span><span class="dl">'</span><span class="s1">pies</span><span class="dl">'</span><span class="p">,</span> <span class="nx">pies</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">ok</span><span class="p">(</span><span class="nx">resource</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">list</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>As described within the <a href="https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#viewing-the-pies">RAML definition</a>, important details about each pie are embedded within the listing collection resource.
+This stops us from having to make many individual HTTP requests per pie.
+We can then encapsulate this in the concrete handler within <code class="language-plaintext highlighter-rouge">src/list.js</code>, which configures the external database service dependency.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">list</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/list</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">allPies</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./services/dynamoDBPieStore</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">TABLE_NAME</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">TABLE_NAME</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">TABLE_NAME is not present</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="nx">list</span><span class="p">({</span>
+  <span class="na">allPies</span><span class="p">:</span> <span class="nx">allPies</span><span class="p">(</span><span class="nx">TABLE_NAME</span><span class="p">),</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>We can now assert that the handler provides the desired results by covering the behaviour with tests within <code class="language-plaintext highlighter-rouge">src/__tests__/list.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/list</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">lists mince pies</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">pies</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="na">Id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">UserId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">Name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Mince Pie</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">AvgRating</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">PhotoUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">ThumbnailUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">Ratings</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="na">AddedAt</span><span class="p">:</span> <span class="mi">123456789</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="na">Id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">2</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">UserId</span><span class="p">:</span> <span class="dl">'</span><span class="s1">USER_ID</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">Name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Another Mince Pie</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">AvgRating</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">PhotoUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">ThumbnailUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">Ratings</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="na">AddedAt</span><span class="p">:</span> <span class="mi">123456789</span><span class="p">,</span>
+    <span class="p">},</span>
+  <span class="p">];</span>
+
+  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">allPies</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">pies</span><span class="p">),</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span><span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({},</span> <span class="p">{}));</span>
+
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toEqual</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">total</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">_embedded</span><span class="p">.</span><span class="nx">pies</span><span class="p">).</span><span class="nx">toHaveLength</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Finally, we can define the list handler within <code class="language-plaintext highlighter-rouge">functions.yml</code>, and perform another <code class="language-plaintext highlighter-rouge">make deploy</code>.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">list-pies</span><span class="pi">:</span>
+  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/list.handler</span>
+  <span class="na">events</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">path</span><span class="pi">:</span> <span class="s">/pies</span>
+        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
+        <span class="na">cors</span><span class="pi">:</span> <span class="no">true</span>
+</code></pre></div></div>
+
+<p>If we now visit this new endpoint we should see the pie we added from the last request.
+We have now added the ability to add and list mince pies within the challenge using online AWS resources.
+In similar fashion to how we were able to develop the bootstrap endpoint offline, we will now expand upon this and add the ability to interact with these endpoints using Amazon DynamoDB Local.</p>
+
+<h3 id="using-amazon-dynamodb-local-for-offline-development">Using Amazon DynamoDB Local for Offline Development</h3>
+
+<p>We shall be using a dedicated <a href="https://hub.docker.com/r/ccabreraruiz/dynamodb-local/">Docker container</a> which will expose the DynamoDB Local instance to our API.
+To begin, we need to add the new service to the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file, ensuring that the <code class="language-plaintext highlighter-rouge">serverless-offline</code> service is linked and made aware of it.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
+  <span class="na">serverless-offline</span><span class="pi">:</span>
+    <span class="na">links</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">dynamodb</span>
+  <span class="na">dynamodb</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">ccabreraruiz/dynamodb-local</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">8000:8000</span>
+</code></pre></div></div>
+
+<p>The Serverless Framework is able to interact with this DynamoDB Local instance by adding an <a href="https://www.npmjs.com/package/serverless-dynamodb-local">additional plugin</a>.
+We shall add this development dependency to the <code class="language-plaintext highlighter-rouge">package.json</code> file.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nl">devDependencies</span><span class="p">:</span> <span class="p">{</span>
+     <span class="dl">"</span><span class="s2">serverless-dynamodb-local</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">^0.2.30</span><span class="dl">"</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>With this now available, we can define how the plugin can access the local instance within the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">custom</span><span class="pi">:</span>
+  <span class="na">dynamodb</span><span class="pi">:</span>
+    <span class="na">start</span><span class="pi">:</span>
+      <span class="na">host</span><span class="pi">:</span> <span class="s">dynamodb</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">8000</span>
+
+<span class="na">plugins</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">serverless-dynamodb-local</span>
+</code></pre></div></div>
+
+<p>This plugin can be used for both provisioning and managing a DynamoDB Local instance.
+As we are using Docker to provision the instance we only require the plugin to ensure that the specific resources presented in <code class="language-plaintext highlighter-rouge">resources.yml</code> are made available.
+To do this we shall update the <code class="language-plaintext highlighter-rouge">Makefile</code> offline target to ensure that a freshly migrated DynamoDB table is present when we wish to develop offline.</p>
+
+<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">offline</span><span class="o">:</span>
+  <span class="err">docker-compose</span> <span class="err">rm</span> <span class="err">-sf</span> <span class="err">dynamodb</span> <span class="err">&amp;&amp;</span> <span class="err">\</span>
+  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless-offline</span> <span class="err">sls</span> <span class="err">dynamodb</span> <span class="err">migrate</span> <span class="nv">--stage</span><span class="o">=</span>offline <span class="o">&amp;&amp;</span> <span class="se">\</span>
+  docker-compose run <span class="nt">--service-ports</span> <span class="nt">--rm</span> serverless-offline sls offline <span class="nt">--stage</span><span class="o">=</span>offline
+</code></pre></div></div>
+
+<p>The next step is to decide how we will provide offline counterparts to the online Amazon Cognito and Amazon DynamoDB we will be using in online stages.
+To do this we will take advantage of Webpack’s <a href="https://webpack.js.org/configuration/resolve/#resolve-alias">alias resolution</a> and a flag that is set when Serverless is building the offline instance.
+We shall update <code class="language-plaintext highlighter-rouge">webpack.config.js</code> as follows.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">IS_OFFLINE</span> <span class="o">=</span> <span class="nx">slsw</span><span class="p">.</span><span class="nx">lib</span><span class="p">.</span><span class="nx">webpack</span><span class="p">.</span><span class="nx">isLocal</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">resolve</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">alias</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">db</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span>
+        <span class="nx">__dirname</span><span class="p">,</span>
+        <span class="s2">`./src/services/</span><span class="p">${</span><span class="nx">IS_OFFLINE</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">localDynamoDBPieStore</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">dynamoDBPieStore</span><span class="dl">'</span><span class="p">}</span><span class="s2">`</span>
+      <span class="p">),</span>
+      <span class="na">userTokenAuthenticator</span><span class="p">:</span> <span class="nx">path</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span>
+        <span class="nx">__dirname</span><span class="p">,</span>
+        <span class="s2">`src/services/</span><span class="p">${</span>
+          <span class="nx">IS_OFFLINE</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">inMemoryUserTokenAuthenticator</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">cognitoUserTokenAuthenticator</span><span class="dl">'</span>
+        <span class="p">}</span><span class="s2">`</span>
+      <span class="p">),</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>By adding this layer of indirection we provide the ability to swap out the desired <code class="language-plaintext highlighter-rouge">db</code> and <code class="language-plaintext highlighter-rouge">userTokenAuthenticator</code> service, based on if we are in online or offline mode.
+To maintain the current online functionality all we need to do is replace the paths defined within <code class="language-plaintext highlighter-rouge">src/list.js</code> and <code class="language-plaintext highlighter-rouge">src/add.js</code> with these new aliases.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">addPie</span><span class="p">,</span> <span class="nx">allPies</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">db</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">createUserTokenAuthenticator</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">userTokenAuthenticator</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Now we can define the specific implementations of the service which will be used in offline mode.
+In the case of <code class="language-plaintext highlighter-rouge">db</code> which will interact with the local instance, we can define it as so within <code class="language-plaintext highlighter-rouge">src/services/localDynamoDBPieStore.js</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">Pie</span><span class="p">,</span> <span class="nx">UserId</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="nx">uuid</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">uuid/v4</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">AWS</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">aws-sdk</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">config</span> <span class="o">=</span> <span class="p">{</span> <span class="na">region</span><span class="p">:</span> <span class="dl">'</span><span class="s1">localhost</span><span class="dl">'</span><span class="p">,</span> <span class="na">endpoint</span><span class="p">:</span> <span class="dl">'</span><span class="s1">http://dynamodb:8000</span><span class="dl">'</span> <span class="p">};</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">addPie</span> <span class="o">=</span>
+  <span class="p">(</span><span class="nx">tableName</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="p">(</span><span class="nx">userId</span><span class="p">:</span> <span class="nx">UserId</span><span class="p">,</span> <span class="nx">name</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Pie</span><span class="o">&gt;</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">pie</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="na">Id</span><span class="p">:</span> <span class="nx">uuid</span><span class="p">(),</span>
+      <span class="na">UserId</span><span class="p">:</span> <span class="nx">userId</span><span class="p">,</span>
+      <span class="na">Name</span><span class="p">:</span> <span class="nx">name</span><span class="p">,</span>
+      <span class="na">AvgRating</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="na">PhotoUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">ThumbnailUrl</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span>
+      <span class="na">Ratings</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="na">AddedAt</span><span class="p">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">(),</span>
+    <span class="p">};</span>
+
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">DynamoDB</span><span class="p">.</span><span class="nx">DocumentClient</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">put</span><span class="p">({</span> <span class="na">TableName</span><span class="p">:</span> <span class="nx">tableName</span><span class="p">,</span> <span class="na">Item</span><span class="p">:</span> <span class="nx">pie</span> <span class="p">})</span>
+      <span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">pie</span><span class="p">);</span>
+  <span class="p">};</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">allPies</span> <span class="o">=</span> <span class="p">(</span><span class="nx">tableName</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nb">Array</span><span class="o">&lt;</span><span class="nx">Pie</span><span class="o">&gt;&gt;</span> <span class="o">=&gt;</span>
+  <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">DynamoDB</span><span class="p">.</span><span class="nx">DocumentClient</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">scan</span><span class="p">({</span> <span class="na">TableName</span><span class="p">:</span> <span class="nx">tableName</span> <span class="p">})</span>
+    <span class="p">.</span><span class="nx">promise</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Items</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>You can see in this case we are required to provide the specific local endpoint that the <code class="language-plaintext highlighter-rouge">DocumentClient</code> should interact with.
+In the case of the <code class="language-plaintext highlighter-rouge">userTokenAuthenticator</code>, there is sadly no local equivalent to Amazon Cognito.
+We shall instead use a simple in-memory representation (<code class="language-plaintext highlighter-rouge">src/services/inMemoryUserTokenAuthenticator.js</code>), which will provide a couple of stub user tokens for us to use.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
+
+<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">UserTokenAuthenticator</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">users</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">TOKEN1</span><span class="p">:</span> <span class="dl">'</span><span class="s1">User1</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">TOKEN2</span><span class="p">:</span> <span class="dl">'</span><span class="s1">User2</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">TOKEN3</span><span class="p">:</span> <span class="dl">'</span><span class="s1">User3</span><span class="dl">'</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="k">export</span> <span class="k">default</span> <span class="p">(</span><span class="nx">poolId</span><span class="p">:</span> <span class="nx">string</span><span class="p">):</span> <span class="nx">UserTokenAuthenticator</span> <span class="o">=&gt;</span>
+  <span class="k">async</span> <span class="nx">token</span> <span class="o">=&gt;</span>
+    <span class="nx">users</span><span class="p">[</span><span class="nx">token</span><span class="p">];</span>
+</code></pre></div></div>
+
+<p>With these changes, we are required to define what the new aliases point to in regards to Flow.
+We shall use the online services in this case, adding them to the <code class="language-plaintext highlighter-rouge">.flowconfig</code> file like so.</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">[options]</span>
+<span class="py">module.name_mapper</span><span class="p">=</span><span class="s">'^db$'</span> <span class="s">-&gt; '&lt;PROJECT_ROOT&gt;/src/services/dynamoDBPieStore'</span>
+<span class="py">module.name_mapper</span><span class="p">=</span><span class="s">'^userTokenAuthenticator$'</span> <span class="s">-&gt; '&lt;PROJECT_ROOT&gt;/src/services/cognitoUserTokenAuthenticator'</span>
+</code></pre></div></div>
+
+<p>Finally, we can <code class="language-plaintext highlighter-rouge">make offline</code> and experiment with the new API endpoints offline.
+We can supply authenticated user tokens (i.e <code class="language-plaintext highlighter-rouge">TOKEN1</code>) in the event that we wish to add a new pie to the challenge.
+In the case of the local DynamoDB instance, we are able to inspect the current state and run custom queries by visiting <code class="language-plaintext highlighter-rouge">http://0.0.0.0:8000/shell/</code>.</p>
+
+<p><img src="/uploads/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" /></p>
+
+<p>I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manor.
+In the next post we shall be expanding the API further, by adding the capability to view and remove specified mince pies.</p>

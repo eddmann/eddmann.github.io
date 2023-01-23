@@ -1,0 +1,314 @@
+#%RAML 1.0
+title: mince-pie-challenge-api
+version: 1
+baseUri: https://api.mincepiechallenge.com
+mediaType:
+  - application/hal+json
+  - application/problem+json
+protocols: https
+
+securitySchemes:
+  optional-jwt:
+    description: Optionally provide a valid JSON Web Token.
+    type: x-jwt
+    describedBy:
+      headers:
+        Authorization:
+          description: Used to send a JSON Web Token with the request.
+          type: string
+          required: false
+  strict-jwt:
+    description: Requires a valid JSON Web Token be provided.
+    type: x-jwt
+    describedBy:
+      headers:
+        Authorization:
+          description: Used to send a JSON Web Token with the request.
+          type: string
+          required: true
+      responses:
+        401:
+          body:
+            application/problem+json:
+              type: object
+              example: |
+                {
+                  "title": "Unauthorized",
+                  "detail": "Service requires an authenticated user"
+                }
+
+/:
+  get:
+    description: |
+      Provides available actions and Cognito authentication pool identifiers.
+    responses:
+      200:
+        body:
+          application/hal+json:
+            example: |
+              {
+                "_links": {
+                  "self": { "href": "/" },
+                  "list": { "href": "/pies" },
+                  "add": { "href": "/pies" },
+                  "view": {
+                    "href": "/pies/{id}",
+                    "templated": true
+                  }
+                },
+                "cognito": {
+                  "poolId": "eu-west-1_BXXROsWOu",
+                  "clientId": "3qf6pqo467hr1tcbm3kf5sn2v3"
+                },
+                "baseEndpointUrl": "https://api.mincepiechallenge.com"
+              }
+
+/pies:
+  get:
+    description: List all available mince pie's in the challenge.
+    responses:
+      200:
+        body:
+          application/hal+json:
+            type: object
+            example: |
+              {
+                "_links": {
+                  "self": { "href": "/pies" }
+                },
+                "_embedded": {
+                  "pies": [
+                    {
+                      "_links": {
+                        "self": { "href": "/pies/9d197f40" }
+                      },
+                      "id": "9d197f40",
+                      "name": "Awesome Mince Pie",
+                      "thumbnail": "http://s3.com/9d197f40.jpg",
+                      "rating": {
+                        "avg": 5,
+                        "total": 1
+                      }
+                    }
+                  ]
+                },
+                "total": 1
+              }
+  post:
+    description: Add a new mince pie to the challenge.
+    securedBy: strict-jwt
+    body:
+      application/json:
+        type: object
+        example: |
+          {
+            "name": "Awesome Mince Pie"
+          }
+    responses:
+      201:
+        headers:
+          Location:
+            type: string
+            example: "/pies/9d197f40"
+        body:
+          application/hal+json:
+            type: object
+            example: |
+              {
+                "_links": {
+                  "self": { "href": "/pies/9d197f40" },
+                  "photo": { "href": "/pies/9d197f40/photo" }
+                },
+                "id": "9d197f40",
+                "name": "Awesome Mince Pie",
+                "addedAt": "2018-06-11T12:00:00.000Z",
+                "rating": {
+                  "avg": 0,
+                  "total": 0
+                }
+              }
+      400:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Bad Request",
+                "detail": "Invalid request body",
+                "errors": [
+                  { "name": "name", "reason": "You must supply the pie's name." }
+                ]
+              }
+
+/pies/{id}:
+  get:
+    description: View a specified mince pie.
+    securedBy: optional-jwt
+    responses:
+      200:
+        body:
+          application/hal+json:
+            type: object
+            example: |
+              {
+                "_links": {
+                  "self": { "href": "/pies/9d197f40" },
+                  "photo?": { "href": "/pies/9d197f40/photo" },
+                  "rate?": { "href": "/pies/9d197f40/rate" },
+                  "remove?": { "href": "/pies/9d197f40" }
+                },
+                "id": "9d197f40",
+                "name": "Awesome Mince Pie",
+                "addedAt": "2018-06-11T12:00:00.000Z",
+                "photo": "http://s3.com/original/9d197f40.jpg",
+                "thumbnail": "http://s3.com/9d197f40.jpg",
+                "rating": {
+                  "avg": 0,
+                  "total": 0
+                }
+              }
+      404:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Not Found",
+                "detail": "Unable to find the specified mince pie."
+              }
+  delete:
+    description: Remove a specified mince pie from the challenge.
+    securedBy: strict-jwt
+    responses:
+      204:
+        description: Successfully deleted the mince pie.
+      403:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Forbidden",
+                "detail": "This mince pie does not belong to you."
+              }
+      404:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Not Found",
+                "detail": "Unable to find the specified mince pie."
+              }
+
+/pies/{id}/rate:
+  put:
+    description: Rate a specified mince pie.
+    securedBy: strict-jwt
+    body:
+      application/json:
+        type: object
+        example: |
+          {
+            "rating": 5
+          }
+    responses:
+      204:
+        description: Successfully rated the mince pie.
+      400:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Bad Request",
+                "detail": "Invalid request body",
+                "errors": [
+                  { "name": "rating", "reason": "You must supply a valid pie rating." }
+                ]
+              }
+      403:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Forbidden",
+                "detail": "You have already rated this mince pie."
+              }
+      404:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Not Found",
+                "detail": "Unable to find the specified mince pie."
+              }
+
+/pies/{id}/photo:
+  put:
+    description: Request a new photo upload URL.
+    securedBy: strict-jwt
+    body:
+      application/json:
+        type: object
+        example: |
+          {
+            "fileExtension": "jpg",
+            "contentType": "image/jpg"
+          }
+    responses:
+      201:
+        headers:
+          Location:
+            type: string
+            example: "http://s3.com/upload/9d197f40"
+        body:
+          application/hal+json:
+            type: object
+            example: |
+              {
+                "_links": {
+                  "self": { "href": "http://s3.com/upload/9d197f40" }
+                },
+                "url": "http://s3.com/upload/9d197f40"
+              }
+      400:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Bad Request",
+                "detail": "Invalid request body",
+                "errors": [
+                  { "name": "fileExtension", "reason": "You must supply the file extension." },
+                  { "name": "contentType", "reason": "You must supply the content-type." }
+                ]
+              }
+      403:
+        body:
+          application/problem+json:
+            type: object
+            examples:
+              not-owner: |
+                {
+                  "title": "Forbidden",
+                  "detail": "This mince pie does not belong to you."
+                }
+              photo-present: |
+                {
+                  "title": "Forbidden",
+                  "detail": "This mince pie already has a photo."
+                }
+
+      404:
+        body:
+          application/problem+json:
+            type: object
+            example: |
+              {
+                "title": "Not Found",
+                "detail": "Unable to find the specified mince pie."
+              }

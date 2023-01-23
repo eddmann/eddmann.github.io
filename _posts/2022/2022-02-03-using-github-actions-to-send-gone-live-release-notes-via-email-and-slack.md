@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Using GitHub Actions to send Gone Live release notes via Email and Slack'
 link: https://tech.mybuilder.com/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/
 meta: 'Using GitHub Actions to send Gone Live release notes via Email and Slack'
@@ -27,7 +28,7 @@ So with this in mind, I was able to spend a day building several GitHub Actions 
 
 ## Email release notifier
 
-<a href="https://github.com/eddmann/email-release-notifier"><img src="/uploads/posts/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/email-notification.png" /></a>
+<a href="https://github.com/eddmann/email-release-notifier"><img src="/uploads/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/email-notification.png" /></a>
 
 The completed Email release notifier is available for review and use [on GitHub](https://github.com/eddmann/email-release-notifier).
 When a release is published within GitHub the contents is stored as Markdown, as such, we were required to convert this Markdown to HTML so it could be presented in an Email.
@@ -59,7 +60,7 @@ jobs:
 
 ## Slack release notifier
 
-<a href="https://github.com/eddmann/slack-release-notifier"><img src="/uploads/posts/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/slack-notification.png" /></a>
+<a href="https://github.com/eddmann/slack-release-notifier"><img src="/uploads/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/slack-notification.png" /></a>
 
 The completed Slack release notifier is available for review and use [on GitHub](https://github.com/eddmann/slack-release-notifier).
 In this case, we wanted to not only send it to a desired shared channel, but also provide a means of _mentioning_ tech team members based on interested pull request changes going live.

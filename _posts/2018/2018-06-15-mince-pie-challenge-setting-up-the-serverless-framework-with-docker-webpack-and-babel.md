@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel'
 link: https://tech.mybuilder.com/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/
 meta: 'Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel'

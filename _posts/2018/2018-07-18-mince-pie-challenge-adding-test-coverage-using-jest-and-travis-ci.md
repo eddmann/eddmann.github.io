@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
 link: https://tech.mybuilder.com/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/
 meta: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
@@ -300,7 +301,7 @@ We can then setup a dummy `.env` file (which is required by our Docker Compose c
 If any command returns a non-zero response, Travis CI assumes this to be an issue and will fail the build.
 You can see how a successful build looks in the screenshot below.
 
-<img src="/uploads/posts/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/travis-ci.png" alt="Travis CI" />
+<img src="/uploads/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/travis-ci.png" alt="Travis CI" />
 
 We now have a well equipped Continuous Integration pipeline in place.
 Join me in the next post were we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using [Serverless Offline](https://github.com/dherault/serverless-offline).

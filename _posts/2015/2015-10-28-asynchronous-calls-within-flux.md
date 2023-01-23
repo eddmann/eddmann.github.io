@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Asynchronous Calls within Flux'
 link: https://tech.mybuilder.com/asynchronous-calls-within-flux/
 meta: 'Exploration into handling asynchronous calls within the Flux architecture'
@@ -58,7 +59,7 @@ const postJson = (endpoint, payload) =>
 />
 ```
 
-![Asynchronous Calls within Components](/uploads/posts/asynchronous-calls-within-flux/asynchronous-calls-within-components.png)
+![Asynchronous Calls within Components](/uploads/asynchronous-calls-within-flux/asynchronous-calls-within-components.png)
 
 Although the above paradigm worked, we noticed many issues arise from its presence.
 The first of which was how all the logic had now been co-located within the view layer.
@@ -108,7 +109,7 @@ This refactoring made it easier to now test the component in isolation as well, 
 <TaskInput onSubmit={message => webApi.addTask(message)} />
 ```
 
-![Web API and Action Creator Addition](/uploads/posts/asynchronous-calls-within-flux/web-api-and-action-creator-addition.png)
+![Web API and Action Creator Addition](/uploads/asynchronous-calls-within-flux/web-api-and-action-creator-addition.png)
 
 However, there were still issues that persisted after this refactoring.
 Still the component and now additionally Web API, were the only ones aware of this action being carried out within the system.
@@ -164,7 +165,7 @@ We could now access the updated task action by way of the client actions creator
 <TaskInput onSubmit={message => clientActions.addTask(message)} />
 ```
 
-![Optimistic Asynchronous Calls](/uploads/posts/asynchronous-calls-within-flux/optimistic-asynchronous-calls.png)
+![Optimistic Asynchronous Calls](/uploads/asynchronous-calls-within-flux/optimistic-asynchronous-calls.png)
 
 To conclude, this final refactoring allowed us to clearly visualise and work within specific boundaries of the application, all with there own rates of change.
 We have found a significant ease in testing areas of the application in isolation, as well as a far easier to reason about mental model.

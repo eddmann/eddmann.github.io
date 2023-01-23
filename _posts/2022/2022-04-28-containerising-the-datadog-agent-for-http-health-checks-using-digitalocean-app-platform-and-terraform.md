@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform'
 link: https://tech.mybuilder.com/containerising-the-datadog-agent-for-http-health-checks-using-digitalocean-app-platform-and-terraform/
 meta: 'Documents my experience containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform'

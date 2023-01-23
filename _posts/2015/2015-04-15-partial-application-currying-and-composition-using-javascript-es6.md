@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Partial Application (Currying) and Composition using JavaScript ES6'
 link: https://tech.mybuilder.com/partial-application-currying-and-composition-using-javascript-es6/
 meta: 'Expressing Partial Application, Currying and Composition in a succinct manner using ES2015'

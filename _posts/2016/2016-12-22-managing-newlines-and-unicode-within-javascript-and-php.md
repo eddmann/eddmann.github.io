@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Managing Newlines and Unicode within JavaScript and PHP'
 link: https://tech.mybuilder.com/managing-newlines-and-unicode-within-javascript-and-php/
 meta: 'Looking into managing Newlines and Unicode within JavaScript and PHP'

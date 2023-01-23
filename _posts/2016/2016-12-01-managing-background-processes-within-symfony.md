@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Managing Background Processes within Symfony'
 link: https://tech.mybuilder.com/managing-background-processes-within-symfony/
 meta: 'Looking into managing background processes within Symfony'

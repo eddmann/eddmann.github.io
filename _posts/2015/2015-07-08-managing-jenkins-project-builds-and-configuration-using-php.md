@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Managing Jenkins Project Builds and Configuration using PHP'
 link: https://tech.mybuilder.com/managing-jenkins-project-builds-and-configuration-using-php/
 meta: 'Using PHP to manage Jenkins Project Builds and Configuration via the command-line'

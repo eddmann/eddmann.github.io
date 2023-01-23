@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
 link: https://tech.mybuilder.com/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/
 meta: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
@@ -298,7 +299,7 @@ We can now `POST` to this endpoint as described within the RAML documentation, a
 However, without going into the AWS console and viewing the table records, the client is unable to actually see any of the pies they have added.
 We will address this in the next section.
 
-<img src="/uploads/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/aws-console-dynamodb.png" alt="DynamoDB AWS Console" />
+<img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/aws-console-dynamodb.png" alt="DynamoDB AWS Console" />
 
 ### Listing Pies with Amazon DynamoDB
 
@@ -581,7 +582,7 @@ Finally, we can `make offline` and experiment with the new API endpoints offline
 We can supply authenticated user tokens (i.e `TOKEN1`) in the event that we wish to add a new pie to the challenge.
 In the case of the local DynamoDB instance, we are able to inspect the current state and run custom queries by visiting `http://0.0.0.0:8000/shell/`.
 
-<img src="/uploads/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" />
+<img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" />
 
 I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manor.
 In the next post we shall be expanding the API further, by adding the capability to view and remove specified mince pies.

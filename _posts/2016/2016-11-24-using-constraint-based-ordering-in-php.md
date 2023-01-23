@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Using Constraint-based Ordering in PHP'
 link: https://tech.mybuilder.com/using-constraint-based-ordering-in-php/
 meta: 'Looking into using Constraint-based Ordering in PHP'
@@ -38,7 +39,7 @@ Upon reflection however, I did not feel that the resulting list looked 'random' 
 I decided to try and implement such an approach in a more functional manner, thinking about the declarative steps that were required to create the result.
 I was able to break down the process into three seperate actions, as shown in the example below:
 
-<img src="/uploads/posts/using-constraint-based-ordering-in-php/idea.png" style="width:auto;" />
+<img src="/uploads/using-constraint-based-ordering-in-php/idea.png" style="width:auto;" />
 
 Unfortuantly PHP does not include the ability to `partition` or `interleave` arrays, so I created a couple of simple implementations to aid my solution.
 

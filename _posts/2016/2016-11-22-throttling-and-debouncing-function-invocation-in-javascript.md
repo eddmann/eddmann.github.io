@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Throttling and Debouncing Function Invocation in JavaScript'
 link: https://tech.mybuilder.com/throttling-and-debouncing-function-invocation-in-javascript/
 meta: 'Looking into Throttling and Debouncing Function Invocation in JavaScript'

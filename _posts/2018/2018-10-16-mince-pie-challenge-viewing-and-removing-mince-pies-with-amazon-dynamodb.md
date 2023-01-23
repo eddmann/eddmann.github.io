@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
 link: https://tech.mybuilder.com/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/
 meta: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
@@ -417,12 +418,12 @@ it('removes the users pie', async () => {
 With this behaviour now exercised by automated tests we are equipped to test performing these actions within both an offline and online development environment.
 We will run `make offline` and test viewing a newly created mince pie as the resource owner, using [Postman](https://www.getpostman.com/).
 
-<img src="/uploads/posts/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/postman-view-pie.png" alt="Viewing Pie in Postman" />
+<img src="/uploads/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/postman-view-pie.png" alt="Viewing Pie in Postman" />
 
 You will see that as the pie owner we have the ability to remove it from the challenge.
 We will now call this action and ensure that the pie has been successfully removed.
 
-<img src="/uploads/posts/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/postman-remove-pie.png" alt="Removing Pie in Postman" />
+<img src="/uploads/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/postman-remove-pie.png" alt="Removing Pie in Postman" />
 
 Finally, we can `make deploy` and perform the same assertions in the online development environment.
 

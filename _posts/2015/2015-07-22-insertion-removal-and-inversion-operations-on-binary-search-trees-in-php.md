@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Insertion, Removal and Inversion Operations on Binary (Search) Trees in PHP'
 link: https://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/
 meta: 'Exploration into Binary (Search) Trees and implementing common-place operations using PHP'
@@ -36,7 +37,7 @@ To decide which child to traverse down we use the discussed comparator invariant
 Below is a small diagram depicting the insertion of a value within an existing tree.
 
 <p style="text-align:center;">
-    <img src="/uploads/posts/binary-search-trees-in-php/insertion.png" style="width:220px;" alt="Binary Search Tree Insertion" />
+    <img src="/uploads/binary-search-trees-in-php/insertion.png" style="width:220px;" alt="Binary Search Tree Insertion" />
 </p>
 
 ### Mutable
@@ -117,7 +118,7 @@ function minValue($root)
 Below is a small diagram depicting the removal of a node which meets the third use-case.
 
 <p style="text-align:center;">
-    <img src="/uploads/posts/binary-search-trees-in-php/removal.png" style="width:338px" alt="Binary Search Tree Removal" />
+    <img src="/uploads/binary-search-trees-in-php/removal.png" style="width:338px" alt="Binary Search Tree Removal" />
 </p>
 
 ### Mutable

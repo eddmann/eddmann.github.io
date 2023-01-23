@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
 link: https://tech.mybuilder.com/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/
 meta: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
@@ -236,7 +237,7 @@ Now if we invoke `make flow` or attempt a `make deploy`, we will see that our ty
 Although we are able to run Flow when desired using `make flow`, I have found it beneficial to gain instant feedback within my editor using a project such as [Flow-IDE](https://atom.io/packages/flow-ide) for Atom.
 In doing so we are able to get real-time Flow analysis, which makes it easier to manage the project and introduce typing to the code-base.
 
-<img src="/uploads/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/flow-ide.png" alt="Flow IDE" />
+<img src="/uploads/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/flow-ide.png" alt="Flow IDE" />
 
 With Flow now configured, I wish to increase our code confidence even more so by adding the unit testing framework [Jest](https://jestjs.io/) into the project.
 Join me in the next post were we will look into testing the application using Jest, and add continuous integration via [Travis CI](https://travis-ci.org/).

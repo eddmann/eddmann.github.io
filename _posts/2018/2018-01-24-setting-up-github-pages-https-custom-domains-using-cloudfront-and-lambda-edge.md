@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge'
 link: https://tech.mybuilder.com/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/
 meta: 'Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge'
@@ -16,20 +17,20 @@ To get around the fact that we can only route plain HTTP traffic using custom do
 Doing so allowed us to supply our own SSL certificate and custom domain secure connection.
 Below is a high-level diagram depicting the approach we took.
 
-<img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/architecture.png" alt="Architecture" />
+<img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/architecture.png" alt="Architecture" />
 
 We first setup a new distribution which was associated with a certificate supplied by [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/).
 
-<img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/distribution.png" alt="Distribution Settings" />
+<img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/distribution.png" alt="Distribution Settings" />
 
 Following this we created a new origin which routed traffic to the specified `*.github.io` domain.
 We ensured that only HTTPS via TLS 1.2 was used for requests to the origin server for security concerns.
 
-<img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/origin.png" alt="Distribution Origin" />
+<img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/origin.png" alt="Distribution Origin" />
 
 With this origin in-place we then created a default cache behaviour which enforced HTTPS traffic (redirecting HTTP traffic if found).
 
-<img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/cache.png" alt="Default Cache Dehaviour" />
+<img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/cache.png" alt="Default Cache Dehaviour" />
 
 ### Handling Github Page Redirects
 
@@ -62,6 +63,6 @@ exports.handler = (event, context, callback) => {
 };
 ```
 
-<img src="/uploads/posts/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/lambda.png" alt="Origin Response Lambda" />
+<img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/lambda.png" alt="Origin Response Lambda" />
 
 Once this was complete we setup an `ALIAS` record for the custom domain within Route 53 and all GitHub Pages traffic could now be accessed from the custom domain over HTTPS.

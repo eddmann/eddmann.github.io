@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Designing the RESTful API with RAML'
 link: https://tech.mybuilder.com/mince-pie-challenge-designing-the-restful-api-with-raml/
 meta: 'Mince Pie Challenge: Designing the RESTful API with RAML'
@@ -402,9 +403,9 @@ We are now able to experiment with this API, using proposed user-stories and exp
 There are many [different](https://github.com/mulesoft/osprey) [tools](https://github.com/RePoChO/raml-mocker) available to bring this API to life, allowing you to handle mock service calls.
 
 I have found it beneficial to produce clear, easy-to-read documentation from the specification using [raml2html](https://github.com/raml2html/raml2html).
-You can explore this [documentation](/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.html) and the complete underlying [specification](/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.raml) at your leisure.
+You can explore this [documentation](/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api.html) and the complete underlying [specification](/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api.raml) at your leisure.
 
-<a href="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api.html"><img src="/uploads/posts/mince-pie-challenge-designing-the-restful-api-with-raml/api-documentation.png" alt="API Documentation" /></a>
+<a href="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api.html"><img src="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api-documentation.png" alt="API Documentation" /></a>
 
 With the API design now finalised we can move on to actually building it!
 Join me in the next post were we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.

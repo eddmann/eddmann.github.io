@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'
 link: https://tech.mybuilder.com/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/
 meta: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'

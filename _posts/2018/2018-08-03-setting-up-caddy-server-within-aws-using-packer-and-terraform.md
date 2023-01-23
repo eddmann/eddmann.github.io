@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Setting up Caddy Server within AWS using Packer and Terraform'
 link: https://tech.mybuilder.com/setting-up-caddy-server-within-aws-using-packer-and-terraform/
 meta: 'Setting up Caddy Server within AWS using Packer and Terraform'
@@ -21,7 +22,7 @@ As the `threedevsandamaybe.com` domain is not currently managed by Amazon Route 
 
 With these two prerequisite resources in place, we can look at how the service will be constructed, as shown in the following diagram.
 
-<img src="/uploads/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure.png" alt="Caddy Server" />
+<img src="/uploads/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure.png" alt="Caddy Server" />
 
 ### Provisioning the Machine with Packer
 

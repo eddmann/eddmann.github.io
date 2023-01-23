@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"
 link: https://tech.mybuilder.com/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/
 meta: "Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"
@@ -245,7 +246,7 @@ You can find the code in its entirety, along with supporting assets in [this](ht
 
 <p>
   <audio controls>
-    <source src="/uploads/posts/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/winner.mp3" type="audio/mpeg">
+    <source src="/uploads/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/winner.mp3" type="audio/mpeg">
     Your browser does not support the audio tag.
   </audio>
 </p>

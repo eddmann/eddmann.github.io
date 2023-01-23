@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "'Memes as a Service' using Lambda, Serverless and ImageMagick"
 link: https://tech.mybuilder.com/memes-as-a-service-using-lambda-serverless-and-imagemagick/
 meta: "Creating a 'Memes as a Service' using Lambda, Serverless and ImageMagick"
@@ -141,4 +142,4 @@ I always tend to provide the `verbose` flag as it gives you good insight into wh
 With this now deployed you can visit the resulting API Gateway endpoint and begin experimenting with generating your own memes!
 You can find the code in its entirety, along with supporting assets in [this](https://github.com/eddmann/memes-as-a-service-serverless) GitHub repository.
 
-<img src="/uploads/posts/memes-as-a-service/memes.jpg" alt="Memes as a Service" />
+<img src="/uploads/memes-as-a-service/memes.jpg" alt="Memes as a Service" />

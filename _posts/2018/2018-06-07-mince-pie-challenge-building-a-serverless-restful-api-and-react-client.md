@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
 link: https://tech.mybuilder.com/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/
 meta: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
@@ -16,7 +17,7 @@ The application itself will revolve around the responsibly of managing the 'extr
 We will provide the user with the ability to register, login, add new mince pies to the challenge (with a photo) and rate these pies.
 Although this may seem like a trivial CRUD system it will allow us to explore many different technologies and services in the process.
 
-<img src="/uploads/posts/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/mince-pie-challenge.png" alt="Mince Pie Challenge" />
+<img src="/uploads/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/mince-pie-challenge.png" alt="Mince Pie Challenge" />
 
 📝 The API will demonstrate the use of:
 

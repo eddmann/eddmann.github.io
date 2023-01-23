@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
 link: https://tech.mybuilder.com/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/
 meta: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
@@ -174,7 +175,7 @@ With this addition we can run `make test` locally to ensure the handler honours 
 Committing these changes to the GitHub repository will in-turn invoke a new Travis CI build.
 Finally, we can run `make deploy` to see this endpoint in action within our `dev` AWS stage.
 
-<img src="/uploads/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap.png" alt="Online Bootstrap Endpoint" />
+<img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap.png" alt="Online Bootstrap Endpoint" />
 
 ### Adding Serverless Offline
 
@@ -241,7 +242,7 @@ offline:
 With his in place we can run `make offline`, you should now be able to access the offline endpoint by visiting `http://0.0.0.0:3000`.
 Any changes that you now make to the handler implementation will be automatically represented within the offline instance, providing you with a much quicker development REPL cycle.
 
-<img src="/uploads/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap.png" alt="Offline Bootstrap Endpoint" />
+<img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap.png" alt="Offline Bootstrap Endpoint" />
 
 We have now created our first Mince Pie Challenge API endpoint, which not only works within the online `dev` stage, but also is equipped to handle offline access.
 Join me in the next post where we will be adding the ability to add and list Mince Pies to the API, using both an online and local [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) instance.

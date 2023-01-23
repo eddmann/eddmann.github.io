@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Designing Immutable Concepts with Transient Mutation in PHP'
 link: https://tech.mybuilder.com/designing-immutable-concepts-with-transient-mutation-in-php/
 meta: 'Looking into designing Immutable concepts with Transient Mutation in PHP'

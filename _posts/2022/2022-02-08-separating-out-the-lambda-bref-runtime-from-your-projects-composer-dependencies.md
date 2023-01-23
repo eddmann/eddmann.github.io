@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Separating out the Lambda Bref runtime from your projects Composer dependencies'
 link: https://tech.mybuilder.com/separating-out-the-lambda-bref-runtime-from-your-projects-composer-dependencies/
 meta: 'Separating out the Lambda Bref runtime from your projects Composer dependencies'

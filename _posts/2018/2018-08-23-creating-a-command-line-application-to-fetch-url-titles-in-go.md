@@ -1,4 +1,5 @@
 ---
+layout: post
 title: 'Creating a Command Line Application to Fetch URL Titles in Go'
 link: https://tech.mybuilder.com/creating-a-command-line-application-to-fetch-url-titles-in-go/
 meta: 'Creating a Command Line Application to Fetch URL Titles in Go'
@@ -174,7 +175,7 @@ build:
 This target will compile individual executable artifacts for all the specified operating system and architecture combinations.
 We should now be able to test the relevant artifact for the host system you are currently using, in my case macOS.
 
-<img src="/uploads/posts/creating-a-command-line-application-to-fetch-url-titles-in-go/urls-to-md-darwin-amd64.gif" alt="Command Line Application Demo" />
+<img src="/uploads/creating-a-command-line-application-to-fetch-url-titles-in-go/urls-to-md-darwin-amd64.gif" alt="Command Line Application Demo" />
 
 I hope you have found it interesting looking into developing and distributing a trivial command-line application using Golang.
 The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this is extremely useful.

@@ -60,7 +60,7 @@ This means that the project autoloader does not need to be aware of Bref, and as
 <p>The project in question packages the release as a <a href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html">container image</a>.
 As such, we were able to create a multi-stage Docker build (as shown below) which handles our desired outcome.</p>
 
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> composer:2.2.5 AS runtime</span>
+<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="w"> </span><span class="s">composer:2.2.5</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">runtime</span>
 
 <span class="k">RUN </span><span class="nb">mkdir</span> <span class="nt">-p</span> /tmp/runtime <span class="se">\
 </span> <span class="o">&amp;&amp;</span> composer require <span class="nt">-d</span> /tmp/runtime bref/bref:1.5.3

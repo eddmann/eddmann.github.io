@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Binary Search Trees in Clojure"
-meta: "Exploring Binary Search Trees and associated actions in Clojure"
+title: 'Binary Search Trees in Clojure'
+meta: 'Exploring Binary Search Trees and associated actions in Clojure'
 ---
 
 This weekend I was able to spend some more time exploring Clojure.
-I decided that it would be interesting to reimplement some of the [Binary Search Tree work](http://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/) I had previously done in PHP.
+I decided that it would be interesting to reimplement some of the [Binary Search Tree work](https://eddmann.com/posts/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/) I had previously done in PHP.
 We start by creating a simple record definition which describes the contents of a Node.
+
 <!--more-->
 
 ```clojure

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This article documents my experience building a Progress Web Application which performs Secret Santa draws in both a local and remote setting">
+
+    <title>
+        
+            Building a Secret Santa Draw PWA in React and TypeScript &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Building a Secret Santa Draw PWA in React and TypeScript</h1>
+    <time datetime="2023-11-25T00:00:00+00:00" class="post-date">25 Nov 2023</time>
+    <p>Over the <a href="https://eddmann.com/posts/allocating-and-notifying-secret-santas-via-email-using-clojure/">past</a> <a href="https://eddmann.com/posts/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/">several</a> <a href="https://eddmann.com/posts/allocating-secret-santas-using-an-aws-step-function-workflow-and-every-available-lambda-runtime/">years</a> I have taken the opportunity of allocating Secret Santa’s for members of my family as a means of exploring new technologies.
+For the past several months I have been interested in the concept of Progress Web Application’s (thanks in large part to <a href="https://frontendmasters.com/courses/pwas/">this series</a>), and getting more hands-on experience in with the ever-changing frontend landscape.
+As such, I decided that this year I would build a small application that works across Desktop, iOS and Android to perform Secret Santa draws in both a local and remote setting.
+In this article I would like to document how I went about building this application.</p>
+
+
+
+<p><a href="https://eddmann.com/secret-santa-pwa/">
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/app-icon.png" style="max-width:150px;border-radius:20%;margin:0 auto;" alt="Secret Santa Draw" />
+</a></p>
+
+<h2 id="the-app">The App</h2>
+
+<div style="display:flex;gap:0.5rem;flex-direction:row;margin:1rem 0 0;">
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-main.png" alt="Main" />
+  </div>
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-participants.png" alt="Participants" />
+  </div>
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-exclusions.png" alt="Exclusions" />
+  </div>
+</div>
+
+<p>Based on the <a href="https://eddmann.com/posts/building-a-running-calculator-pwa-in-react-and-typescript/">research and development</a> carried out last month to build the <a href="https://eddmann.com/running-calculator/">Running Calculator</a>, I had a good base (Vite, TypeScript, React and styled-components) to start from.
+The final build includes the ability to create Secret Santa draws in both a local and remote setting, using Redux to manage the application state.
+I wanted the application to be standalone, where-by all its behaviour could be deployed as a <a href="https://github.com/eddmann/secret-santa-pwa/blob/main/.github/workflows/release.yml">static artifact</a> on GitHub Pages.
+I did not want to integrate it directly with an SMS provider like I have in past years, instead opting to use the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API">Web Share API</a> to craft a message with a unique URL to access each participants draw result.
+On top of this, I did not want a dependency on remote persistence (to store the draw results) so had to devise a means of passing the draw results within this shared URL.</p>
+
+<h3 id="local-draw">Local draw</h3>
+
+<div style="display:flex;gap:0.5rem;flex-direction:row;margin:1rem auto 0;max-width:400px;">
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-local-draw.png" alt="Local Draw" />
+  </div>
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-local-draw-reveal.png" alt="Local Draw Reveal" />
+  </div>
+</div>
+
+<p>Local draws are carried out and presented on the same device.
+Once the draw has been completed, each allocation is presented one after another with the device being passed around to each requested participant until everyone knows who they are Secret Santa for.
+To ensure that participants do not accidentally see the next participants allocation I added a multistep process to reveal the result.
+Throughout development, I was able to sprinkle in several CSS animations to aid in the overall UX, one of which was fading in the recipients name upon being revealed.</p>
+
+<h3 id="remote-draw">Remote draw</h3>
+
+<div style="display:flex;gap:0.5rem;flex-direction:row;margin:1rem 0 0;">
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-remote-draw.png" alt="Remote Draw" />
+  </div>
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-remote-draw-share.png" alt="Remote Draw Share" />
+  </div>
+  <div>
+    <img src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-remote-draw-reveal.png" alt="Remote Draw Reveal" />
+  </div>
+</div>
+
+<p>Remote draws are carried out on a single device with the resulting allocations being shared with each participant via an encrypted URL (using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API">Web Share API</a>).
+When the encrypted URL is visited the participant is presented with a similar screen to a Local draw, where they can reveal who they are Secret Santa for.
+Being encrypted (using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a>) the user of the device who completed the draw (and tasked with sharing the results) is unable to <em>snoop</em> on each allocation.
+As all state about the allocation is stored with the URL there is no need for remote state persistence, and the application can remain a simple SPA deployed on <a href=".github/workflows/release.yml">GitHub Actions</a> 🎉.</p>
+
+<h3 id="draw-history">Draw history</h3>
+
+<p>Each draw is persisted locally on the device using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API">Web Storage API</a>.
+This allows the user to retrieve the results again after the draw has taken place.
+Going forward it may be beneficial to review other means of persisting state on the Web i.e. <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a>.
+Currently, the draw results which are stored within the Redux state are subscribed to and persisted upon each store change.
+This is a little unperformant as we are required to encode and write JSON entities anytime the store changes, but this will suffice for the initial release.</p>
+
+<h3 id="snowfall">Snowfall</h3>
+
+<div style="margin:0 auto;max-width:200px">
+  <video style="width:100%" controls="" muted="">
+    <source src="/uploads/building-a-secret-santa-draw-pwa-in-react-and-typescript/ios-loading.mp4" type="video/mp4" />
+  </video>
+</div>
+
+<p>There is a small <em>easter egg</em> on the applications home screen.
+Using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent">DeviceMotionEvent</a> when you shake the device, the amount and speed of the snow flawing increases.
+On iOS the user is required to given permission to the application to read this information, as such, they are required to click the small bottom-right phone icon (if it appears) before shaking the device.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Like previous years I have enjoyed exploring another means of taking the problem of allocating Secret Santa and applying it to a project to learn new technologies.
+This build has expanded my use of what is possible within a Progress Web Application using many more Web APIs that are present.
+Over the last day or so I have been looking at the possibility of packaging this PWA up into a native iOS and Android application using <a href="https://capacitorjs.com/">Capacitor</a>.
+I hope to find some time to release this onto the Google Play and App Store and document my experience in doing so in the future.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

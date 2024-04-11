@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database">
+
+    <title>
+        
+            Q&A Retrieval Augmented Generation (RAG) with LangChain and Chroma &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Q&A Retrieval Augmented Generation (RAG) with LangChain and Chroma</h1>
+    <time datetime="2023-05-10T00:00:00+00:00" class="post-date">10 May 2023</time>
+    <p>Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
+This article documents my experience exploring how to implement <a href="https://python.langchain.com/docs/use_cases/question_answering/">Q&amp;A Retrieval Augmented Generation</a> (RAG) using LangChain and the <a href="https://www.trychroma.com/">Chroma</a> vector database.</p>
+
+
+
+<p>This article was originally written as an Jupyter Notebook which can be <a href="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb">downloaded here</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">openai</span> <span class="n">datasets</span> <span class="n">chromadb</span>
+</code></pre></div></div>
+
+<h2 id="loading-a-dataset-into-chroma">Loading a Dataset into Chroma</h2>
+
+<p>We will initially load a data-set (Wikipedia article corpus) and chunk it into input that we can feed into the vector database.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s">"wikipedia"</span><span class="p">,</span> <span class="s">"20220301.simple"</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s">'train[:10]'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.text_splitter</span> <span class="kn">import</span> <span class="n">RecursiveCharacterTextSplitter</span>
+
+<span class="n">text_splitter</span> <span class="o">=</span> <span class="n">RecursiveCharacterTextSplitter</span><span class="p">(</span>
+    <span class="n">chunk_size</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span>
+    <span class="n">chunk_overlap</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">text_splitter</span><span class="p">.</span><span class="n">split_text</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">6</span><span class="p">][</span><span class="s">'text'</span><span class="p">])[:</span><span class="mi">3</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['Alan Mathison Turing OBE FRS (London, 23 June 1912 – Wilmslow, Cheshire, 7 June 1954) was an English mathematician and computer scientist. He was born in Maida Vale, London.\n\nEarly life and family \nAlan Turing was born in Maida Vale, London on 23 June 1912. His father was part of a family of merchants from Scotland. His mother, Ethel Sara, was the daughter of an engineer.',
+ 'Education \nTuring went to St. Michael\'s, a school at 20 Charles Road, St Leonards-on-sea, when he was five years old.\n"This is only a foretaste of what is to come, and only the shadow of what is going to be.” – Alan Turing.',
+ 'The Stoney family were once prominent landlords, here in North Tipperary. His mother Ethel Sara Stoney (1881–1976) was daughter of Edward Waller Stoney (Borrisokane, North Tipperary) and Sarah Crawford (Cartron Abbey, Co. Longford); Protestant Anglo-Irish gentry.']
+</code></pre></div></div>
+
+<p>We can now generate embeddings of each of the data-set chunks and store these within the Chroma vector database.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.docstore.document</span> <span class="kn">import</span> <span class="n">Document</span>
+<span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
+<span class="kn">from</span> <span class="nn">langchain.embeddings.openai</span> <span class="kn">import</span> <span class="n">OpenAIEmbeddings</span>
+
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenAIEmbeddings</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s">'text-embedding-ada-002'</span><span class="p">)</span>
+
+<span class="n">documents</span> <span class="o">=</span> \
+    <span class="p">[</span><span class="n">Document</span><span class="p">(</span><span class="n">page_content</span><span class="o">=</span><span class="n">chunk_text</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s">"id"</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s">'id'</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">chunk_idx</span><span class="p">),</span> <span class="s">"source"</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s">'url'</span><span class="p">]})</span>
+     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">data</span>
+     <span class="k">for</span> <span class="p">(</span><span class="n">chunk_idx</span><span class="p">,</span> <span class="n">chunk_text</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text_splitter</span><span class="p">.</span><span class="n">split_text</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s">'text'</span><span class="p">]))]</span>
+
+<span class="n">store</span> <span class="o">=</span> <span class="n">Chroma</span><span class="p">.</span><span class="n">from_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We can then search the vector database for the given articles that have the most relevance to the given query.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"Where was Alaning Turing born and what is an Engima machine?"</span>
+
+<span class="n">store</span><span class="p">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Document(page_content='Alan Mathison Turing OBE FRS (London, 23 June 1912 – Wilmslow, Cheshire, 7 June 1954) was an English mathematician and computer scientist. He was born in Maida Vale, London.\n\nEarly life and family \nAlan Turing was born in Maida Vale, London on 23 June 1912. His father was part of a family of merchants from Scotland. His mother, Ethel Sara, was the daughter of an engineer.', metadata={'id': '130', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+ Document(page_content='Educated in Dublin at Alexandra School and College; on October 1st 1907 she married Julius Mathison Turing, latter son of Reverend John Robert Turing and Fanny Boyd, in Dublin. Born on June 23rd 1912, Alan Turing would go on to be regarded as one of the greatest figures of the twentieth century.', metadata={'id': '133', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+ Document(page_content='A brilliant mathematician and cryptographer Alan was to become the founder of modern-day computer science and artificial intelligence; designing a machine at Bletchley Park to break secret Enigma encrypted messages used by the Nazi German war machine to protect sensitive commercial, diplomatic and military communications during World War 2. Thus, Turing made the single biggest contribution to the', metadata={'id': '134', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+ Document(page_content='Education \nTuring went to St. Michael\'s, a school at 20 Charles Road, St Leonards-on-sea, when he was five years old.\n"This is only a foretaste of what is to come, and only the shadow of what is going to be.” – Alan Turing.', metadata={'id': '131', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'})]
+</code></pre></div></div>
+
+<h2 id="integrating-the-data-source-with-a-llm">Integrating the data-source with a LLM</h2>
+
+<p>Now we can wire up the LLM to use the Chroma vector database within a <code class="language-plaintext highlighter-rouge">RetrievalQA</code> chain.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chat_models</span> <span class="kn">import</span> <span class="n">ChatOpenAI</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOpenAI</span><span class="p">(</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s">'gpt-3.5-turbo'</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<p>There are several different ways we can compile and ask the LLM the question.</p>
+
+<h3 id="stuff">Stuff</h3>
+
+<blockquote>
+  <p>The stuff documents chain (“stuff” as in “to stuff” or “to fill”) is the most straightforward of the document chains.
+It takes a list of documents, inserts them all into a prompt and passes that prompt to an LLM.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQA</span>
+
+<span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="p">.</span><span class="n">from_chain_type</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">chain_type</span><span class="o">=</span><span class="s">"stuff"</span><span class="p">,</span>
+    <span class="n">retriever</span><span class="o">=</span><span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">qa</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>Alan Turing was born in Maida Vale, London.
+An Enigma machine was a cipher machine used by the Nazi German military during World War II to encrypt and decrypt secret messages. It was considered highly secure at the time and was used to protect sensitive communications.
+Turing played a crucial role in breaking the Enigma code, which greatly aided the Allied forces in their efforts during the war.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">RetrievalQAWithSourcesChain</span>
+
+<span class="n">qa_with_sources</span> <span class="o">=</span> <span class="n">RetrievalQAWithSourcesChain</span><span class="p">.</span><span class="n">from_chain_type</span><span class="p">(</span>
+    <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">,</span>
+    <span class="n">chain_type</span><span class="o">=</span><span class="s">"stuff"</span><span class="p">,</span>
+    <span class="n">retriever</span><span class="o">=</span><span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">qa_with_sources</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+ 'answer': 'Alan Turing was born in Maida Vale, London. An Enigma machine was a device designed by Turing at Bletchley Park to break secret Enigma encrypted messages used by the Nazi German war machine during World War 2.\n',
+ 'sources': '\n- https://simple.wikipedia.org/wiki/Alan%20Turing'}
+</code></pre></div></div>
+
+<h3 id="map-reduce">Map-Reduce</h3>
+
+<blockquote>
+  <p>The map reduce documents chain first applies an LLM chain to each document individually (the Map step), treating the chain output as a new document.
+It then passes all the new documents to a separate combine documents chain to get a single output (the Reduce step).</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chains.question_answering</span> <span class="kn">import</span> <span class="n">load_qa_chain</span>
+
+<span class="n">qa</span> <span class="o">=</span> <span class="n">RetrievalQA</span><span class="p">(</span>
+    <span class="n">combine_documents_chain</span><span class="o">=</span><span class="n">load_qa_chain</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">chain_type</span><span class="o">=</span><span class="s">"map_reduce"</span><span class="p">),</span>
+    <span class="n">retriever</span><span class="o">=</span><span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">qa</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The given portion of the document does not provide any information about where Alan Turing was born or what an Enigma machine is.</p>
+</blockquote>
+
+<p>Sadly this type of chain does not look to have returned the desired results.</p>
+
+<h2 id="building-a-qa-chatbot">Building a Q&amp;A Chatbot</h2>
+
+<p>We can also use the <code class="language-plaintext highlighter-rouge">ConversationalRetrievalChain</code> to build a Chatbot that we can interact with to answer the desired questions.
+This includes adding a <em>memory</em> in which we can ask additional question based on previous questions and answers.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">ConversationalRetrievalChain</span>
+<span class="kn">from</span> <span class="nn">langchain.memory</span> <span class="kn">import</span> <span class="n">ConversationBufferMemory</span>
+
+<span class="n">memory</span> <span class="o">=</span> <span class="n">ConversationBufferMemory</span><span class="p">(</span><span class="n">memory_key</span><span class="o">=</span><span class="s">"chat_history"</span><span class="p">,</span> <span class="n">return_messages</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">qa</span> <span class="o">=</span> <span class="n">ConversationalRetrievalChain</span><span class="p">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">(),</span> <span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+
+<span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="s">"Where was Alaning Turing born?"</span><span class="p">})</span>
+<span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="s">"What year was he born?"</span><span class="p">})</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'What year was he born?',
+ 'chat_history': [HumanMessage(content='Where was Alaning Turing born?', additional_kwargs={}, example=False),
+  AIMessage(content='Alan Turing was born in Maida Vale, London.', additional_kwargs={}, example=False),
+  HumanMessage(content='What year was he born?', additional_kwargs={}, example=False),
+  AIMessage(content='Alan Turing was born in 1912.', additional_kwargs={}, example=False)],
+ 'answer': 'Alan Turing was born in 1912.'}
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">qa</span> <span class="o">=</span> <span class="n">ConversationalRetrievalChain</span><span class="p">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">(),</span> <span class="n">return_source_documents</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s">"chat_history"</span><span class="p">:</span> <span class="p">[]})</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+ 'chat_history': [],
+ 'answer': 'Alan Turing was born in Maida Vale, London. \n\nAn Enigma machine was a cipher machine used by the Nazi German military during World War II to encrypt and decrypt secret messages. It was considered highly secure at the time and was used to protect sensitive communications. Turing played a crucial role in breaking the Enigma code, which greatly aided the Allied forces in their efforts during the war.',
+ 'source_documents': [Document(page_content='Alan Mathison Turing OBE FRS (London, 23 June 1912 – Wilmslow, Cheshire, 7 June 1954) was an English mathematician and computer scientist. He was born in Maida Vale, London.\n\nEarly life and family \nAlan Turing was born in Maida Vale, London on 23 June 1912. His father was part of a family of merchants from Scotland. His mother, Ethel Sara, was the daughter of an engineer.', metadata={'id': '130', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+  Document(page_content='Educated in Dublin at Alexandra School and College; on October 1st 1907 she married Julius Mathison Turing, latter son of Reverend John Robert Turing and Fanny Boyd, in Dublin. Born on June 23rd 1912, Alan Turing would go on to be regarded as one of the greatest figures of the twentieth century.', metadata={'id': '133', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+  Document(page_content='A brilliant mathematician and cryptographer Alan was to become the founder of modern-day computer science and artificial intelligence; designing a machine at Bletchley Park to break secret Enigma encrypted messages used by the Nazi German war machine to protect sensitive commercial, diplomatic and military communications during World War 2. Thus, Turing made the single biggest contribution to the', metadata={'id': '134', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
+  Document(page_content='Education \nTuring went to St. Michael\'s, a school at 20 Charles Road, St Leonards-on-sea, when he was five years old.\n"This is only a foretaste of what is to come, and only the shadow of what is going to be.” – Alan Turing.', metadata={'id': '131', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'})]}
+</code></pre></div></div>
+
+<h3 id="adding-a-ui">Adding a UI</h3>
+
+<p>Thanks to <a href="https://www.gradio.app/">gradio</a> we can front this chain with a simple Chat UI.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">gradio</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">gradio</span> <span class="k">as</span> <span class="n">gr</span>
+
+<span class="n">memory</span> <span class="o">=</span> <span class="n">ConversationBufferMemory</span><span class="p">(</span><span class="n">memory_key</span><span class="o">=</span><span class="s">"chat_history"</span><span class="p">,</span> <span class="n">return_messages</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">qa</span> <span class="o">=</span> <span class="n">ConversationalRetrievalChain</span><span class="p">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">(),</span> <span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">gr</span><span class="p">.</span><span class="n">Blocks</span><span class="p">()</span> <span class="k">as</span> <span class="n">demo</span><span class="p">:</span>
+    <span class="n">chatbot</span> <span class="o">=</span> <span class="n">gr</span><span class="p">.</span><span class="n">Chatbot</span><span class="p">()</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">gr</span><span class="p">.</span><span class="n">Textbox</span><span class="p">()</span>
+    <span class="n">clear</span> <span class="o">=</span> <span class="n">gr</span><span class="p">.</span><span class="n">ClearButton</span><span class="p">([</span><span class="n">msg</span><span class="p">,</span> <span class="n">chatbot</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">respond</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">chat_history</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
+        <span class="n">chat_history</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">message</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">'answer'</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="s">""</span><span class="p">,</span> <span class="n">chat_history</span>
+
+    <span class="n">msg</span><span class="p">.</span><span class="n">submit</span><span class="p">(</span><span class="n">respond</span><span class="p">,</span> <span class="p">[</span><span class="n">msg</span><span class="p">,</span> <span class="n">chatbot</span><span class="p">],</span> <span class="p">[</span><span class="n">msg</span><span class="p">,</span> <span class="n">chatbot</span><span class="p">])</span>
+
+<span class="n">demo</span><span class="p">.</span><span class="n">launch</span><span class="p">()</span>
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

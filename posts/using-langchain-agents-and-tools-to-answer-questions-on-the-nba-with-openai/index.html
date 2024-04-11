@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This article explores using LangChain Agents and Tools to answer questions on the NBA with OpenAI">
+
+    <title>
+        
+            Using LangChain Agents and Tools to answer questions on the NBA with OpenAI &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Using LangChain Agents and Tools to answer questions on the NBA with OpenAI</h1>
+    <time datetime="2023-06-23T00:00:00+00:00" class="post-date">23 Jun 2023</time>
+    <p>Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
+This article documents the use of <a href="https://www.langchain.com/">LangChain</a> <a href="https://python.langchain.com/docs/modules/agents/">Agents</a>/<a href="https://python.langchain.com/docs/modules/tools/">Tools</a> to help aid in answering questions based on recent NBA events.</p>
+
+
+
+<p>This article was originally written as an Jupyter Notebook which can be <a href="/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb">downloaded here</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">openai</span> <span class="n">bs4</span> <span class="n">requests</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.llms</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">llm</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s">"text-davinci-003"</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="without-a-source">Without a source</h2>
+
+<p>The LLM is trained up-to a given point in time, it is not aware of recent events.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Was the 2023 NBA season MVP part of the team that won the NBA championship that year?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>It is too early to tell.</p>
+</blockquote>
+
+<p>It can also be completely wrong…</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Was the 1998 NBA season MVP part of the team that won the NBA championship that year?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>No, the 1998 NBA season MVP was Michael Jordan of the Chicago Bulls, but the NBA championship that year was won by the San Antonio Spurs.</p>
+</blockquote>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Who won the 1998 NBA season MVP, what team where they on?, what team won the NBA championship that year?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>The 1998 NBA season MVP was Michael Jordan of the Chicago Bulls. The Chicago Bulls also won the NBA championship that year.</p>
+</blockquote>
+
+<h2 id="adding-a-source">Adding a source</h2>
+
+<blockquote>
+  <p>“You Don’t Have to Know Everything. You Just Have to Know Where to Find It.”
+– <cite>Albert Einstein</cite></p>
+</blockquote>
+
+<p>We can improve the models answer by providing tools for it to use to lookup recent events within a given domain.
+This aids in <em>grounding</em> the model and helps to ensure it does not hallucinate.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.agents</span> <span class="kn">import</span> <span class="n">AgentType</span><span class="p">,</span> <span class="n">load_tools</span><span class="p">,</span> <span class="n">initialize_agent</span><span class="p">,</span> <span class="n">Tool</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">def</span> <span class="nf">search_statmuse</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s">'https://www.statmuse.com/nba/ask/</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">content</span><span class="p">,</span> <span class="s">"html.parser"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">soup</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="s">"h1"</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span class="s">"nlg-answer"</span><span class="p">).</span><span class="n">text</span>
+
+<span class="n">statmuse_tool</span> <span class="o">=</span> <span class="n">Tool</span><span class="p">(</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">"Statmuse"</span><span class="p">,</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">search_statmuse</span><span class="p">,</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s">"""
+        NBA basketball search engine. Use this if the question is related to NBA basktetball stats and trivia.
+        For example: 'who is the highest scoring player in the 2023 season?',
+        You must:
+        - Always specify a year or timeframe with your search.
+        - Only search for a single player, MVP or team in a single search.
+    """</span>
+<span class="p">)</span>
+
+<span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s">"llm-math"</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">statmuse_tool</span><span class="p">]</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">initialize_agent</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="p">.</span><span class="n">ZERO_SHOT_REACT_DESCRIPTION</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">agent</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="s">"Was the 2023 NBA season MVP part of the team that won the NBA championship that year?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Entering new AgentExecutor chain...
+
+Thought: I need to find out who the MVP was and which team they were on
+Action: Statmuse
+Action Input: Who was the 2023 NBA season MVP?
+Observation:
+Joel Embiid won the MVP award in 2022-23.
+
+Thought: I need to find out which team Joel Embiid was on
+Action: Statmuse
+Action Input: What team was Joel Embiid on in the 2023 season?
+Observation:
+Joel Embiid played for the 76ers in 2022-23.
+
+Thought: I need to find out which team won the NBA championship in 2023
+Action: Statmuse
+Action Input: Who won the NBA championship in 2023?
+Observation:
+The Denver Nuggets won in the 2023 NBA Finals against the Miami Heat, 4 games to 1.
+
+Thought: I now know the final answer
+Final Answer: No, Joel Embiid was not part of the team that won the NBA championship in 2023.
+
+&gt; Finished chain.
+</code></pre></div></div>
+
+<blockquote>
+  <p>No, Joel Embiid was not part of the team that won the NBA championship in 2023.</p>
+</blockquote>
+
+<p>That is more like it! how about the other question…</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">agent</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="s">"Was the 1998 NBA season MVP part of the team that won the NBA championship that year?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Entering new AgentExecutor chain...
+
+Thought: I need to find out who the MVP was and which team won the championship
+Action: Statmuse
+Action Input: Who was the 1998 NBA season MVP?
+Observation:
+Michael Jordan won the MVP award in 1997-98.
+
+Thought: I need to find out which team won the championship that year
+Action: Statmuse
+Action Input: Who won the 1998 NBA championship?
+Observation:
+The Chicago Bulls won in the 1998 NBA Finals against the Utah Jazz, 4 games to 2.
+
+Thought: I now know the final answer
+Final Answer: Yes, Michael Jordan was part of the team that won the 1998 NBA championship.
+
+&gt; Finished chain.
+</code></pre></div></div>
+
+<blockquote>
+  <p>Yes, Michael Jordan was part of the team that won the 1998 NBA championship.</p>
+</blockquote>
+
+<p>Much better!</p>
+
+<h3 id="combining-tools">Combining tools</h3>
+
+<p>We now can combine the abilities to; reason about a question, find the relevant information, and then compute a given answer.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">agent</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="s">"How many combined points did the 2023 NBA season MVP, and the 2023 NBA finals MVP score for the entire 2023 season?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Entering new AgentExecutor chain...
+
+Thought: I need to find out who the MVPs were and then add up their points
+Action: Statmuse
+Action Input: Who was the 2023 NBA season MVP?
+Observation:
+Joel Embiid won the MVP award in 2022-23.
+
+Thought: Now I need to find out who the Finals MVP was
+Action: Statmuse
+Action Input: Who was the 2023 NBA Finals MVP?
+Observation:
+Nikola Jokic won the Finals MVP award once in the 2023 NBA Finals.
+
+Thought: Now I need to find out how many points each of them scored in the 2023 season
+Action: Statmuse
+Action Input: How many points did Joel Embiid score in the 2023 season?
+Observation:
+Joel Embiid scored 2,183 points in 2022-23.
+
+Thought: Now I need to find out how many points Nikola Jokic scored in the 2023 season
+Action: Statmuse
+Action Input: How many points did Nikola Jokic score in the 2023 season?
+Observation:
+Nikola Jokic dropped 1,690 points in 2022-23.
+
+Thought: I now know the final answer
+Final Answer: The combined points of the 2023 NBA season MVP and the 2023 NBA Finals MVP for the entire 2023 season was 3,873 points.
+
+&gt; Finished chain.
+</code></pre></div></div>
+
+<blockquote>
+  <p>The combined points of the 2023 NBA season MVP and the 2023 NBA Finals MVP for the entire 2023 season was 3,873 points.</p>
+</blockquote>
+
+<p>Lets now add a tool to fetch information from Wikipedia.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s">"wikipedia"</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">statmuse_tool</span><span class="p">]</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">initialize_agent</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="p">.</span><span class="n">ZERO_SHOT_REACT_DESCRIPTION</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">agent</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="s">"Where was the NBA finals MVP for the 2023 season born, and how many total points did he score for the entire season?"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; Entering new AgentExecutor chain...
+
+Thought: I need to find out who the MVP was and then look up their birthplace and total points scored.
+Action: Statmuse
+Action Input: Who was the 2023 NBA Finals MVP?
+Observation:
+Nikola Jokic won the Finals MVP award once in the 2023 NBA Finals.
+
+Thought: I need to find out where Nikola Jokic was born and how many points he scored in the 2023 season.
+Action: Wikipedia
+Action Input: Nikola Jokic
+Observation: Page: Nikola Jokić
+Summary: Nikola Jokić (Serbian Cyrillic: Никола Јокић, pronounced [nǐkola jôkitɕ] (listen); born February 19, 1995) is a Serbian professional basketball player, who is a center for the Denver Nuggets of the National Basketball Association (NBA). Nicknamed "The Joker," and hailed as one of the biggest draft steals in NBA history, he is regarded as one of the greatest players and centers of all time. A five-time NBA All-Star, he has been named to the All-NBA Team on five occasions (including three first-team selections), and won the NBA Most Valuable Player Award for the 2020–21 and 2021–22 seasons. He represents the Serbian national team with which he won a silver medal at the 2016 Summer Olympics.
+Jokić was selected by the Nuggets in the second round of the 2014 NBA draft. He was voted to the NBA All-Rookie First Team in 2016. In the 2018–19 NBA season, while leading the Nuggets to the Western Conference Semifinals, he received his first All-Star and All-NBA First Team selections. The following season, he once again received All-Star and All-NBA honors, while leading his team to the Western Conference Finals. In the 2022–23 NBA season, he was awarded NBA Finals MVP after leading the Nuggets to their first-ever NBA championship. Jokić ranks among the top 10 on the all-time list of the NBA players with the most triple-doubles (regular season and playoffs), where he is the leading European player and center, and he holds the record for fastest triple-double (achieved in 14 minutes and 33 seconds).
+
+Page: 2023 NBA playoffs
+Summary: The 2023 NBA playoffs was the postseason tournament of the National Basketball Association's 2022–23 season. The playoffs began on April 15 and concluded on June 12 with the Denver Nuggets winning the 2023 NBA Finals.
+
+Page: 2023 NBA Finals
+Summary: The 2023 NBA Finals was the championship series of the National Basketball Association (NBA)'s 2022–23 season and conclusion to the season's playoffs. The best-of-seven playoffs was played between the Eastern Conference champion Miami Heat and the Western Conference champion Denver Nuggets. The series started on June 1, and concluded in a Denver victory on June 12.The Nuggets defeated the Heat in four of five games, winning their first championship in franchise history after 47 seasons in the NBA. Denver's Nikola Jokić was unanimously voted the NBA Finals Most Valuable Player (MVP), after averaging 30.2 points, 14.0 rebounds, 7.2 assists, and 1.4 blocks while shooting 58.3% from the field and 42.1% from the 3-point line. Jokić is the lowest-selected player to ever win Finals MVP, being the 41st pick of the 2014 NBA draft. This marked the first NBA Finals appearance for Denver. This was also the second Finals to feature a No. 8 seed, along with the 1999 NBA Finals.
+Thought: I now know the final answer
+Final Answer: Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and he scored a total of 1,845 points in the 2023 season.
+
+&gt; Finished chain.
+</code></pre></div></div>
+
+<blockquote>
+  <p>Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and he scored a total of 1,845 points in the 2023 season.</p>
+</blockquote>
+
+<p>Although this is a very contrived example it shows the power of how you can get the LLM to reason about a problem, breaking it up into smaller tasks of which it can use provided tools.
+It does not necessarily need to know the answer, just how to find the answer.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

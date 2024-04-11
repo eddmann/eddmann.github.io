@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This article documents my exploration into using Python and pandas to determine the closest Parkrun Alphabet Challenge for a given local run">
+
+    <title>
+        
+            Determining your closest Parkrun Alphabet Challenge using Python and pandas &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Determining your closest Parkrun Alphabet Challenge using Python and pandas</h1>
+    <time datetime="2023-07-22T00:00:00+00:00" class="post-date">22 Jul 2023</time>
+    <p>The Parkrun Alphabet is an <a href="https://blog.parkrun.com/uk/2018/07/18/the-parkrun-alphabet/">unofficial challenge</a> that sees runners complete a Parkrun at locations starting with each letter of the English alphabet.
+I am a big fan of the Parkrun and wanted to work out how feasible it would be for me to complete the challenge based on the closest <em>tourist</em> locations to my <em>local</em> weekly run.
+I also thought this would be a great opportunity to explore <a href="https://pandas.pydata.org/">pandas</a> and work with <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">DataFrames</a>.</p>
+
+
+
+<p>This article was original written as an Jupyter Notebook which can be <a href="/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb">downloaded here</a>.</p>
+
+<h3 id="the-dataset">The Dataset</h3>
+
+<p>My first job was to build a dataset of all the current Parkrun events and their locations.
+Fortunately, the official Parkrun websites provides this dataset indirectly by-way of OpenStreetMap <a href="https://wiki.openstreetmap.org/wiki/Features">Features</a> in their interactive map.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">events</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"https://images.parkrun.com/events.json"</span><span class="p">).</span><span class="n">content</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>For historical prosperity I stored a local copy of this dataset; as it is not an official dataset and more an implementation detail of another feature there is a high likely hood it could change.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"closest-parkrun-alphabet-challenge.json"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="nb">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>This dataset provides me with the required Parkrun event names and location coordinates (longitude and latitude).
+Based on a supplied local Parkrun event I should be able to determine the closest event per-letter of the English alphabet to complete the challenge.</p>
+
+<h3 id="calculating-distances-using-the-haversine-formula">Calculating Distances using the Haversine Formula</h3>
+
+<p>To calculate the distance between two different events I will use the Haversine formula.
+This formula calculates the shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the two points.
+Although this will not factor in actual travel considerations (such as roads, traffic etc.) it is a <em>good enough</em> metric to solve the problem.
+There are <a href="https://nathanrooy.github.io/posts/2016-09-07/haversine-with-python/">many</a> <a href="https://en.wikipedia.org/wiki/Haversine_formula">other</a> <a href="https://www.movable-type.co.uk/scripts/latlong.html">resources</a> which go into detail on how this formula works; instead of re-implementing it I have decided to use an <a href="https://pypi.org/project/haversine/">existing library</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">haversine</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">event_a</span><span class="p">,</span> <span class="n">event_b</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="s">"events"</span><span class="p">][</span><span class="s">"features"</span><span class="p">]</span>
+
+<span class="n">event_a</span><span class="p">[</span><span class="s">"geometry"</span><span class="p">][</span><span class="s">"coordinates"</span><span class="p">]</span>
+
+<span class="c1"># [-0.335791, 51.410992]
+</span></code></pre></div></div>
+
+<p>The library I am using looks to require the coordinates to be positioned in the opposite direction (latitude, longitude) to what the dataset has provided (longitude, latitude).
+As such, I will apply a simple transformation over the dataset before usage within the distance calculation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">haversine</span> <span class="kn">import</span> <span class="n">haversine</span>
+
+<span class="k">def</span> <span class="nf">flip</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">coords</span>
+    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+
+<span class="n">haversine</span><span class="p">(</span><span class="n">flip</span><span class="p">(</span><span class="n">event_a</span><span class="p">[</span><span class="s">"geometry"</span><span class="p">][</span><span class="s">"coordinates"</span><span class="p">]),</span> <span class="n">flip</span><span class="p">(</span><span class="n">event_b</span><span class="p">[</span><span class="s">"geometry"</span><span class="p">][</span><span class="s">"coordinates"</span><span class="p">]),</span> <span class="n">unit</span><span class="o">=</span><span class="s">"mi"</span><span class="p">)</span>
+
+<span class="c1"># 4.952173093357963
+</span></code></pre></div></div>
+
+<h3 id="putting-it-all-together-with-pandas">Putting it all together with Pandas</h3>
+
+<p>Now that we have the core building blocks in-place we can now go about solving the problem using the panda’s library.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">json_normalize</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="s">"events"</span><span class="p">][</span><span class="s">"features"</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>With the normalised dataset now imported into a DataFrame, I will go about applying some initial transformations to prepare the data for use.
+The first of which is, as the imported dataset includes both adult and junior events, I only wish to consider adult events for this problem.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ADULT_PARKRUN</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="p">[</span><span class="s">"properties.seriesid"</span><span class="p">]</span> <span class="o">==</span> <span class="n">ADULT_PARKRUN</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>The event names look to conform to lower-case, English alphabet characters (even in the case of international Parkrun events).
+We can produce a new column from this source to group each of the events alphabetically by their first character going forward.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"letter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">"properties.eventname"</span><span class="p">].</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>As discussed before, the final piece of dataset preparation we need to do is ensure the the coordinates are supplied to the Haversine formula in the expected order.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">flip</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We can now find the local Parkrun event within the DataFrame.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">local_parkrun</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">frame</span><span class="p">[</span><span class="s">"properties.EventShortName"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"Wimbledon Common"</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>id                                                          2
+type                                                  Feature
+geometry.type                                           Point
+geometry.coordinates                   (51.442078, -0.232215)
+properties.eventname                                wimbledon
+properties.EventLongName             Wimbledon Common parkrun
+properties.EventShortName                    Wimbledon Common
+properties.LocalisedEventLongName                        None
+properties.countrycode                                     97
+properties.seriesid                                         1
+properties.EventLocation                     Wimbledon Common
+letter                                                      w
+Name: 1, dtype: object
+</code></pre></div></div>
+
+<p>We can then finally determine each <em>tourist</em> events distance away from the local event.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"distance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">parkrun</span><span class="p">:</span> <span class="n">haversine</span><span class="p">(</span><span class="n">parkrun</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">],</span> <span class="n">local_parkrun</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s">'mi'</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">challenge</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s">'letter'</span><span class="p">,</span> <span class="s">'distance'</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">).</span><span class="n">groupby</span><span class="p">(</span><span class="s">'letter'</span><span class="p">).</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">parkruns</span><span class="p">:</span> <span class="n">parkruns</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">challenge</span><span class="p">[[</span><span class="s">'properties.EventShortName'</span><span class="p">,</span> <span class="s">'distance'</span><span class="p">]]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>              properties.EventShortName    distance
+letter
+a      275                   Ally Pally   11.633086
+       864                     Aldenham   14.678486
+b      0                     Bushy Park    4.952173
+       69                     Brockwell    5.505712
+c      1317              Clapham Common    3.610917
+       344                   Crane Park    6.023641
+d      302                      Dulwich    6.590564
+       888               Dartford Heath   18.186340
+e      462               East Grinstead   23.870382
+       2162           Edenbrook Country   29.585593
+f      562                Fulham Palace    2.181071
+       20                 Finsbury Park   10.390485
+g      177                  Gunnersbury    4.729258
+       343                    Gladstone    7.940967
+h      1637                    Hanworth    7.156085
+       65               Hampstead Heath    8.508784
+i      1755            Ifield Mill Pond   23.123788
+       1876       Itchen Valley Country   59.060942
+j      1544                 Jersey Farm   23.143607
+       900                       Jersey  177.952723
+k      68                      Kingston    3.497859
+       1625                     Kingdom   25.778223
+l      176                        Lloyd    8.459577
+       2272  Lordship Recreation Ground   12.234581
+m      301                     Mile End   10.021387
+       1292                 Mole Valley   14.049230
+n      122                      Nonsuch    5.883647
+       566              Northala Fields    9.252729
+o      50                 Old Deer Park    3.569700
+       524                     Osterley    6.028906
+p      668                  Peckham Rye    7.443820
+       234                       Pymmes   14.130422
+q      481              Queen Elizabeth   46.581142
+       309             Queen’s, Belfast  320.843908
+r      3                  Richmond Park    2.700374
+       15               Roundshaw Downs    7.902912
+s      2108                    Southall    7.536143
+       199                South Norwood    8.075157
+t      972               Tooting Common    3.729324
+       2340       Thames Path, Woolwich   13.809657
+u      390                  Upton Court   15.324948
+       1644                    Uckfield   35.385475
+v      1309               Victoria Dock   11.653173
+       169                   Valentines   15.691955
+w      1               Wimbledon Common    0.000000
+       277              Wormwood Scrubs    5.419166
+y      2297   Yarborough Leisure Centre  125.414614
+       87                          York  176.070534
+z      1905                  Zuiderpark  198.046322
+       1779                 Ziegelwiese  523.953296
+</code></pre></div></div>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

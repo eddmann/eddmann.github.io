@@ -62,28 +62,32 @@ In this article I will document my experience completing the Advent of Code 2023
 <h3 id="first-impressions">First-impressions</h3>
 
 <p>From the offset I found that both languages were very comparable in syntax and style - both modelling problems using similar paradigms, OO with a blend of functional primitives.
-Both also follow suit in that the language developer also provides the <em>defacto</em> IDE in which to <em>code</em>; for Kotlin (created by JetBrains) it is <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> and Swift (created by Apple) it is <a href="https://developer.apple.com/xcode/">Xcode</a>.
+Both also follow suit in that the language developer also provides the <em>defacto</em> IDE in which to work in; for Kotlin (created by JetBrains) it is <a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> and Swift (created by Apple) it is <a href="https://developer.apple.com/xcode/">Xcode</a>.
 Throughout the month I found myself much more productive within IntelliJ than Xcode.
 I should caveat that I have been using JetBrain’s suite of IDEs (PHPStorm in particular) for many years, however I found that Xcode would randomly crash on me (not what you want from an IDE) even in my limited time using it.
 I remember watching a <a href="https://frontendmasters.com/courses/swift-ios/">video series</a> on iOS development last year which mentioned that this was deemed to be <em>expected behaviour</em> when working in Xcode 😬.</p>
 
 <h4 id="starter-templates">Starter Templates</h4>
 
-<p>Both languages developers have (rather handily) published Advent of Code starter templates (<a href="https://github.com/kotlin-hands-on/advent-of-code-kotlin-template">Kotlin</a>, <a href="https://github.com/apple/swift-aoc-starter-example">Swift</a>) which provide a convenient means of getting stated tackling each daily problem.
-It is good to see language developers investing time to do this, as Advent of Code is a great tool to help advertise a language, as it is the time developers typically explore different languages (me being case in point).
+<p>Both languages developers have (rather handily) published Advent of Code starter templates (<a href="https://github.com/kotlin-hands-on/advent-of-code-kotlin-template">Kotlin</a>, <a href="https://github.com/apple/swift-aoc-starter-example">Swift</a>) which provide a convenient means of getting started tackling each daily problem.
+It is good to see language developers investing time in this, as Advent of Code is a great tool to help advertise a language - it is the time developers typically get to explore different languages (me being case in point).
 I found the REPL provided by the Kotlin starter template to again be better, having the ability to run each day from within the IDE (using the gutter <em>play</em> button) was very useful; and it felt as though during problem-solving quicker to compile (maybe incremental compilation?).
-I had initially looked at using <a href="https://developer.apple.com/swift-playgrounds/">Swift Playgrounds</a> to iterate on the solutions within Xcode but found that it was very un-performant due to the way it has to instrument your code 😔.
+I had initially looked at using <a href="https://developer.apple.com/swift-playgrounds/">Swift Playgrounds</a> to iterate on the solutions within Xcode but found that it was very un-performant due to the way it has to instrument the code 😔.
 After some research I found there were some <em>tricks</em> to make it more performant, but I did not want re-write the code to appease the IDE.</p>
 
 <h3 id="today-i-learned">Today I learned…</h3>
 
-<p>Each day I wrote down my learnings and insights into each language as I went about solving the problem.
-Below I have documented these findings, paying close attention to the use of the language itself over the actual problem they were trying to solve.</p>
+<p>Each day I wrote down my learnings and insights into each language as I went about solving the problems.
+Below I have documented these findings, paying close attention to the use of the language itself over the actual problems they were trying to solve.</p>
 
 <h4 id="day-1">Day 1</h4>
 
-<p>I found that tuple declaration (<code class="language-plaintext highlighter-rouge">Pair</code>) within Kotlin seemed a little verbose and subsequent infix <code class="language-plaintext highlighter-rouge">to</code> syntax was odd.
-I understand this was most likely due to not wanting to add additional syntax to the language, however, Swift tuples are much more readable.</p>
+<p>From the offset I decided to add extension methods within both languages to help parse the input.
+This included <code class="language-plaintext highlighter-rouge">lines</code>, <code class="language-plaintext highlighter-rouge">ints</code> and <code class="language-plaintext highlighter-rouge">longs</code> (in the case of Kotlin).
+Having to explicitly specify longs (64-bit values) within Kotlin felt like it was one overflow away from being a problem, this must be due to being hosted on the JVM.</p>
+
+<p>Additional to this, I also found that tuple declaration (<code class="language-plaintext highlighter-rouge">Pair</code>) within Kotlin seemed a little verbose, and the subsequent infix <code class="language-plaintext highlighter-rouge">to</code> syntax was odd.
+I understand that this is most likely due to not wanting to add additional syntax to the language, however Swift tuples are much more readable.</p>
 
 <h4 id="day-2">Day 2</h4>
 
@@ -105,7 +109,7 @@ I found that it was incredibly cheap to add such powerful capabilities, however,
 
 <p>This day provided me with a perfect excuse to explore both languages’ concurrency capabilities.
 They both follow similar asynchronous execution models (<code class="language-plaintext highlighter-rouge">async</code>, <code class="language-plaintext highlighter-rouge">await</code>) which provide an ideal level of abstraction.
-Within the second part there was an <em>intelligent</em> way to solve the problem and a brute force means; splitting up the required work lead to great use-case for solving the problem in parallel.</p>
+Within part two there was an <em>intelligent</em> way to solve the problem and a brute force means; splitting up the required work lead to great use-case for solving the problem in parallel.</p>
 
 <p>Swift has come on leaps and bounds from the time I remember having to use <a href="https://en.wikipedia.org/wiki/Grand_Central_Dispatch">Grand Central Dispatch</a>.
 Having explored Kotlin’s concurrency model first and finding Java’s <code class="language-plaintext highlighter-rouge">parallelStream</code>, I decided to implement a similar abstraction within Swift (<code class="language-plaintext highlighter-rouge">parallelMap</code>) using a generic <em>Sequence</em> extension method.
@@ -116,13 +120,13 @@ It was very cool to see all my machines cores being utilised with very little co
 <p>Something that I knew I wanted to include in <em>santa-lang</em> (borrowed from Kotlin and Swift) was trailing Lambda expression/Closures syntax.
 I used this syntax heavily throughout the month and building function APIs that took advantage of this syntax provides for a very readable DSL.</p>
 
-<p>Additional to this, explicitly having to define Swift’s arguments during invocation (unless explicitly declaring not to) was initially odd to me, however, the arguments names being part of the method/function signature brought with it increased expressibility to the code.</p>
+<p>Additional to this, explicitly having to define Swift’s arguments during invocation (unless explicitly declaring not to) was initially odd to me, however, the parameter names being part of the method/function signature brought with it increased expressibility to the code.</p>
 
 <h4 id="day-7">Day 7</h4>
 
 <p>This day allowed me to use Kotlin’s and Swift’s advanced pattern matching capabilities within <code class="language-plaintext highlighter-rouge">switch</code> and <code class="language-plaintext highlighter-rouge">when</code> expressions respectably.
 I was able to pattern match on lists, including values found within the data structure itself.
-On top of this I was also able to abstract out the concept of a <code class="language-plaintext highlighter-rouge">Hand</code> into a type which could encapsulate how it was compared in both languages.
+On top of this, I was also able to abstract out the concept of a <code class="language-plaintext highlighter-rouge">Hand</code> into a type which could encapsulate how it was compared in both languages.
 This lead to a very concise solution where-by the input was passed into <code class="language-plaintext highlighter-rouge">Hand</code>’s and then sorted before performing several collection operations on the output.</p>
 
 <h4 id="day-8">Day 8</h4>
@@ -133,7 +137,7 @@ I was initially opposed to this when designing <em>santa-lang,</em> but I can se
 <h4 id="day-9">Day 9</h4>
 
 <p>As explained before, Kotlin has a very rich standard library and provides the ability to generate an <em>infinite</em> sequence.
-Along with this it includes functions (i.e <code class="language-plaintext highlighter-rouge">zipWithNext</code> and <code class="language-plaintext highlighter-rouge">takeIf</code>) which feel like they have been added just for Advent of Code?!
+Along with this, it includes functions (i.e <code class="language-plaintext highlighter-rouge">zipWithNext</code> and <code class="language-plaintext highlighter-rouge">takeIf</code>) which feel like they have been added just for Advent of Code?!
 This day’s Kotlin solution was by-far my favourite solution for the entire calendar.</p>
 
 <h4 id="day-10">Day 10</h4>
@@ -149,8 +153,9 @@ However, Swift did not provide such functionality, but never fear, this was anot
 <h4 id="day-12">Day 12</h4>
 
 <p>I found that Kotlin had better support for treating composed data-structures as values.
-For example, I was able to make a <code class="language-plaintext highlighter-rouge">Pair&lt;String, List&lt;Int&gt;&gt;</code> a <em>hashable</em> map key, whereas in Swift I had to implement the <code class="language-plaintext highlighter-rouge">Hashable</code> protocol which was a pain.
-I was also big fan of the <code class="language-plaintext highlighter-rouge">if let</code> syntax within Swift and felt this would be a welcome addition to Kotlin.
+For example, I was able to make a <code class="language-plaintext highlighter-rouge">Pair&lt;String, List&lt;Int&gt;&gt;</code> a <em>hashable</em> map key, whereas in Swift I had to implement the <code class="language-plaintext highlighter-rouge">Hashable</code> protocol which was a pain.</p>
+
+<p>I was also big fan of the <code class="language-plaintext highlighter-rouge">if let</code> syntax within Swift and felt this would be a welcome addition to Kotlin.
 Combined with <code class="language-plaintext highlighter-rouge">Optional</code> typing constructs this provided an easy means of unwrapping values with scoped variables.</p>
 
 <h4 id="day-13">Day 13</h4>
@@ -179,7 +184,7 @@ One such collection was a double-ended queue (Deque) which I was able to make us
 <h4 id="day-17">Day 17</h4>
 
 <p>It was fun being able to use Java’s <a href="https://docs.oracle.com/javase/8/docs/api/java/util/PriorityQueue.html">Priority Queue</a> implementation within Kotlin.
-One of the advantages of using the JVM is that you can use libraries that are already present.
+One of the advantages of being hosted on the JVM is that you can use libraries that are already available.
 The syntax for interacting with these libraries is also very clean, for example, you can provide a Kotlin Lambda expressions for the comparator.
 Sadly, Swift does not provide such a data-structure, so I had to go about building a heap-backed <a href="https://github.com/eddmann/advent-of-code/blob/master/2023/swift/AdventOfCode2023/Sources/PriorityQueue.swift">Priority Queue</a> which was fun.</p>
 
@@ -190,15 +195,15 @@ However, upon writing this article I have seen that Swift 5.9 has <a href="https
 
 <h4 id="day-19">Day 19</h4>
 
-<p>I had fun building out an enumerated <code class="language-plaintext highlighter-rouge">Workflow</code> type, being able to destructure the type using the <code class="language-plaintext highlighter-rouge">switch</code> pattern in Swift.
+<p>I had fun building out an enumerated <code class="language-plaintext highlighter-rouge">Workflow</code> type, being able to destructure the type using a <code class="language-plaintext highlighter-rouge">switch</code> statement in Swift.
 There was also more internal debate about Kotlin’s standard library, Kotlin’s <code class="language-plaintext highlighter-rouge">mapIndexed</code> vs Swift’s <code class="language-plaintext highlighter-rouge">enumerated().map()</code>.
 The purist in me likes the latter, however, the developer who already is akin to the language and just wants to solve the problem likes the ease of the former 🤔.</p>
 
 <h4 id="day-20">Day 20</h4>
 
 <p>I can not believe it took me until day 20 to find <code class="language-plaintext highlighter-rouge">buildMap</code> within Kotlin.
-This provides you with the ability to construct the Map in a mutable/imperative means, with the resulting value being returned to the caller as a immutable data-structure.
-I am a big fan of this explicit mutation, and thanks to implicit Lambda contexts for providing access to the data-structure methods.</p>
+This provides you with the ability to construct the Map in a mutable/imperative manner, with the resulting value being returned to the caller as an immutable data-structure.
+I am a big fan of this explicit mutation, all thanks to implicit Lambda contexts for providing access to the data-structure methods.</p>
 
 <h4 id="day-21">Day 21</h4>
 
@@ -212,11 +217,11 @@ One such example of this was in today’s <code class="language-plaintext highli
 <h4 id="day-23">Day 23</h4>
 
 <p>Some syntactic sugar that Kotlin could adopt from Swift would be the ability to omit the verbose enumeration definitions.
-The compiler is aware of the type which is required and as such omitting the enumerated class and only provide the value aids in readability, for example <code class="language-plaintext highlighter-rouge">.NORTH</code> instead of <code class="language-plaintext highlighter-rouge">Point.NORTH</code>.</p>
+The compiler is aware of the type which is required, and as such, omitting the enumerated class and only provide the value aids in readability - for example <code class="language-plaintext highlighter-rouge">.NORTH</code> instead of <code class="language-plaintext highlighter-rouge">Point.NORTH</code>.</p>
 
 <h4 id="day-24">Day 24</h4>
 
-<p>Part two was a tough math problem and I sadly had to reach out to the subreddit for help.
+<p>Part two was a tough math problem and I sadly had to reach out to the sub-reddit for help.
 It did however provide me with a reason to explore interacting with third-party libraries within both languages, by way of running the <a href="https://github.com/Z3Prover/z3">Z3 problem solver</a>.
 There are official Z3 Java bindings which thanks to Kotlin’s interop I was able to use seamlessly.
 Fortunately within Swift, someone had worked on building a <a href="https://github.com/LuizZak/swift-z3">wrapper</a> that exposed a great Swift interface for this C-library.</p>
@@ -224,17 +229,14 @@ Fortunately within Swift, someone had worked on building a <a href="https://gith
 <h4 id="day-25">Day 25</h4>
 
 <p>Today was the day I attempted to explore implementing a generic solution to being able to use a tuple as a hash value within Swift, so worth it on the last day…
-In regard to the Kotlin solution along with implementing Karger’s algorithm I decided to try and solve it using a Graphviz visualisation, which I thought would make for a cool diagram to include in this article.</p>
+In regard to the Kotlin solution, along with implementing Karger’s algorithm I decided to try and solve it using a Graphviz visualisation, which I thought would make for a cool diagram to include in this article.</p>
 
 <p><img src="/uploads/solving-the-advent-of-code-2023-calendar-in-kotlin-and-swift/day25.png" alt="Day 25 Graphviz Solution" style="max-width:280px;margin:0 auto;" /></p>
 
 <h3 id="santa-lang-dsl-in-kotlin">santa-lang DSL in Kotlin</h3>
 
 <p>As an additional exploration I wished to look into Kotlin’s <a href="https://kotlinlang.org/docs/type-safe-builders.html">type-safe builders</a>, which provide you with a means to implement your own DSL on-top of the language.
-I felt that it could be possible to implement the day solution structure I had designed for <em>santa-lang</em> within Kotlin itself.
-It was amazing to see what can be achieved with the languages support of Lambda expression contexts.
-Overall the experience was very easy, however, I did find <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-dsl-marker/">DSL markers</a> a little confusing to get my head around.
-Similar to infix operators and extension methods this is another language feature that provides great power; a part of me again fears how developers could over-use/exploit it (i.e. everything does not need its own DSL!).</p>
+I felt that it could be possible to implement the <a href="https://eddmann.com/santa-lang/runner/">day solution structure</a> I had designed for <em>santa-lang</em> within Kotlin itself.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fun main() = solution {
     fun calibrate(values: List&lt;String&gt;) = values.sumOf { value -&gt;
@@ -283,6 +285,12 @@ Similar to infix operators and extension methods this is another language featur
     }
 }
 </code></pre></div></div>
+
+<p>It was amazing to see what can be achieved with the languages support of Lambda expression contexts.
+Overall the experience was very easy, however, I did find <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-dsl-marker/">DSL markers</a> a little confusing to get my head around.
+Similar to infix operators and extension methods this is another language feature that provides great power; a part of me again fears how developers could over-use/exploit it (i.e. everything does not need its own DSL!).</p>
+
+<p><img src="/uploads/solving-the-advent-of-code-2023-calendar-in-kotlin-and-swift/santa-lang-dsl.png" alt="santa-lang DSL in Kotlin" /></p>
 
 <h3 id="conclusion">Conclusion</h3>
 

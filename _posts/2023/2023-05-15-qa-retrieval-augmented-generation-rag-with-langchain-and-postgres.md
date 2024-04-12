@@ -100,7 +100,7 @@ store = PGVector.from_documents(
 We can then search the vector database for the given articles that have the most relevance to the given query.
 
 ```python
-query = "Where was Alaning Turing born and what is an Engima machine?"
+query = "Where was Alan Turing born and what is an Engima machine?"
 
 store.similarity_search(query)
 ```
@@ -161,7 +161,7 @@ qa_with_sources(query)
 ```
 
 ```
-{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+{'question': 'Where was Alan Turing born and what is an Engima machine?',
  'answer': 'Alan Turing was born in Maida Vale, London. An Enigma machine was a device designed by Turing at Bletchley Park to break secret Enigma encrypted messages used by the Nazi German war machine during World War 2.\n',
  'sources': '\n- https://simple.wikipedia.org/wiki/Alan%20Turing'}
 ```
@@ -199,13 +199,13 @@ memory = ConversationBufferMemory(memory_key="chat_history", return_messages=Tru
 
 qa = ConversationalRetrievalChain.from_llm(llm, store.as_retriever(), memory=memory)
 
-qa({"question": "Where was Alaning Turing born?"})
+qa({"question": "Where was Alan Turing born?"})
 qa({"question": "What year was he born?"})
 ```
 
 ```
 {'question': 'What year was he born?',
- 'chat_history': [HumanMessage(content='Where was Alaning Turing born?', additional_kwargs={}, example=False),
+ 'chat_history': [HumanMessage(content='Where was Alan Turing born?', additional_kwargs={}, example=False),
   AIMessage(content='Alan Turing was born in Maida Vale, London.', additional_kwargs={}, example=False),
   HumanMessage(content='What year was he born?', additional_kwargs={}, example=False),
   AIMessage(content='Alan Turing was born in 1912.', additional_kwargs={}, example=False)],
@@ -219,7 +219,7 @@ qa({"question": query, "chat_history": []})
 ```
 
 ```
-{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+{'question': 'Where was Alan Turing born and what is an Engima machine?',
  'chat_history': [],
  'answer': 'Alan Turing was born in Maida Vale, London. \n\nAn Enigma machine was a cipher machine used by the Nazi German military during World War II to encrypt and decrypt secret messages. It was considered highly secure at the time and was used to protect sensitive communications. Turing played a crucial role in breaking the Enigma code, which greatly aided the Allied forces in their efforts during the war.',
  'source_documents': [Document(page_content='Alan Mathison Turing OBE FRS (London, 23 June 1912 – Wilmslow, Cheshire, 7 June 1954) was an English mathematician and computer scientist. He was born in Maida Vale, London.\n\nEarly life and family \nAlan Turing was born in Maida Vale, London on 23 June 1912. His father was part of a family of merchants from Scotland. His mother, Ethel Sara, was the daughter of an engineer.', metadata={'id': '130', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
@@ -256,3 +256,5 @@ with gr.Blocks() as demo:
 
 demo.launch()
 ```
+
+<img src="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/chatbot.png" alt="Chatbot" style="max-width:550px;margin:0 auto;" />

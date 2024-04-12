@@ -136,7 +136,7 @@ This article documents my experience exploring how to implement <a href="https:/
 
 <p>We can then search the vector database for the given articles that have the most relevance to the given query.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"Where was Alaning Turing born and what is an Engima machine?"</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"Where was Alan Turing born and what is an Engima machine?"</span>
 
 <span class="n">store</span><span class="p">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 </code></pre></div></div>
@@ -196,7 +196,7 @@ It was considered highly secure at the time and was used to protect sensitive co
 <span class="n">qa_with_sources</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alan Turing born and what is an Engima machine?',
  'answer': 'Alan Turing was born in Maida Vale, London. An Enigma machine was a device designed by Turing at Bletchley Park to break secret Enigma encrypted messages used by the Nazi German war machine during World War 2.\n',
  'sources': '\n- https://simple.wikipedia.org/wiki/Alan%20Turing'}
 </code></pre></div></div>
@@ -236,12 +236,12 @@ This includes adding a <em>memory</em> in which we can ask additional question b
 
 <span class="n">qa</span> <span class="o">=</span> <span class="n">ConversationalRetrievalChain</span><span class="p">.</span><span class="n">from_llm</span><span class="p">(</span><span class="n">llm</span><span class="p">,</span> <span class="n">store</span><span class="p">.</span><span class="n">as_retriever</span><span class="p">(),</span> <span class="n">memory</span><span class="o">=</span><span class="n">memory</span><span class="p">)</span>
 
-<span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="s">"Where was Alaning Turing born?"</span><span class="p">})</span>
+<span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="s">"Where was Alan Turing born?"</span><span class="p">})</span>
 <span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="s">"What year was he born?"</span><span class="p">})</span>
 </code></pre></div></div>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'What year was he born?',
- 'chat_history': [HumanMessage(content='Where was Alaning Turing born?', additional_kwargs={}, example=False),
+ 'chat_history': [HumanMessage(content='Where was Alan Turing born?', additional_kwargs={}, example=False),
   AIMessage(content='Alan Turing was born in Maida Vale, London.', additional_kwargs={}, example=False),
   HumanMessage(content='What year was he born?', additional_kwargs={}, example=False),
   AIMessage(content='Alan Turing was born in 1912.', additional_kwargs={}, example=False)],
@@ -253,7 +253,7 @@ This includes adding a <em>memory</em> in which we can ask additional question b
 <span class="n">qa</span><span class="p">({</span><span class="s">"question"</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span> <span class="s">"chat_history"</span><span class="p">:</span> <span class="p">[]})</span>
 </code></pre></div></div>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alaning Turing born and what is an Engima machine?',
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'question': 'Where was Alan Turing born and what is an Engima machine?',
  'chat_history': [],
  'answer': 'Alan Turing was born in Maida Vale, London. \n\nAn Enigma machine was a cipher machine used by the Nazi German military during World War II to encrypt and decrypt secret messages. It was considered highly secure at the time and was used to protect sensitive communications. Turing played a crucial role in breaking the Enigma code, which greatly aided the Allied forces in their efforts during the war.',
  'source_documents': [Document(page_content='Alan Mathison Turing OBE FRS (London, 23 June 1912 – Wilmslow, Cheshire, 7 June 1954) was an English mathematician and computer scientist. He was born in Maida Vale, London.\n\nEarly life and family \nAlan Turing was born in Maida Vale, London on 23 June 1912. His father was part of a family of merchants from Scotland. His mother, Ethel Sara, was the daughter of an engineer.', metadata={'id': '130', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'}),
@@ -288,6 +288,8 @@ This includes adding a <em>memory</em> in which we can ask additional question b
 
 <span class="n">demo</span><span class="p">.</span><span class="n">launch</span><span class="p">()</span>
 </code></pre></div></div>
+
+<p><img src="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/chatbot.png" alt="Chatbot" style="max-width:550px;margin:0 auto;" /></p>
 
 </article>
 

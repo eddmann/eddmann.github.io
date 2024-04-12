@@ -257,4 +257,6 @@ with gr.Blocks() as demo:
 demo.launch()
 ```
 
-<img src="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/chatbot.png" alt="Chatbot" style="max-width:550px;margin:0 auto;" />
+<div style="max-width:550px;margin:0 auto;">
+    <img src="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/chatbot.png" alt="Chatbot" />
+</div>

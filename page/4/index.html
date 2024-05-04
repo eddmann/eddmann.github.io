@@ -51,6 +51,73 @@
     
         <article class="post">
             <h1 class="post-title">
+                <a href="/posts/solving-the-advent-of-code-2021-calendar-using-c-in-under-half-a-second/">
+                    Solving the Advent of Code 2021 calendar using C in under half-a-second
+                </a>
+            </h1>
+
+            <time datetime="2022-05-30T00:00:00+00:00" class="post-date">30 May 2022</time>
+
+            <p>Since being introduced to the world of <a href="https://adventofcode.com/">Advent of Code</a> just prior to the 2020 calendar starting, I subsequently spent the majority of 2021 completing (and documenting) the <a href="https://eddmann.com/archive/tag/advent-of-code-2015/">2015</a>, <a href="https://eddmann.com/archive/tag/advent-of-code-2016/">2016</a> and <a href="https://github.com/eddmann/advent-of-code/tree/master/2017/rust">2017</a> calendars.
+For the 2021 calendar I decided that it would be interesting (and challenging) to complete the calendar in C, with an initial solution written in Python to meet the daily aspect of the challenge.
+Additionally, with C being such a performant language, I also wanted to set the goal of ensuring that the entire C calendar was solvable on a single CPU core in under a half-a-second (inspired by <a href="https://dannyvankooten.com/solving-advent-of-code-2020-under-1-second/">this</a> blog post).
+In this post I wish to discuss how I went about achieving this goal (<em>spoiler</em> <code class="language-plaintext highlighter-rouge">410315 μs (0.410 s)</code> on average) and the hurdles I faced along the way.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/deploying-our-wedding-website-onto-a-raspberry-pi-kubernetes-cluster-using-k3s-and-helm/">
+                    Deploying our Wedding Website onto a Raspberry Pi Kubernetes cluster using K3s and Helm
+                </a>
+            </h1>
+
+            <time datetime="2022-04-29T00:00:00+00:00" class="post-date">29 Apr 2022</time>
+
+            <p>Over the past couple of weeks I have been thinking of how feasible it would be to deploy the <a href="https://github.com/eddmann/our-wedding-website">wedding website</a> I released earlier this year on Kubernetes using a Raspberry Pi cluster.
+After a little research, this past bank-holiday weekend I set myself the goal to build and deploy the web application on Kubernetes by the end of the Monday bank-holiday!
+In this post I would like to discuss how I went about achieving this goal and what I learnt in the process.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/containerising-the-datadog-agent-for-http-health-checks-using-digitalocean-app-platform-and-terraform/">
+                    Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform
+                </a>
+            </h1>
+
+            <time datetime="2022-04-28T00:00:00+00:00" class="post-date">28 Apr 2022</time>
+
+            <p>We have been a big fan of DataDog and the level of telemetry/monitoring it provides us for many years now.
+One such aspect of monitoring that we employ throughout the services we maintain are <a href="https://docs.datadoghq.com/integrations/http_check/">HTTP health checks</a>, which are intentionally run on a separate cloud provider to our primary which is AWS.
+DataDog has supplied the ability to handle running these checks via <a href="https://docs.datadoghq.com/agent/">their agent</a> for many years, providing us with a sufficient blackbox means of ensuring a service is functioning as expected.
+This past week we explored the viability of containerising this responsibility into a service which could be run on a Serverless platform such as the <a href="https://www.digitalocean.com/products/app-platform">DigitalOcean App Platform</a>.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/can-you-name-that-aws-service/">
+                    Can you name that AWS service?
+                </a>
+            </h1>
+
+            <time datetime="2022-03-25T00:00:00+00:00" class="post-date">25 Mar 2022</time>
+
+            <p>I have always been amazed by the sheer amount of services AWS offers.
+Although I spend a lot of time working within AWS, I am always surprised to find yet another service that I did not know existed.
+Better still, is with each new service comes an associated new service icon.
+This is why I thought it would be interesting (and somewhat educational) to build a small trivia game which quizzes you on AWS service icons.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
                 <a href="/posts/managing-long-running-aws-fargate-ecs-tasks-within-your-serverless-project/">
                     Managing long-running AWS Fargate ECS tasks within your Serverless project
                 </a>
@@ -64,68 +131,6 @@ Function-as-a-Service (FaaS) offerings like AWS Lambda impose limitations which 
 However, there are times when we need to execute behaviour which exceed common-place FaaS duration limits (i.e. AWS Lambda’s 15-minute limit).
 In this case we ideally do not want to resort to a lower-level of compute (i.e. a VPS such as EC2), but instead be able to define and run such behaviour alongside our FaaS counterparts.
 In this post I would like to discuss a <a href="https://github.com/eddmann/serverless-fargate">Serverless Framework plugin</a> I have written which aids in bridging this gap, by-way of ECS and <a href="https://aws.amazon.com/fargate/">AWS Fargate</a>.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/separating-out-the-lambda-bref-runtime-from-your-projects-composer-dependencies/">
-                    Separating out the Lambda Bref runtime from your projects Composer dependencies
-                </a>
-            </h1>
-
-            <time datetime="2022-02-08T00:00:00+00:00" class="post-date">08 Feb 2022</time>
-
-            <p>Having had great success using AWS Lambda within our insurance product (<a href="https://mybuilder-plus.com/">MyBuilder Plus</a>), late last year we made the decision to move <strong>all</strong> our web request traffic over to the platform!
-However, we noticed when attempting to migrate over one application in particular, that we could not use the latest release of <a href="https://bref.sh/">Bref</a> (the PHP runtime) due to a conflict between required Symfony <a href="https://symfony.com/doc/current/components/process.html">Process component</a> versions.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/">
-                    Using GitHub Actions to send Gone Live release notes via Email and Slack
-                </a>
-            </h1>
-
-            <time datetime="2022-02-03T00:00:00+00:00" class="post-date">03 Feb 2022</time>
-
-            <p>Ensuring that both the tech team and company as a whole are aware of changes that have just been released is very important.
-This keeps everyone <em>in the loop</em> with the work that the tech team are carrying out, and how the system is changing over time.
-Last year MyBuilder transitioned away from Jenkins to GitHub Actions to manage our CI pipelines, and in the process was able to revise how we notified interested parties about releases.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/our-wedding-website-three-years-in-the-making/">
-                    Our Wedding website, three years in the making...
-                </a>
-            </h1>
-
-            <time datetime="2022-01-28T00:00:00+00:00" class="post-date">28 Jan 2022</time>
-
-            <p>Like many developers, over-engineering personal projects in the spirit of learning is something I am well aware of doing.
-So, when it came time to decide how we were going to collect RVSP’s for our upcoming wedding I already had ideas.
-What resulted was a solution which follows DDD, CQRS, Hexagonal architecture, Event sourcing, and is deployed on AWS Lambda using PHP.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/">
-                    Building a Secret Santa allocator and SMS sender using a Raspberry Pi Pico/MicroPython and SIM800L module
-                </a>
-            </h1>
-
-            <time datetime="2021-11-03T00:00:00+00:00" class="post-date">03 Nov 2021</time>
-
-            <p>Over the past couple of years I have explored <a href="https://eddmann.com/posts/allocating-secret-santas-with-a-substitution-cipher-using-clojure/">several</a> <a href="https://eddmann.com/posts/allocating-and-notifying-secret-santas-via-email-using-clojure/">different</a> ways in which to solve the problem of allocating Secret Santa’s for members of my family.
-Having spent a couple of months recently interested in microcontrollers, I decided that this year I would send out automatically allocated Secret Santas via SMS using a Raspberry Pi Pico/MicroPython and <a href="https://lastminuteengineers.com/sim800l-gsm-module-arduino-tutorial/">SIM800L GSM module</a>.</p>
 
 
         </article>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This series of articles documents my experience rewriting the santa-lang interpreter in Rust; in this article I delve into how I organised the project and built the core language">
+
+    <title>
+        
+            Rewriting the santa-lang interpreter in Rust, Part 1 - Implementing the Core &middot; Edd Mann
+        
+    </title>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+
+    <script>
+        var _gaq=[['_setAccount','UA-32512081-1'],['_setDomainName','eddmann.com'],['_trackPageview']];
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = 'https://ssl.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">Rewriting the santa-lang interpreter in Rust, Part 1 - Implementing the Core</h1>
+    <time datetime="2023-08-05T00:00:00+00:00" class="post-date">05 Aug 2023</time>
+    <p>After implementing santa-lang in <a href="https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/">TypeScript (Node)</a> I wanted to explore rewriting the tree-walking interpreter in a lower-level systems language for efficiency and performance gains.
+My goal was to be able to run the entire <a href="https://adventofcode.com/2022">Advent of Code 2022 calendar</a> *quicker* than the Node variant.
+I settled on using Rust due to its blend of high and low level constructs, its vibrant package registry (Cargo), memory management model and previous <a href="https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/">enjoyable experience using the language</a>.
+In this first article within the series, I will document how I went about organising the project and rewriting the core language within Rust.</p>
+
+
+
+<p><img style="max-width:350px;margin:0 auto;" src="/uploads/rewriting-the-santa-lang-interpreter-in-rust/logo.png" alt="santa-lang" /></p>
+
+<p>I decided to organise the project using <a href="https://doc.rust-lang.org/cargo/reference/workspaces.html">Cargo workspaces</a>, with the language and each (delivery) runtime being colocated in the same monorepo as separate packages.
+This provided a good level of modularity and structure to the project.
+Within the language library itself, I broke up each of the individual layers into subdirectory modules, with tests colocated with the specific layer.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── Cargo.toml
+├── runtime
+│   └── cli
+│       └── Cargo.toml
+└── lang
+    ├── Cargo.toml
+    └── src
+        ├── evaluator
+        ├── lexer
+        ├── parser
+        └── runner
+</code></pre></div></div>
+
+<p>To implement the core I used the TypeScript test-suite as documented behaviour I wished to provide.
+This proved to be a very rewarding experience, where-by investing the time in making a solid test-suite for the initial implementation made it somewhat trivial to follow this time around.
+Due to the manner in which each layer (<a href="#lexer">Lexer</a>, <a href="#parser">Parser</a>, <a href="#evaluator">Evaluator</a>) is built on-top of each other I was able to work my way up the stack, garnering confidence at each level.
+Whilst building out the testing framework within Rust I stumbled upon <a href="https://docs.rs/expect-test/latest/expect_test/">expect_test</a>, which uses macros to provide a frictionless means to validate (and automatically update) test assertions.
+For data-structure centric outputs such as the Lexer and Parser this was ideal.</p>
+
+<h2 id="lexer">Lexer</h2>
+
+<p>Within the Lexer I decided to implement the tokenizer as an <code class="language-plaintext highlighter-rouge">Iterator</code> which the Parser could consume.
+I additionally used a <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/token.rs#L118-L177">macro</a> (shown below) to express the Lexer tokens in an <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/mod.rs#L44">easier to read</a> form than the <code class="language-plaintext highlighter-rouge">Token</code> enumeration itself.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#[macro_export]</span>
+<span class="nd">macro_rules!</span> <span class="n">T</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">INT</span><span class="p">]</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="nv">$crate</span><span class="p">::</span><span class="nn">lexer</span><span class="p">::</span><span class="nn">TokenKind</span><span class="p">::</span><span class="n">Integer</span> <span class="p">};</span>
+    <span class="p">[</span><span class="o">+</span><span class="p">]</span>   <span class="k">=&gt;</span> <span class="p">{</span> <span class="nv">$crate</span><span class="p">::</span><span class="nn">lexer</span><span class="p">::</span><span class="nn">TokenKind</span><span class="p">::</span><span class="n">Plus</span> <span class="p">};</span>
+    <span class="p">[||]</span>  <span class="k">=&gt;</span> <span class="p">{</span> <span class="nv">$crate</span><span class="p">::</span><span class="nn">lexer</span><span class="p">::</span><span class="nn">TokenKind</span><span class="p">::</span><span class="n">PipePipe</span> <span class="p">};</span>
+    <span class="c1">// ..</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="parser">Parser</h2>
+
+<p>With the Lexer implemented and tested, the generated tokens were then used to construct an Abstract Syntax Tree (AST) by-way of the Parser.
+There were several interesting choices that were made due to using Rust as the implementation language.</p>
+
+<p>In this case an error was handled using an explicit <code class="language-plaintext highlighter-rouge">Result</code> type, as opposed to throwing an exception.
+Upon a parser error being found, a <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/parser/mod.rs#L26"><code class="language-plaintext highlighter-rouge">ParserErr</code></a> would be returned with a detailed message and the source location.
+To not introduce <em>indentation hell</em> I appreciated how we could express an <code class="language-plaintext highlighter-rouge">Err</code> short-circuiting execution using the <a href="https://doc.rust-lang.org/rust-by-example/std/result/question_mark.html">question mark operator</a>.
+For example, <code class="language-plaintext highlighter-rouge">self.expect(T![ID])?</code> ensures that the next token consumed is an <em>identity</em> else it short-circuits and returns the <code class="language-plaintext highlighter-rouge">Err</code> type.
+This syntax also works for <code class="language-plaintext highlighter-rouge">Option</code> types too.</p>
+
+<p>As discussed before, we were able to use the macro tokens that were defined within the Lexer to clearly describe the translation to a meaningful AST.
+One such example of this was whilst parsing an <em>if expression</em>, combining the representation of the tokens as expected santa-lang syntax along with short-circuiting upon a <code class="language-plaintext highlighter-rouge">ParserErr</code>.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">parse_if_expression</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">RExpression</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">start</span> <span class="o">=</span> <span class="k">self</span><span class="nf">.expect</span><span class="p">(</span><span class="nd">T!</span><span class="p">[</span><span class="n">IF</span><span class="p">])</span><span class="o">?</span><span class="p">;</span>
+
+    <span class="k">self</span><span class="nf">.consume_if</span><span class="p">(</span><span class="nd">T!</span><span class="p">[</span><span class="sc">'('</span><span class="p">]);</span>
+    <span class="k">let</span> <span class="n">condition</span> <span class="o">=</span> <span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="k">self</span><span class="nf">.parse_expression</span><span class="p">(</span><span class="nn">Precedence</span><span class="p">::</span><span class="n">Lowest</span><span class="p">)</span><span class="o">?</span><span class="p">);</span>
+    <span class="k">self</span><span class="nf">.consume_if</span><span class="p">(</span><span class="nd">T!</span><span class="p">[</span><span class="sc">')'</span><span class="p">]);</span>
+    <span class="k">let</span> <span class="n">consequence</span> <span class="o">=</span> <span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="k">self</span><span class="nf">.parse_block_statement</span><span class="p">()</span><span class="o">?</span><span class="p">);</span>
+    <span class="k">let</span> <span class="n">alternative</span> <span class="o">=</span> <span class="k">if</span> <span class="k">self</span><span class="nf">.consume_if</span><span class="p">(</span><span class="nd">T!</span><span class="p">[</span><span class="n">ELSE</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nf">Some</span><span class="p">(</span><span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="k">self</span><span class="nf">.parse_block_statement</span><span class="p">()</span><span class="o">?</span><span class="p">))</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nb">None</span>
+    <span class="p">};</span>
+
+    <span class="nf">Ok</span><span class="p">(</span><span class="n">Expression</span> <span class="p">{</span>
+        <span class="n">kind</span><span class="p">:</span> <span class="nn">ExpressionKind</span><span class="p">::</span><span class="n">If</span> <span class="p">{</span> <span class="n">condition</span><span class="p">,</span> <span class="n">consequence</span><span class="p">,</span> <span class="n">alternative</span> <span class="p">},</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">start</span><span class="nf">.source_range</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="py">.current_token</span><span class="p">),</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>It was also during Parser development that I became very familiar with the concept of a <code class="language-plaintext highlighter-rouge">Box</code>.
+This type stores a value on the <em>heap</em> rather than the <em>stack</em> - with the size of the smart-pointer known at compile-time, and the value it points to being of indeterminate size until runtime.
+As we are allocating the value onto the <em>heap</em> this does incur performance penalties.
+It also provides us with the ability to define recursive types, which is required when building up the AST.
+For example, in the case of <code class="language-plaintext highlighter-rouge">Box&lt;Expression&gt;</code>, we do not know the exact type/size of <code class="language-plaintext highlighter-rouge">Expression</code> at compile-time as we are required to parse the santa-lang source code provided at runtime to decern this.</p>
+
+<h2 id="evaluator">Evaluator</h2>
+
+<p>The largest undertaking was evaluating the parsed AST.
+In this step I opted to use the concept of <code class="language-plaintext highlighter-rouge">Frames</code> to model the stacked computation.
+Represented as an <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/mod.rs#L42C10-L60">enumeration</a>, it allowed me to trivially express and destructure the different states.</p>
+
+<p>Like the TypeScript implementation, trying to break up the evaluation behaviour into manageable sized chunks was an important task.
+To achieve this I decided to break up key behaviours into separate functions (located in separate files).
+To ensure that there was no performance penalty or unnecessary function invocation for this decision I used <a href="https://nnethercote.github.io/perf-book/inlining.html">inline annotation’s</a>, which will be spoken about more in a future article within the series.
+Some behaviours that I separated out were language <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/function.rs">function invocation</a> (user-land, memoized, closures, external and built-in), <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/infix.rs">infix operations</a> and santa-lang’s <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/matcher.rs">match expressions</a>.</p>
+
+<h3 id="rcrefcellt">Rc&lt;RefCell&lt;T&gt;&gt;</h3>
+
+<p>Similar to the Parser, as the size of certain values are not known at compile-time, some work has to be delegated to runtime.
+As evaluation of the santa-lang source code could lead to shared ownership and mutation of given values we could not rely on Rust’s compile-time memory management.
+It was here that I was introduced to <code class="language-plaintext highlighter-rouge">Rc&lt;RefCell&lt;T&gt;&gt;</code>.
+The <code class="language-plaintext highlighter-rouge">Rc</code> keeps tracks of how many references exist to a given value, deallocating it when the count reaches zero.
+The <code class="language-plaintext highlighter-rouge">RefCell</code> provides us with the ability to borrow a mutable value even when the type is deemed immutable.
+Combined, this allows multiple parts of the program to have read-only access to the same value, whilst allowing parts to mutate it when necessary.
+This results in runtime errors over our preferred compile-time errors.
+It should also be noted that this combination only works for single-threaded applications, there are alternative means of being able to solve this for multithreaded applications (i.e. using <code class="language-plaintext highlighter-rouge">Arc</code>).</p>
+
+<p>I have a love-hate relationship with this concept, on the one hand it allows me to trivially handle many <code class="language-plaintext highlighter-rouge">Object</code>’s being passed around and mutated throughout the evaluators life-time.
+However, on the other hand it doesn’t feel very Rust like, losing the compile-time memory management guarantees that we hold so dear.
+Having looked at several different interpreter implementations in Rust I noticed that all had used this concept, but I would really like to go back and see if there is another way to remove the high dependence on this going forward.</p>
+
+<h3 id="lazy-sequences">Lazy Sequences</h3>
+
+<p>In the previous implementation I had made extensive use of the <a href="https://immutable-js.com/">ImmutableJS</a> library, not only for immutable data-structures but the lazy operations that could be applied on them as well.
+However, when it came to the Rust implementation there was no such library that offered both behaviours.
+I was fortunately able to use the <a href="https://github.com/bodil/im-rs">im-rs</a> library which provided performant Immutable data-structures (of which I found <a href="https://github.com/eddmann/im-rs/commit/90092043778c5812c0b236d61c70acdb3acaa584">one gotcha bug</a>), but in-regards to the lazy sequences I had to implement these myself.</p>
+
+<p>It was an interesting challenge (especially with Rust’s borrow checker) to handle such computation.
+Similar to the Lexer I built my own custom <code class="language-plaintext highlighter-rouge">Iterator</code> which handled resolving the underlying lazy value and applying operations which had been defined (<code class="language-plaintext highlighter-rouge">maps</code>, <code class="language-plaintext highlighter-rouge">filters</code>, etc.).
+I was happy with the resulting behaviour but still feel that this implementation could do with some attention, it still does not feel very Rust-like to me (I wonder what a true <em>Rustacean</em> would think of it).</p>
+
+<h3 id="standard-library">Standard Library</h3>
+
+<p>A large part of the santa-lang evaluator is the standard library that it provides.
+As the language is dynamically-typed, each function call can be passed many arguments (of differing types) and needs to be able to handle them accordingly.
+Upon researching a means to handle this within Rust I could see there were two options, dynamic dispatch (via <code class="language-plaintext highlighter-rouge">Object</code> type traits) and in-place invocation (via pattern matching).
+I had used <a href="https://www.shuttle.rs/blog/2024/04/18/using-traits-generics-rust#object-traits-and-dynamic-dispatch">dynamic dispatch</a> within the TypeScript implementation and although highly readable/extendable, it was going to result in runtime performance penalties I was not willing to incur.
+As such, I was only left with in-place invocation.</p>
+
+<p>Taking inspiration from the <a href="https://docs.rs/enum_dispatch/latest/enum_dispatch/">enum_dispatch</a> crate, I decided to build my own <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/macros.rs"><code class="language-plaintext highlighter-rouge">builtin!</code></a> function suite of macros, allowing me to remove the boilerplate of choosing inline invocation whilst keeping a clean DSL for defining the many different functions the language had to offer.
+A good example of this is how the <code class="language-plaintext highlighter-rouge">map</code> function is defined, where-by we are able to co-locate the different mapping behaviours based on type.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">builtin!</span> <span class="p">{</span>
+    <span class="nf">map</span><span class="p">(</span><span class="n">mapper</span><span class="p">,</span> <span class="n">collection</span><span class="p">)</span> <span class="p">[</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">source</span><span class="p">]</span> <span class="k">match</span> <span class="p">{</span>
+        <span class="p">(</span><span class="nn">Object</span><span class="p">::</span><span class="nf">Function</span><span class="p">(</span><span class="n">mapper</span><span class="p">),</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">List</span><span class="p">(</span><span class="n">list</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+        <span class="p">(</span><span class="nn">Object</span><span class="p">::</span><span class="nf">Function</span><span class="p">(</span><span class="n">mapper</span><span class="p">),</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">Set</span><span class="p">(</span><span class="n">set</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+        <span class="p">(</span><span class="nn">Object</span><span class="p">::</span><span class="nf">Function</span><span class="p">(</span><span class="n">mapper</span><span class="p">),</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">Dictionary</span><span class="p">(</span><span class="n">map</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+        <span class="p">(</span><span class="nn">Object</span><span class="p">::</span><span class="nf">Function</span><span class="p">(</span><span class="n">mapper</span><span class="p">),</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">LazySequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+        <span class="p">(</span><span class="nn">Object</span><span class="p">::</span><span class="nf">Function</span><span class="p">(</span><span class="n">mapper</span><span class="p">),</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">String</span><span class="p">(</span><span class="n">string</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Additionally, it catered for <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/collection.rs#L835">multi-arity arguments</a>.</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">builtin!</span> <span class="p">{</span>
+    <span class="nf">zip</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="o">..</span><span class="n">collections</span><span class="p">)</span> <span class="p">[</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">source</span><span class="p">]</span> <span class="k">match</span> <span class="p">{</span>
+        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="nn">Object</span><span class="p">::</span><span class="nf">List</span><span class="p">(</span><span class="n">collections</span><span class="p">))</span> <span class="k">=&gt;</span> <span class="p">{</span> <span class="c1">// .. }</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This DSL is one of the areas I am most proud of within the Rust rewrite of the language.
+It allows me to clearly define a function’s parameters and implement pattern matched behaviours based on the parsed in arguments.</p>
+
+<h3 id="external-functions">External Functions</h3>
+
+<p>Along with providing in-built functions defined within the core language, the TypeScript implementation included a means of adding external functions which are defined during evaluator instantiation.
+These external functions can be used to provide runtime specific behaviour, for example, implementing I/O concerns such as <code class="language-plaintext highlighter-rouge">puts</code> and <code class="language-plaintext highlighter-rouge">read</code>.
+To implement this capability within the interpreter I was required to use a <code class="language-plaintext highlighter-rouge">dyn Fn</code> <a href="https://doc.rust-lang.org/std/keyword.dyn.html">trait object</a> definition over basic function pointers.
+This provides the ability to pass <em>Closures</em> as external functions - which was a requirement when building the WASM runtime, discussed in the next article.
+There are some performance disadvantages with having to model it this way, due to extra indirection via the <em>vtable</em> lookup.
+However, it should be noted that a heap allocation is not required if the trait object it is storing has zero size, which is the case for functions and Closures which do not capture any variables.</p>
+
+<h2 id="runner">Runner</h2>
+
+<p>Finally, I was able to build the Advent of Code Runner which was used to parse the <em>AoC</em> file format and execute the solutions (with provided tests).
+At this step I enjoyed building a <a href="https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/runner/mod.rs#L82-L84"><code class="language-plaintext highlighter-rouge">Time</code></a> trait which was used for runtimes to specify how they determined the current time, as we could not solely on a <a href="https://en.wikipedia.org/wiki/POSIX">POSIX</a> implementation (i.e. WASM).
+I also encapsulated the internal Parser and Runtime errors into a type which is publicly accessible to the runtimes using the <code class="language-plaintext highlighter-rouge">From</code> trait (<code class="language-plaintext highlighter-rouge">From&lt;RuntimeErr&gt; for RunErr</code>).
+This ensured that the internal error types remained private and were not leaked out of the <em>core domain</em>.</p>
+
+<h2 id="whats-next">What’s next…</h2>
+
+<p>With the core language library now implemented and tested it was time to move on to the different runtimes.
+In the <a href="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/">next post</a> within the series I will document how I went about integrating the core language library into the (delivery) runtimes.</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

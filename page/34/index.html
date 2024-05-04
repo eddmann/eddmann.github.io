@@ -51,6 +51,69 @@
     
         <article class="post">
             <h1 class="post-title">
+                <a href="/posts/implementing-streams-in-php/">
+                    Implementing Streams in PHP
+                </a>
+            </h1>
+
+            <time datetime="2015-01-16T00:00:00+00:00" class="post-date">16 Jan 2015</time>
+
+            <p>Typically, when we think about a list of elements we assume there is both a start and finite end.
+In this example the list has been precomputed and stored for subsequent traversal and transformation.
+If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.</p>
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/cons-lists-and-folds-in-php/">
+                    Cons Lists and Folds in PHP
+                </a>
+            </h1>
+
+            <time datetime="2015-01-02T00:00:00+00:00" class="post-date">02 Jan 2015</time>
+
+            <p>Cons cells are used to (cons)truct a data object which represents an ordered pair.
+The elements in this pair can be identified as ‘car’ and ‘cdr’ accordingly.
+Using this simple representation we are able to not only hold ordered pairs, but also create more complex data-structures, such as a List.</p>
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/the-internals-of-git/">
+                    The Internals of Git
+                </a>
+            </h1>
+
+            <time datetime="2014-12-27T00:00:00+00:00" class="post-date">27 Dec 2014</time>
+
+            <p>I have been using Git for the past couple of years and remember how long it took me to get my head around the work-flow.
+Throughout the past couple of months, thanks to a couple of <a href="http://ftp.newartisans.com/pub/git.from.bottom.up.pdf">well</a> <a href="http://mrchlblng.me/2014/09/practical-git-introduction/">timed</a> <a href="http://episodes.gitminutes.com/">findings</a>, I have gained an interest into how Git works internally.
+In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we are familiar with using on a day-to-day basis.</p>
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/reversing-a-unicode-string-in-php-using-utf-16-be-le/">
+                    Reversing a Unicode String in PHP using UTF-16BE/LE
+                </a>
+            </h1>
+
+            <time datetime="2014-05-11T00:00:00+00:00" class="post-date">11 May 2014</time>
+
+            <p>Last week I was bit by the Unicode encoding issue when trying to naively manipulate a user’s input using PHP’s built-in string functions.
+PHP simply assumes that all characters are a single byte (octet) and the provided functions use this assumption when processing a string.
+In this article I will not be going into depth on the subject of Unicode representations, I feel this topic deserves it’s own series of articles.
+However, you should be aware that in ‘Western Europe’ we commonly only use the basic <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> character-set (consisting of 7 bytes).
+This makes the transition to the popular ‘UTF-8’ Unicode representation almost seamless, as the two map one-to-one.
+I wish to however, discuss how to reverse a Unicode string (UTF-8) using a combination of <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> magic and the <a href="http://www.php.net/manual/en/function.strrev.php">‘strrev’</a> function.</p>
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
                 <a href="/posts/reversing-a-string-in-php/">
                     Reversing a String in PHP
                 </a>
@@ -61,69 +124,6 @@
             <p>Since recently setting up a forum for <a href="http://forum.threedevsandamaybe.com/">Three Devs and a Maybe</a>, we have started to partake in a weekly <a href="http://en.wikipedia.org/wiki/Kata_(programming)">code-kata</a>.
 What could be more fitting to start with than the common interview question, reversing a string in ‘X’ language.
 In this case the language is PHP, and below are some of the many ways contrived to solve the problem.</p>
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/tuples-in-php/">
-                    Tuples in PHP
-                </a>
-            </h1>
-
-            <time datetime="2014-04-17T00:00:00+00:00" class="post-date">17 Apr 2014</time>
-
-            <p>Since exploring languages such as Scala and Python which provide the tuple data-structure, I have been keen to experiment with how to clearly map it into a PHP solution.
-Tuples are simply a finite, ordered sequence of elements - usually with good language support to both pack (construction) and unpack (deconstruction) of the values.
-I have found that many use-cases of the common place array structure in PHP could be better suited to n-tuple’s.
-Familiar examples such as coordinate pairs (points) and records from a relational database (i.e. maybe the user id and name) could succinctly take advantage of the structure.</p>
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/storing-php-sessions-file-caches-in-memory-using-tmpfs/">
-                    Storing PHP Sessions/File Caches in Memory using TMPFS
-                </a>
-            </h1>
-
-            <time datetime="2014-04-16T00:00:00+00:00" class="post-date">16 Apr 2014</time>
-
-            <p>Yesterday I was looking through some application logs and noticed a significant bottleneck with I/O reads in the implemented file cache.
-This cache is used to temporary store processed views and records for a set duration.
-I looked into a couple of solutions to alleviate the intense spinning disk usage, ranging from <a href="http://memcached.org/">Memcache</a> to <a href="http://redis.io/">Redis</a>.
-These products are great for large-scale applications (spread over multiple systems), however, in my case simply required a single local configuration.</p>
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/implementing-rot13-and-rot-n-caesar-ciphers-in-python/">
-                    Implementing ROT13 and ROT(n) Caesar Ciphers in Python
-                </a>
-            </h1>
-
-            <time datetime="2014-04-12T00:00:00+00:00" class="post-date">12 Apr 2014</time>
-
-            <p>The Caesar cipher (shift cipher) is an extremely simple encryption technique.
-Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
-The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.</p>
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/securing-sessions-in-php/">
-                    Securing Sessions in PHP
-                </a>
-            </h1>
-
-            <time datetime="2014-04-09T00:00:00+00:00" class="post-date">09 Apr 2014</time>
-
-            <p>Following on from my previous post on <a href="/posts/self-signed-ssl-certificates-with-nginx-and-apache/">Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Broken Authentication and Session Management</a>).
-When delving into the subject I was unable to find a definitive resource for an PHP implementation.
-Due to this, I set out to combine all the best practice I could find into a single Session handler, to help protect against the common attack vectors.
-Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default ‘SessionHandler’ class.</p>
 
         </article>
     

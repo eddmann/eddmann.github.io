@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Password security is a highly discussed/misunderstood topic.">
+    <meta name="description" content="An in-depth exploration of PHPass as the leading password hashing library, detailing best practices for password storage and security in PHP applications.">
 
     <title>
         
@@ -50,49 +50,60 @@
                 <article class="post">
     <h1 class="post-title">PHPass, the go-to password hashing library</h1>
     <time datetime="2012-06-28T00:00:00+00:00" class="post-date">28 Jun 2012</time>
-    <p>It is becoming a scarily common occurence to read about <a href="http://www.guardian.co.uk/technology/us-news-blog/2012/jun/07/blogpost-eharmony-linkedin-hacked-leaked">yet</a> <a href="http://www.bbc.co.uk/news/technology-18338956">another</a> <a href="http://www.pcworld.com/article/257178/music_site_lastfm_joins_the_passwordleak_parade.html">batch</a> of high-profile websites user’s passwords being leaked online - for everyone’s cracking pleasure.
-Whats even more shocking is how poorly these sites are storing them.
-In regard to LinkedIn, it turned out that they had just stored them as un-salted, plan ‘ol MD5 hashes, that any Joe Bloggs could run a rainbow table over with extremely high success rates.
-The tried and proven means of storing passwords in todays web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value.
-The trouble and confusion arises however in how to actually get to this end result, there are so many ‘wrong’ ways to go about it.
-</p>
+    <p>It is becoming a scarily common occurrence to read about <a href="http://www.guardian.co.uk/technology/us-news-blog/2012/jun/07/blogpost-eharmony-linkedin-hacked-leaked">yet</a> <a href="http://www.bbc.co.uk/news/technology-18338956">another</a> <a href="http://www.pcworld.com/article/257178/music_site_lastfm_joins_the_passwordleak_parade.html">batch</a> of high-profile websites’ users’ passwords being leaked online - for everyone’s cracking pleasure.
+What’s even more shocking is how poorly these sites are storing them.
+In the case of LinkedIn, it turned out that they had stored them as unsalted, plain MD5 hashes, which any Joe Bloggs could easily crack using a rainbow table.
+The tried and tested means of storing passwords in today’s web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value.
+The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available.</p>
+
+
 
 <h2 id="how-should-you-be-storing-passwords-then">How should you be storing passwords then?</h2>
 
-<p>Reading through countless articles and experimenting with many implementations I have arrived at the conclusion that, as the title of this post clearly states, <a href="http://www.openwall.com/phpass/">PHPass</a> is the way to go - of course if your programming in PHP that is.
-PHPass provides you with the latest and greatest ideologies to deter malicious third-parties from successfully cracking your user’s passwords.
-I say deter as nothing is unbreakable, and your main aim as the developer is to make it as hard as possible for the attacker (hey, they love a challenge).</p>
+<p>After reading through countless articles and experimenting with many implementations, I have arrived at the conclusion that, as the title of this post clearly states, <a href="http://www.openwall.com/phpass/">PHPass</a> is the way to go – provided that you are programming in PHP.
+PHPass provides you with the latest and most effective strategies to deter malicious third parties from successfully cracking your users’ passwords.
+I say deter, as nothing is unbreakable, and your main aim as a developer is to make it as hard as possible for the attacker (after all, they love a challenge).</p>
 
 <h2 id="what-phpass-gives-you">What PHPass gives you</h2>
 
-<p>PHPass gives you the lethal combination of salting, key stretching and Bcrypt.
-Salting is a relatively common method used in making the process of cracking your stored hashes harder.
-Salts are most commonly unqiue (technically called a <a href="http://en.wikipedia.org/wiki/Cryptographic_nonce">nonce</a>), or though they can be global, that are appendend/prepended to the given value making the produced output unqiue no matter what the input.
-Randomness for these salts is generated from multiple factors, depending on the host system, for example on a UNIX system ‘/dev/urandom’ can be used.</p>
+<p>PHPass provides the lethal combination of salting, key stretching, and Bcrypt.</p>
 
-<p>Salting prevents a few of the most widely exploited weaknesses in todays hashing functions.
-Thease threats include the ability to use a pre-hased list (such as a rainbow table) on the subject, as well as the ability to reuse a cracked hash’s password on another record with the same hash sequence.
-I have spent many years implementing this method, both as a per-application and record basis.
-In the last couple of developments I have introduced the concept of combining the two, as documented by Steve Gibson on the awesome Security Now podcast (<a href="http://www.grc.com/sn/sn-358.htm">episode 358</a>).</p>
+<h3 id="salting">Salting</h3>
 
-<p>Key streching was a new concept to me before I started to seriously put time into researching this subject.
-At its most basic form, key stretching is the process of re-running a said action, in are case cypotgraphic function a certain amount of times before returning with the output.
-Commonly used cryptographic hashing functions such as MD5, SHA1, SHA2 were not designed to be used for password hashing, but instead designed for speed.
-What seemed like a complicated enough algorithm 10 years ago has now become an obsolete opinion due to <a href="http://en.wikipedia.org/wiki/Moore's_law">Moore’s law</a> working its magical powers.
-These algorithms by themselves are just too easy for current hardware to crack (even with a salt), check out <a href="http://www.troyhunt.com/2012/06/our-password-hashing-has-no-clothes.html">this</a> blog post to read more.
-The way in which we solve this issue is by doing mutiple iterations (called key stretching) of the cryptographic function over the input before returning the output.
-This slows down and adds complexity to the calculation process, which as a password hashing function is our goal.
-You commonly only compute hashes in a typical web appliction at login and on signup, adding a few (micro)seconds to this process will not affect you, but increases the time it takes the cracker exponentially.</p>
+<p>Salting is a relatively common method used to make the process of cracking your stored hashes more difficult.
+Salts are most commonly unique (technically called a <a href="http://en.wikipedia.org/wiki/Cryptographic_nonce">nonce</a>), although they can be global.
+They are appended or prepended to the given value, making the produced output unique regardless of the input.
+The randomness for these salts is generated from multiple factors, depending on the host system.
+For example, on a UNIX system, ‘/dev/urandom’ can be used.
+Salting prevents some of the most widely exploited weaknesses in today’s hashing functions.
+These threats include the ability to use a pre-hashed list (such as a rainbow table) on the subject, as well as the ability to reuse a cracked hash’s password on another record with the same hash sequence.
+I have spent many years implementing this method, both on a per-application and per-record basis.
+In recent developments, I have introduced the concept of combining the two, as documented by Steve Gibson on the excellent Security Now podcast (<a href="http://www.grc.com/sn/sn-358.htm">episode 358</a>).</p>
 
-<p>The final piece of the PHPass puzzle is <a href="http://en.wikipedia.org/wiki/Bcrypt">Bycrpt</a>.
-Created in 1999 by Niels Provos and David Mazieres, it was designed from the ground up to be a password cryptographic hash function.
-By this I mean that it was meant to be a technically slow, memory-expensive process (making a brute-force attack an extremely laborious task) - helping put Moore’s law back in its place.
-To help future proof the implementation it is adaptive and supports the use of key stretching.
-This allows you to set the amount of iterations to do per hash, which can be defined per hash as the count is stored within the output.</p>
+<h3 id="key-stretching">Key Stretching</h3>
+
+<p>Key stretching was a new concept to me before I started to seriously research this subject.
+In its most basic form, key stretching is the process of re-running a given cryptographic function a certain number of times before returning the output.
+Commonly used cryptographic hashing functions, such as MD5, SHA1, and SHA2, were not designed for password hashing but for speed.
+What seemed like a complicated algorithm 10 years ago has now become an outdated concept due to <a href="http://en.wikipedia.org/wiki/Moore's_law">Moore’s law</a> working its magic.
+These algorithms, by themselves, are simply too easy for current hardware to crack (even with a salt).
+Check out <a href="http://www.troyhunt.com/2012/06/our-password-hashing-has-no-clothes.html">this</a> blog post to read more.
+The way we solve this issue is by performing multiple iterations (known as key stretching) of the cryptographic function on the input before returning the output.
+This slows down and adds complexity to the calculation process, which is our goal as a password hashing function.
+In a typical web application, hashes are computed only at login and signup.
+Adding a few microseconds to this process will not affect user experience, but it increases the time required for an attacker to crack the hash exponentially.</p>
+
+<h3 id="bcrypt">Bcrypt</h3>
+
+<p>The final piece of the PHPass puzzle is <a href="http://en.wikipedia.org/wiki/Bcrypt">Bcrypt</a>.
+Created in 1999 by Niels Provos and David Mazieres, it was designed from the ground up to be a password-specific cryptographic hash function.
+This means that it was designed to be technically slow and memory-expensive, making a brute-force attack extremely labourious – helping to put Moore’s law in its place.
+To help future-proof the implementation, it is adaptive and supports the use of key stretching.
+This allows you to set the number of iterations per hash, as the count is stored within the output.</p>
 
 <h2 id="a-simple-example">A simple example</h2>
 
-<p>There are many good examples of how to use PHPass already online (such as <a href="http://sunnyis.me/blog/secure-passwords/">here</a>), so I will keep mine short and sweet.
+<p>There are many good examples of how to use PHPass online (such as <a href="http://sunnyis.me/blog/secure-passwords/">this one</a>), so I will keep mine short and sweet.
 You can simply hash a password with PHPass using the code snippet below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">require_once</span><span class="p">(</span><span class="s1">'PasswordHash.php'</span><span class="p">);</span>
@@ -106,25 +117,24 @@ You can simply hash a password with PHPass using the code snippet below.</p>
 <span class="nv">$hash</span> <span class="o">=</span> <span class="nv">$phpass</span><span class="o">-&gt;</span><span class="nf">HashPassword</span><span class="p">(</span><span class="nv">$password</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Its even easier to compare hashes, using the following code snippet.</p>
+<p>It’s even easier to compare hashes, using the following code snippet.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$hash</span> <span class="o">=</span> <span class="s1">'$2a$08$ezQB7LWGLPs3RtJLS9os5...'</span><span class="p">;</span>
 
-<span class="nv">$password</span> <span class="o">=</span> <span class="s1">'passsword1234'</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s1">'password1234'</span><span class="p">;</span>
 
 <span class="k">if</span> <span class="p">(</span><span class="nv">$phpass</span><span class="o">-&gt;</span><span class="nf">CheckPassword</span><span class="p">(</span><span class="nv">$password</span><span class="p">,</span> <span class="nv">$hash</span><span class="p">))</span>
   <span class="k">echo</span> <span class="s1">'We have found a match!'</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>I am an avid CodeIgniter user at present, and was happy to discover that a quick search on GitHub returned a very cool PHPass wrapper library (love the use of the ‘_call’ function).
-The library can be found <a href="http://github.com/segersjens/CodeIgniter-Phpass-Library">here</a>.</p>
-
-<p>The one and only point I hope you take away from this article is that if you are using PHP, use PHPass as your password hashing library!</p>
+<p>I am an avid CodeIgniter user at present, and I was happy to discover that a quick search on GitHub returned a very cool PHPass wrapper library (I love the use of the <code class="language-plaintext highlighter-rouge">_call</code> function).
+The library can be found <a href="http://github.com/segersjens/CodeIgniter-Phpass-Library">here</a>.
+The one and only point I hope you take away from this article is that if you are using PHP, you should use PHPass as your password hashing library!</p>
 
 <h2 id="update">Update</h2>
 
-<p>Since the release of PHP 5.5 an even simpler set of functions have been added to the core (documentation found <a href="http://php.net/manual/en/function.password-hash.php">here</a>), and it is recommended that you take advantage of these instead.
-<a href="http://blog.ircmaxell.com/">Anthony Ferrara</a>, the creator of the update has also provided a library for backwards compatability (&gt;= PHP 5.3.7) <a href="http://github.com/ircmaxell/password_compat">here</a>.</p>
+<p>Since the release of PHP 5.5, an even simpler set of functions has been added to the core (documentation found <a href="http://php.net/manual/en/function.password-hash.php">here</a>), and it is recommended that you take advantage of these instead.
+<a href="http://blog.ircmaxell.com/">Anthony Ferrara</a>, the creator of the update, has also provided a library for backwards compatibility (&gt;= PHP 5.3.7) <a href="http://github.com/ircmaxell/password_compat">here</a>.</p>
 
 </article>
 

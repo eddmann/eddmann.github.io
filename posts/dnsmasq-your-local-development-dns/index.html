@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Local development can be a pain, checkout DNSMasq.">
+    <meta name="description" content="Learn how DNSMasq can simplify local DNS configuration for multi-user development environments on Ubuntu Server and DD-WRT routers.">
 
     <title>
         
@@ -51,73 +51,75 @@
     <h1 class="post-title">DNSMasq, your local development DNS</h1>
     <time datetime="2012-05-15T00:00:00+00:00" class="post-date">15 May 2012</time>
     <p>Setting up a single-user web development environment is easy.
-One-click (OS)AMP installers do all the work and internal domains are all stored in one easy to reach host file.
-However, expanding this to a multi-user development team, all of which needing access to the same resources, is a whole different beast.
-On-top of this, they may require access from multiple devices, some of which may not include a host file, such as a mobile phone.
+One-click (OS)AMP installers do all the work and store internal domains in an easily accessible host file.
+However, expanding this to a multi-user development team, all of whom need access to the same resources, is a completely different challenge.
+Moreover, they may require access from multiple devices, some of which do not have a host file, such as mobile phones.</p>
 
-A common solution to this problem is to pass around host files (which encompass all of the development domains used) and hope that everyone is in sync.
-In the case of devices that do not have a readily accessable host file, uploading externally accessible builds or providing an alternative gateway into the development ecosystem is one way to pursue a fix.
-These methods do not feel right to me, far too many variables and extra work for my liking.
-An even better solution, which will get rid of all the overhead, is to setup your own local DNS and start living like its a single-user environment again.</p>
+
+
+<p>A common solution to this problem is to share host files, which include all the development domains used, in the hope that everyone remains in sync.
+In the case of devices that do not have a readily accessible host file, uploading externally accessible builds or providing an alternative gateway into the development ecosystem is one way to address the issue.
+These methods do not seem right to me; they involve far too many variables and extra work.
+An even better solution, which eliminates all the overhead, is to set up your own local DNS and start enjoying the simplicity of a single-user environment.</p>
 
 <h2 id="ladies-and-gentleman-dnsmasq">Ladies and gentleman, DNSMasq</h2>
 
-<p>To setup your own local DNS you can spend hours configuring BIND, but nothing beats the ease and maintainability of DNSMasq.
-DNSMasq is a lighweight DNS, DHCP and TFTP server provider and is ideal for this case-study.
-In a couple of return-key-hits from inside your package manager of choice you will have setup a local DNS server for the whole development team to access, keeping all those pesky local domains in one host file, the way it should be.</p>
+<p>To set up your own local DNS you can spend hours configuring BIND, but nothing beats the ease and maintainability of DNSMasq.
+DNSMasq is a lightweight DNS, DHCP, and TFTP server and is ideal for this case study.
+In just a few keystrokes using your package manager of choice, you can set up a local DNS server for the entire development team, keeping all those pesky local domains consolidated in one host file as they should be.</p>
 
 <h2 id="installation">Installation</h2>
 
-<p>I will be installing and configuring a DNSMasq setup on a Ubuntu Server distrubtion, but installation on other setups should be fairly similar.</p>
+<p>I will be installing and configuring a DNSMasq setup on an Ubuntu Server distribution, but installation on other platforms should be fairly similar.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>dnsmasq
 </code></pre></div></div>
 
-<p>Upon successful installation you may be greeted with a unfriendly ‘port 53 already in use’ message.
-To resolve this issue use the following commands; first checking which process is already using port 53 and then killing that process by its id.</p>
+<p>Upon successful installation, you may be greeted with an unfriendly “port 53 already in use” message.
+To resolve this issue, use the following commands: first, check which process is using port 53, and then kill that process by its ID.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>netstat <span class="nt">-anlp</span> | <span class="nb">grep</span> <span class="nt">-w</span> LISTEN
 <span class="nv">$ </span><span class="nb">sudo kill</span> <span class="o">[</span>process-id]
 </code></pre></div></div>
 
-<p>The last step is to add all your local development domains to the host file found at ‘/etc/hosts’.
-Once all domains have been fully imported the final command that needs to be run is to restart DNSMasq.</p>
+<p>The final step is to add all your local development domains to the host file found at <code class="language-plaintext highlighter-rouge">/etc/hosts</code>.
+Once all domains have been added, the final command that needs to be executed is to restart DNSMasq.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo</span> /etc/init.d/dnsmasq restart
 </code></pre></div></div>
 
-<p>To access your newly created DNS server, you can either individually add the servers IP address to each computers DNS network configuration or alternatively, point your routers DNS record to the IP address.</p>
+<p>To access your newly created DNS server, you can either individually add the server’s IP address to each computer’s DNS network configuration, or alternatively, point your router’s DNS record to the IP address.</p>
 
 <h2 id="an-alternative-option">An alternative option…</h2>
 
-<p>If your feeling extra hardcore and do not wish to install another software dependency on your system, you may wish to consider flashing your router with <a href="http://www.dd-wrt.com/">DD-WRT</a> (if your router supports it) and allow hardware to do the work.
-Setting up DNSMasq on an applicable DD-WRT installation is as simple as adding the local domain entries into the ‘Additonal DNSMasq Options’ textarea in the administration panel.</p>
+<p>If you’re feeling extra hardcore and do not wish to install another software dependency on your system, you may wish to consider flashing your router with <a href="http://www.dd-wrt.com/">DD-WRT</a> (if your router supports it) and letting the hardware do the work.
+Setting up DNSMasq on a compatible DD-WRT installation is as simple as adding the local domain entries into the “Additional DNSMasq Options” textarea in the administration panel.</p>
 
-<p>Below is an screenshot of an example DD-WRT DNSMasq configuration</p>
+<p>Below is a screenshot of an example DD-WRT DNSMasq configuration</p>
 
 <p><img src="/uploads/dnsmasq-your-local-development-dns/dd-wrt.png" alt="DD-WRT" /></p>
 
 <h2 id="an-even-more-awesome-idea">An even more awesome idea</h2>
 
-<p>Instead of having to add an extra entry for each development site, which can be a chore, we have the chance to make it even easier.
-My regular naming convention for local development sites is to use the descriptive ‘.dev’ TLD.
+<p>Instead of having to add an extra entry for each development site, which can be a chore, we have an opportunity to make it even easier.
+My regular naming convention for local development sites is to use the descriptive “.dev” TLD.
 This naming scheme allows me to easily distinguish between development and live builds.
-Lucky for us we have the chance to exploit the fact that ‘.dev’ is an unused TLD.
-With DNSMasq we are able to easily setup a TLD wildcard which will check/match any TLD we pass through the DNS and forward it to are defined location.
-As a consequence any URL request sent with a ‘.dev’ TLD can be directed to my local development server for Apache to happily respond to.
-For setup on a software installation you are required to add the following line into your ‘dnsconfig.conf’.</p>
+Fortunately, we have the opportunity to exploit the fact that “.dev” is an unused TLD.
+With DNSMasq, we are able to easily set up a TLD wildcard which will check and match any domain we pass through the DNS and forward it to our defined location.
+As a consequence, any URL request using a “.dev” TLD can be directed to my local development server for Apache to respond to.
+For a software installation, you are required to add the following line to your <code class="language-plaintext highlighter-rouge">dnsmasq.conf</code> file.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo</span> <span class="s2">"address=/dev/[dev-sever-ip]"</span> <span class="o">&gt;&gt;</span> /etc/dnsmasq.etc
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo echo</span> <span class="s2">"address=/dev/[dev-server-ip]"</span> <span class="o">&gt;&gt;</span> /etc/dnsmasq.conf
 </code></pre></div></div>
 
-<p>Or in the case of DD-WRT, adding the above configuration setting to the ‘Additonal DNSMasq Options’ textarea in the administration panel.</p>
+<p>Alternatively, in the case of DD-WRT, add the above configuration setting to the “Additional DNSMasq Options” textarea in the administration panel.</p>
 
 <h2 id="resources">Resources</h2>
 
 <ul>
-  <li><a href="http://www.thekelleys.org.uk/dnsmasq/doc.html">DNSMasq - Offical Site</a></li>
+  <li><a href="http://www.thekelleys.org.uk/dnsmasq/doc.html">DNSMasq - Official Site</a></li>
   <li><a href="http://davidwinter.me/articles/2011/06/18/simple-local-web-development-with-apache-and-dnsmasq/">Simple local web development with Apache and DNSMasq</a></li>
-  <li><a href="http://www.dd-wrt.com/site/index">DD-WRT - Offical Site</a></li>
+  <li><a href="http://www.dd-wrt.com/site/index">DD-WRT - Official Site</a></li>
   <li><a href="http://www.dd-wrt.com/wiki/index.php/DNSMasq_as_DHCP_server">DNSMasq as DD-WRT DHCP Server</a></li>
 </ul>
 

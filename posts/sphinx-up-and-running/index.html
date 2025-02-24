@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Advanced full-text indexing, super quick.">
+    <meta name="description" content="A comprehensive guide to installing and configuring Sphinx, a powerful full-text search engine, with SphinxSE integration for MySQL.">
 
     <title>
         
@@ -50,36 +50,37 @@
                 <article class="post">
     <h1 class="post-title">Sphinx, up and running</h1>
     <time datetime="2012-03-10T00:00:00+00:00" class="post-date">10 Mar 2012</time>
-    <p>Sphinx (<em>SQL Phrase Index</em>) is an open-source, full-text search engine, independent of any one data-store implementation.
-The origin of the data does not concern Sphinx, as interaction with the data-source is abstracted by the many drivers available.
-Currently built-in to the product are drivers for MySQL, PostgreSQL, ODBC-compliant databases and the ability to parse XML formatted streams (via pipes).
-It must be noted however, that each data record is required to have a single unique field ID.
-</p>
+    <p>Sphinx (<em>SQL Phrase Index</em>) is an open-source, full-text search engine, independent of any one data store implementation.
+The origin of the data does not concern Sphinx, as interaction with the data source is abstracted by the many drivers available.
+Currently, built-in to the product are drivers for MySQL, PostgreSQL, ODBC-compliant databases and the ability to parse XML-formatted streams (via pipes).
+It must be noted, however, that each data record is required to have a single unique field ID.</p>
 
-<p>To query the search engine (through the daemon - <em>searchd</em>) you have three different options (depending on your selected data source):</p>
+
+
+<p>To query the search engine (through the daemon – <em>searchd</em>) you have three different options (depending on your selected data source):</p>
 
 <ol>
-  <li>SphinxAPI, a lightweight native search API. PHP, Perl, Ruby and Java implementations are distributed out of the box. Due to its small size and minimal complexity, many third-party ports exist along with the ability to easily create your own.</li>
-  <li>SphinxQL, using Sphinx’s own MySQL network protocol implementation you have the ability to communicate using a MySQL client, and query the data with this SQL subset.</li>
-  <li>SphinxSE, a MySQL server storage engine plugin which allows you to interface with the search daemon via tables (with specifically defined schemas).</li>
+  <li><strong>SphinxAPI</strong>, a lightweight native search API. PHP, Perl, Ruby and Java implementations are distributed out of the box. Due to its small size and minimal complexity, many third-party ports exist along with the ability to easily create your own.</li>
+  <li><strong>SphinxQL</strong>, using Sphinx’s own MySQL network protocol implementation you have the ability to communicate using a MySQL client and query the data with this SQL subset.</li>
+  <li><strong>SphinxSE</strong>, a MySQL server storage engine plugin which allows you to interface with the search daemon via tables (with specifically defined schemas).</li>
 </ol>
 
 <h2 id="mysql-and-sphinx">MySQL and Sphinx</h2>
 
-<p>Sphinx is heavily used in conjunction with MySQL server, hence the greater amount of options available to interact with each of the two.
-It is however, misconstruded as being the full-text search engine for InnoDB tables.
-This is true to a degree, as it is true that it opens the possibility up for full-text indexing on InnoDB tables, similar to MyISAM tables, however both implemenations are slightly different.</p>
+<p>Sphinx is heavily used in conjunction with the MySQL server, hence the greater number of options available to interact with each of the two.
+It is, however, often misconstrued as being the full-text search engine for InnoDB tables.
+This is true to a degree, as it opens up the possibility for full-text indexing on InnoDB tables, similar to MyISAM tables; however, both implementations are slightly different.</p>
 
-<p>Being an external product, Sphinx indexes are not updated upon each change to its source (be it an INSERT, UPDATE or DELETE).
-MySQL’s MyISAM implementation does however provide this functionality, processing these changes immediately after the effect has occured.
-As a result of this, huge performance hits are garned when handling large data sets.
-This can lead to Sphinx and the data source getting out-of-sync unless precautions are put in place (i.e. scheduled indexes).
-On top of this Sphinx only returns the matching records primary keys, requiring extra processing to be done to retrieve the records relevant data.
-This hinderance can be dampened by using SphinxSE.</p>
+<p>Being an external product, Sphinx indexes are not updated upon each change to its source (be it an <code class="language-plaintext highlighter-rouge">INSERT</code>, <code class="language-plaintext highlighter-rouge">UPDATE</code> or <code class="language-plaintext highlighter-rouge">DELETE</code>).
+MySQL’s MyISAM implementation, however, provides this functionality by processing these changes immediately after the effect has occurred.
+As a result, huge performance hits are incurred when handling large data sets.
+This can lead to Sphinx and the data source getting out of sync unless precautions are put in place (i.e. scheduled indexes).
+On top of this, Sphinx only returns the matching records’ primary keys, requiring extra processing to retrieve the relevant data for those records.
+This hindrance can be mitigated by using SphinxSE.</p>
 
 <h2 id="installation">Installation</h2>
 
-<p>If you are liking the sound of Sphinx and want to give it a go, below I have provided a step-by-step guide to setting up a working installation along with SphinxSE support on a Ubuntu 11.10 server.</p>
+<p>If you like the sound of Sphinx and want to give it a go, below I have provided a step-by-step guide to setting up a working installation with SphinxSE support on an Ubuntu 11.10 server.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>wget http://sphinxsearch.com/files/sphinx-2.0.4-release.tar.gz
 <span class="nv">$ </span><span class="nb">tar</span> <span class="nt">-zxf</span> sphinx-2.0.4-release.tar.gz
@@ -88,15 +89,15 @@ This hinderance can be dampened by using SphinxSE.</p>
 <span class="nv">$ </span><span class="nb">sudo </span>make <span class="nb">install</span>
 </code></pre></div></div>
 
-<p>You may be required to install the following dependencies to succesfully compile Sphinx.</p>
+<p>You may be required to install the following dependencies to successfully compile Sphinx.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>build-essential libmysql++-dev
 </code></pre></div></div>
 
 <h2 id="setup">Setup</h2>
 
-<p>Once you have successfully compiled and installed Sphinx you now need to configure the installation.
-For this demo we will use the test data/configuration provided with the distrubition.</p>
+<p>Once you have successfully compiled and installed Sphinx, you now need to configure the installation.
+For this demonstration, we will use the test data/configuration provided with the distribution.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /usr/local/sphinx/etc/
 <span class="nv">$ </span><span class="nb">sudo cp </span>sphinx.conf.dist sphinx.conf
@@ -109,10 +110,10 @@ For this demo we will use the test data/configuration provided with the distrubi
 
 <h2 id="sphinxse">SphinxSE</h2>
 
-<p>Now that we have a fully functioning Sphinx setup along with a sample dataset it is time to setup MySQL and Sphinx’s special table engine.
-There are two avenues that can be taken to acheive this, the first is compiling the MySQL server from source along with the Sphinx engine and install the resulting compilation.
-Alternatively we can compile the Sphinx engine with the MySQL server version we have and then copy the required files to the current MySQL server setup.
-I will be doing the later in this article.</p>
+<p>Now that we have a fully functioning Sphinx setup along with a sample dataset, it is time to set up MySQL and Sphinx’s special table engine.
+There are two avenues that can be taken to achieve this, the first is compiling the MySQL server from source along with the Sphinx engine and installing the resulting compilation.
+Alternatively, we can compile the Sphinx engine with the MySQL server version we have and then copy the required files to the current MySQL server setup.
+I will be doing the latter in this article.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>wget http://downloads.mysql.com/archives/mysql-5.1/mysql-5.1.58.tar.gz
 <span class="nv">$ </span><span class="nb">tar</span> <span class="nt">-zxf</span> mysql-5.1.58.tar.gz
@@ -121,7 +122,7 @@ I will be doing the later in this article.</p>
 <span class="nv">$ </span>sh BUILD/autorun.sh<span class="p">;</span>
 <span class="nv">$ </span>./configure
 <span class="nv">$ </span>make
-<span class="c"># copy and install the new engine into are installation</span>
+<span class="c"># copy and install the new engine into our installation</span>
 <span class="nv">$ </span><span class="nb">cp </span>storage/sphinx/.libs/ha_sphinx.<span class="k">*</span> /usr/lib/mysql/plugin/
 <span class="nv">$ </span>mysql <span class="nt">-u</span> root <span class="nt">-p</span>
 <span class="nv">$ </span>mysql&gt; INSTALL PLUGIN sphinx SONAME <span class="s1">'ha_sphinx.so'</span><span class="p">;</span>
@@ -134,14 +135,14 @@ I will be doing the later in this article.</p>
 
 <h2 id="usage">Usage</h2>
 
-<p>Now that you have successfully compiled and installed Sphinx and SphinxSE all that is required is to create a special table to interface with the search daemon.</p>
+<p>Now that you have successfully compiled and installed Sphinx and SphinxSE, all that is required is to create a special table to interface with the search daemon.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* create the special table */</span>
 <span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">t1</span>
 <span class="p">(</span>
-  <span class="n">id</span>       <span class="nb">INT</span> <span class="nb">UNSIGNED</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
-  <span class="n">weight</span>   <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
-  <span class="n">query</span>    <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">3072</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="n">id</span> <span class="nb">INT</span> <span class="nb">UNSIGNED</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="n">weight</span> <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="n">query</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">3072</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
   <span class="n">group_id</span> <span class="nb">INT</span><span class="p">,</span>
   <span class="k">INDEX</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 <span class="p">)</span> <span class="n">ENGINE</span><span class="o">=</span><span class="n">SPHINX</span> <span class="k">CONNECTION</span><span class="o">=</span><span class="nv">"sphinx://localhost:9312/test"</span><span class="p">;</span>

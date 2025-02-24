@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Used all the time, so lets make it better.">
+    <meta name="description" content="Discover a custom alternative to PHP's var_dump function that improves HTML presentation, displays context details, and offers a die-after-dump feature for efficient debugging.">
 
     <title>
         
@@ -50,23 +50,28 @@
                 <article class="post">
     <h1 class="post-title">An alternative to 'var_dump' in PHP</h1>
     <time datetime="2012-09-10T00:00:00+00:00" class="post-date">10 Sep 2012</time>
-    <p>Whilst working with PHP, I seem to use ‘var_dump’ a ridiculous amount, its a debugging must-have.
-However, it does fall short in a few ways, especially in how it does not take into consideration that the function is almost always displayed in a HTML page - switching to the page’s source can become a pain.
-Due to the pitfalls a host of projects such as <a href="http://krumo.sourceforge.net/">Krumo</a> and <a href="http://raveren.github.io/kint/">Kint</a> have cropped up to cater for these needs.
-As well as these projects, if you have <a href="http://xdebug.org/">XDebug</a> installed it will replace the default ‘var_dump’ function with its own implementation that outputs the information with well-needed styling.
+    <p>Whilst working with PHP, I seem to use <code class="language-plaintext highlighter-rouge">var_dump</code> a ridiculous amount.
+It’s a debugging must-have.
+However, it does fall short in a few ways.
+It does not take into consideration that the function is almost always displayed on an HTML page, and switching to the page source can be troublesome.
+Due to these pitfalls, a host of projects such as <a href="http://krumo.sourceforge.net/">Krumo</a> and <a href="http://raveren.github.io/kint/">Kint</a> have emerged to cater for these needs.
+In addition to these projects, if you have <a href="http://xdebug.org/">XDebug</a> installed, it will replace the default <code class="language-plaintext highlighter-rouge">var_dump</code> function with its own implementation that outputs the information with much-needed styling.</p>
 
-For me though, I do not need all bells n’ whistles that these provide, my base requirements are:</p>
+
+
+<p>For me though, I do not need all the bells and whistles that these provide.
+My base requirements are:</p>
 
 <ul>
-  <li>Better presentation on a HTML page, no viewing of source necessarily</li>
-  <li>Output of the Page, Class, Function, Line that called the function</li>
-  <li>Ability to end script execution immediately after outputting the information (for easier debugging)</li>
+  <li>Better presentation on an HTML page, without the need to view the source.</li>
+  <li>Output of the file, class, function, and line that called the function.</li>
+  <li>The ability to end script execution immediately after outputting the information (for easier debugging).</li>
 </ul>
 
 <h2 id="the-code">The code…</h2>
 
-<p>So as a result of these requirements I created the two simple functions below.
-I am sure there are many similar implementations available online, but these two are serving me well.</p>
+<p>So, as a result of these requirements, I created the two simple functions below.
+I am sure there are many similar implementations available online, but these two serve me well.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">dump</span><span class="p">()</span>
 <span class="p">{</span>

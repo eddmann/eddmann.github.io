@@ -1,24 +1,30 @@
 ---
 layout: post
 title: "An alternative to 'var_dump' in PHP"
-meta: "Used all the time, so lets make it better."
+meta: "Discover a custom alternative to PHP's var_dump function that improves HTML presentation, displays context details, and offers a die-after-dump feature for efficient debugging."
+tags: php debugging
 ---
 
-Whilst working with PHP, I seem to use 'var\_dump' a ridiculous amount, its a debugging must-have.
-However, it does fall short in a few ways, especially in how it does not take into consideration that the function is almost always displayed in a HTML page - switching to the page's source can become a pain.
-Due to the pitfalls a host of projects such as [Krumo](http://krumo.sourceforge.net/) and [Kint](http://raveren.github.io/kint/) have cropped up to cater for these needs.
-As well as these projects, if you have [XDebug](http://xdebug.org/) installed it will replace the default 'var\_dump' function with its own implementation that outputs the information with well-needed styling.
-<!--more-->
-For me though, I do not need all bells n' whistles that these provide, my base requirements are:
+Whilst working with PHP, I seem to use `var_dump` a ridiculous amount.
+It's a debugging must-have.
+However, it does fall short in a few ways.
+It does not take into consideration that the function is almost always displayed on an HTML page, and switching to the page source can be troublesome.
+Due to these pitfalls, a host of projects such as [Krumo](http://krumo.sourceforge.net/) and [Kint](http://raveren.github.io/kint/) have emerged to cater for these needs.
+In addition to these projects, if you have [XDebug](http://xdebug.org/) installed, it will replace the default `var_dump` function with its own implementation that outputs the information with much-needed styling.
 
-* Better presentation on a HTML page, no viewing of source necessarily
-* Output of the Page, Class, Function, Line that called the function
-* Ability to end script execution immediately after outputting the information (for easier debugging)
+<!--more-->
+
+For me though, I do not need all the bells and whistles that these provide.
+My base requirements are:
+
+- Better presentation on an HTML page, without the need to view the source.
+- Output of the file, class, function, and line that called the function.
+- The ability to end script execution immediately after outputting the information (for easier debugging).
 
 ## The code...
 
-So as a result of these requirements I created the two simple functions below.
-I am sure there are many similar implementations available online, but these two are serving me well.
+So, as a result of these requirements, I created the two simple functions below.
+I am sure there are many similar implementations available online, but these two serve me well.
 
 ```php
 function dump()
@@ -56,7 +62,7 @@ function dump_d()
 
 ## Resources
 
-* [A Gist of the above implementation](http://gist.github.com/3692379)
-* [Kint](http://raveren.github.io/kint/)
-* [Krumo](http://krumo.sourceforge.net/)
-* [XDebug](http://xdebug.org/)
+- [A Gist of the above implementation](http://gist.github.com/3692379)
+- [Kint](http://raveren.github.io/kint/)
+- [Krumo](http://krumo.sourceforge.net/)
+- [XDebug](http://xdebug.org/)

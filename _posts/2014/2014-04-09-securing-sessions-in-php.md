@@ -1,21 +1,23 @@
 ---
 layout: post
 title: 'Securing Sessions in PHP'
-meta: 'Creating a secure Session handler class in PHP, using collated best-practices.'
+meta: 'A comprehensive guide to creating a secure PHP session handler class using best practices for session management and encryption.'
+tags: php security
 ---
 
 Following on from my previous post on [Self-signed SSL certificates](/posts/self-signed-ssl-certificates-with-nginx-and-apache/), I would now like to address the second most common Web application vulnerability ([Broken Authentication and Session Management](https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management)).
-When delving into the subject I was unable to find a definitive resource for an PHP implementation.
-Due to this, I set out to combine all the best practice I could find into a single Session handler, to help protect against the common attack vectors.
-Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default 'SessionHandler' class.
+When delving into the subject I was unable to find a definitive resource for a PHP implementation.
+Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors.
+Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default `SessionHandler` class.
 
 <!--more-->
 
-In my initial research I found multiple commonly mis-configured options that should be addressed, these are presented below in the 'setup' method.
-Here we specify that sessions should only be passed via cookies, removing the possibility of the session identifier being sent as a 'GET' parameter.
+In my initial research I found multiple commonly mis-configured options that should be addressed, and these are presented below in the `setup` method.
+Here we specify that sessions should only be passed via cookies, removing the possibility of the session identifier being sent as a _GET_ parameter.
 We then alter the session name (from the default) to a specified application-specific name, which is good practice.
 Finally, we set the cookie parameters of the session identifier.
-These parameters can be overridden when initialising the session handler, however, recommended defaults of only allowing it to be sent over HTTPS (if present) and restricted HTTP access (no client-side script access).
+These parameters can be overridden when initialising the session handler.
+However, recommended defaults are to only allow it to be sent over HTTPS (if present) and to restrict HTTP access (no client-side script access).
 It is recommended that you override the path and domain based on the application instance (abiding by the principle of least privilege).
 
 ```php
@@ -61,10 +63,10 @@ class SecureSessionHandler extends SessionHandler {
 
 ## Session Management
 
-With the environment successfully configured we are now able to safety start, destroy and regenerate the current session using the provided methods below.
-The 'start' method in-principle wraps the 'session_start' function, however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
-The 'forget' method removes the contents of the `$_SESSION` array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
-Finally, the 'refresh' method replaces the current session identifier with a new one.
+With the environment successfully configured we are now able to safely start, destroy and regenerate the current session using the provided methods below.
+The `start` method in principle wraps the `session_start` function; however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
+The `forget` method removes the contents of the `$_SESSION` array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
+Finally, the `refresh` method replaces the current session identifier with a new one.
 
 ```php
 public function start()
@@ -105,9 +107,9 @@ public function refresh()
 
 There are many different ways to persist the contents of a user's session, dependent on your business requirements.
 Extending the default SessionHandler allows us to rewrite how sessions are read and written.
-In this case I have decided to encrypt/decrypt (using mcrypt) the serialized contents using a specified key, before calling the original read/write methods.
-Typically the session contents are written to plain-text files, and if not correctly configured (file permissions, directory location) are stored in the global PHP session directory.
-This may not be an issue if you have sole access to the server (or are using a security patch such as [Suhosin](http://www.hardened-php.net/suhosin/)), but in a shared-hosting environment could result in a major security breach.
+In this case I have decided to encrypt/decrypt (using mcrypt) the serialised contents using a specified key, before calling the original read/write methods.
+Typically the session contents are written to plain-text files, and if not correctly configured (file permissions, directory location) they are stored in the global PHP session directory.
+This may not be an issue if you have sole access to the server (or are using a security patch such as [Suhosin](http://www.hardened-php.net/suhosin/)), but in a shared-hosting environment it could result in a major security breach.
 
 ```php
 public function read($id)
@@ -123,9 +125,9 @@ public function write($id, $data)
 
 ## Session Expiration and Validation
 
-With the session contents now encrypted we can move on to make sure that the current session timeouts (expires) after a defined idle period, and the user is as expected (to counter session hijacking).
-Sessions are garbage collected based on a configured time, however, it is good practice to check and expire idle sessions in the application-land per-request.
-The example below stores the time of the last activity in the user's session - checking against the current time to validate if it has exceeded the specified duration (in minutes).
+With the session contents now encrypted we can move on to ensure that the current session times out (expires) after a defined idle period, and that the user is as expected (to counter session hijacking).
+Sessions are garbage collected based on a configured time; however, it is good practice to check and expire idle sessions in the application-land per request.
+The example below stores the time of the last activity in the user's session, checking against the current time to validate if it has exceeded the specified duration (in minutes).
 Fingerprinting the current session with the user's user-agent and IP address allows us to provide another layer of security against session hijacking.
 To address network proxy issues (which could cause false positives), only the first two IP blocks are used in the calculation of the fingerprint hash.
 
@@ -169,8 +171,8 @@ public function isValid($ttl = 30)
 
 ## Session Access
 
-This section is not exactly security related, but as we are creating a session wrapper, it would be worthwhile to provide the ability to add and retrieve session values based on dot notation.
-Doing so increases the readability when accessing large array based data-structures.
+This section is not exactly security related, but as we are creating a session wrapper it is worthwhile to provide the ability to add and retrieve session values based on dot notation.
+Doing so increases the readability when accessing large array-based data structures.
 
 ```php
 public function get($name)
@@ -214,8 +216,8 @@ public function put($name, $value)
 
 ## Example Usage
 
-With the implementation now in place we can see the example in-practice.
-I have constructed a test environment which makes sure that the PHP configuration uses session files, stored in a relative directory.
+With the implementation now in place we can see the example in practice.
+I have constructed a test environment which ensures that the PHP configuration uses session files stored in a relative directory.
 In conjunction, we create a new session handler instance (passing in our encryption key) and register it with the PHP engine.
 
 ```php

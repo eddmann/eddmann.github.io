@@ -1,24 +1,27 @@
 ---
 layout: post
-title: "Using Graphviz with SVG Output in PHP"
-meta: "Representing Graphs using Graphviz and SVG in PHP."
+title: 'Using Graphviz with SVG Output in PHP'
+meta: 'Learn how to integrate Graphviz with SVG output in PHP to create interactive, scalable graphs within your markdown posts.'
+tags: php graphviz svg
 ---
 
-Since adding the functionality to process syntax highlighting through [Pygments](http://pygments.org/) I had been on the look out for similar external tools I could integrate.
+Since adding the functionality to process syntax highlighting through [Pygments](http://pygments.org/) I had been on the lookout for similar external tools that I could integrate.
 One area that I felt was lacking in my posts was accompanying visual aids, which would be useful when explaining a new concept or algorithm.
-Like most developers I feel at home in an editor, so delving into another software package did not appeal to me.
+Like most developers, I feel at home in an editor, so delving into another software package did not appeal to me.
+
 <!--more-->
-It was highly desirable to maintain my current work-flow and store all content related to a post (unless necessary) within the single markdown file.
-[Graphviz](http://www.graphviz.org/) was the tool for job, enabling graphs to be described using a small DSL and results outputted in a variety of formats.
-Along with the ability to describe graphs in plain-text, the option to output results in [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics) allowed me keep post dependencies down to a minimum.
-SVG (Scalable Vector Graphics) is an XML-based vector image format, providing lossless-scaling and small file sizes.
-This allowed me to embedded outputted graphs within the rendered post, similar in process to syntax highlighting with Pygments.
+
+It was highly desirable to maintain my current workflow and store all content related to a post (unless necessary) within a single markdown file.
+[Graphviz](http://www.graphviz.org/) was the tool for the job, enabling graphs to be described using a small DSL and output in a variety of formats.
+Along with the ability to describe graphs in plain text, the option to output results in [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics) allowed me to keep post dependencies to a minimum.
+SVG (Scalable Vector Graphics) is an XML-based vector image format, providing lossless scaling and small file sizes.
+This allowed me to embed outputted graphs within the rendered post, similar to the process of syntax highlighting with Pygments.
 
 ## Implementation
 
 Below is a simple example implementation to output SVG variants of each defined graph within a supplied string (post).
 I made the assumption that the 'dot' command (provided by Graphviz) is present in the user's path (this can be easily altered).
-For consistency I decided to declare graph definitions using Markdown Extra's [fenced blocks](http://michelf.ca/projects/php-markdown/extra/#fenced-code-blocks) notation, discussed further in the [Pygments post](/posts/using-pythons-pygments-syntax-highlighter-in-php/).
+For consistency, I decided to declare graph definitions using Markdown Extra's [fenced blocks](http://michelf.ca/projects/php-markdown/extra/#fenced-code-blocks) notation, discussed further in the [Pygments post](/posts/using-pythons-pygments-syntax-highlighter-in-php/).
 Providing the code block with a unique '.dot-show' language type-hint allowed me to be sure of no conflicting pre-processes.
 
 ```php
@@ -57,18 +60,18 @@ function graphviz($post)
 }
 ```
 
-Looking at the example above you will notice the use of the same regular expression replacement and process command calls found in the Pygments implementation.
-All that has been altered is the processing occurred on the outputted result and of course the command itself.
+Looking at the example above, you will notice the use of the same regular expression replacement and process command calls found in the Pygments implementation.
+All that has been altered is the processing that occurred on the outputted result and, of course, the command itself.
 Comments and unnecessary headers are removed from the resulting output, along with the inclusion of random 'id' element names (as multiple graphs may use the same names).
-The 'max-height' style replaces the defined width and height of the SVG element to fix an issue I found in maintaining height ratio when resizing the graph.
+The 'max-height' style replaces the defined width and height of the SVG element to fix an issue I found in maintaining the height ratio when resizing the graph.
 
 ## Examples
 
-Now that we have an example implementation to work with, lets see some of the impressive results we can achieve when using Graphviz and SVG output.
+Now that we have an example implementation to work with, let's see some of the impressive results we can achieve when using Graphviz and SVG output.
 
 ### UML Class Diagram
 
-Inspired by the great article found [here](http://www.ffnn.nl/pages/articles/media/uml-diagrams-using-graphviz-dot.php), I was able to describe a simple UML Class Diagram in .dot notation and output the results in SVG.
+Inspired by the excellent article found [here](http://www.ffnn.nl/pages/articles/media/uml-diagrams-using-graphviz-dot.php), I was able to describe a simple UML Class Diagram in .dot notation and output the results in SVG.
 
 ```
 digraph G

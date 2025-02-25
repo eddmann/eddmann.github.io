@@ -1,11 +1,12 @@
 ---
 layout: post
 title: 'Creating a Basic Auth. WSGI Middleware in Python'
-meta: 'Using WSGI Middleware to secure provided application instances.'
+meta: 'Learn how to implement a basic authentication WSGI middleware in Python to secure your web applications effectively.'
+tags: python wsgi
 ---
 
-With my recent dedicated introduction to the Python language I have become very appreciative of the highly composable nature of [WSGI](http://en.wikipedia.org/wiki/Web_Server_Gateway_Interface) applications.
-In a functional style you are able to compose a desired application from many different components, using the middleware ideology.
+With my recent dedicated introduction to the Python language, I have become very appreciative of the highly composable nature of [WSGI](http://en.wikipedia.org/wiki/Web_Server_Gateway_Interface) applications.
+In a functional style, you are able to compose a desired application from many different components, using the middleware ideology.
 The benefits of this approach can be clearly seen in the contrived example depicted below, which is based on my previous [Flask example](/posts/using-basic-auth-and-decorators-in-pythons-flask/).
 
 <!--more-->
@@ -52,5 +53,5 @@ if __name__ == '__main__':
         print('Goodbye!')
 ```
 
-As you can see we are able to secure a specified WSGI application with the provided 'Auth' middleware.
-The advantages of using this loosely coupled approach allows us to easily replace the authentication implementation with an alternative (i.e. OAuth) in future builds, without alteration to encapsulated applications.
+As you can see, we are able to secure a specified WSGI application with the provided 'Auth' middleware.
+The advantages of using this loosely coupled approach allow us to easily replace the authentication implementation with an alternative (i.e. OAuth) in future builds, without alteration to encapsulated applications.

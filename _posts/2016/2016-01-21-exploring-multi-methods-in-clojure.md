@@ -1,18 +1,19 @@
 ---
 layout: post
 title: 'Exploring Multi-Methods in Clojure'
-meta: 'Exploring Multi-Methods in Clojure using some simple examples'
+meta: 'Discover how to implement multi-methods in Clojure with practical examples including FizzBuzz, factorial, Rock-Paper-Scissors, and odd-even evaluation.'
+tags: clojure
 ---
 
-Currently reading through the [Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book I have recently been introduced to Clojure's multi-method support.
+Currently reading through the [Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book, I have recently been introduced to Clojure's multi-method support.
 I decided that it would be interesting to see this feature in action, so I opened up LightTable and codified some example use-cases.
 
 <!--more-->
 
 ## FizzBuzz
 
-The implementation below carries on from were my article about [FizzBuzz in Clojure](/posts/fizzbuzz-in-clojure/) left off.
-Using the two documented `fizz?` and `buzz?` helpers, followed by the [`juxt`](https://clojuredocs.org/clojure.core/juxt) core function we are able to codify the problem in a highly descriptive manner.
+The implementation below carries on from where my article about [FizzBuzz in Clojure](/posts/fizzbuzz-in-clojure/) left off.
+Using the two documented `fizz?` and `buzz?` helpers, followed by the [`juxt`](https://clojuredocs.org/clojure.core/juxt) core function, we are able to codify the problem in a highly descriptive manner.
 
 ```clojure
 (def fizz? #(zero? (mod % 3)))
@@ -29,8 +30,8 @@ Using the two documented `fizz?` and `buzz?` helpers, followed by the [`juxt`](h
 
 ## Factorial
 
-We are also able to use multi-methods in a similar manner to pattern-matching found in languages such as Scala and Haskell.
-The below implementation recursively computes the supplied arguments factorial value, handling the base-case of 0 using the function `identity` as the dispatch call.
+We are also able to use multi-methods in a similar manner to the pattern-matching found in languages such as Scala and Haskell.
+The implementation below recursively computes the supplied argument's factorial value, handling the base-case of 0 using the function `identity` as the dispatch call.
 
 ```clojure
 (defmulti factorial identity)
@@ -42,8 +43,8 @@ The below implementation recursively computes the supplied arguments factorial v
 
 ## Rock-Paper-Scissors
 
-We are able to expand upon the rules based approach laid out in the previous examples by documenting the Rock-Paper-Scissors game in code.
-Using this multi-method allows us to compute all the possible winning-moves for both players.
+We are able to expand upon the rules-based approach laid out in the previous examples by documenting the Rock-Paper-Scissors game in code.
+This multi-method allows us to compute all the possible winning moves for both players.
 
 ```clojure
 (defmulti beats? vector)
@@ -60,17 +61,17 @@ Using this multi-method allows us to compute all the possible winning-moves for 
         :when (or one-wins two-wins)]
     (if one-wins ["1" one two] ["2" one two])))
 ; [2 :rock :paper] [1 :rock :scissors] [1 :paper :rock]
-; [2 :paper :scissors] [2 :scissors :rock] [1 :scissors :paper])
+; [2 :paper :scissors] [2 :scissors :rock] [1 :scissors :paper]
 ```
 
 ## Odd or Even
 
-Finally we can use the core `odd?` function to polymorphically return a string depicting the supplied values odd-even status.
+Finally, we can use the core `odd?` function to polymorphically return a string depicting the supplied value's odd-even status.
 
 ```clojure
 (defmulti odd-even odd?)
 (defmethod odd-even true [n] (str n " is Odd"))
 (defmethod odd-even false [n] (str n " is Even"))
 
-(odd-even? 5) ; 5 is Odd
+(odd-even 5) ; 5 is Odd
 ```

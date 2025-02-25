@@ -1,14 +1,17 @@
 ---
 layout: post
-title: "Implementing a Singly Linked-List in C"
-meta: "Simple C implementation of a Singly Linked-List."
+title: 'Implementing a Singly Linked-List in C'
+meta: 'Learn how to implement a singly linked list in C with this detailed guide, featuring code examples and explanations on insertion, deletion, and boolean usage in C.'
+tags: c data-structures
 ---
 
 Over the past couple of days I have become very interested in brushing up on my limited C knowledge.
 As I discussed in my previous [post](/posts/experimenting-with-the-xor-swap-method-in-java/) on using the XOR swap method, everyday languages are becoming very high-level, and as a result taking away some of the fun.
-In the next couple of posts I wish to implement some of the common place data-structures found in development, but unlike previous attempts, these will be in straight C.
+In the next couple of posts I wish to implement some of the commonplace data structures found in development, but unlike previous attempts, these will be in straight C.
+
 <!--more-->
-The first such data-structure I wish to discuss is the common place singly linear linked-list.
+
+The first such data structure I wish to discuss is the singly linked list.
 
 ```c
 #include <stdio.h>
@@ -77,10 +80,10 @@ void list()
 }
 ```
 
-As you can see from the implementation above, both insertion and removal methods allow the user to specify if they wish to effect the head or tail.
-Surprisingly, it was not until the ISO-C99 standard that C got a native boolean data type (_Bool).
-The 'stdbool.h' header file defines library macros (true, false) which resolve to the _Bool type.
-With the above implementation we are also able to print out the contents of the full linked-list at that present time.
+As you can see from the implementation above, both insertion and removal methods allow the user to specify if they wish to affect the head or tail.
+Surprisingly, it was not until the ISO-C99 standard that C got a native boolean data type (\_Bool).
+The 'stdbool.h' header file defines library macros (true, false) which resolve to the \_Bool type.
+With the above implementation we are also able to print out the contents of the full linked list at that present time.
 
 ```c
 int main()
@@ -98,7 +101,7 @@ int main()
 ```
 
 The above method bootstraps the implementation together, providing us with an example of inserting items initially at the tail and then at the head.
-We then delete four items from the list, in a similar manner to the insertion step, deleting half from the tail and the other half from the head.
+We then delete four items from the list in a similar manner to the insertion step, deleting half from the tail and the other half from the head.
 
 ```bash
 $ gcc linkedlist.c -o linkedlist && ./linkedlist

@@ -1,14 +1,18 @@
 ---
 layout: post
 title: 'Parallel Summation in Java'
-meta: 'Parallelisation of the Summation operation using Java Threads.'
+meta: 'Learn how to implement parallel summation in Java using threads for enhanced performance and speed optimisation.'
+tags: java algorithm
 ---
 
 Summation is the common operation of adding a sequence of numbers together, resulting in their total.
 The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress.
-For small sequences, a single threaded implementation will suffice, however, when the size increases use of other available CPU cores helps provide necessary speed optimisations.
-As addition is an associative operation it makes no difference to the end result in which order we process the collection, this behavior works well for are implementation design. <!--more-->
-Below is an example implementation which splits the summation of a sequence of numbers into (close to) equal collections, each being processed in parallel within their own thread.
+For small sequences, a single-threaded implementation will suffice.
+However, when the size increases, the use of other available CPU cores helps to provide the necessary speed optimisations.
+As addition is an associative operation, it makes no difference to the end result in which order we process the collection.
+This behaviour works well for our implementation design. <!--more-->
+Below is an example implementation which splits the summation of a sequence of numbers into (close to) equal collections.
+Each collection is processed in parallel within its own thread.
 
 ```java
 public class Summation extends Thread {
@@ -84,7 +88,7 @@ public class Summation extends Thread {
 }
 ```
 
-Looking at the implementation above you will notice that I have taken advantage of static functionality to combine both the sum and thread instances required to complete the task.
+Looking at the implementation above, you will notice that I have taken advantage of static functionality to combine both the sum and thread instances required to complete the task.
 Calling 'parallelSum' with a single argument (being the specified array), the system is queried on how many available processing cores are present.
 We then create 'Summation' instances that are supplied with the low and high range of indexes within the subject array they are required to process.
 These are then started and subsequently joined into the main thread for the final round of partial sum addition to complete the process.
@@ -120,4 +124,4 @@ public static void main(String[] args)
 ```
 
 Looking at the results above, you will see that using the parallelised approach provides us with noticeable speed gains.
-An interesting observation I made when running the benchmark was that the speed increases after splitting the subject operation into 2 threads did not significantly alter the time taken.
+An interesting observation I made when running the benchmark was that increasing the number of threads to two did not significantly improve the speed.

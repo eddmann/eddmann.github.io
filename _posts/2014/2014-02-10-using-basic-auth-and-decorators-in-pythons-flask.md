@@ -1,13 +1,14 @@
 ---
 layout: post
 title: "Using Basic Auth. and Decorators in Python's Flask"
-meta: "Simple Flask example, with basic authentication using Python decorators"
+meta: 'Simple Flask example, with basic authentication using Python decorators'
 ---
 
 I have recently set aside some time to delve into the world of Python and all its Zen.
 Being a web-developer at heart I of-course had to look at the current options available to me.
 In this post I will be guiding you through creating a single-script web application using Flask and Basic access authentication.
 For simplicity I will assume that you have a working installation of either Python 2.7/3.3 and [virtualenv](http://www.virtualenv.org/en/latest/index.html).
+
 <!--more-->
 
 ## Project Setup
@@ -23,7 +24,7 @@ $ pip install Flask
 ```
 
 Using the commands provided above we first create a new virtual environment called 'venv' in the projects root directory.
-To configure the python, pip etc. commands to take notice of the custom installation directories within the current shell instance,  we must source the 'activate' script.
+To configure the python, pip etc. commands to take notice of the custom installation directories within the current shell instance, we must source the 'activate' script.
 Finally, we install Flask using the typical 'pip' command.
 
 ## The Application

@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Processing a List of Links using Python and BeautifulSoup"
-meta: "Using Python and BeautifulSoup to create a processed list of links."
+title: 'Processing a List of Links using Python and BeautifulSoup'
+meta: 'Using Python and BeautifulSoup to create a processed list of links.'
 ---
 
 Whilst uploading the [weekly podcast](http://threedevsandamaybe.com/) I am required to produce a list of links we discussed about on the show.
 This can get a little tiresome, visiting each link and finding a suitable title.
 Along with this, using Markdown you are required to provide lists in a specific format.
 I had been doing this manually for a couple of weeks and last night I thought, I am a developer, I should not be doing unnecessary work.
+
 <!--more-->
 
 Below is a simple script I wrote in Python (3) that grabs the latest entry from your clipboard (a list of links) and then processes them into the specified format.

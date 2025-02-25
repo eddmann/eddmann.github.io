@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Implementing Basic Python Decorators in PHP"
-meta: "Implementing Python Decorators as a thought-experiment in PHP"
+title: 'Implementing Basic Python Decorators in PHP'
+meta: 'Implementing Python Decorators as a thought-experiment in PHP'
 ---
 
 Having just stepped into the world of Python I think it is only human-nature to compare, if not contemplate solutions to, discovered given strengths in a more familiar language.
 My familiar language being of-course PHP, I thought it would be a good thought experiment to see if I could design a basic decorator implementation in the language.
 Decorators, as discussed in [another post](/posts/using-basic-auth-and-decorators-in-pythons-flask/), are an easy concept to explain.
 Simply put they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner.
+
 <!--more-->
 
 ## The Implementation

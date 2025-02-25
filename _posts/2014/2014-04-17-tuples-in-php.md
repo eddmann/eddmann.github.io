@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Tuples in PHP"
-meta: "Experimenting with a Tuple (optionally typed) implementation in PHP."
+title: 'Tuples in PHP'
+meta: 'Experimenting with a Tuple (optionally typed) implementation in PHP.'
 ---
 
 Since exploring languages such as Scala and Python which provide the tuple data-structure, I have been keen to experiment with how to clearly map it into a PHP solution.
 Tuples are simply a finite, ordered sequence of elements - usually with good language support to both pack (construction) and unpack (deconstruction) of the values.
 I have found that many use-cases of the common place array structure in PHP could be better suited to n-tuple's.
 Familiar examples such as coordinate pairs (points) and records from a relational database (i.e. maybe the user id and name) could succinctly take advantage of the structure.
+
 <!--more-->
 
 I discussed briefly that what makes tuples so powerful in the highlighted languages is their good support for handling their contents, for example unpacking a user tuple into separate id and name variables.

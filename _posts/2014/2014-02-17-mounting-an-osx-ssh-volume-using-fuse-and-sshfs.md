@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Mounting an OSX SSH Volume using FUSE and SSHFS"
-meta: "Using FUSE and SSHFS to locally mount a remote SSH directory."
+title: 'Mounting an OSX SSH Volume using FUSE and SSHFS'
+meta: 'Using FUSE and SSHFS to locally mount a remote SSH directory.'
 ---
 
 [FUSE for OSX](http://osxfuse.github.io/) is a Mac OSX port of the popular [Filesystem in Userspace](http://en.wikipedia.org/wiki/Filesystem_in_Userspace) (FUSE) software, and a successor to MacFUSE.
 Once installed you have the ability to mount many different types of remote and local file-system in userland, without the need to alter the kernel.
 An example filesystem that I have found to be very useful is [SSHFS](http://en.wikipedia.org/wiki/SSHFS), which allows you to interact with files located on a remote server, via the SSH protocol.
 Once mounted the specified remote directory can be accessed as if it were a local volume.
+
 <!--more-->
 
 ## Example Usage

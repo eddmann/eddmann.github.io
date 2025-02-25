@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Storing PHP Sessions/File Caches in Memory using TMPFS"
-meta: "Using TMPFS to store non-persistent files on a memory partition."
+title: 'Storing PHP Sessions/File Caches in Memory using TMPFS'
+meta: 'Using TMPFS to store non-persistent files on a memory partition.'
 ---
 
 Yesterday I was looking through some application logs and noticed a significant bottleneck with I/O reads in the implemented file cache.
 This cache is used to temporary store processed views and records for a set duration.
 I looked into a couple of solutions to alleviate the intense spinning disk usage, ranging from [Memcache](http://memcached.org/) to [Redis](http://redis.io/).
 These products are great for large-scale applications (spread over multiple systems), however, in my case simply required a single local configuration.
+
 <!--more-->
 
 This was when I found 'tmpfs', saving me from all sorts of issues relating to adding yet another application to the production stack.

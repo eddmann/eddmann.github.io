@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Reversing a Unicode String in PHP using UTF-16BE/LE"
-meta: "Explaining how to reverse a Unicode String using UTF-16 and Endianness in PHP."
+title: 'Reversing a Unicode String in PHP using UTF-16BE/LE'
+meta: 'Explaining how to reverse a Unicode String using UTF-16 and Endianness in PHP.'
 ---
 
 Last week I was bit by the Unicode encoding issue when trying to naively manipulate a user's input using PHP's built-in string functions.
@@ -10,6 +10,7 @@ In this article I will not be going into depth on the subject of Unicode represe
 However, you should be aware that in 'Western Europe' we commonly only use the basic [ASCII](http://en.wikipedia.org/wiki/ASCII) character-set (consisting of 7 bytes).
 This makes the transition to the popular 'UTF-8' Unicode representation almost seamless, as the two map one-to-one.
 I wish to however, discuss how to reverse a Unicode string (UTF-8) using a combination of [endianness](http://en.wikipedia.org/wiki/Endianness) magic and the ['strrev'](http://www.php.net/manual/en/function.strrev.php) function.
+
 <!--more-->
 
 To clearly highlight the examples, the function below is used throughout the post, returning how the string is represented in binary.
@@ -26,7 +27,7 @@ function str2bin($str)
 
 ## Naive Approach
 
-With many encodings that only include single-byte character representations (i.e. ASCII, ISO 8859-*) using the in-built `strrev` function will work fine.
+With many encodings that only include single-byte character representations (i.e. ASCII, ISO 8859-\*) using the in-built `strrev` function will work fine.
 However, the constructed UTF-8 string below contains a combination of ASCII-compatible characters and a multi-byte 'Black Star' character.
 You will notice that the two first bytes represent the 'a' and 'b' characters, and as they fit inside a single octet each they are not affected.
 The issue arises however, with the 'Black Star' character, which requires a three-byte representation.

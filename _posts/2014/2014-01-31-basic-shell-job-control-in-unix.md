@@ -1,12 +1,11 @@
 ---
 layout: post
-title: "Basic Shell Job Control in Unix"
-meta: "Understanding and using basic Shell Job Control in Unix."
+title: 'Basic Shell Job Control in Unix'
+meta: 'Understanding and using basic Shell Job Control in Unix.'
 ---
 
-Within Unix-based operating-systems the concept of [Job Control](http://en.wikipedia.org/wiki/Job_control_(Unix)) provides you with the ability to manage multiple 'batch jobs'.
-Appending a single ampersand (&) to a command instructs the shell to fork and execute the action in a separate sub-shell.
-<!--more-->
+Within Unix-based operating-systems the concept of [Job Control](<http://en.wikipedia.org/wiki/Job_control_(Unix)>) provides you with the ability to manage multiple 'batch jobs'.
+Appending a single ampersand (&) to a command instructs the shell to fork and execute the action in a separate sub-shell. <!--more-->
 This creates a background job, providing asynchronous, parallel computation to take place.
 Once the job has been created the shell returns an immediate success signal, allowing for further script command execution or returning the focus of the cursor back to the user.
 The forked background process will still be attached to its parent, meaning any resulting output will still be displayed in the terminal.

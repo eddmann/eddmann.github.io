@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Reversing a String in PHP"
-meta: "Interesting ways to reverse a string in PHP."
+title: 'Reversing a String in PHP'
+meta: 'Interesting ways to reverse a string in PHP.'
 ---
 
-Since recently setting up a forum for [Three Devs and a Maybe](http://forum.threedevsandamaybe.com/), we have started to partake in a weekly [code-kata](http://en.wikipedia.org/wiki/Kata_(programming)).
+Since recently setting up a forum for [Three Devs and a Maybe](http://forum.threedevsandamaybe.com/), we have started to partake in a weekly [code-kata](<http://en.wikipedia.org/wiki/Kata_(programming)>).
 What could be more fitting to start with than the common interview question, reversing a string in 'X' language.
 In this case the language is PHP, and below are some of the many ways contrived to solve the problem.
+
 <!--more-->
 
 ## Basic Implementations

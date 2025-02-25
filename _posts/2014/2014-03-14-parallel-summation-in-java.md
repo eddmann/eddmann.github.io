@@ -1,14 +1,13 @@
 ---
 layout: post
-title: "Parallel Summation in Java"
-meta: "Parallelisation of the Summation operation using Java Threads."
+title: 'Parallel Summation in Java'
+meta: 'Parallelisation of the Summation operation using Java Threads.'
 ---
 
 Summation is the common operation of adding a sequence of numbers together, resulting in their total.
 The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress.
 For small sequences, a single threaded implementation will suffice, however, when the size increases use of other available CPU cores helps provide necessary speed optimisations.
-As addition is an associative operation it makes no difference to the end result in which order we process the collection, this behavior works well for are implementation design.
-<!--more-->
+As addition is an associative operation it makes no difference to the end result in which order we process the collection, this behavior works well for are implementation design. <!--more-->
 Below is an example implementation which splits the summation of a sequence of numbers into (close to) equal collections, each being processed in parallel within their own thread.
 
 ```java

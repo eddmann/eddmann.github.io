@@ -1,13 +1,12 @@
 ---
 layout: post
-title: "Arch Linux and Awesome WM Installation Notes"
-meta: "Simple notes for my Arch Linux and Awesome WM installation setup."
+title: 'Arch Linux and Awesome WM Installation Notes'
+meta: 'Simple notes for my Arch Linux and Awesome WM installation setup.'
 ---
 
 I have been a big fan of [Arch Linux](https://www.archlinux.org/) (inc. it's philosophy) and the [Awesome](http://awesome.naquadah.org/) Window Manager for just under a year now.
 I recently went through the process of a clean installation on my laptop and thought I would jot down some installation notes for future reference.
-Some background information on my 64bit setup, I currently use Intel HD Graphics 4000 and a Western Digital 4K Advanced Format Hard Drive.
-<!--more-->
+Some background information on my 64bit setup, I currently use Intel HD Graphics 4000 and a Western Digital 4K Advanced Format Hard Drive. <!--more-->
 I opted for the simplicity of setting up only two partitions (root and home) using [GParted](http://gparted.org/) prior to the writing of these notes.
 
 ## Base Installation

@@ -1,15 +1,14 @@
 ---
 layout: post
-title: "Compiling PHP 5.5 with ZTS and pthreads Support"
-meta: "Compiling PHP 5.5 from source, with ZTS and pthreads support on CentOS 6.5"
+title: 'Compiling PHP 5.5 with ZTS and pthreads Support'
+meta: 'Compiling PHP 5.5 from source, with ZTS and pthreads support on CentOS 6.5'
 ---
 
 [POSIX Threads](http://en.wikipedia.org/wiki/POSIX_Threads) are a standard for threading implementations available in many Unix-like operating systems.
-Written in C they provide developers with high-level thread management methods, synchronization etc.
-<!--more-->
+Written in C they provide developers with high-level thread management methods, synchronization etc. <!--more-->
 Support for these methods in PHP is provided by an extension called [pthreads](http://pthreads.org/), enabling user-land multi-threaded applications to be built.
 Designed in a similar manner to the implementation specified in Java, PHP can now 'can create, read, write, execute and synchronize with Threads, Workers and Stackables'.
-This is a major step in the right direction for PHP development, providing better suited solutions than simply [forking](http://en.wikipedia.org/wiki/Fork_(system_call)) (process copying).
+This is a major step in the right direction for PHP development, providing better suited solutions than simply [forking](<http://en.wikipedia.org/wiki/Fork_(system_call)>) (process copying).
 To experiment with this extension however, it is required to have a PHP built with ZTS enabled (Thread-safety support).
 This option can only be specified at compile-time and as such I felt that it would be an ideal time to provide a simple guide to compile PHP from source.
 For this example I am working with a base CentOS 6.5 installation.
@@ -18,14 +17,14 @@ For this example I am working with a base CentOS 6.5 installation.
 
 To compile PHP from source we must first make sure the development tools required are present (such as GCC).
 One issue that cropped up when trying to install the 'Development Tools' group was the complaint of not having access to kernel packages.
-To overcome this problem I simply removed 'kernal*' from the excluded list provided in '/etc/yum.conf'.
+To overcome this problem I simply removed 'kernal\*' from the excluded list provided in '/etc/yum.conf'.
 
 ```bash
 $ sed -i "s/^\exclude.*$/exclude=/g" /etc/yum.conf
 $ yum groupinstall -y 'Development Tools'
 ```
 
-Looking at the first command above we remove all excludes that have currently been set, in my case this was only 'kernal*', but I recommend you check your setup first.
+Looking at the first command above we remove all excludes that have currently been set, in my case this was only 'kernal\*', but I recommend you check your setup first.
 We are now able to install the required packages to download the compressed source code and compile the XML library provided in PHP.
 I decided to set a global variable with the desired version of PHP I wished to compile, making the command listing more flexible when updates arise.
 

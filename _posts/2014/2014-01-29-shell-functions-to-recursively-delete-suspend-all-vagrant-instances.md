@@ -1,12 +1,11 @@
 ---
 layout: post
-title: "Shell Functions to Recursively Delete/Suspend all Vagrant Instances"
-meta: "Functions to help manage currently running and obsolete Vagrant instances."
+title: 'Shell Functions to Recursively Delete/Suspend all Vagrant Instances'
+meta: 'Functions to help manage currently running and obsolete Vagrant instances.'
 ---
 
 I have been using [Vagrant](http://www.vagrantup.com/) exclusively for almost a year now and am still loving it, even with the introduction of [Docker](https://www.docker.io/).
-One issue I do find that arises is managing currently running and obsolete instances.
-<!--more-->
+One issue I do find that arises is managing currently running and obsolete instances. <!--more-->
 Port conflicts can be a huge pain to correct if you are like me and use Vagrant for many different projects at one time, resorting to loading up VirtualBox.
 To help ease the pain I have created two shell script functions (tested in Bash) for recursively locating and either deleting or suspending Vagrant instances it finds.
 

@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "The Y (Fixed-Point) Combinator in PHP"
-meta: "An introduction to the Y-combinator, using PHP."
+title: 'The Y (Fixed-Point) Combinator in PHP'
+meta: 'An introduction to the Y-combinator, using PHP.'
 ---
 
 A combinator is a type of higher-order function that can be used to express functions without the explicit use of variables.
 A fixed point is a value that is unchanged by a function, satisfying the equation which can be found [here](http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator).
 Using the Y-combinator allows us to essentially convert non-recursive code into a recursive counterpart (without directly using named recursion or iteration).
 To work it's magic the recursive function is computed as the fixed point of the non-recursive function.
+
 <!--more-->
 
 You may be asking yourself why is this at all relevant in an imperative language such as PHP?

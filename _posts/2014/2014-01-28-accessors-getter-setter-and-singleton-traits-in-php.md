@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Accessors (Getter/Setter) and Singleton Traits in PHP"
-meta: "Using traits to implement prototype Getter/Setter and Singleton capabilities."
+title: 'Accessors (Getter/Setter) and Singleton Traits in PHP'
+meta: 'Using traits to implement prototype Getter/Setter and Singleton capabilities.'
 ---
 
 Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared.
 One such instance is the reduction in boilerplate code when prototyping a new idea.
 Though these should be implemented within the project before completion, I have found using the two traits below to help speed up the development life-cycle.
+
 <!--more-->
 
 ## Accessors (Getter/Setter)
@@ -45,9 +46,9 @@ trait Accessors {
 }
 ```
 
-Looking at the code above you will notice that we use PHP's '\__call' magic method to see if the users invoked method is of interest to us.
+Looking at the code above you will notice that we use PHP's `__call` magic method to see if the users invoked method is of interest to us.
 To keep control of this traits 'magic', the call only looks for properties that exist within the class that the trait has been used in.
-You are however able to replace '\__CLASS__' with '$this' to provide the entire classes properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
+You are however able to replace `__CLASS__` with '$this' to provide the entire classes properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
 Below is an example use-case for including this trait.
 
 ```php

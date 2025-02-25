@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Implementing ROT13 and ROT(n) Caesar Ciphers in Python"
-meta: "Multiple implementations to encode and decode Caesar Cipher based messages."
+title: 'Implementing ROT13 and ROT(n) Caesar Ciphers in Python'
+meta: 'Multiple implementations to encode and decode Caesar Cipher based messages.'
 ---
 
 The Caesar cipher (shift cipher) is an extremely simple encryption technique.
 Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
 The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.
+
 <!--more-->
 
 ROT13 (aka. rotate by 13 places) is an implementation of this cipher, replacing each letter with the letter 13 positions after it in the given symbol table (typically the alphabet).
@@ -14,7 +15,7 @@ As the basic Latin alphabet is 26 letters long, the same algorithm implementatio
 
 ## Basic Implementation
 
-Using Python 3.4 as the implementation language we are able to simply use the provided (*batteries included*) 'encode' method as shown below.
+Using Python 3.4 as the implementation language we are able to simply use the provided (_batteries included_) 'encode' method as shown below.
 
 ```python
 def rot13(s):

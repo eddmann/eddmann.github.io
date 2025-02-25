@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Using Iterative deepening depth-first search in Python"
-meta: "Example usage of the Iterative deepening depth-first algorithm."
+title: 'Using Iterative deepening depth-first search in Python'
+meta: 'Example usage of the Iterative deepening depth-first algorithm.'
 ---
 
 Iterative deepening depth-first search (IDDFS) is an extension to the 'vanilla' depth-first search algorithm, with an added constraint on the total depth explored per iteration.
@@ -9,6 +9,7 @@ This addition produces equivalent results to what can be achieved using breadth-
 Due to BFS's storage of fringe vertices in memory, Od^b memory space may be required (b = branching factor), this is a stark contrast to IDDFS's O(bd) worst-case memory requirements.
 On a per-iteration interval vertex successors at the depth-cap level are ignored, and if the goal has not been found, the maximum level is increased (by one) and the processes repeated.
 Similarly to BFS, it has the guarantee to find an optimal path between two subject vertices, as the shallowest goal vertex will be the depth-cap first, resulting in no exploration of subsequent, unnecessary branches.
+
 <!--more-->
 
 ## n-Puzzle example

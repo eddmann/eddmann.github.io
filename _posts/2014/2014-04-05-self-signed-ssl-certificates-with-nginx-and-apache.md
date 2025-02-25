@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Self-Signed SSL Certificates with Nginx and Apache"
-meta: "Creating and configuring self-signed certificates with Nginx and Apache."
+title: 'Self-Signed SSL Certificates with Nginx and Apache'
+meta: 'Creating and configuring self-signed certificates with Nginx and Apache.'
 ---
 
 Since having the opportunity to discuss web application security ([part 1](http://threedevsandamaybe.com/posts/web-application-security-part-1/), [part 2](http://threedevsandamaybe.com/posts/web-application-security-part-2/)) recently on the podcast, I thought it was a good time to have a deeper look into SSL/TLS (Transport Layer Security).
 There are plenty of good resources online discussing the [technical side](http://www.youtube.com/watch?v=iQsKdtjwtYI) of the topic, however, at a high-level point-to-point encryption and server identification are the two problems it attempts to solve.
+
 <!--more-->
 
 Self-signed SSL certificates are an inexpensive (free) means of taking advantage of point-to-point encryption on non-production, development server setups.

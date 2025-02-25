@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Introduction to Creating a Basic PHP Extension"
-meta: "Basic introduction to setting up and building a PHP Extension."
+title: 'Introduction to Creating a Basic PHP Extension'
+meta: 'Basic introduction to setting up and building a PHP Extension.'
 ---
 
 I recently decided to test my novice C skills in the field of building a PHP extension.
 However, despite some very good resources ([here](http://www.phpinternalsbook.com/) and [here](http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/)), there still seems to be a lack of beginner-friendly material on the subject.
 In this post I will be documenting a simple development environment that has worked well on a fresh CentOS 6.5 installation.
 Once this has been setup, we will then move on to creating a simple 'Hello World' extension, highlighting some of the extension platforms capabilities.
+
 <!--more-->
 
 ## Setup

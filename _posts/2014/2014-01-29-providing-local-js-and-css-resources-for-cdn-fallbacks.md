@@ -1,12 +1,11 @@
 ---
 layout: post
-title: "Providing Local JS and CSS Resources for CDN Fallbacks"
+title: 'Providing Local JS and CSS Resources for CDN Fallbacks'
 meta: "Including JS and CSS fallback options for resources hosted by CDN's"
 ---
 
 In a recent [podcast](http://threedevsandamaybe.com/posts/html-experiences-part-1/) the topic of using Content Delivery Networks (CDN) to host common-place resources such as jQuery and Twitter Bootstrap came up.
-The merits of having access to large scale delivery infrastructures provided by Google and the possibility that the client will already have these asset cached are huge wins.
-<!--more-->
+The merits of having access to large scale delivery infrastructures provided by Google and the possibility that the client will already have these asset cached are huge wins. <!--more-->
 One pessimistic comment which can arise however, is what happens if these CDN's suddenly become unavailable.
 Though highly unlikely in the case of Google's [Hosted Libraries](https://developers.google.com/speed/libraries/devguide), similar acts such development whilst offline may likely result in the same effect.
 To get around this, hosting fallback local version of the assets is a worthwhile investment.
@@ -20,19 +19,23 @@ Inspired by the [HTML5 Boilerplates](http://html5boilerplate.com/) jQuery fallba
 ```html
 <!-- jQuery -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script>
+  window.jQuery || document.write('<script src="/js/jquery-1.10.2.min.js"><\/script>');
+</script>
 
 <!-- Bootstrap -->
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-<script>window.jQuery.fn.modal || document.write('<script src="/js/bootstrap-3.0.3.min.js"><\/script>')</script>
 <script>
-    (function($) {
-        $(function() {
-            if ($('body').css('color') !== 'rgb(51, 51, 51)') {
-                $('head').prepend('<link rel="stylesheet" href="/css/bootstrap-3.0.3.min.css">');
-            }
-        });
-    })(window.jQuery);
+  window.jQuery.fn.modal || document.write('<script src="/js/bootstrap-3.0.3.min.js"><\/script>');
+</script>
+<script>
+  (function ($) {
+    $(function () {
+      if ($('body').css('color') !== 'rgb(51, 51, 51)') {
+        $('head').prepend('<link rel="stylesheet" href="/css/bootstrap-3.0.3.min.css">');
+      }
+    });
+  })(window.jQuery);
 </script>
 ```
 
@@ -46,23 +49,27 @@ This example uses jQuery for ease of explanation, as we can be confident at this
 The second example takes advantage of the great [YepNope](http://yepnopejs.com/) library, providing us with the ability to test for existence of a predicate and act upon this result.
 Including YepNope and the provided CSS plugin extension in the document head, we are able to be sure that the 'complete' callbacks will only be invoked when either the related JS or CSS assets have been fully loaded.
 
-```javascript
-yepnope([{
+```js
+yepnope([
+  {
     load: '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js',
-    complete: function() {
-        window.jQuery || yepnope('/js/jquery-1.10.2.min.js');
-    }
-}, {
+    complete: function () {
+      window.jQuery || yepnope('/js/jquery-1.10.2.min.js');
+    },
+  },
+  {
     load: 'timeout=1000!//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css',
-    complete: function() {
-        $('body').css('color') == 'rgb(51, 51, 51)' || yepnope('/css/bootstrap-3.0.3.min.css');
-    }
-}, {
+    complete: function () {
+      $('body').css('color') == 'rgb(51, 51, 51)' || yepnope('/css/bootstrap-3.0.3.min.css');
+    },
+  },
+  {
     load: '//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js',
-    complete: function() {
-        window.jQuery.fn.modal || yepnope('/js/bootstrap-3.0.3.min.js');
-    }
-}]);
+    complete: function () {
+      window.jQuery.fn.modal || yepnope('/js/bootstrap-3.0.3.min.js');
+    },
+  },
+]);
 ```
 
 You will notice that this example is very similar to the basic implementation, testing for the existence of window variables and CSS body properties.
@@ -76,22 +83,23 @@ The final example uses the incredibly small library [Fallback.js](http://fallbac
 This can be seen by how simple the API is to use, with default checking of window variable existence based on the assets key name.
 Similar to the features provided in YepNope such as loading resources asynchronously we are able to increase page loading times with minimal hassle.
 
-```javascript
-fallback.load({
+```js
+fallback.load(
+  {
     bootstrapCss: '//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css',
-    jQuery: [
-        '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js',
-        '/js/jquery-1.10.2.min.js'
+    jQuery: ['//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', '/js/jquery-1.10.2.min.js'],
+    'jQuery.fn.modal': [
+      // bootstrap
+      '//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js',
+      '/js/bootstrap-3.0.3.min.js',
     ],
-    'jQuery.fn.modal': [ // bootstrap
-        '//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js',
-        '/js/bootstrap-3.0.3.min.js'
-    ]
-}, {
+  },
+  {
     shim: {
-        'jQuery.fn.modal': [ 'jQuery' ] // bootstrap
-    }
-});
+      'jQuery.fn.modal': ['jQuery'], // bootstrap
+    },
+  }
+);
 ```
 
 The one issue with this library is that it is tied into checking the window object for resource existence.

@@ -1,18 +1,19 @@
 ---
 layout: post
-title: "Understanding Python WSGI with Examples"
-meta: "Examples to get started with Python WSGI development."
+title: 'Understanding Python WSGI with Examples'
+meta: 'Examples to get started with Python WSGI development.'
 ---
 
 Coming from a strongly PHP background, initially looking at the web-development landscape whilst delving into Python seemed a little confusing.
 As Python was not developed for the web from an offset, a specification was accepted called [PEP 333](http://www.python.org/dev/peps/pep-0333/) which standardised the required interface between Web servers and Python Web Frameworks/Applications.
 Despite the additional complexity, the manner in which middle-ware applications can be integrated, along with the server choice add possibilities that I find hard to locate a comparable in PHP.
+
 <!--more-->
 
 ## Basic Example
 
 Simply put a WSGI (Web Sever Gateway Interface) compliant application must supply a callable (function, class) which accepts a 'environ' dictionary and 'start_response' function.
-For a familiar PHP comparison, you can think of the 'environ' dictionary as a combined '$_SERVER', '$_GET' and '$_POST', with extra processing required.
+For a familiar PHP comparison, you can think of the 'environ' dictionary as a combined `$_SERVER`, `$_GET` and `$_POST`, with extra processing required.
 This callable is expected to invoke the 'start_response' function with the desired response-code/header-data, and then return a byte iterable with the response body.
 
 ```python

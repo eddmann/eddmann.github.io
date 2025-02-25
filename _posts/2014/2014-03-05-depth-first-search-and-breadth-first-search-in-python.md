@@ -1,17 +1,16 @@
 ---
 layout: post
-title: "Depth-First Search and Breadth-First Search in Python"
-meta: "Exploring both Depth-First and Breadth-First Search."
+title: 'Depth-First Search and Breadth-First Search in Python'
+meta: 'Exploring both Depth-First and Breadth-First Search.'
 ---
 
 Graph theory and in particular the graph ADT (abstract data-type) is widely explored and implemented in the field of Computer Science and Mathematics.
 Consisting of vertices (nodes) and the edges (optionally directed/weighted) that connect them, the data-structure is effectively able to represent and solve many problem domains.
-One of the most popular areas of algorithm design within this space is the problem of checking for the existence or (shortest) path between two or more vertices in the graph.
-<!--more-->
+One of the most popular areas of algorithm design within this space is the problem of checking for the existence or (shortest) path between two or more vertices in the graph. <!--more-->
 Properties such as edge weighting and direction are two such factors that the algorithm designer can take into consideration.
 In this post I will be exploring two of the simpler available algorithms, Depth-First and Breath-First search to achieve the goals highlighted below:
 
-- Find all vertices in a subject vertices [connected component](http://en.wikipedia.org/wiki/Connected_component_(graph_theory)).
+- Find all vertices in a subject vertices [connected component](<http://en.wikipedia.org/wiki/Connected_component_(graph_theory)>).
 - Return all available paths between two vertices.
 - And in the case of BFS, return the shortest path (length measured by number of path edges).
 
@@ -173,7 +172,7 @@ shortest_path(graph, 'A', 'F') # ['A', 'C', 'F']
 ## Resources
 
 - [Depth-and Breadth-First Search](http://jeremykun.com/2013/01/22/depth-and-breadth-first-search/)
-- [Connected component](http://en.wikipedia.org/wiki/Connected_component_(graph_theory))
+- [Connected component](<http://en.wikipedia.org/wiki/Connected_component_(graph_theory)>)
 - [Adjacency matrix](http://en.wikipedia.org/wiki/Adjacency_matrix)
 - [Adjacency list](http://en.wikipedia.org/wiki/Adjacency_list)
 - [Python Gotcha: Default arguments and mutable data structures](http://developmentality.wordpress.com/2010/08/23/python-gotcha-default-arguments/)

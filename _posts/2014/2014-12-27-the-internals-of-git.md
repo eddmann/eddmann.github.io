@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "The Internals of Git"
-meta: "Delving into how Git internally represents project history."
+title: 'The Internals of Git'
+meta: 'Delving into how Git internally represents project history.'
 ---
 
 I have been using Git for the past couple of years and remember how long it took me to get my head around the work-flow.
 Throughout the past couple of months, thanks to a couple of [well](http://ftp.newartisans.com/pub/git.from.bottom.up.pdf) [timed](http://mrchlblng.me/2014/09/practical-git-introduction/) [findings](http://episodes.gitminutes.com/), I have gained an interest into how Git works internally.
 In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we are familiar with using on a day-to-day basis.
+
 <!--more-->
 
 At its core a Git repository is a key-value object store, where each SHA-1 key is generated based on multiple factors.

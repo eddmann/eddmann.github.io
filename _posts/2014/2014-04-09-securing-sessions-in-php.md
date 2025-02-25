@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Securing Sessions in PHP"
-meta: "Creating a secure Session handler class in PHP, using collated best-practices."
+title: 'Securing Sessions in PHP'
+meta: 'Creating a secure Session handler class in PHP, using collated best-practices.'
 ---
 
 Following on from my previous post on [Self-signed SSL certificates](/posts/self-signed-ssl-certificates-with-nginx-and-apache/), I would now like to address the second most common Web application vulnerability ([Broken Authentication and Session Management](https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management)).
 When delving into the subject I was unable to find a definitive resource for an PHP implementation.
 Due to this, I set out to combine all the best practice I could find into a single Session handler, to help protect against the common attack vectors.
 Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default 'SessionHandler' class.
+
 <!--more-->
 
 In my initial research I found multiple commonly mis-configured options that should be addressed, these are presented below in the 'setup' method.
@@ -62,7 +63,7 @@ class SecureSessionHandler extends SessionHandler {
 
 With the environment successfully configured we are now able to safety start, destroy and regenerate the current session using the provided methods below.
 The 'start' method in-principle wraps the 'session_start' function, however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
-The 'forget' method removes the contents of the '$_SESSION' array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
+The 'forget' method removes the contents of the `$_SESSION` array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
 Finally, the 'refresh' method replaces the current session identifier with a new one.
 
 ```php

@@ -1,11 +1,12 @@
 ---
 layout: post
 title: 'Peano Numbers and Arithmetic in JavaScript'
-meta: 'Exploring how to represent natural numbers and arithmetic operations without typical language constructs'
+meta: 'Discover how to represent natural numbers using Peano numbers in JavaScript through functional programming techniques and recursive arithmetic operations.'
+tags: javascript functional-programming
 ---
 
 Whilst completing the [Functional Programming Principles in Scala](https://www.coursera.org/course/progfun) course a couple of years ago one of the exercises was in the realm of Peano numbers.
-This subject fascinated me, how we were able to represent non-negative natural numbers without any preformed concepts - relying solely on the logical expressions and recursive algorithms. <!--more-->
+This subject fascinated me, demonstrating how we were able to represent non-negative natural numbers without any pre-existing concepts - relying solely on logical expressions and recursive algorithms. <!--more-->
 Peano numbers allow us to represent all natural numbers using a defined zero value and a successor function.
 
 ```js
@@ -17,7 +18,7 @@ const pred = a => a();
 ```
 
 Following these rules we have created the concept of zero (represented as false within our host language), along with the successor function which wraps and returns this value in a new lambda upon each invocation.
-We have also supplied accompanying zero comparator and predecessor functions which will assist us in upcoming examples.
+We have also supplied accompanying zero comparator and predecessor functions, which will assist us in upcoming examples.
 
 ## Arithmetic
 
@@ -30,11 +31,11 @@ const mul = (a, b) => (isZero(a) ? zero() : add(mul(pred(a), b), b));
 const div = (a, b) => (isZero(a) ? zero() : succ(div(sub(a, b), b)));
 ```
 
-Looking at the definitions above you can see how we have been able to represent these operations using recursion and the functions defined before hand.
+Looking at the definitions above, you can see how we have been able to represent these operations using recursion and the functions defined beforehand.
 
 ## Logic
 
-We are also able to as easily represent logical operations which return the host languages boolean value type.
+We are also able to represent logical operations just as easily, which return the host language's boolean value type.
 
 ```js
 const equal = (a, b) =>

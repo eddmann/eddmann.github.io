@@ -1,12 +1,13 @@
 ---
 layout: post
-title: 'Arabic to Roman Numerals converter in JavaScript'
-meta: 'Converting from Hindu-Arabic to Roman Numerals, taking advantage of ES2015 features'
+title: 'Arabic to Roman Numerals Converter in JavaScript'
+meta: 'Learn how to convert Arabic numbers to Roman numerals using modern JavaScript and ES2015 features with two distinct solutions.'
+tags: javascript algorithms
 ---
 
-Having an hour to spare recently I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals. <!--more-->
-Below are two different solutions to solving this problem, taking advantage of many ES2015 additions in the process.
-Both implementations use the lookup table provided below to handle translation of the seven symbols, along with the subtractive form used to avoid four characters being repeated in a row.
+Having an hour to spare recently, I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals. <!--more-->
+Below are two different solutions to solve this problem, taking advantage of many ES2015 additions in the process.
+Both implementations use the lookup table provided below to handle the translation of the seven symbols, along with the subtractive form used to avoid four characters being repeated in a row.
 
 ```js
 const chart = [
@@ -41,7 +42,7 @@ const toRoman = decimal =>
 ```
 
 The solution above uses the higher-order fold function to `reduce` the supplied Arabic number into a Roman numeral equivalent.
-Combined with using a two element array as a form of tuple that we are able to deconstruct at each level, this forms a very descriptive implementation.
+Combined with using a two-element array as a form of tuple that we are able to deconstruct at each level, this forms a very descriptive implementation.
 
 ## Solution 2
 
@@ -57,5 +58,5 @@ const toRoman = decimal => {
 };
 ```
 
-The second solution follows a typical head-tail recursive pattern, taking advantage of the call-stack to return the built-up translation.
-Deconstruction has been taken even further in this example, highlighting how it is possible to pull out not only a single element but elements within elements from an array subject.
+The second solution follows a typical head-tail recursive pattern, taking advantage of the call stack to return the built-up translation.
+Deconstruction has been taken even further in this example, highlighting how it is possible to extract not only a single element but elements within elements from an array.

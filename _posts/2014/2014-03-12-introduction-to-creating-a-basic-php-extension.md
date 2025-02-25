@@ -1,19 +1,20 @@
 ---
 layout: post
 title: 'Introduction to Creating a Basic PHP Extension'
-meta: 'Basic introduction to setting up and building a PHP Extension.'
+meta: 'A comprehensive beginner\'s guide to setting up and building a PHP extension on CentOS, including environment setup, coding and testing.'
+tags: php-extension c php
 ---
 
 I recently decided to test my novice C skills in the field of building a PHP extension.
 However, despite some very good resources ([here](http://www.phpinternalsbook.com/) and [here](http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/)), there still seems to be a lack of beginner-friendly material on the subject.
-In this post I will be documenting a simple development environment that has worked well on a fresh CentOS 6.5 installation.
-Once this has been setup, we will then move on to creating a simple 'Hello World' extension, highlighting some of the extension platforms capabilities.
+In this post I will document a simple development environment that has worked well on a fresh CentOS 6.5 installation.
+Once this has been set up, we will then move on to creating a simple 'Hello World' extension, highlighting some of the extension platform's capabilities.
 
 <!--more-->
 
 ## Setup
 
-The first step we need to take is to install all the prerequisite development tools (automake, autoconf etc.) required to compile PHP from source.
+The first step we need to take is to install all the prerequisite development tools (automake, autoconf, etc.) required to compile PHP from source.
 We can do this simply by running the following commands within a shell instance.
 
 ```bash
@@ -21,15 +22,15 @@ $ sed -i "s/^\exclude.*$/exclude=/g" /etc/yum.conf # allow kernel-devel package.
 $ yum groupinstall -y 'Development Tools'
 ```
 
-With these tools now successfully available to us we can now pull-down the PHP source code and checkout the desired version.
+With these tools now successfully available to us, we can now pull down the PHP source code and check out the desired version.
 
 ```bash
 $ git clone http://git.php.net/repository/php-src.git
 $ git checkout PHP-5.5
 ```
 
-The final step is to configure and compile the code-base, specifying where you wish the installed binary files to be located.
-As this build is simply for testing purposes I have decided to compile as bare-bones installation as possible, whilst still taking into consideration development requirements (i.e. debugging).
+The final step is to configure and compile the codebase, specifying where you wish the installed binary files to be located.
+As this build is simply for testing purposes, I have decided to compile a bare-bones installation as possible, whilst still taking into consideration development requirements (i.e. debugging).
 
 ```bash
 $ ./buildconf
@@ -39,13 +40,12 @@ $ make && make install
 
 ## Creating the Extension
 
-With the development environment now setup we can commence with creating the extension.
-The extension we will be creating will provide the user with two functions, which go as follows:
+With the development environment now set up, we can commence with creating the extension.
+The extension we will be creating will provide the user with two functions.
+The first function, `hello_world()`, returns the string "Hello, World!" to the user.
+The second function, `hello(string $name, [, bool $format])`, greets the supplied user's name (i.e. "Hello, Joe!") and neatly formats the input if specified.
 
-- hello_world () - returns the string "Hello, World!" to the user.
-- hello (string $name, [, bool $format ] ) - greets the supplied users name (i.e. "Hello, Joe!"), neatly formatting the input if specified.
-
-So as to provide you with some context for what this extension is trying to achieve, the equivalent PHP code has been provided below.
+To provide you with some context for what this extension is trying to achieve, the equivalent PHP code has been provided below.
 
 ```php
 function hello_world()
@@ -63,7 +63,7 @@ function hello($name, $format = true)
 }
 ```
 
-The first file that is required to successfully compile the new extension is the 'config.m4' file, used when running 'phpize'.
+The first file that is required to successfully compile the new extension is the `config.m4` file, used when running `phpize`.
 This file defines where the extension is located and how it can be enabled.
 
 ```bash
@@ -76,7 +76,7 @@ if test "$PHP_HELLO" = "yes"; then
 fi
 ```
 
-We are then able to provide the extension with an implementation using the ('hello.c') example below.
+We are then able to provide the extension with an implementation using the (`hello.c`) example below.
 
 ```c
 #ifdef HAVE_CONFIG_H
@@ -153,14 +153,15 @@ PHP_FUNCTION(hello)
 }
 ```
 
-Looking at the example above you will notice that there is far more boilerplate work required to initially setup and define the functions supplied.
-An interesting section I would like to draw your attention to is the 'zend_parse_parameters' function call, which supplies the function with the users provided string name and optional format boolean.
-If the user has decided to format the input we must first make a copy of the name value to work on.
-Finally, if we were required to format the string we must do some housekeeping at the end of the function, so as to not cause any memory leaks.
+Looking at the example above, you will notice that there is far more boilerplate work required to initially set up and define the functions supplied.
+An interesting section I would like to draw your attention to is the `zend_parse_parameters` function call, which supplies the function with the user's provided string name and optional format boolean.
+If the user has decided to format the input, we must first make a copy of the name value to work on.
+Finally, if we were required to format the string, we must do some housekeeping at the end of the function so as not to cause any memory leaks.
 
-With the implementation now in place we are able to build and test the new extension.
-We must first run 'phpize' to create the necessary build scripts, notice that I am specifying the full path to where I installed the compiled PHP binaries.
-In a similar manner we must also configure the build, supplying the full path to the 'php-config' application.
+With the implementation now in place, we are able to build and test the new extension.
+We must first run `phpize` to create the necessary build scripts.
+Notice that I am specifying the full path to where I installed the compiled PHP binaries.
+In a similar manner, we must also configure the build, supplying the full path to the `php-config` application.
 
 ```bash
 $ $HOME/php/bin/phpize
@@ -168,7 +169,7 @@ $ ./configure --with-php-config=$HOME/php/bin/php-config
 $ make && make install
 ```
 
-We can now test the extension is working correctly, by running the CLI PHP binary with the new extension specified.
+We can now test that the extension is working correctly by running the CLI PHP binary with the new extension specified.
 
 ```bash
 $ $HOME/php/bin/php -dextension=hello.so -r "echo hello_world();"       # Hello, World!

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring how to represent natural numbers and arithmetic operations without typical language constructs">
+    <meta name="description" content="Discover how to represent natural numbers using Peano numbers in JavaScript through functional programming techniques and recursive arithmetic operations.">
 
     <title>
         
@@ -51,7 +51,7 @@
     <h1 class="post-title">Peano Numbers and Arithmetic in JavaScript</h1>
     <time datetime="2015-10-01T00:00:00+00:00" class="post-date">01 Oct 2015</time>
     <p>Whilst completing the <a href="https://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> course a couple of years ago one of the exercises was in the realm of Peano numbers.
-This subject fascinated me, how we were able to represent non-negative natural numbers without any preformed concepts - relying solely on the logical expressions and recursive algorithms. 
+This subject fascinated me, demonstrating how we were able to represent non-negative natural numbers without any pre-existing concepts - relying solely on logical expressions and recursive algorithms. 
 Peano numbers allow us to represent all natural numbers using a defined zero value and a successor function.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">zero</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="kc">false</span><span class="p">;</span>
@@ -62,7 +62,7 @@ Peano numbers allow us to represent all natural numbers using a defined zero val
 </code></pre></div></div>
 
 <p>Following these rules we have created the concept of zero (represented as false within our host language), along with the successor function which wraps and returns this value in a new lambda upon each invocation.
-We have also supplied accompanying zero comparator and predecessor functions which will assist us in upcoming examples.</p>
+We have also supplied accompanying zero comparator and predecessor functions, which will assist us in upcoming examples.</p>
 
 <h2 id="arithmetic">Arithmetic</h2>
 
@@ -74,11 +74,11 @@ We have also supplied accompanying zero comparator and predecessor functions whi
 <span class="kd">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">zero</span><span class="p">()</span> <span class="p">:</span> <span class="nx">succ</span><span class="p">(</span><span class="nx">div</span><span class="p">(</span><span class="nx">sub</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">),</span> <span class="nx">b</span><span class="p">)));</span>
 </code></pre></div></div>
 
-<p>Looking at the definitions above you can see how we have been able to represent these operations using recursion and the functions defined before hand.</p>
+<p>Looking at the definitions above, you can see how we have been able to represent these operations using recursion and the functions defined beforehand.</p>
 
 <h2 id="logic">Logic</h2>
 
-<p>We are also able to as easily represent logical operations which return the host languages boolean value type.</p>
+<p>We are also able to represent logical operations just as easily, which return the host language’s boolean value type.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">equal</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">isZero</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">?</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">:</span> <span class="nx">isZero</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">equal</span><span class="p">(</span><span class="nx">pred</span><span class="p">(</span><span class="nx">a</span><span class="p">),</span> <span class="nx">pred</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span>

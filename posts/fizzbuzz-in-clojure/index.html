@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Multiple ways to solve the FizzBuzz code kata in Clojure">
+    <meta name="description" content="Explores multiple Clojure solutions for the classic FizzBuzz code kata. Discovering clean and concise implementations that showcase the elegance of Lisp.">
 
     <title>
         
@@ -51,7 +51,7 @@
     <h1 class="post-title">FizzBuzz in Clojure</h1>
     <time datetime="2015-12-31T00:00:00+00:00" class="post-date">31 Dec 2015</time>
     <p>This past Christmas break I had the chance to finally pick up <a href="https://www.manning.com/books/the-joy-of-clojure">The Joy of Clojure</a> book and delve into the world of Lisp.
-Along with the common-place Merge-sort algorithm I find it beneficial to explore a new language and its capabilities by solving the <a href="http://rosettacode.org/wiki/FizzBuzz">FizzBizz</a> code kata.
+Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the <a href="http://rosettacode.org/wiki/FizzBuzz">FizzBuzz</a> code kata.
 In this post I will be explaining a couple of the implementations that I created.</p>
 
 
@@ -70,8 +70,8 @@ In this post I will be explaining a couple of the implementations that I created
 
 <h2 id="solution-1">Solution 1</h2>
 
-<p>This solution is the most trivial taking advantage of ‘cond’ over multiple ‘if’ statements.
-So as to remove some boilerplate the anonymous function short-hand has been used.</p>
+<p>This solution is the most trivial, taking advantage of <code class="language-plaintext highlighter-rouge">cond</code> over multiple <code class="language-plaintext highlighter-rouge">if</code> statements.
+So as to remove some boilerplate, the anonymous function shorthand has been used.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w">
   </span><span class="o">#</span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -81,10 +81,10 @@ So as to remove some boilerplate the anonymous function short-hand has been used
     </span><span class="no">:else</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>## Solution 2</p>
+<h2 id="solution-2">Solution 2</h2>
 
-<p>The solution below uses the ‘let’ statement in combination with ‘str’ to produce an output string.
-If the output string is empty however, the provided number is returned instead.</p>
+<p>The solution below uses the <code class="language-plaintext highlighter-rouge">let</code> statement in combination with <code class="language-plaintext highlighter-rouge">str</code> to produce an output string.
+If the output string is empty, however, the provided number is returned instead.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">s</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">fizz?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="s">"Fizz"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">buzz?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">))]</span><span class="w">
@@ -93,8 +93,8 @@ If the output string is empty however, the provided number is returned instead.<
 
 <h2 id="solution-3">Solution 3</h2>
 
-<p>Conceptionaly similar to the ‘cond’ implementation - ‘some-fn’ allows us to create a function which includes a list of predicates along with their desired return values.
-In the case of a match not being found the supplied number is returned instead.</p>
+<p>Conceptually similar to the <code class="language-plaintext highlighter-rouge">cond</code> implementation, <code class="language-plaintext highlighter-rouge">some-fn</code> allows us to create a function which includes a list of predicates along with their desired return values.
+In the case of a match not being found, the supplied number is returned instead.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">to-words</span><span class="w"> </span><span class="p">(</span><span class="nf">some-fn</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nf">fizzbuzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"FizzBuzz"</span><span class="p">)</span><span class="w">
@@ -107,7 +107,7 @@ In the case of a match not being found the supplied number is returned instead.<
 
 <p>The final solution uses a couple of great Clojure features, including multi-arity overloading to supply a default lookup map, as well as an array map which maintains insertion order.
 Each entry in the map is deconstructed into its predicate and return word (key, value) and then used to test against the supplied number.
-If the predicate passes, the entry is kept and finally joined together to return the output using ‘apply’ and ‘str’ functions.</p>
+If the predicate passes, the entry is kept and finally joined together to return the output using the <code class="language-plaintext highlighter-rouge">apply</code> and <code class="language-plaintext highlighter-rouge">str</code> functions.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w">
   </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">fizzbuzz</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">(</span><span class="nb">array-map</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="s">"Fizz"</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">)))</span><span class="w">

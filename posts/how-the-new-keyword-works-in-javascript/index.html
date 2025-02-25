@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Demystifying how the 'new' keyword works under-the-hood in JavaScript">
+    <meta name="description" content="Learn how the 'new' keyword operates under-the-hood in JavaScript with a clear, step-by-step explanation and a user-land implementation.">
 
     <title>
         
@@ -51,21 +51,21 @@
     <h1 class="post-title">How the 'new' keyword works in JavaScript</h1>
     <time datetime="2015-09-03T00:00:00+00:00" class="post-date">03 Sep 2015</time>
     <p>The <code class="language-plaintext highlighter-rouge">new</code> keyword in JavaScript can sometimes slip up new and experienced programmers alike.
-We typically associate this word with Classical-based Object-oriented languages (such as Java etc.), where as in JavaScript it works a little different. 
-In fact due to the languages prototypical behavior any function can be used as a constructor call, which adds more fuel to the confusion.
-To demystify the process that occurs this article will take you through the four operations that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is invoked on a Function.
-After describing these steps we will then work through codifying a user-land function that mimics its’ behavior.</p>
+We typically associate this word with classical-based object-oriented languages (such as Java, etc.), whereas in JavaScript it works a little differently. 
+In fact, due to the language’s prototypical behaviour, any function can be used as a constructor call, which adds more fuel to the confusion.
+To demystify the process that occurs, this article will take you through the four operations that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is invoked on a Function.
+After describing these steps, we will then work through codifying a user-land function that mimics its behaviour.</p>
 
 <ol>
-  <li>It creates a plain ol’ object</li>
-  <li>It assigns the supplied Functions <code class="language-plaintext highlighter-rouge">prototype</code> object property as the new objects <code class="language-plaintext highlighter-rouge">[[prototype]]</code> link. All Functions are created with a prototype object property which initially just has a constructor member which links back to the Function itself.</li>
-  <li>It invokes the Function constructor (with supplied arguments), binding <code class="language-plaintext highlighter-rouge">this</code> to the newly created object.</li>
-  <li>It checks to see if a non-primitive value has been returned from the function call, if so it will disregard the created object and return this, else the newly formed object is returned.</li>
+  <li>It creates a plain ol’ object.</li>
+  <li>It assigns the supplied Function’s <code class="language-plaintext highlighter-rouge">prototype</code> object property as the new object’s <code class="language-plaintext highlighter-rouge">[[prototype]]</code> link. All functions are created with a prototype object property which initially just has a constructor member that links back to the function itself.</li>
+  <li>It invokes the function constructor (with supplied arguments), binding <code class="language-plaintext highlighter-rouge">this</code> to the newly created object.</li>
+  <li>It checks to see if a non-primitive value has been returned from the function call. If so, it will disregard the created object and return that value; otherwise, the newly formed object is returned.</li>
 </ol>
 
 <h2 id="user-land-solution">User-land Solution</h2>
 
-<p>Now that we know the basic steps that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimic this behavior.</p>
+<p>Now that we know the basic steps that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimics this behaviour.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">isObj</span> <span class="o">=</span> <span class="nx">o</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">;</span>
 

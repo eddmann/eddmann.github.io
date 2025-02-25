@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Multiple implementations to encode and decode Caesar Cipher based messages.">
+    <meta name="description" content="Discover multiple techniques to encode and decode messages using ROT13 and ROT(n) Caesar ciphers in Python, with practical examples and clear explanations.">
 
     <title>
         
@@ -51,17 +51,18 @@
     <h1 class="post-title">Implementing ROT13 and ROT(n) Caesar Ciphers in Python</h1>
     <time datetime="2014-04-12T00:00:00+00:00" class="post-date">12 Apr 2014</time>
     <p>The Caesar cipher (shift cipher) is an extremely simple encryption technique.
-Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
-The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.</p>
+Substitutions of this kind rely on an invariant - replacing each plain-text letter with the letter at a fixed number of positions across the alphabet.
+The recipient is then able to decode the encoded message successfully if they are aware of the chosen shift.</p>
 
 
 
-<p>ROT13 (aka. rotate by 13 places) is an implementation of this cipher, replacing each letter with the letter 13 positions after it in the given symbol table (typically the alphabet).
-As the basic Latin alphabet is 26 letters long, the same algorithm implementation can be used to decode an encoded subject matter.</p>
+<p>ROT13 (also known as rotate by 13 places) is an implementation of this cipher.
+It replaces each letter with the letter 13 positions later in the given symbol table (typically the alphabet).
+As the basic Latin alphabet is 26 letters long, the same algorithm can be used to decode an encoded message.</p>
 
 <h2 id="basic-implementation">Basic Implementation</h2>
 
-<p>Using Python 3.4 as the implementation language we are able to simply use the provided (<em>batteries included</em>) ‘encode’ method as shown below.</p>
+<p>Using Python 3.4 as the implementation language, we are able to simply use the provided (<em>batteries included</em>) ‘encode’ method as shown below.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot13</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">codecs</span> <span class="kn">import</span> <span class="n">encode</span>
@@ -70,10 +71,11 @@ As the basic Latin alphabet is 26 letters long, the same algorithm implementatio
 
 <h2 id="mapping-implementation">Mapping Implementation</h2>
 
-<p>The above implementation is extremely useful, however, it does not give us a feel for how the algorithm works from first principles.
-The example below highlights the same functionality (limited to the Latin alphabet) by way of a mapping over each character in the subject string.
-Each character is passed into the ‘lookup’ function that returns the valid replacement value, not altering non-alphabet characters.
-I would like to point out Python’s ability to succinctly express the between conditions, using a standard math-chaining comparison syntax.</p>
+<p>The above implementation is extremely useful.
+However, it does not give us a feel for how the algorithm works from first principles.
+The example below highlights the same functionality (limited to the Latin alphabet) by mapping each character in the subject string.
+Each character is passed into the <code class="language-plaintext highlighter-rouge">lookup</code> function that returns the valid replacement value without altering non-alphabet characters.
+I would like to highlight Python’s ability to succinctly express range conditions using standard chained comparisons.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot13_alpha</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">lookup</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
@@ -90,10 +92,10 @@ I would like to point out Python’s ability to succinctly express the between c
 
 <h2 id="generic-alphabet-shift-implementation">Generic Alphabet Shift Implementation</h2>
 
-<p>Using Python’s string translation functionality I was able to make a more generic implementation, allowing you to specify the position length.
+<p>Using Python’s string translation functionality, I was able to create a more generic implementation that allows you to specify the shift length.
 I decided on using partial function application to allow for rotation functions to be composed and reused.
-For example the use-case below follows a single invocation of the initially implemented function.
-We could have instead assigned this function to a variable (say ‘rot13’) and call at will.</p>
+For example, the use-case below follows a single invocation of the initially implemented function.
+We could have instead assigned this function to a variable (say <code class="language-plaintext highlighter-rouge">rot13</code>) and called it at will.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot_alpha</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">ascii_lowercase</span> <span class="k">as</span> <span class="n">lc</span><span class="p">,</span> <span class="n">ascii_uppercase</span> <span class="k">as</span> <span class="n">uc</span>
@@ -105,10 +107,10 @@ We could have instead assigned this function to a variable (say ‘rot13’) and
 
 <h2 id="generic-shift-implementation">Generic Shift Implementation</h2>
 
-<p>The final fixed piece of the implementation is that it only handles Latin alphabet symbols.
-Say we would like to use ROT5 for number encoding, this would require an individual implementation.
+<p>The final implementation limitation is that it only handles Latin alphabet symbols.
+If we would like to use ROT5 for number encoding, this would require a separate implementation.
 The example below removes this constraint, allowing the user to pass in each of the symbol strings they wish to permit for encoding.
-These passed in values are used to create an encoded lookup table, based on the position length (similar to the previous example).
+These passed-in values are used to create an encoded lookup table based on the shift length (similar to the previous example).
 Finally, the lookup table is used by Python’s string translation method to return the processed value.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rot</span><span class="p">(</span><span class="o">*</span><span class="n">symbols</span><span class="p">):</span>
@@ -119,10 +121,10 @@ Finally, the lookup table is used by Python’s string translation method to ret
     <span class="k">return</span> <span class="n">_rot</span>
 </code></pre></div></div>
 
-<p>Below highlights the discussed number encoding by five positions.
-We are able to compose a new function based on the partial application nature of the ‘rot’ function.
+<p>The following example highlights number encoding by five positions.
+We are able to compose a new function based on the partial application nature of the <code class="language-plaintext highlighter-rouge">rot</code> function.
 Latin alphabet encoding is also present with the five position length invariant.
-I would like to note that a separate decode implementation is required (-N), as unlike ROT13 the encode algorithm is not it’s own inverse.</p>
+I would like to note that a separate decode implementation is required (-N), as unlike ROT13 the encode algorithm is not its own inverse.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rot5_num</span> <span class="o">=</span> <span class="n">rot</span><span class="p">(</span><span class="s">'0123456789'</span><span class="p">)(</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">rot5_num</span><span class="p">(</span><span class="s">'1234'</span><span class="p">)</span> <span class="c1"># 6789

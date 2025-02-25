@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An introduction to the Y-combinator, using PHP.">
+    <meta name="description" content="Discover how to implement the Y-combinator in PHP to achieve elegant recursion, memoization, and closure bindings for functional programming.">
 
     <title>
         
@@ -51,22 +51,22 @@
     <h1 class="post-title">The Y (Fixed-Point) Combinator in PHP</h1>
     <time datetime="2014-04-01T00:00:00+00:00" class="post-date">01 Apr 2014</time>
     <p>A combinator is a type of higher-order function that can be used to express functions without the explicit use of variables.
-A fixed point is a value that is unchanged by a function, satisfying the equation which can be found <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator">here</a>.
+A fixed point is a value that remains unchanged by a function, satisfying the equation which can be found <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator">here</a>.
 Using the Y-combinator allows us to essentially convert non-recursive code into a recursive counterpart (without directly using named recursion or iteration).
-To work it’s magic the recursive function is computed as the fixed point of the non-recursive function.</p>
+To work its magic, the recursive function is computed as the fixed point of the non-recursive function.</p>
 
 
 
-<p>You may be asking yourself why is this at all relevant in an imperative language such as PHP?
+<p>You may be asking yourself why this is at all relevant in an imperative language such as PHP?
 Well, with the introduction of Closures (since PHP 5.3) the language has slowly started to embrace many functional concepts.
-One such concept however, still requires some work to correctly implement in-practice, that being recursive closures.
-In a previous memorization <a href="/posts/implementing-and-using-memoization-in-php/">post</a> I highlighted a factorial implementation using such an approach, requiring some PHP reference hackery to pass in the closure variable, as this would not typically be available in the function scope.
+One such concept, however, still requires some work to correctly implement in practice, namely recursive closures.
+In a previous memoization <a href="/posts/implementing-and-using-memoization-in-php/">post</a> I highlighted a factorial implementation using such an approach, which required some PHP reference hackery to pass in the closure variable, as this would not typically be available in the function scope.
 With a little research I stumbled upon the concept of Haskell’s ‘fix’ function which is generally known by the name ‘Y-combinator’.
-I was keen to provide a thought-experiment into how this could be implemented in the PHP language along with some interesting example use-cases.</p>
+I was keen to provide a thought experiment into how this could be implemented in the PHP language along with some interesting example use cases.</p>
 
 <h2 id="basic-implementation">Basic Implementation</h2>
 
-<p>Below is my first attempt at implementing the Y combinator in PHP, cheating a little by temporarily storing the fix-point function in a variable to remove code duplication.</p>
+<p>Below is my first attempt at implementing the Y combinator in PHP, cheating a little by temporarily storing the fixed-point function in a variable to remove code duplication.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">Y</span><span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
 <span class="p">{</span>
@@ -82,8 +82,8 @@ I was keen to provide a thought-experiment into how this could be implemented in
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This function can be then be applied to solve the Fibonacci sequence, as shown below.
-As you can see the implementation provides us with the ability to reference the function by parameter instead of name (call-by-name), which in (typed) lambda calculus is not possible.</p>
+<p>This function can then be applied to solve the Fibonacci sequence, as shown below.
+As you can see, the implementation provides us with the ability to reference the function by parameter instead of name (call-by-name), which in (typed) lambda calculus is not possible.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">Y</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
 <span class="p">{</span>
@@ -96,10 +96,10 @@ As you can see the implementation provides us with the ability to reference the 
 <span class="p">});</span>
 </code></pre></div></div>
 
-<h2 id="adding-memorization">Adding Memorization</h2>
+<h2 id="adding-memoization">Adding Memoization</h2>
 
-<p>With the basic concept now implemented, we can simply expand on this example to include the ability to memorize function call results.
-Providing an initial empty cache, we first check to see if the hashed function call arguments have already be processed in the past, if so we skip the function invocation step and return the answer.</p>
+<p>With the basic concept now implemented, we can simply expand on this example to include the ability to memoize function call results.
+Providing an initial empty cache, we first check to see if the hashed function call arguments have already been processed in the past; if so, we skip the function invocation step and return the answer.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">YMemo</span><span class="p">(</span><span class="nv">$F</span><span class="p">,</span> <span class="nv">$cache</span> <span class="o">=</span> <span class="p">[])</span>
 <span class="p">{</span>
@@ -121,7 +121,7 @@ Providing an initial empty cache, we first check to see if the hashed function c
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>As the added memorization is an implementation detail, the user facing API has not changed and the function can again be expressed in the same manner as before (now with significant run-time speed increases).</p>
+<p>As the added memoization is an implementation detail, the user-facing API has not changed and the function can again be expressed in the same manner as before (now with significant run-time speed increases).</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">YMemo</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$fib</span><span class="p">)</span>
 <span class="p">{</span>
@@ -136,8 +136,8 @@ Providing an initial empty cache, we first check to see if the hashed function c
 
 <h2 id="using-closure-bindings">Using Closure Bindings</h2>
 
-<p>Included more for it’s athsetic appeal (syntactic sugar) we can take advantage of <a href="http://www.php.net/manual/en/closure.bind.php">Closure Bindings</a> within PHP (since 5.4) to remove the need to explicitly pass in the fixed-point function.
-Although clearly violating the properties of a true Y-combinator, we are instead able to now simply invoke ‘$this’ with the supplied arguments, providing a more user-friendly implementation.</p>
+<p>Included more for its aesthetic appeal (syntactic sugar), we can take advantage of <a href="http://www.php.net/manual/en/closure.bind.php">Closure Bindings</a> within PHP (since 5.4) to remove the need to explicitly pass in the fixed-point function.
+Although this clearly violates the properties of a true Y-combinator, we are instead able to now simply invoke <code class="language-plaintext highlighter-rouge">$this</code> with the supplied arguments, providing a more user-friendly implementation.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">Yish</span><span class="p">(</span><span class="nv">$F</span><span class="p">)</span>
 <span class="p">{</span>
@@ -153,7 +153,7 @@ Although clearly violating the properties of a true Y-combinator, we are instead
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>We can use the example of the Fibonacci sequence again, to this time make use of the closure bound implementation.</p>
+<p>We can use the example of the Fibonacci sequence again, to this time make use of the closure-bound implementation.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nf">Yish</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
 <span class="p">{</span>

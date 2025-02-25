@@ -1,25 +1,34 @@
 ---
 layout: post
-title: "Implementing Heapsort in Java and C"
-meta: "Using the tree-based heap data structure to sort an input array."
+title: 'Implementing Heapsort in Java and C'
+meta: 'Discover how to implement the efficient heapsort algorithm in Java and C with detailed code examples and explanations on building a tree-based heap data structure for sorting.'
+tags: java c algorithm
 ---
 
-Heapsort is a sorting algorithm which can be split into two distinct stages.
-The first stage is to build a tree-based heap data structure from the supplied input.
-Conforming to the [heap property](http://en.wikipedia.org/wiki/Binary_heap) either requires the structure follow that all parent nodes are greater than or equal to their children (with the highest at the root), or the inverse.
+In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array.
+We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code.
+
 <!--more-->
-Being called a max-heap and min-heap respectively, this step in itself has many different interesting use-cases outside of simply sorting an input.
-Implementing said heap as an array allows us to reuse the input array for both the heap and resulting output.
-All binary trees are able to be represented in array form, but as a heap is always weighted on the side of completeness, it can be stored very efficiently.
-The second step simply builds up the sorted array, with the next element removed from the heap structure (reconstructing the heap after each iteration), until no elements are left.
-The implementation works in both minimum and maximum forms, with only the second steps direction requiring alteration.
-Being a comparison-based algorithm it caters for a user supplied comparison operation, determining which of the two subject elements should occur first in the output.
-However, though the option for in-place sorting, it is not stable, resulting in the possibility of initially ordered equal keys being reordered.
+
+## How it works
+
+Heapsort is a sorting algorithm which can be split into two distinct steps.
+
+The first step is to build a tree-based heap data structure from the supplied input.
+Conforming to the [heap property](http://en.wikipedia.org/wiki/Binary_heap) requires the structure to ensure that all parent nodes are greater than or equal to their children (with the highest at the root), or the inverse.
+Being called a max-heap and a min-heap respectively, this step in itself has many interesting use cases outside of simply sorting an input.
+Implementing the heap as an array allows us to reuse the input array for both the heap and the resulting output.
+All binary trees can be represented in array form, but as a heap is always weighted towards completeness, it can be stored very efficiently.
+
+The second step simply builds up the sorted array, with the next element removed from the heap structure (reconstructing the heap after each iteration) until no elements remain.
+The implementation works in both minimum and maximum forms, with only the direction in the second step requiring alteration.
+Being a comparison-based algorithm, it caters for a user-supplied comparison operation, determining which of the two subject elements should occur first in the output.
+However, despite the option for in-place sorting, it is not stable, resulting in the possibility of initially ordered equal keys being reordered.
 
 ## Java Implementation
 
 Below is an implementation of the Heapsort algorithm written in Java.
-I was able to simply add the flexibility provided by generalising the sorting algorithm to any class that implemented the [Comparable](http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html) interface.
+I was able to add the flexibility provided by generalising the sorting algorithm to any class that implemented the [Comparable](http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html) interface.
 
 ```java
 public class Heap {
@@ -74,14 +83,14 @@ public class Heap {
 ```
 
 Looking at the implementation above you will notice that the first step the sorting method takes is to create a heap structure from the input.
-Calling the 'heapify' method on the first half of the input array guarantees (by recursion) to build up the heap data structure and fulfill the heap property.
-Once this step has completed we loop through each item in the heap, swapping the first and last heap elements, reducing and reconstructing the structure after each iteration.
+Calling the `heapify` method on the first half of the input array guarantees (by recursion) that the heap data structure is built and the heap property is fulfilled.
+Once this step has been completed, we loop through each item in the heap, swapping the first and last heap elements, reducing and reconstructing the structure after each iteration.
 
 ## C Implementation
 
 Below is a C implementation, similar to the above Java example.
-Using macros I was able to abstract away some of the repetitive code used to count and swap items in the subject array.
-In this case I decided against adding confusion to the resulting implementation with the introduction of void pointer generalisation, and instead focused only on integer input.
+Using macros, I was able to abstract away some of the repetitive code used to count and swap items in the subject array.
+In this case, I decided against adding confusion to the resulting implementation with the introduction of void pointer generalisation, and instead focused only on integer input.
 
 ```c
 #include <stdio.h>
@@ -142,8 +151,8 @@ int main(int argc, char *argv[])
 }
 ```
 
-As I discussed above this implementation is very similar to its Java counterpart.
-One small 'hack' that I found very useful in C's macro system was the use of a 'do/while' loop to create multi-line definitions with the least compiler issues.
+As discussed above, this implementation is very similar to its Java counterpart.
+One small _hack_ that I found very useful in C's macro system was the use of a 'do/while' loop to create multi-line definitions with the least compiler issues.
 
 ## Resources
 

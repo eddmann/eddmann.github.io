@@ -1,18 +1,19 @@
 ---
 layout: post
 title: 'Reversing a String in PHP'
-meta: 'Interesting ways to reverse a string in PHP.'
+meta: 'Explore innovative methods to reverse strings in PHP, from basic built-in functions to advanced recursive and Unicode-support techniques.'
+tags: php
 ---
 
 Since recently setting up a forum for [Three Devs and a Maybe](http://forum.threedevsandamaybe.com/), we have started to partake in a weekly [code-kata](<http://en.wikipedia.org/wiki/Kata_(programming)>).
-What could be more fitting to start with than the common interview question, reversing a string in 'X' language.
+What could be more fitting to start with than the common interview question, reversing a string in a given language.
 In this case the language is PHP, and below are some of the many ways contrived to solve the problem.
 
 <!--more-->
 
 ## Basic Implementations
 
-The implementation below is the most simple, taking advantage of PHP's vast amount of 'built-in' functions to reverse the supplied string.
+The implementation below is the simplest, as it takes advantage of PHP's extensive built-in functions to reverse the supplied string.
 
 ```php
 function reverse($str)
@@ -21,7 +22,7 @@ function reverse($str)
 }
 ```
 
-In a similar manner, we are able to compose a 'reverse' function by joining ([alias for 'implode'](http://php.net/function.join)) a reversed array of the string characters.
+Similarly, we can compose a `reverse` function by joining (alias for [`implode`](http://php.net/function.join)) a reversed array of the string characters.
 
 ```php
 function reverse($str)
@@ -31,7 +32,7 @@ function reverse($str)
 ```
 
 The most imperative approach to reverse a string is by looping over each character with indexes at each end, swapping their contents upon each iteration.
-PHP's ability to access individual characters in an array manner turns out to be very useful in this case.
+PHP's ability to access individual characters in an array-like manner turns out to be very useful in this case.
 
 ```php
 function reverse($str)
@@ -46,7 +47,7 @@ function reverse($str)
 }
 ```
 
-Though not best practice, the desired result can be compacted into a single 'for' loop declaration, shown below.
+Although not best practice, the desired result can be compacted into a single `for` loop declaration, as shown below.
 
 ```php
 function reverse($str)
@@ -57,8 +58,8 @@ function reverse($str)
 }
 ```
 
-Another non-practical approach using the 'array_walk' function can be found below.
-An interesting implementation detail, is how you are able to clearly see that a copy of '$out' is being passed into the closure function.
+Another impractical approach using the `array_walk` function can be found below.
+An interesting implementation detail is that a copy of `$out` is being passed into the closure function.
 
 ```php
 function reverse($str)
@@ -76,9 +77,9 @@ function reverse($str)
 
 ## Recursive Implementations
 
-The second group of implementations contrived used forms of recursion to achieve the desired result.
-The first of such methods is a simple recursive invocation of the function, removing the head character upon each call.
-Once the string has reached one character, the base-case has been hit and the remaining string is simply returned.
+The second group of implementations employs recursion to achieve the desired result.
+The first of these methods is a simple recursive invocation of the function, removing the head character upon each call.
+Once the string has reached one character, the base case has been hit and the remaining string is simply returned.
 
 ```php
 function reverse($str)
@@ -92,7 +93,7 @@ function reverse($str)
 ```
 
 The implementation below takes advantage of the [divide and conquer](http://en.wikipedia.org/wiki/Divide_and_conquer_algorithm) algorithm paradigm, flipping the left and right substrings upon each recursive invocation.
-Similar to the previous example, if the base-case of a single character string is met, the remaining string is simply returned.
+Similar to the previous example, if the base case of a single character string is met, the remaining string is simply returned.
 
 ```php
 function reverse($str)
@@ -111,9 +112,9 @@ function reverse($str)
 
 ## Unicode-Support Implementations
 
-PHP's in-built support for Unicode strings is 'somewhat' lacking, as such, extra steps are required to correctly reverse a string of this type.
-As Unicode character representations can consist of multiple bytes (i.e. UTF-8), we are unable to naively use 'strlen' and 'str_split' (which assume a character is always a single byte).
-The implementation below uses 'preg_split' support for Unicode characters, to correctly split the string into characters for us to reverse.
+PHP's built-in support for Unicode strings is somewhat lacking; as such, extra steps are required to correctly reverse a string of this type.
+As Unicode character representations can consist of multiple bytes (i.e. UTF-8), we are unable to naively use `strlen` and `str_split` (which assume a character is always a single byte).
+The implementation below uses `preg_split` support for Unicode characters to correctly split the string into characters for us to reverse.
 
 ```php
 function reverse($str)
@@ -122,7 +123,7 @@ function reverse($str)
 }
 ```
 
-Using some [endianness](http://en.wikipedia.org/wiki/Endianness) conversion trickery we are able to use PHP's in-built 'strrev' function.
+Using some [endianness](http://en.wikipedia.org/wiki/Endianness) conversion trickery we are able to use PHP's built-in `strrev` function.
 The implementation below uses 'iconv' to achieve the desired results.
 
 ```php
@@ -132,7 +133,7 @@ function reverse($str)
 }
 ```
 
-Similar in-nature to the previous example, we are instead now using the 'mb' library to perform the conversion.
+Similar in nature to the previous example, we are instead now using the `mb` library to perform the conversion.
 
 ```php
 function reverse($str)

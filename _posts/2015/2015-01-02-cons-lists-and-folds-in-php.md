@@ -1,13 +1,12 @@
 ---
 layout: post
-title: "Cons Lists and Folds in PHP"
-meta: "Looking into implementing Cons cell Lists and Fold operations in PHP"
+title: 'Cons Lists and Folds in PHP'
+meta: 'Looking into implementing Cons cell Lists and Fold operations in PHP'
 ---
 
 Cons cells are used to (cons)truct a data object which represents an ordered pair.
 The elements in this pair can be identified as 'car' and 'cdr' accordingly.
-Using this simple representation we are able to not only hold ordered pairs, but also create more complex data-structures, such as a List.
-<!--more-->
+Using this simple representation we are able to not only hold ordered pairs, but also create more complex data-structures, such as a List. <!--more-->
 Below is an example interface that we will be using to implement the two different kinds of Cons cell required to create this List data-structure.
 
 ```php

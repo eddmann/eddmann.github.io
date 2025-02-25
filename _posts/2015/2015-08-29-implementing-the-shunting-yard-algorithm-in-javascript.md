@@ -1,19 +1,18 @@
 ---
 layout: post
-title: "Implementing the Shunting Yard algorithm in JavaScript"
-meta: "Parsing an infix expression into its RPN counterpart using the Shunting Yard algorithm in JavaScript"
+title: 'Implementing the Shunting Yard algorithm in JavaScript'
+meta: 'Parsing an infix expression into its RPN counterpart using the Shunting Yard algorithm in JavaScript'
 ---
 
 Following on from my [recent post](/posts/small-rpn-implementation-in-javascript) on implementing a small RPN parser using JavaScript, we can expand on this by handling infix expressions.
-This can be achieved by initially parsing the expression into its postfix (RPN) counterpart, highlighting another use case where a stack based approach works well.
-<!--more-->
+This can be achieved by initially parsing the expression into its postfix (RPN) counterpart, highlighting another use case where a stack based approach works well. <!--more-->
 Looping over each token we either push the token to the output if it is numeric, pop from the operator stack based on precedence if an operator or handle brackets accordingly.
 You can find a more in-depth description of the algorithm using Java as the example language in a [previous post](/posts/shunting-yard-implementation-in-java).
 
 ```js
-let yard = (infix) => {
-  let ops = {'+': 1, '-': 1, '*': 2, '/': 2};
-  let peek = (a) => a[a.length - 1];
+let yard = infix => {
+  let ops = { '+': 1, '-': 1, '*': 2, '/': 2 };
+  let peek = a => a[a.length - 1];
   let stack = [];
 
   return infix
@@ -34,8 +33,7 @@ let yard = (infix) => {
       }
 
       if (token == ')') {
-        while (peek(stack) != '(')
-          output.push(stack.pop());
+        while (peek(stack) != '(') output.push(stack.pop());
         stack.pop();
       }
 
@@ -46,5 +44,5 @@ let yard = (infix) => {
 };
 
 yard('3 + 4 * 5 / (3 + 2)'); // 3 4 5 * 3 2 + / +
-rpn(yard('3 + 4 * 5 / (3 + 2)')) // 7
+rpn(yard('3 + 4 * 5 / (3 + 2)')); // 7
 ```

@@ -1,15 +1,14 @@
 ---
 layout: post
-title: "Implementing Streams in PHP"
-meta: "Multiple ways of implementing the Stream data-structure using PHP"
+title: 'Implementing Streams in PHP'
+meta: 'Multiple ways of implementing the Stream data-structure using PHP'
 ---
 
 Typically, when we think about a list of elements we assume there is both a start and finite end.
 In this example the list has been precomputed and stored for subsequent traversal and transformation.
-If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.
-<!--more-->
+If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists. <!--more-->
 Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
-This concept is called a [Stream](http://en.wikipedia.org/wiki/Stream_(computing)), commonly also referred to as a lazy list, and is a foundational concept in languages such as Haskell.
+This concept is called a [Stream](<http://en.wikipedia.org/wiki/Stream_(computing)>), commonly also referred to as a lazy list, and is a foundational concept in languages such as Haskell.
 Streams are not interacted with in the same manner as finite lists, as they cannot be operated on as a whole.
 Instead they should be thought of as 'codata' (infinite) or an Object-oriented [Iterable](http://en.wikipedia.org/wiki/Iterator), as a opposed to just simply 'data' (finite).
 As well as being able to create a Stream based on a supplied promise, we are also able to compose new Streams using 'map' and 'filter' methods.

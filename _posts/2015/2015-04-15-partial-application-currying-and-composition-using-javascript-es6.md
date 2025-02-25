@@ -23,10 +23,9 @@ The ability to partially apply (or even more strictly [curry](http://en.wikipedi
 There are many examples of implementing such behavior in JavaScript, all typically following an imperative mindset.
 The implementation shown below instead uses recursion along with some of the new features present in ES6 to succinctly codify the definition of what partial application truly is.
 
-<!-- prettier-ignore -->
 ```js
 let curry = (fn, ...args) => {
-  let _curry = (args) =>
+  let _curry = args =>
     args.length < fn.length
       ? (..._args) => _curry([...args, ..._args])
       : fn(...args);
@@ -46,9 +45,13 @@ This example also takes advantage of the arrow functions behaviour to return the
 Another Functional building block is the ability to create new functionality by way of function composition.
 In a similar manner to how we implemented partial application, we are also able to use ES6's new features to aid us in creating a composition function.
 
-<!-- prettier-ignore -->
 ```js
-let compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
+let compose = (...fns) =>
+  fns.reduce(
+    (f, g) =>
+      (...args) =>
+        f(g(...args))
+  );
 ```
 
 The one-line implementation shown above clearly highlights how explicit we are able to be when using the new arrow and rest-spread syntax.

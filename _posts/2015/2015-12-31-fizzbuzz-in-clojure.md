@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "FizzBuzz in Clojure"
-meta: "Multiple ways to solve the FizzBuzz code kata in Clojure"
+title: 'FizzBuzz in Clojure'
+meta: 'Multiple ways to solve the FizzBuzz code kata in Clojure'
 ---
 
 This past Christmas break I had the chance to finally pick up [The Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book and delve into the world of Lisp.
 Along with the common-place Merge-sort algorithm I find it beneficial to explore a new language and its capabilities by solving the [FizzBizz](http://rosettacode.org/wiki/FizzBuzz) code kata.
 In this post I will be explaining a couple of the implementations that I created.
+
 <!--more-->
 
 Each of the four solutions below share the following predicate functions.
@@ -65,7 +66,7 @@ In the case of a match not being found the supplied number is returned instead.
 
 The final solution uses a couple of great Clojure features, including multi-arity overloading to supply a default lookup map, as well as an array map which maintains insertion order.
 Each entry in the map is deconstructed into its predicate and return word (key, value) and then used to test against the supplied number.
-If the predicate passes, the entry is kept and finally joined together to return the output using 'apply' and  'str' functions.
+If the predicate passes, the entry is kept and finally joined together to return the output using 'apply' and 'str' functions.
 
 ```clojure
 (defn fizzbuzz

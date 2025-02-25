@@ -1,13 +1,15 @@
 ---
 layout: post
-title: "Uploading Podcast Audio to YouTube"
-meta: "Simple way of uploading audio tracks to YouTube."
+title: 'Uploading Podcast Audio to YouTube'
+meta: 'Learn how to effortlessly transform your podcast audio into a YouTube video using a static image and ffmpeg for a visually engaging experience.'
+tags: youtube podcast ffmpeg
 ---
 
-YouTube unfortunately does not provide you with the ability to upload audio tracks individually, which is a pain if you do not work with video (such as a podcast).
-The way to get around this limitation is to create a video which includes the desired audio track and a fixed image (i.e. cover-art) which lasts the duration of the track.
+Unfortunately, YouTube does not provide you with the ability to upload audio tracks individually, which can be inconvenient if you do not work with video (such as a podcast).
+The way to get around this limitation is to create a video which includes the desired audio track and a fixed image (i.e. cover art) which lasts the duration of the track.
 There are many ways of achieving such a result, from iMovie and Windows Movie Maker to the online service [TunesToTube](http://www.tunestotube.com/).
-With a little [research](https://trac.ffmpeg.org/wiki/EncodeforYouTube) however, I was able to come up with a even simpler solution that only requires the ever useful [ffmpeg](http://www.ffmpeg.org).
+With a little [research](https://trac.ffmpeg.org/wiki/Encode/YouTube), however, I was able to come up with an even simpler solution that only requires the ever-useful [ffmpeg](http://www.ffmpeg.org).
+
 <!--more-->
 
 ```bash

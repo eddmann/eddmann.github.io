@@ -2,7 +2,7 @@
 layout: post
 title: 'Shunting Yard Implementation in Java'
 meta: 'A comprehensive guide to implementing the Shunting Yard algorithm in Java, converting infix expressions to postfix notation with a clear code example and detailed explanation.'
-tags: java algorithm
+tags: java algorithms
 ---
 
 The Shunting Yard algorithm was developed by the great [Edsger Dijkstra](http://en.wikipedia.org/wiki/Edsger_Dijkstra) as a means to parse an infix mathematical expression into Reverse Polish notation (postfix).

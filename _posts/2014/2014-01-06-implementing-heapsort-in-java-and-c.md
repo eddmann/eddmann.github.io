@@ -2,7 +2,7 @@
 layout: post
 title: 'Implementing Heapsort in Java and C'
 meta: 'Discover how to implement the efficient heapsort algorithm in Java and C with detailed code examples and explanations on building a tree-based heap data structure for sorting.'
-tags: java c algorithm
+tags: java c algorithms
 ---
 
 In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array.

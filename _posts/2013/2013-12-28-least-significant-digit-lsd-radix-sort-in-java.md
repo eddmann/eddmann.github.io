@@ -2,7 +2,7 @@
 layout: post
 title: 'Least Significant Digit (LSD) Radix Sort in Java'
 meta: 'Discover how to implement a queue-based Least Significant Digit (LSD) Radix Sort in Java with detailed code examples and explanations.'
-tags: java algorithm
+tags: java algorithms
 ---
 
 Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset.

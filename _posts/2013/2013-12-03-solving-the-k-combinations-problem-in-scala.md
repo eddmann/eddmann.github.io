@@ -2,7 +2,7 @@
 layout: post
 title: 'Solving the k-combinations problem in Scala'
 meta: 'Discover multiple approaches to solving the k-combinations (N-choose-k) problem in Scala, including brute-force, recursive and implicit class methods for efficient combinatorial calculations.'
-tags: scala algorithm
+tags: scala algorithms
 ---
 
 More often than not there are many different ways to solve a particular task.

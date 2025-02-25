@@ -2,7 +2,7 @@
 layout: post
 title: 'Parallel Summation in Java'
 meta: 'Learn how to implement parallel summation in Java using threads for enhanced performance and speed optimisation.'
-tags: java algorithm
+tags: java algorithms
 ---
 
 Summation is the common operation of adding a sequence of numbers together, resulting in their total.

@@ -2,7 +2,7 @@
 layout: post
 title: 'Merge sort in Scala using Tail-recursion and Streams'
 meta: 'Discover two optimised implementations of merge sort in Scala using tail recursion and streams, complete with detailed code examples and explanations.'
-tags: scala algorithm functional-programming
+tags: scala algorithms functional-programming
 ---
 
 In a previous [post](/posts/merge-sort-comparison-in-java-and-scala/) I made a rudimentary comparison of Java and Scala using the [Merge sort](http://en.wikipedia.org/wiki/Merge_sort) algorithm as a case study.

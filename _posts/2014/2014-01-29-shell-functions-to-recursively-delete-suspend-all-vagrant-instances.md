@@ -1,7 +1,8 @@
 ---
 layout: post
 title: 'Shell Functions to Recursively Delete/Suspend all Vagrant Instances'
-meta: 'Functions to help manage currently running and obsolete Vagrant instances.'
+meta: 'Learn how to manage and automate deletion or suspension of Vagrant instances with recursive shell functions for a smoother development workflow.'
+tags: vagrant
 ---
 
 I have been using [Vagrant](http://www.vagrantup.com/) exclusively for almost a year now and am still loving it, even with the introduction of [Docker](https://www.docker.io/).
@@ -31,4 +32,4 @@ function vagrant-suspend-all() {
 
 The two functions above allow you to provide a starting directory to locate instances, based on the existence of a '.vagrant' directory.
 If no path is provided the present working directory is used instead.
-Finally progress of each found instance and actions taken is printed to the terminal.
+Finally, progress of each found instance and actions taken is printed to the terminal.

@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Bubble-sort in Clojure"
-meta: "Implementing the Bubble-sort algorithm in Clojure"
+title: 'Bubble-sort in Clojure'
+meta: 'Implementing the Bubble-sort algorithm in Clojure'
 ---
 
 Following on with my exploration into implementing common sorting algorithms in Clojure, today we have the Bubble-sort.
 This sort works by iteratively passing through the supplied sequence, swapping the current element with the next if it is comparably greater.
 The operation is complete when a pass through the sequence does not result in a swap occurring.
+
 <!--more-->
 
 ```clojure

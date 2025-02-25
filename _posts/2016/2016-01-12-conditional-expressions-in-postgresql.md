@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Conditional Expressions in PostgreSQL"
-meta: "An interesting use-case for conditional expressions in PostgreSQL"
+title: 'Conditional Expressions in PostgreSQL'
+meta: 'An interesting use-case for conditional expressions in PostgreSQL'
 ---
 
 There maybe a case were you need to make sure only a single row value is `true` in a collection of results.
 A common pattern for doing such a task is to set all values to `false` within this collection, and then set the desired one to `true`.
+
 <!--more-->
 
 ```sql

@@ -1,12 +1,11 @@
 ---
 layout: post
-title: "Operations on a Deck of Cards in PostgreSQL"
-meta: "Exploring how to use PostgreSQL for performing operations on a Deck of Cards"
+title: 'Operations on a Deck of Cards in PostgreSQL'
+meta: 'Exploring how to use PostgreSQL for performing operations on a Deck of Cards'
 ---
 
 Recently I have been looking more into SQL and in-particular how RDMS's work under-the-hood.
-I thought it would be interesting to use some of the lesser-known features that PostgreSQL has to offer, concentrating my efforts on operations performed on a deck of cards.
-<!--more-->
+I thought it would be interesting to use some of the lesser-known features that PostgreSQL has to offer, concentrating my efforts on operations performed on a deck of cards. <!--more-->
 
 ```sql
 WITH deck AS (

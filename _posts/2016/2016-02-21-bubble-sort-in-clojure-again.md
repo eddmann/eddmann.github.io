@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Bubble-sort in Clojure... again"
-meta: "Yet another implementation of the Bubble-sort algorithm in Clojure"
+title: 'Bubble-sort in Clojure... again'
+meta: 'Yet another implementation of the Bubble-sort algorithm in Clojure'
 ---
 
 Following on from my [previous solution](/posts/bubble-sort-in-clojure/) to implementing the Bubble-sort algorithm in Clojure, I thought it would be interesting to experiment with a different approach.
 Taking advantage of lists and vectors respective cheap head and tail insertions, we can use these two properties to good effect as shown below.
+
 <!--more-->
 
 ```clojure

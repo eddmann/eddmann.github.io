@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Anagram Solver in Clojure"
-meta: "Multiple different ways in-which to solve Anagrams using Clojure"
+title: 'Anagram Solver in Clojure'
+meta: 'Multiple different ways in-which to solve Anagrams using Clojure'
 ---
 
 This past week discussion around solving anagrams was brought up - I thought it would be interesting to devise a couple of methods for computational achieving such a task.
 Providing an anagram string and a dictionary file, I wished to be returned all possible matching words from the dictionary.
+
 <!--more-->
 
 I decided this expectational exercise was a great opportunity to use Clojure.

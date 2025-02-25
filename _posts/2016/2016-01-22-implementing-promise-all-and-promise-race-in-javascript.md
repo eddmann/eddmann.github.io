@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Implementing Promise.all and Promise.race in JavaScript"
-meta: "Explaining solutions to implementing Promise.all and Promise.race in JavaScript"
+title: 'Implementing Promise.all and Promise.race in JavaScript'
+meta: 'Explaining solutions to implementing Promise.all and Promise.race in JavaScript'
 ---
 
 Throughout the past couple of months much of the JavaScript development I have been involved with has revolved around [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 Promises are a simple abstraction to handle deferred and asynchronous computations.
 This lunchtime I decided to see how one would go about implementing two concepts that are present in the Promise standard ([`all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) and [`race`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race)).
+
 <!--more-->
 
 ## Promise.all
@@ -20,7 +21,8 @@ const all = (...promises) => {
 
   const merged = promises.reduce(
     (acc, p) => acc.then(() => p).then(r => results.push(r)),
-    Promise.resolve(null));
+    Promise.resolve(null)
+  );
 
   return merged.then(() => results);
 };
@@ -31,10 +33,11 @@ We are able to use this solution in a couple of contrived examples, initially hi
 ```js
 const p1 = Promise.resolve('foo');
 const p2 = 'bar';
-const p3 = new Promise((res, rej) => { setTimeout(res, 100, 'baz') });
+const p3 = new Promise((res, rej) => {
+  setTimeout(res, 100, 'baz');
+});
 
-all(p1, p2, p3)
-  .then(([a1, a2, a3]) => console.log(a1, a2, a3));
+all(p1, p2, p3).then(([a1, a2, a3]) => console.log(a1, a2, a3));
 // "foo" "bar" "baz"
 
 const p4 = Promise.reject('qux');
@@ -61,12 +64,18 @@ const race = (...promises) =>
 We are able to highlight this implementation in an example, first depicting the 'happy path', followed by a rejection which is returned due to 'winning the race'.
 
 ```js
-const p1 = new Promise((res, rej) => { setTimeout(res, 100, 'foo') });
-const p2 = new Promise((res, rej) => { setTimeout(res, 200, 'bar') });
+const p1 = new Promise((res, rej) => {
+  setTimeout(res, 100, 'foo');
+});
+const p2 = new Promise((res, rej) => {
+  setTimeout(res, 200, 'bar');
+});
 
 race(p1, p2).then(a => console.log(a)); // "foo"
 
-const p3 = new Promise((res, rej) => { setTimeout(rej, 50, 'baz') });
+const p3 = new Promise((res, rej) => {
+  setTimeout(rej, 50, 'baz');
+});
 
 race(p1, p2, p3)
   .then(a => console.log(a))

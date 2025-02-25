@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Mergesort in Clojure using Post Conditionals"
-meta: "A simple merge-sort implementation in Clojure using post conditionals to maintain sort invariant"
+title: 'Mergesort in Clojure using Post Conditionals'
+meta: 'A simple merge-sort implementation in Clojure using post conditionals to maintain sort invariant'
 ---
 
-Whilst currently reading through [The Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book I was introduced to the concept of pre and post-conditionals, similar to another language I have heard about called [Eiffel](https://en.wikipedia.org/wiki/Eiffel_(programming_language)).
+Whilst currently reading through [The Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book I was introduced to the concept of pre and post-conditionals, similar to another language I have heard about called [Eiffel](<https://en.wikipedia.org/wiki/Eiffel_(programming_language)>).
 To experiment with this feature I decided to create a simple merge-sort algorithm implementation which provided the post invariant that its returned values were sorted by the provided predicate.
+
 <!--more-->
 
 ```clojure

@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Validating 32-bit Integers using PHP"
-meta: "Platform-agnostic validation of 32-bit signed integers in PHP"
+title: 'Validating 32-bit Integers using PHP'
+meta: 'Platform-agnostic validation of 32-bit signed integers in PHP'
 ---
 
 Last week I was required to validate that a supplied integer would fit correctly into a 32-bit address space.
 The available size of an integer within PHP is platform dependent, and could either be 32 or 64 bits based on the architecture you are using.
 This function had to cater for these differences and as such I decided to explore a couple of different options for producing this validation.
+
 <!--more-->
 
 ```php

@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Mapping, Filtering and Reducing in PHP"
-meta: "Exploring how to transform common-place imperative code, with these higher-order functions."
+title: 'Mapping, Filtering and Reducing in PHP'
+meta: 'Exploring how to transform common-place imperative code, with these higher-order functions.'
 ---
 
 Over the past couple of years I have transitioned from boilerplate-heavy, imperative code, to begin using the more intuitive `map`, `filter` and `reduce` higher-order functions.
 In this article I hope to highlight the transformation that occurs, along with simplification, when moving away from the imperative and onto the declarative.
 We shall be performing a simple process which transforms a collection of user entries into a filtered collection of their names.
 Although trivial in nature, it is a great place to highlight the power of the paradigm shift.
+
 <!--more-->
 
 Below you will find the initial collection of user entires we wish to process.

@@ -1,16 +1,17 @@
 ---
 layout: post
-title: "Implementing a Cancelable Promise in JavaScript"
-meta: "Creating a Promise in JavaScript that can be cancelled"
+title: 'Implementing a Cancelable Promise in JavaScript'
+meta: 'Creating a Promise in JavaScript that can be cancelled'
 ---
 
 I recently was working on a React component which complained about its state being set when it was not mounted.
 This was due to a uncompleted promise being resolved when the component had since been unmounted.
 To solve this issue I was able to use the concept of a cancelable promise which would be canceled before the component was unmounted.
+
 <!--more-->
 
 ```js
-const cancelable = (promise) => {
+const cancelable = promise => {
   let hasCancelled = false;
 
   return {
@@ -21,8 +22,8 @@ const cancelable = (promise) => {
 
       return v;
     }),
-    cancel: () => hasCancelled = true
-  }
+    cancel: () => (hasCancelled = true),
+  };
 };
 ```
 

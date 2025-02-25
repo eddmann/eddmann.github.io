@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "Recursive Functions using a Trampoline in Clojure"
-meta: "Using the concept of a Trampoline to maintain a single call stack frame in Clojure"
+title: 'Recursive Functions using a Trampoline in Clojure'
+meta: 'Using the concept of a Trampoline to maintain a single call stack frame in Clojure'
 ---
 
 Following on from yesterdays post that discussed ['Trampolining' in JavaScript](/posts/recursive-functions-using-a-trampoline-in-javascript/), I thought it would be interesting to see what Clojure has to offer.
+
 <!--more-->
 
 ## Odd and Even

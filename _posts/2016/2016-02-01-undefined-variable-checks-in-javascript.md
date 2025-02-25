@@ -1,11 +1,10 @@
 ---
 layout: post
-title: "Undefined variable checks in JavaScript"
-meta: "Checking for the existence of a variable in JavaScript"
+title: 'Undefined variable checks in JavaScript'
+meta: 'Checking for the existence of a variable in JavaScript'
 ---
 
-This morning I stumbled upon an issue surrounding checking for the existence of a variable in JavaScript.
-<!--more-->
+This morning I stumbled upon an issue surrounding checking for the existence of a variable in JavaScript. <!--more-->
 I was under the impression that I could perform this check as follows:
 
 ```js

@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Infix Calculator in Clojure"
-meta: "Creating a small infix-calculator in Clojure using the Shunting Yard algorithm and RPN evaluation"
+title: 'Infix Calculator in Clojure'
+meta: 'Creating a small infix-calculator in Clojure using the Shunting Yard algorithm and RPN evaluation'
 ---
 
 Following on from my previous post, I have continued my exploration into Clojure by implementing a simple infix calculator - using the Shunting Yard algorithm and RPN evaluation.
 The documented implementation is split into three distinct parts of which I will describe piece-by-piece, before composing them together to result in the final calculator.
+
 <!--more-->
 
 ## Tokenization

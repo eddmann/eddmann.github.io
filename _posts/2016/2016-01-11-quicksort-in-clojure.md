@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "QuickSort in Clojure"
-meta: "Exploring the clojure.core library by implementing the QuickSort algorithm"
+title: 'QuickSort in Clojure'
+meta: 'Exploring the clojure.core library by implementing the QuickSort algorithm'
 ---
 
 This past weekend I had the chance to delve more into Clojure's [core library](https://clojuredocs.org/clojure.core).
 I experimented with some interesting aspects of the library by implementing the QuickSort algorithm in a couple of different ways.
+
 <!--more-->
 
 ## Random Number Generation

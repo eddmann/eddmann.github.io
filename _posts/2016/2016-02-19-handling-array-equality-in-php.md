@@ -1,10 +1,11 @@
 ---
 layout: post
-title: "Handling Array Equality in PHP"
-meta: "Exploring how PHP handles equality in-regard to Arrays"
+title: 'Handling Array Equality in PHP'
+meta: 'Exploring how PHP handles equality in-regard to Arrays'
 ---
 
 If you want to check if two arrays contain the same values, regardless of order, you will have some issue using the operators `==` and `===`.
+
 <!--more-->
 
 With the equal operator `==` you are able to check for equality based on the type coerced values and keys (regardless of order).

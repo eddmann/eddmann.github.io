@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Exploring Multi-Methods in Clojure"
-meta: "Exploring Multi-Methods in Clojure using some simple examples"
+title: 'Exploring Multi-Methods in Clojure'
+meta: 'Exploring Multi-Methods in Clojure using some simple examples'
 ---
 
 Currently reading through the [Joy of Clojure](https://www.manning.com/books/the-joy-of-clojure) book I have recently been introduced to Clojure's multi-method support.
 I decided that it would be interesting to see this feature in action, so I opened up LightTable and codified some example use-cases.
+
 <!--more-->
 
 ## FizzBuzz

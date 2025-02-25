@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Generating Podcast Stats in PHP"
-meta: "Creating simple podcast stats stored in YAML front-matter using PHP"
+title: 'Generating Podcast Stats in PHP'
+meta: 'Creating simple podcast stats stored in YAML front-matter using PHP'
 ---
 
 In the [100th episode](http://threedevsandamaybe.com/the-one-hundredth-episode/) of Three Devs and a Maybe I decided to generate some stats relating to the previous 99 episodes and formed a small quiz out of these findings.
 All information relating to each podcast is stored in separate Markdown files within YAML front-matter, which makes it easy to pull out and process.
 I thought it would be interesting to go over the code I used to achieve this.
+
 <!--more-->
 
 ### Parsing the YAML front-matter
@@ -29,8 +30,8 @@ $podcasts = array_reduce(scandir(POSTS_DIR), function ($meta, $fileName) {
 
 ### Stats, stats, stats
 
-With the podcast meta-data now in a format with can process, we can now go about generating some stats. 
- 
+With the podcast meta-data now in a format with can process, we can now go about generating some stats.
+
 ```php
 // Total size
 array_sum(array_column($podcasts, 'size'));

@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Insertion-sort in Clojure"
-meta: "Implementing the Insertion-sort algorithm in Clojure"
+title: 'Insertion-sort in Clojure'
+meta: 'Implementing the Insertion-sort algorithm in Clojure'
 ---
 
 The next sorting algorithm I have decided to explore is the Insertion-sort.
 This sorting technique can be completed in-place, however, using Clojure we will instead be using a `reduce` to accumulate the final sorted collection.
 Each element is iteratively inserted into a 'new' collection which maintains a sorted invariant as shown in the implementation documented below.
+
 <!--more-->
 
 ```clojure

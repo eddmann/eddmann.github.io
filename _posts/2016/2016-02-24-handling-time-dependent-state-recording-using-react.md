@@ -42,7 +42,13 @@ class RecordableTextArea extends React.Component {
   };
 
   render() {
-    return <textarea value={this.state.value} onChange={this._addEvent} {...this.props} />;
+    return (
+      <textarea
+        value={this.state.value}
+        onChange={this._addEvent}
+        {...this.props}
+      />
+    );
   }
 }
 ```

@@ -1,24 +1,29 @@
 ---
 layout: post
-title: "Using Generators for Promise Coroutines in JavaScript"
-meta: "Using ES2015 Generators to coordinate promise coroutines in JavaScript"
+title: 'Using Generators for Promise Coroutines in JavaScript'
+meta: 'Using ES2015 Generators to coordinate promise coroutines in JavaScript'
 ---
 
 In a [previous article](/posts/fetching-link-titles-using-promises-and-async-await-in-javascript/) I demonstrated how a new feature from ES2016 (`async`/`await` functions) could be used to help coordinate promises and execution.
 However, we are instead able to use Generators (introduced in ES2015) to provide this feature, minus the syntactic sugar these two new keywords provide.
+
 <!--more-->
 
 ```js
-const spawn = (fn) => (...args) => {
-  const gen = fn(...args);
-  const cont = (res) => res.done
-    ? res.value
-    : Promise.resolve(res.value).then(
-        val => cont(gen.next(val)),
-        err => cont(gen.throw(err)));
+const spawn =
+  fn =>
+  (...args) => {
+    const gen = fn(...args);
+    const cont = res =>
+      res.done
+        ? res.value
+        : Promise.resolve(res.value).then(
+            val => cont(gen.next(val)),
+            err => cont(gen.throw(err))
+          );
 
-  return cont(gen.next());
-}
+    return cont(gen.next());
+  };
 ```
 
 Passing in a Generator function and yielding in-place of `await`, we are able to take advantage of the Generators control we have for resuming its execution.
@@ -29,10 +34,12 @@ This allows us to wait for the resolution or rejection of the yielded promise be
 Below is a contrived example of using co-routines to coordinate the returned result of a collection of random promises (similar to a `Promise.all` use-case).
 
 ```js
-const randomPromise = (value) =>
-  new Promise((res, rej) => setTimeout(Math.random() > 0.3 ? res : rej, 1000, value));
+const randomPromise = value =>
+  new Promise((res, rej) =>
+    setTimeout(Math.random() > 0.3 ? res : rej, 1000, value)
+  );
 
-const run = spawn(function*(values) {
+const run = spawn(function* (values) {
   const results = [];
 
   for (const val of values.map(randomPromise)) {
@@ -48,7 +55,7 @@ const run = spawn(function*(values) {
 
 console.time('run');
 run(['foo', 'bar', 'baz'])
-  .then((x) => {
+  .then(x => {
     console.log(x);
     console.timeEnd('run');
   })

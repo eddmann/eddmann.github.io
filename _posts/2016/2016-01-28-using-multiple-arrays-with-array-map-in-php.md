@@ -1,12 +1,13 @@
 ---
 layout: post
-title: "Using Multiple Arrays with array_map in PHP"
-meta: "Examples of supplying array_map with multiple arrays to be used within the callback"
+title: 'Using Multiple Arrays with array_map in PHP'
+meta: 'Examples of supplying array_map with multiple arrays to be used within the callback'
 ---
 
 Today I stumble upon some code that I did not realise was possible with an `array_map` function in PHP.
 You are able to supply multiple arrays, which in turn will get 'zipped up' and passed to the supplied callback as parameters.
 This allows for some rather elegant solutions to the 'index issue' and accessing keys from within the callback - both of which are easily achieved in an impertivive mindset.
+
 <!--more-->
 
 ## Current Index

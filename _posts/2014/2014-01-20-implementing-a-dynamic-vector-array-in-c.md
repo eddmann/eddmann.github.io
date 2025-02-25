@@ -1,24 +1,27 @@
 ---
 layout: post
-title: "Implementing a Dynamic Vector (Array) in C"
-meta: "Implementing a resizable, dynamic array data-type in C."
+title: 'Implementing a Dynamic Vector (Array) in C'
+meta: 'Learn how to implement a dynamic, resizable vector (array) in C using efficient memory management techniques and simplified macros.'
+tags: c data-structures
 ---
 
-An array (vector) is a common-place data type, used to hold and describe a collection of elements.
+An array (vector) is a commonplace data type, used to hold and describe a collection of elements.
 These elements can be fetched at runtime by one or more indices (identifying keys).
-A distinguishing feature of an array compared to a list is that they allow for constant-time random access lookup, compared to the latters sequential access.
-Resizable arrays allow for an unspecified upper-bound of collection elements at runtime, and are conceptuality similar to a list.
+A distinguishing feature of an array compared to a list is that arrays allow constant-time random access, unlike lists which provide sequential access.
+Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists.
+
 <!--more-->
-These dynamic arrays are more complicated and less used in introduction to its compatriot list, which is dynamic by nature.
-Using C as the language of implementation this post will guide you through building a simple vector data-structure.
+
+Dynamic arrays are more complicated and less commonly used compared to their counterpart, the list, which is dynamic by nature.
+Using C as the language of implementation, this post will guide you through building a simple vector data structure.
 The structure will take advantage of a fixed-size array, with a counter invariant that keeps track of how many elements are currently present.
-If the underlying array becomes exhausted, the addition operation will re-allocate the contents to a larger size, by way of a copy.
+If the underlying array becomes exhausted, the addition operation will reallocate the contents to a larger size by means of a copy.
 
 ## The Make File
 
-'Make' is a popular utility used throughout software development to build executable artifacts (programs and libraries) from described source code.
-Through a simple DSL, associations from descriptive short-names (targets) and a series of related commands to execute are made.
-Running the 'make' command executes the first present target, and this must be considered in the design of the file.
+'Make' is a popular utility used throughout software development to build executable artefacts (programmes and libraries) from provided source code.
+Through a simple DSL, associations from descriptive short names (targets) and a series of related commands to execute are made.
+Running the 'make' command executes the first target found, so this must be carefully considered when designing the file.
 Below is a sample Makefile which provides the vector project with simple build, debug and clean targets.
 
 ```make
@@ -46,16 +49,16 @@ clean:
     $(RM) *.o $(OUT)
 ```
 
-Looking at the code example above you will notice a few variables which are used to define specific aspects used when running the targets (such as the compiler command and flags used).
-To keep things modular the compilation of the 'main' and 'vector' source-code files has been split, with file dependences specific to each target specified after the short-name.
+Looking at the code example above, you will notice a few variables that are used to define specific aspects when running the targets (such as the compiler command and flags used).
+To keep things modular, the compilation of the 'main' and 'vector' source-code files has been split, with file dependencies specific to each target specified after the short name.
 The 'debug' target appends a macro definition flag which is used to include any debug information present in the source code.
 
 ## The Header File
 
-Defining a header file allows the programmer to separate specific aspects of the programs source-code into reusable files.
+Defining a header file allows the programmer to separate specific aspects of the programme's source code into reusable files.
 These files commonly contain forward declarations of identifiers and functions.
-This allows a user to include the codes header file in their own work, separating the definition from the implementation.
-Including a header file produces the same results as copying the full contents into the callers file.
+This allows a user to include the code's header file in their own work, thereby separating the definition from the implementation.
+Including a header file produces the same results as copying the full contents into the caller's file.
 Below shows the header file implemented for the vector example.
 
 ```c
@@ -90,17 +93,17 @@ void vector_free(vector *);
 #endif
 ```
 
-We wrap the contents of this file in a definition condition to make sure that even with multiple inclusion between aggregate source code files, only one inclusion is processed in the result.
-A 'vector' type definition is included which provides access to the capacity and total current elements in the collection.
-Along with this, a 'items' variable with a pointer of void pointers is included, allowing us to insert a heterogeneous collection of elements into the vector.
-The 'vector_resize' method is defined to be 'static' resulting in successful execution of the function only occurring in the file it is defined in (accessibility control).
+We wrap the contents of this file in an _include_ guard to ensure that, even when included in multiple source files, it is processed only once.
+A 'vector' type is defined which provides access to the capacity and the current total number of elements in the collection.
+Along with this, an 'items' variable is declared, which is a pointer to void pointers, allowing us to store a heterogeneous collection of elements in the vector.
+The 'vector_resize' function is defined as static, ensuring that it is only accessible within the file in which it is defined.
 
 ## The Implementation File
 
 Using the header file definition, the following file is used to implement these methods.
-As discussed in the previous section 'void pointers' are used to reference the collection elements.
-Void pointers are pointers which point to some arbitrary data that has no specific type.
-As a consequence you are unable to directly deference a pointer of this type and must first provide a casting type.
+As discussed in the previous section, void pointers are used to reference the collection elements.
+Void pointers are pointers that point to arbitrary data with no specific type.
+As a consequence, you are unable to directly dereference a pointer of this type and must first cast it to the appropriate type.
 
 ```c
 #include <stdio.h>
@@ -177,16 +180,16 @@ void vector_free(vector *v)
 }
 ```
 
-Looking at the code example above you will notice that the 'vector_resize' function is called if certain conditions are met on addition or deletion.
-If the current vector capacity has been exhausted when an addition has been requested the size is doubled and the vector contents re-allocated.
-In a similar fashion, upon deletion, if the vector is a quarter full the contents is reallocated to a vector of half the current size.
-These conditions for resizing work well in practice to balance memory capacity and computation time required to fulfill each resize.
+Looking at the code example above, you will notice that the 'vector_resize' function is called when certain conditions are met during addition or deletion.
+If the current vector capacity is exhausted when an addition is requested, the size is doubled and the vector contents reallocated.
+Similarly, upon deletion, if the vector is a quarter full, the contents are reallocated to a vector of half the current size.
+These conditions for resizing work well in practice to balance memory capacity and the computation time required to fulfil each resize.
 
 ## The Test Case
 
-With all the pieces put in place we are now able to test case the implementation.
-Below shows an example using the direct functions, adding a few strings (character sequences) to a collection, printing the contents, modifying the contents and then printing it out again.
-One unfortunate use-case detail that can not be avoided with the use of void pointers is the necessary cast.
+With all the pieces in place, we are now able to test the implementation.
+Below is an example using the direct functions: adding a few strings (character sequences) to a collection, printing the contents, modifying the contents, and then printing it out again.
+One unfortunate detail that cannot be avoided when using void pointers is the necessary cast.
 
 ```c
 #include <stdio.h>
@@ -225,8 +228,8 @@ int main(void)
 }
 ```
 
-To simplify the use of the vector implementation the header file defines a few macro functions which can be used in place of the base function calls.
-Below highlights these definition in practice, removing some of the verbosity present in the previous example.
+To simplify the use of the vector implementation, the header file defines a few macro functions which can be used in place of the base function calls.
+Below is an example that highlights these definitions in practice, reducing some of the verbosity present in the previous example.
 
 ```c
 #include <stdio.h>

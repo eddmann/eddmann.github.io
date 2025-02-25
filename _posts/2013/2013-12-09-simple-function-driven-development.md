@@ -1,15 +1,17 @@
 ---
 layout: post
-title: "Simple Function Driven-Development"
-meta: "Sometimes it pays-off to keep development simple."
+title: 'Simple Function Driven-Development'
+meta: 'Discover the power of simplicity in PHP with function driven development techniques, optimised caching, and templating for efficient backend design.'
+tags: php
 ---
 
 I recently had the chance to rewrite the backend of my [personal website](http://github.com/eddmann/eddmann).
-I was surprised at how accustom I had become to using heavy-weight web frameworks (with plenty of accompanying depencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
+I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
 As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read.
-I find myself sometimes being blinded by the need to abstract everything with the Object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
-Simple, single purpose functions that can be used for multiple use-cases within your application is a very good mind-set to try and incorporate.
+I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
+Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate.
 In this post I wish to discuss a couple of the functions that I created to keep the file so simple.
+
 <!--more-->
 
 ## Configuration
@@ -43,8 +45,8 @@ function config($key = '', $file = 'config.php')
 
 Being a file-based blogging platform with meta-data and Markdown content to parse, caching the results is a very desired process to include.
 Again, a very general implementation has been implemented for greater flexibility.
-The key is hashed and it's value stored in a file of that name.
-If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and result stored in the described file.
+The key is hashed and its value stored in a file of that name.
+If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and the result stored in the described file.
 Provided is also a check to make sure a false boolean was not returned, allowing us to have control within the closure of whether to cache the result or not.
 
 ```php
@@ -71,8 +73,8 @@ function cache($key, callable $value, $directory = './cache/')
 ## Template
 
 This simple function allows you to easily parse template files with the provided available variables.
-I have found this to be very useful in splitting-up business logic from complex presentations (separation of concerns) in multiple examples.
-I have been alittle relaxed with my use of the dreaded 'eval' function but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.
+I have found this to be very useful in splitting up business logic from complex presentations (separation of concerns) in multiple examples.
+I have been a little relaxed with my use of the dreaded `eval` function, but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.
 
 ```php
 function tmpl($file, $vars = [], $directory = './templates/')
@@ -89,8 +91,8 @@ function tmpl($file, $vars = [], $directory = './templates/')
 
 ## Example
 
-To piece all these functions together into a collective example I have decided to demonstrate with a cached fibonacci calculatation, the desired number being stored in a configuration file.
-Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th fibonacci number.
+To piece all these functions together into a collective example I have decided to demonstrate with a cached Fibonacci calculation, the desired number being stored in a configuration file.
+Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th Fibonacci number.
 
 ```php
 # config.php
@@ -102,7 +104,7 @@ return [
 ];
 ```
 
-The below template is a simple example of splitting the presentation from code-logic.
+The below template is a simple example of splitting the presentation from code logic.
 
 ```php
 # fibonacci.tmpl.php

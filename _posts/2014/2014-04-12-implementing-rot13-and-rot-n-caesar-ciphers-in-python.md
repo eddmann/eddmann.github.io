@@ -1,21 +1,23 @@
 ---
 layout: post
 title: 'Implementing ROT13 and ROT(n) Caesar Ciphers in Python'
-meta: 'Multiple implementations to encode and decode Caesar Cipher based messages.'
+meta: 'Discover multiple techniques to encode and decode messages using ROT13 and ROT(n) Caesar ciphers in Python, with practical examples and clear explanations.'
+tags: python algorithms encryption
 ---
 
 The Caesar cipher (shift cipher) is an extremely simple encryption technique.
-Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
-The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.
+Substitutions of this kind rely on an invariant - replacing each plain-text letter with the letter at a fixed number of positions across the alphabet.
+The recipient is then able to decode the encoded message successfully if they are aware of the chosen shift.
 
 <!--more-->
 
-ROT13 (aka. rotate by 13 places) is an implementation of this cipher, replacing each letter with the letter 13 positions after it in the given symbol table (typically the alphabet).
-As the basic Latin alphabet is 26 letters long, the same algorithm implementation can be used to decode an encoded subject matter.
+ROT13 (also known as rotate by 13 places) is an implementation of this cipher.
+It replaces each letter with the letter 13 positions later in the given symbol table (typically the alphabet).
+As the basic Latin alphabet is 26 letters long, the same algorithm can be used to decode an encoded message.
 
 ## Basic Implementation
 
-Using Python 3.4 as the implementation language we are able to simply use the provided (_batteries included_) 'encode' method as shown below.
+Using Python 3.4 as the implementation language, we are able to simply use the provided (_batteries included_) 'encode' method as shown below.
 
 ```python
 def rot13(s):
@@ -25,10 +27,11 @@ def rot13(s):
 
 ## Mapping Implementation
 
-The above implementation is extremely useful, however, it does not give us a feel for how the algorithm works from first principles.
-The example below highlights the same functionality (limited to the Latin alphabet) by way of a mapping over each character in the subject string.
-Each character is passed into the 'lookup' function that returns the valid replacement value, not altering non-alphabet characters.
-I would like to point out Python's ability to succinctly express the between conditions, using a standard math-chaining comparison syntax.
+The above implementation is extremely useful.
+However, it does not give us a feel for how the algorithm works from first principles.
+The example below highlights the same functionality (limited to the Latin alphabet) by mapping each character in the subject string.
+Each character is passed into the `lookup` function that returns the valid replacement value without altering non-alphabet characters.
+I would like to highlight Python's ability to succinctly express range conditions using standard chained comparisons.
 
 ```python
 def rot13_alpha(s):
@@ -46,10 +49,10 @@ rot13_alpha('Hello World') # Uryyb Jbeyq
 
 ## Generic Alphabet Shift Implementation
 
-Using Python's string translation functionality I was able to make a more generic implementation, allowing you to specify the position length.
+Using Python's string translation functionality, I was able to create a more generic implementation that allows you to specify the shift length.
 I decided on using partial function application to allow for rotation functions to be composed and reused.
-For example the use-case below follows a single invocation of the initially implemented function.
-We could have instead assigned this function to a variable (say 'rot13') and call at will.
+For example, the use-case below follows a single invocation of the initially implemented function.
+We could have instead assigned this function to a variable (say `rot13`) and called it at will.
 
 ```python
 def rot_alpha(n):
@@ -62,10 +65,10 @@ rot_alpha(13)('Hello World') # Uryyb Jbeyq
 
 ## Generic Shift Implementation
 
-The final fixed piece of the implementation is that it only handles Latin alphabet symbols.
-Say we would like to use ROT5 for number encoding, this would require an individual implementation.
+The final implementation limitation is that it only handles Latin alphabet symbols.
+If we would like to use ROT5 for number encoding, this would require a separate implementation.
 The example below removes this constraint, allowing the user to pass in each of the symbol strings they wish to permit for encoding.
-These passed in values are used to create an encoded lookup table, based on the position length (similar to the previous example).
+These passed-in values are used to create an encoded lookup table based on the shift length (similar to the previous example).
 Finally, the lookup table is used by Python's string translation method to return the processed value.
 
 ```python
@@ -77,10 +80,10 @@ def rot(*symbols):
     return _rot
 ```
 
-Below highlights the discussed number encoding by five positions.
-We are able to compose a new function based on the partial application nature of the 'rot' function.
+The following example highlights number encoding by five positions.
+We are able to compose a new function based on the partial application nature of the `rot` function.
 Latin alphabet encoding is also present with the five position length invariant.
-I would like to note that a separate decode implementation is required (-N), as unlike ROT13 the encode algorithm is not it's own inverse.
+I would like to note that a separate decode implementation is required (-N), as unlike ROT13 the encode algorithm is not its own inverse.
 
 ```python
 rot5_num = rot('0123456789')(5)

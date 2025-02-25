@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Using TMPFS to store non-persistent files on a memory partition.">
+    <meta name="description" content="Optimise your PHP sessions and file caches using TMPFS to boost I/O performance on your Linux system.">
 
     <title>
         
@@ -51,23 +51,25 @@
     <h1 class="post-title">Storing PHP Sessions/File Caches in Memory using TMPFS</h1>
     <time datetime="2014-04-16T00:00:00+00:00" class="post-date">16 Apr 2014</time>
     <p>Yesterday I was looking through some application logs and noticed a significant bottleneck with I/O reads in the implemented file cache.
-This cache is used to temporary store processed views and records for a set duration.
+This cache is used to temporarily store processed views and records for a set duration.
 I looked into a couple of solutions to alleviate the intense spinning disk usage, ranging from <a href="http://memcached.org/">Memcache</a> to <a href="http://redis.io/">Redis</a>.
-These products are great for large-scale applications (spread over multiple systems), however, in my case simply required a single local configuration.</p>
+These products are great for large-scale applications spread over multiple systems.
+However, in my case, a single local configuration was sufficient.</p>
 
 
 
 <p>This was when I found ‘tmpfs’, saving me from all sorts of issues relating to adding yet another application to the production stack.
-‘tmpfs’ appears as a mounted partition on your system, however, under the hood it allocates and uses a section of physical memory (non-persistent through reboots).
-This means that you are able to configure directories (such as the cache) to be mounted on a ‘tmpfs’ partition.
-This results in the desired speed boosts, without tampering with the application logic itself.
-Even better, if the mount is unsuccessful for some reason, it will safety fall-back to using the persistent hard-disk solution.</p>
+‘tmpfs’ appears as a mounted partition on your system.
+Under the hood, it allocates and uses a section of physical memory (non-persistent through reboots).
+This means that you are able to configure directories, such as the cache, to be mounted on a ‘tmpfs’ partition.
+This results in the desired speed boosts without tampering with the application logic itself.
+Even better, if the mount is unsuccessful for some reason, it will safely fall back to using the persistent hard-disk solution.</p>
 
 <h2 id="php-sessions">PHP Sessions</h2>
 
-<p>Though I have been discussing this solution in the case of caches, file-based PHP sessions can be setup in a similar manner.
+<p>Though I have been discussing this solution in the case of caches, file-based PHP sessions can be set up in a similar manner.
 You must first work out where session files for your PHP installation are stored.
-Note, that if your using PHP-FPM you may be required to modify the second configuration line.</p>
+Note that if you’re using PHP-FPM, you may need to modify the second configuration line.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># /etc/php.ini</span>
 session.save_path <span class="o">=</span> /var/lib/php/session
@@ -75,8 +77,8 @@ session.save_path <span class="o">=</span> /var/lib/php/session
 php_value[session.save_path] <span class="o">=</span> /var/lib/php/session
 </code></pre></div></div>
 
-<p>We can then make sure that the directory has been created, along with the fall-back permissions.
-So as to temporary see the performance increases, we are able to mount the ‘tmpfs’ partition to the session directory, setting ownership to the desired user.</p>
+<p>We can then make sure that the directory has been created along with the fallback permissions.
+To temporarily observe performance improvements, we are able to mount the ‘tmpfs’ partition to the session directory, setting ownership to the desired user.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> /var/lib/php/session
 <span class="c"># fallback</span>
@@ -87,7 +89,7 @@ mount <span class="nt">-t</span> tmpfs <span class="nt">-o</span> <span class="n
 umount /var/lib/php/session
 </code></pre></div></div>
 
-<p>If you are a satisfied with the configuration, you can persist the partition mount across reboots by adding the following line to your ‘fstab’ file.</p>
+<p>If you are satisfied with the configuration, you can persist the partition mount across reboots by adding the following line to your ‘fstab’ file.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"tmpfs /var/lib/php/session tmpfs size=32m,uid=</span><span class="si">$(</span><span class="nb">id</span> <span class="nt">-u</span> nginx<span class="si">)</span><span class="s2">,gid=</span><span class="si">$(</span><span class="nb">id</span> <span class="nt">-g</span> nginx<span class="si">)</span><span class="s2">,mode=0755 0 0"</span> <span class="o">&gt;&gt;</span> /etc/fstab
 </code></pre></div></div>

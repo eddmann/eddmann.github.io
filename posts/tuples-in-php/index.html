@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Experimenting with a Tuple (optionally typed) implementation in PHP.">
+    <meta name="description" content="A comprehensive guide on implementing tuples in PHP using SPLFixedArray, featuring both partially applied and dynamically typed tuple examples for robust and efficient code.">
 
     <title>
         
@@ -50,23 +50,24 @@
                 <article class="post">
     <h1 class="post-title">Tuples in PHP</h1>
     <time datetime="2014-04-17T00:00:00+00:00" class="post-date">17 Apr 2014</time>
-    <p>Since exploring languages such as Scala and Python which provide the tuple data-structure, I have been keen to experiment with how to clearly map it into a PHP solution.
-Tuples are simply a finite, ordered sequence of elements - usually with good language support to both pack (construction) and unpack (deconstruction) of the values.
-I have found that many use-cases of the common place array structure in PHP could be better suited to n-tuple’s.
-Familiar examples such as coordinate pairs (points) and records from a relational database (i.e. maybe the user id and name) could succinctly take advantage of the structure.</p>
+    <p>Since exploring languages such as Scala and Python which provide the tuple data structure, I have been keen to experiment with how to clearly map it into a PHP solution.
+Tuples are simply a finite, ordered sequence of elements - usually with good language support to both pack (construction) and unpack (deconstruction) the values.
+I have found that many use cases of the commonplace array structure in PHP could be better suited to n-tuples.
+Familiar examples such as coordinate pairs (points) and records from a relational database (e.g. a user id and name) could succinctly take advantage of the structure.</p>
 
 
 
-<p>I discussed briefly that what makes tuples so powerful in the highlighted languages is their good support for handling their contents, for example unpacking a user tuple into separate id and name variables.
-PHP supports this form of unpacking in regard to arrays using the ‘list’ function, which I frequently use to return multiple values from a function/method invocation.</p>
+<p>I discussed briefly that what makes tuples so powerful in the highlighted languages is their excellent support for handling their contents.
+For example, one can unpack a user tuple into separate id and name variables.
+PHP supports this form of unpacking for arrays using the <code class="language-plaintext highlighter-rouge">list</code> function, which I frequently use to return multiple values from a function or method invocation.</p>
 
 <h2 id="implementation">Implementation</h2>
 
-<p>With a basic understanding of what a tuple now is, I set about creating a thought-experiment in PHP, deciding on taking advantage of the <a href="http://www.php.net/manual/en/class.splfixedarray.php">SPLFixedArray</a> class.
+<p>With a basic understanding of what a tuple is, I set about creating a thought experiment in PHP, deciding to take advantage of the <a href="http://www.php.net/manual/en/class.splfixedarray.php">SPLFixedArray</a> class.
 As a tuple is of a finite length, using the fixed array class will (in theory) provide performance enhancements, along with removing the need to implement the <a href="http://www.php.net/manual/en/class.arrayaccess.php">ArrayAccess</a> interface.
-Before I began designing the below example, I did some research on prior work in the field and noticed a great implementation found <a href="http://forrst.com/posts/Tuples_for_PHP-O3A">here</a>.
-This implementation also provided the option for values to be strictly typed, specifying each positions valid type (by way of a prototype).
-I was very impressed by this idea and decided to include it in my implementation, allowing for creation of more relaxed tuples using the ‘mixed’ data-type.</p>
+Before I began designing the example below, I did some research on prior work in the field and noticed a great implementation found <a href="http://forrst.com/posts/Tuples_for_PHP-O3A">here</a>.
+This implementation also provided the option for values to be strictly typed, specifying each position’s valid type by means of a prototype.
+I was very impressed by this idea and decided to include it in my implementation, enabling the creation of tuples with relaxed typing using the ‘mixed’ data type.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Tuple</span> <span class="kd">extends</span> <span class="nc">SplFixedArray</span> <span class="p">{</span>
 
@@ -144,13 +145,13 @@ I was very impressed by this idea and decided to include it in my implementation
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Looking at the example implementation above you will notice that I take full advantage of the SPLFixedArray class.
-The only array access method I override is ‘offsetSet’, which first checks based on the provided prototype the validity of the value.
-The two interesting inclusions in this class that I would like to highlight are the static ‘create’ and ‘type’ methods.</p>
+<p>Looking at the example implementation above, you will notice that I make full use of the <code class="language-plaintext highlighter-rouge">SPLFixedArray</code> class.
+The only array access method that I override is <code class="language-plaintext highlighter-rouge">offsetSet</code>, which first checks the validity of the value against the provided prototype.
+The two interesting inclusions in this class that I would like to highlight are the static <code class="language-plaintext highlighter-rouge">create</code> and <code class="language-plaintext highlighter-rouge">type</code> methods.</p>
 
 <h2 id="creating-a-tuple">Creating a Tuple</h2>
 
-<p>Using the ‘create’ method you are able to create a partially applied class instantiation (providing the prototype).
+<p>Using the <code class="language-plaintext highlighter-rouge">create</code> method, you are able to create a partially applied class instantiation (by providing the prototype).
 This allows you to use the implementation as shown below, creating a ‘point’ constructor (stored in a variable) which can be called with the desired values to form a concrete tuple instance.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$point</span> <span class="o">=</span> <span class="nc">Tuple</span><span class="o">::</span><span class="nf">create</span><span class="p">(</span><span class="s1">'double'</span><span class="p">,</span> <span class="s1">'double'</span><span class="p">);</span>
@@ -162,18 +163,19 @@ This allows you to use the implementation as shown below, creating a ‘point’
 
 <h2 id="creating-a-typed-tuple">Creating a Typed Tuple</h2>
 
-<p>As explained above I was very impressed by the implementations use of data-types, as such, I explored how I could create new tuple data-types based on the prototype (that could be ideally type-hinted).
-I was able to achieve this by way of the ‘eval’ function (our good friend), dynamically creating a new class based on the provided details.
-To provide the user with a more friendly way to create the data-type (inspired by Python) I also create a function (going by the same name) that returns a new instance of the class when invoked.
-Below is a similar example to the one displayed above, this time however, we are creating and using a new tuple data-type called Point.</p>
+<p>As explained above, I was very impressed by the implementation’s use of data types.
+As such, I explored how I could create new tuple data types based on the prototype, which could ideally be type-hinted.
+I was able to achieve this by using the <code class="language-plaintext highlighter-rouge">eval</code> function (our good friend), dynamically creating a new class based on the provided details.
+To provide the user with a friendlier way to create the data type (inspired by Python), I also created a function (using the same name) that returns a new instance of the class when invoked.
+Below is a similar example to the one displayed above; this time, however, we are creating and using a new tuple data type called <em>Point</em>.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Tuple</span><span class="o">::</span><span class="nf">type</span><span class="p">(</span><span class="s1">'Point'</span><span class="p">,</span> <span class="p">[</span> <span class="s1">'double'</span><span class="p">,</span> <span class="s1">'double'</span> <span class="p">]);</span>
 
 <span class="nf">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">);</span> <span class="c1">// Point(1, 2.5)</span>
 </code></pre></div></div>
 
-<p>This new data-type can then be used to type-hint against parameters in a function/method, as shown below.
-Note the use of the ‘list’ function to unpack the point into its constituent parts, before being returned in a new Point tuple.</p>
+<p>This new data type can then be used to type-hint parameters in a function or method, as shown below.
+Note the use of the <code class="language-plaintext highlighter-rouge">list</code> function to unpack the point into its constituent parts before returning a new <em>Point</em> tuple.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">process</span><span class="p">(</span><span class="kt">Point</span> <span class="nv">$point</span><span class="p">)</span>
 <span class="p">{</span>

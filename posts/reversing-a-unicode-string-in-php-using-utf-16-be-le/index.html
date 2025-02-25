@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explaining how to reverse a Unicode String using UTF-16 and Endianness in PHP.">
+    <meta name="description" content="Learn how to reverse a Unicode string in PHP using UTF-16 endianness conversion for accurate results.">
 
     <title>
         
@@ -50,12 +50,13 @@
                 <article class="post">
     <h1 class="post-title">Reversing a Unicode String in PHP using UTF-16BE/LE</h1>
     <time datetime="2014-05-11T00:00:00+00:00" class="post-date">11 May 2014</time>
-    <p>Last week I was bit by the Unicode encoding issue when trying to naively manipulate a user’s input using PHP’s built-in string functions.
+    <p>Last week I was bitten by the Unicode encoding issue when trying to naively manipulate a user’s input using PHP’s built-in string functions.
 PHP simply assumes that all characters are a single byte (octet) and the provided functions use this assumption when processing a string.
-In this article I will not be going into depth on the subject of Unicode representations, I feel this topic deserves it’s own series of articles.
+In this article I will not be going into depth on the subject of Unicode representations.
+I feel this topic deserves its own series of articles.
 However, you should be aware that in ‘Western Europe’ we commonly only use the basic <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> character-set (consisting of 7 bytes).
 This makes the transition to the popular ‘UTF-8’ Unicode representation almost seamless, as the two map one-to-one.
-I wish to however, discuss how to reverse a Unicode string (UTF-8) using a combination of <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> magic and the <a href="http://www.php.net/manual/en/function.strrev.php">‘strrev’</a> function.</p>
+I wish to, however, discuss how to reverse a Unicode string (UTF-8) using a combination of <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> magic and the <a href="http://www.php.net/manual/en/function.strrev.php">‘strrev’</a> function.</p>
 
 
 
@@ -72,10 +73,10 @@ I wish to however, discuss how to reverse a Unicode string (UTF-8) using a combi
 
 <h2 id="naive-approach">Naive Approach</h2>
 
-<p>With many encodings that only include single-byte character representations (i.e. ASCII, ISO 8859-*) using the in-built <code class="language-plaintext highlighter-rouge">strrev</code> function will work fine.
+<p>With many encodings that only include single-byte character representations (i.e. ASCII, ISO 8859-*), using the in-built <code class="language-plaintext highlighter-rouge">strrev</code> function will work fine.
 However, the constructed UTF-8 string below contains a combination of ASCII-compatible characters and a multi-byte ‘Black Star’ character.
 You will notice that the two first bytes represent the ‘a’ and ‘b’ characters, and as they fit inside a single octet each they are not affected.
-The issue arises however, with the ‘Black Star’ character, which requires a three-byte representation.</p>
+The issue arises, however, with the ‘Black Star’ character, which requires a three-byte representation.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$str</span> <span class="o">=</span> <span class="nb">json_decode</span><span class="p">(</span><span class="s1">'"ab\\u2605"'</span><span class="p">);</span> <span class="c1">// ab★</span>
 <span class="nf">str2bin</span><span class="p">(</span><span class="nv">$str</span><span class="p">);</span> <span class="c1">// 01100001 01100010 11100010 10011000 10000101</span>

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interesting ways to reverse a string in PHP.">
+    <meta name="description" content="Explore innovative methods to reverse strings in PHP, from basic built-in functions to advanced recursive and Unicode-support techniques.">
 
     <title>
         
@@ -51,14 +51,14 @@
     <h1 class="post-title">Reversing a String in PHP</h1>
     <time datetime="2014-05-10T00:00:00+00:00" class="post-date">10 May 2014</time>
     <p>Since recently setting up a forum for <a href="http://forum.threedevsandamaybe.com/">Three Devs and a Maybe</a>, we have started to partake in a weekly <a href="http://en.wikipedia.org/wiki/Kata_(programming)">code-kata</a>.
-What could be more fitting to start with than the common interview question, reversing a string in ‘X’ language.
+What could be more fitting to start with than the common interview question, reversing a string in a given language.
 In this case the language is PHP, and below are some of the many ways contrived to solve the problem.</p>
 
 
 
 <h2 id="basic-implementations">Basic Implementations</h2>
 
-<p>The implementation below is the most simple, taking advantage of PHP’s vast amount of ‘built-in’ functions to reverse the supplied string.</p>
+<p>The implementation below is the simplest, as it takes advantage of PHP’s extensive built-in functions to reverse the supplied string.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -66,7 +66,7 @@ In this case the language is PHP, and below are some of the many ways contrived 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>In a similar manner, we are able to compose a ‘reverse’ function by joining (<a href="http://php.net/function.join">alias for ‘implode’</a>) a reversed array of the string characters.</p>
+<p>Similarly, we can compose a <code class="language-plaintext highlighter-rouge">reverse</code> function by joining (alias for <a href="http://php.net/function.join"><code class="language-plaintext highlighter-rouge">implode</code></a>) a reversed array of the string characters.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -75,7 +75,7 @@ In this case the language is PHP, and below are some of the many ways contrived 
 </code></pre></div></div>
 
 <p>The most imperative approach to reverse a string is by looping over each character with indexes at each end, swapping their contents upon each iteration.
-PHP’s ability to access individual characters in an array manner turns out to be very useful in this case.</p>
+PHP’s ability to access individual characters in an array-like manner turns out to be very useful in this case.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -89,7 +89,7 @@ PHP’s ability to access individual characters in an array manner turns out to 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Though not best practice, the desired result can be compacted into a single ‘for’ loop declaration, shown below.</p>
+<p>Although not best practice, the desired result can be compacted into a single <code class="language-plaintext highlighter-rouge">for</code> loop declaration, as shown below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -99,8 +99,8 @@ PHP’s ability to access individual characters in an array manner turns out to 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Another non-practical approach using the ‘array_walk’ function can be found below.
-An interesting implementation detail, is how you are able to clearly see that a copy of ‘$out’ is being passed into the closure function.</p>
+<p>Another impractical approach using the <code class="language-plaintext highlighter-rouge">array_walk</code> function can be found below.
+An interesting implementation detail is that a copy of <code class="language-plaintext highlighter-rouge">$out</code> is being passed into the closure function.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -117,9 +117,9 @@ An interesting implementation detail, is how you are able to clearly see that a 
 
 <h2 id="recursive-implementations">Recursive Implementations</h2>
 
-<p>The second group of implementations contrived used forms of recursion to achieve the desired result.
-The first of such methods is a simple recursive invocation of the function, removing the head character upon each call.
-Once the string has reached one character, the base-case has been hit and the remaining string is simply returned.</p>
+<p>The second group of implementations employs recursion to achieve the desired result.
+The first of these methods is a simple recursive invocation of the function, removing the head character upon each call.
+Once the string has reached one character, the base case has been hit and the remaining string is simply returned.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -132,7 +132,7 @@ Once the string has reached one character, the base-case has been hit and the re
 </code></pre></div></div>
 
 <p>The implementation below takes advantage of the <a href="http://en.wikipedia.org/wiki/Divide_and_conquer_algorithm">divide and conquer</a> algorithm paradigm, flipping the left and right substrings upon each recursive invocation.
-Similar to the previous example, if the base-case of a single character string is met, the remaining string is simply returned.</p>
+Similar to the previous example, if the base case of a single character string is met, the remaining string is simply returned.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -150,9 +150,9 @@ Similar to the previous example, if the base-case of a single character string i
 
 <h2 id="unicode-support-implementations">Unicode-Support Implementations</h2>
 
-<p>PHP’s in-built support for Unicode strings is ‘somewhat’ lacking, as such, extra steps are required to correctly reverse a string of this type.
-As Unicode character representations can consist of multiple bytes (i.e. UTF-8), we are unable to naively use ‘strlen’ and ‘str_split’ (which assume a character is always a single byte).
-The implementation below uses ‘preg_split’ support for Unicode characters, to correctly split the string into characters for us to reverse.</p>
+<p>PHP’s built-in support for Unicode strings is somewhat lacking; as such, extra steps are required to correctly reverse a string of this type.
+As Unicode character representations can consist of multiple bytes (i.e. UTF-8), we are unable to naively use <code class="language-plaintext highlighter-rouge">strlen</code> and <code class="language-plaintext highlighter-rouge">str_split</code> (which assume a character is always a single byte).
+The implementation below uses <code class="language-plaintext highlighter-rouge">preg_split</code> support for Unicode characters to correctly split the string into characters for us to reverse.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>
@@ -160,7 +160,7 @@ The implementation below uses ‘preg_split’ support for Unicode characters, t
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using some <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> conversion trickery we are able to use PHP’s in-built ‘strrev’ function.
+<p>Using some <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> conversion trickery we are able to use PHP’s built-in <code class="language-plaintext highlighter-rouge">strrev</code> function.
 The implementation below uses ‘iconv’ to achieve the desired results.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
@@ -169,7 +169,7 @@ The implementation below uses ‘iconv’ to achieve the desired results.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Similar in-nature to the previous example, we are instead now using the ‘mb’ library to perform the conversion.</p>
+<p>Similar in nature to the previous example, we are instead now using the <code class="language-plaintext highlighter-rouge">mb</code> library to perform the conversion.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">reverse</span><span class="p">(</span><span class="nv">$str</span><span class="p">)</span>
 <span class="p">{</span>

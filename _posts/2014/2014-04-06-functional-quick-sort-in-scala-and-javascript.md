@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'Functional Quick sort in Scala and JavaScript'
-meta: 'Implementing Quick sort in a functional manner, using Scala and JavaScript.'
+meta: 'A comprehensive guide to implementing functional Quick sort in Scala and JavaScript, complete with detailed code examples and explanations.'
+tags: functional-programming algorithms scala javascript
 ---
 
-Functional languages provide you with the ability to concisely define the intension of a program, without low-level issues getting in the way.
+Functional languages provide you with the ability to concisely define the intent of a piece of code, without low-level issues getting in the way.
 This can be clearly seen when implementing the Quick sort algorithm.
 Often referred to as 'partition-exchange' sort, this divide and conquer algorithm recursively divides a list into two sub-lists, based on a chosen pivot element.
 
@@ -24,13 +25,13 @@ def qsort(xs: List[Int]): List[Int] = xs match {
 }
 ```
 
-So as to highlight the key points in this post, the example has been restricted to only sort lists of integers.
-As well as this, the leftmost element is chosen as the pivot, causing worst-case behavior on already sorted arrays.
+So as to highlight the key points in this post, the example has been restricted to only sorting lists of integers.
+As well as this, the leftmost element is chosen as the pivot, causing worst-case behaviour on already sorted arrays.
 
 ## JavaScript
 
-Having been impressed by how well documented the intension's of the program were when writing in a functional style, I decided on attempting to implement the same example in JavaScript.
-Before I was able to achieve this however, I was required to setup a couple of array helper functions, shown below.
+Having been impressed by how well documented the intentions of the programme were when writing in a functional style, I decided to attempt to implement the same example in JavaScript.
+Before I was able to achieve this, however, I needed to set up a couple of array helper functions, as shown below.
 
 ```js
 Array.prototype.partition = function (fn) {
@@ -61,8 +62,8 @@ Array.prototype.isEmpty = function () {
 };
 ```
 
-As you can see the functions defined are similar to functionality already present in Scala's standard libraries.
-Variable unpacking is planned for inclusion in ECMAScript 6, though at this time, I decided to use a workaround within the current JavaScript specification that achieves a similar affect.
+As you can see, the functions defined are similar to functionality already present in Scala's standard libraries.
+Variable unpacking is planned for inclusion in ECMAScript 6, though at this time, I decided to use a workaround within the current JavaScript specification that achieves a similar effect.
 
 ```js
 function unpack(fn, el) {
@@ -70,7 +71,7 @@ function unpack(fn, el) {
 }
 ```
 
-Finally, with the required helper functionality in place we are then able to define the Quick sort algorithm in JavaScript, using the same rules as the Scala implementation.
+Finally, with the required helper functionality in place, we are then able to define the Quick sort algorithm in JavaScript, using the same rules as the Scala implementation.
 
 ```js
 Array.prototype.qsort = function () {

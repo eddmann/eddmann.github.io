@@ -51,42 +51,6 @@
     
         <article class="post">
             <h1 class="post-title">
-                <a href="/posts/the-internals-of-git/">
-                    The Internals of Git
-                </a>
-            </h1>
-
-            <time datetime="2014-12-27T00:00:00+00:00" class="post-date">27 Dec 2014</time>
-
-            <p>I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow.
-Throughout the past couple of months, thanks to a couple of <a href="http://ftp.newartisans.com/pub/git.from.bottom.up.pdf">well</a> <a href="http://mrchlblng.me/2014/09/practical-git-introduction/">timed</a> <a href="http://episodes.gitminutes.com/">findings</a>, I have gained an interest in how Git works internally.
-In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/reversing-a-unicode-string-in-php-using-utf-16-be-le/">
-                    Reversing a Unicode String in PHP using UTF-16BE/LE
-                </a>
-            </h1>
-
-            <time datetime="2014-05-11T00:00:00+00:00" class="post-date">11 May 2014</time>
-
-            <p>Last week I was bitten by the Unicode encoding issue when trying to naively manipulate a user’s input using PHP’s built-in string functions.
-PHP simply assumes that all characters are a single byte (octet) and the provided functions use this assumption when processing a string.
-In this article I will not be going into depth on the subject of Unicode representations.
-I feel this topic deserves its own series of articles.
-However, you should be aware that in ‘Western Europe’ we commonly only use the basic <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> character-set (consisting of 7 bytes).
-This makes the transition to the popular ‘UTF-8’ Unicode representation almost seamless, as the two map one-to-one.
-I wish to, however, discuss how to reverse a Unicode string (UTF-8) using a combination of <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> magic and the <a href="http://www.php.net/manual/en/function.strrev.php">‘strrev’</a> function.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
                 <a href="/posts/reversing-a-string-in-php/">
                     Reversing a String in PHP
                 </a>
@@ -132,6 +96,39 @@ This cache is used to temporarily store processed views and records for a set du
 I looked into a couple of solutions to alleviate the intense spinning disk usage, ranging from <a href="http://memcached.org/">Memcache</a> to <a href="http://redis.io/">Redis</a>.
 These products are great for large-scale applications spread over multiple systems.
 However, in my case, a single local configuration was sufficient.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/implementing-rot13-and-rot-n-caesar-ciphers-in-python/">
+                    Implementing ROT13 and ROT(n) Caesar Ciphers in Python
+                </a>
+            </h1>
+
+            <time datetime="2014-04-12T00:00:00+00:00" class="post-date">12 Apr 2014</time>
+
+            <p>The Caesar cipher (shift cipher) is an extremely simple encryption technique.
+Substitutions of this kind rely on an invariant - replacing each plain-text letter with the letter at a fixed number of positions across the alphabet.
+The recipient is then able to decode the encoded message successfully if they are aware of the chosen shift.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
+                <a href="/posts/securing-sessions-in-php/">
+                    Securing Sessions in PHP
+                </a>
+            </h1>
+
+            <time datetime="2014-04-09T00:00:00+00:00" class="post-date">09 Apr 2014</time>
+
+            <p>Following on from my previous post on <a href="/posts/self-signed-ssl-certificates-with-nginx-and-apache/">Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Broken Authentication and Session Management</a>).
+When delving into the subject I was unable to find a definitive resource for a PHP implementation.
+Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors.
+Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default <code class="language-plaintext highlighter-rouge">SessionHandler</code> class.</p>
 
 
         </article>

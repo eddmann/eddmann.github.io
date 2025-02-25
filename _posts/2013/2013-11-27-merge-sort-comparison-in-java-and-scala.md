@@ -2,7 +2,7 @@
 layout: post
 title: 'Merge sort comparison in Java and Scala'
 meta: 'A detailed comparison of Merge Sort implementations in Java and Scala, highlighting the differences between imperative and functional programming paradigms.'
-tags: java scala functional-programming algorithm
+tags: java scala functional-programming algorithms
 ---
 
 Having only just recently got a complete shot of functional goodness in the form of the [Functional Programming Principles in Scala](http://www.coursera.org/course/progfun) [MOOC](http://en.wikipedia.org/wiki/Massive_open_online_course), my imperative standing is in a state of confusion.

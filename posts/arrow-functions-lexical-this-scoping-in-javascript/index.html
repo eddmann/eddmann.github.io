@@ -51,21 +51,24 @@
     <h1 class="post-title">Arrow Functions Lexical 'this' Scoping in JavaScript</h1>
     <time datetime="2016-02-04T00:00:00+00:00" class="post-date">04 Feb 2016</time>
     <p>One feature of ES2015 that I feel can be a stumbling block (but extremely useful) is Arrow Functions lexical scoping of <code class="language-plaintext highlighter-rouge">this</code>.
-Before this addition, every new function defined its own <code class="language-plaintext highlighter-rouge">this</code> - meaning we were required to explicitly bind or locally store the <code class="language-plaintext highlighter-rouge">this</code> reference that we desired in many use-cases.
-
+Before this addition, every new function defined its own <code class="language-plaintext highlighter-rouge">this</code> - meaning we were required to explicitly bind or locally store the <code class="language-plaintext highlighter-rouge">this</code> reference that we desired in many use-cases. 
 The two technique used to overcome this problem are highlighted below, using a locally stored <code class="language-plaintext highlighter-rouge">this</code> reference or a bound function.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Counter</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">var</span> <span class="nx">_this</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
   <span class="nx">_this</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">_this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span> <span class="p">};</span>
-<span class="p">};</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="nx">_this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Counter</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-<span class="p">};</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 <p>The contrived example usage below shows passing the counters <code class="language-plaintext highlighter-rouge">inc</code> method to a high-order function and asserting the desired <code class="language-plaintext highlighter-rouge">this</code> behavior.</p>
@@ -73,7 +76,9 @@ The two technique used to overcome this problem are highlighted below, using a l
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Counter</span><span class="p">();</span>
 
 <span class="nx">setInterval</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">inc</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
-<span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">counter</span><span class="p">);</span> <span class="p">},</span> <span class="mi">1500</span><span class="p">);</span>
+<span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">counter</span><span class="p">);</span>
+<span class="p">},</span> <span class="mi">1500</span><span class="p">);</span>
 <span class="c1">// 1, 2, 3, 4, 5</span>
 </code></pre></div></div>
 
@@ -81,8 +86,10 @@ The two technique used to overcome this problem are highlighted below, using a l
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">Counter</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">};</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">inc</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 </article>

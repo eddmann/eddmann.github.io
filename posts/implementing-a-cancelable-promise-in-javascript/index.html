@@ -52,10 +52,11 @@
     <time datetime="2016-01-28T00:00:00+00:00" class="post-date">28 Jan 2016</time>
     <p>I recently was working on a React component which complained about its state being set when it was not mounted.
 This was due to a uncompleted promise being resolved when the component had since been unmounted.
-To solve this issue I was able to use the concept of a cancelable promise which would be canceled before the component was unmounted.
-</p>
+To solve this issue I was able to use the concept of a cancelable promise which would be canceled before the component was unmounted.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cancelable</span> <span class="o">=</span> <span class="p">(</span><span class="nx">promise</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cancelable</span> <span class="o">=</span> <span class="nx">promise</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">hasCancelled</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
 
   <span class="k">return</span> <span class="p">{</span>
@@ -66,8 +67,8 @@ To solve this issue I was able to use the concept of a cancelable promise which 
 
       <span class="k">return</span> <span class="nx">v</span><span class="p">;</span>
     <span class="p">}),</span>
-    <span class="na">cancel</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">hasCancelled</span> <span class="o">=</span> <span class="kc">true</span>
-  <span class="p">}</span>
+    <span class="na">cancel</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">hasCancelled</span> <span class="o">=</span> <span class="kc">true</span><span class="p">),</span>
+  <span class="p">};</span>
 <span class="p">};</span>
 </code></pre></div></div>
 

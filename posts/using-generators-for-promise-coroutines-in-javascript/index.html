@@ -51,19 +51,24 @@
     <h1 class="post-title">Using Generators for Promise Coroutines in JavaScript</h1>
     <time datetime="2016-02-10T00:00:00+00:00" class="post-date">10 Feb 2016</time>
     <p>In a <a href="/posts/fetching-link-titles-using-promises-and-async-await-in-javascript/">previous article</a> I demonstrated how a new feature from ES2016 (<code class="language-plaintext highlighter-rouge">async</code>/<code class="language-plaintext highlighter-rouge">await</code> functions) could be used to help coordinate promises and execution.
-However, we are instead able to use Generators (introduced in ES2015) to provide this feature, minus the syntactic sugar these two new keywords provide.
-</p>
+However, we are instead able to use Generators (introduced in ES2015) to provide this feature, minus the syntactic sugar these two new keywords provide.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">spawn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">gen</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">cont</span> <span class="o">=</span> <span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">done</span>
-    <span class="p">?</span> <span class="nx">res</span><span class="p">.</span><span class="nx">value</span>
-    <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">value</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
-        <span class="nx">val</span> <span class="o">=&gt;</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">val</span><span class="p">)),</span>
-        <span class="nx">err</span> <span class="o">=&gt;</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="k">throw</span><span class="p">(</span><span class="nx">err</span><span class="p">)));</span>
 
-  <span class="k">return</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">());</span>
-<span class="p">}</span>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">spawn</span> <span class="o">=</span>
+  <span class="nx">fn</span> <span class="o">=&gt;</span>
+  <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">gen</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">cont</span> <span class="o">=</span> <span class="nx">res</span> <span class="o">=&gt;</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">done</span>
+        <span class="p">?</span> <span class="nx">res</span><span class="p">.</span><span class="nx">value</span>
+        <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">value</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span>
+            <span class="nx">val</span> <span class="o">=&gt;</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">(</span><span class="nx">val</span><span class="p">)),</span>
+            <span class="nx">err</span> <span class="o">=&gt;</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="k">throw</span><span class="p">(</span><span class="nx">err</span><span class="p">))</span>
+          <span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">cont</span><span class="p">(</span><span class="nx">gen</span><span class="p">.</span><span class="nx">next</span><span class="p">());</span>
+  <span class="p">};</span>
 </code></pre></div></div>
 
 <p>Passing in a Generator function and yielding in-place of <code class="language-plaintext highlighter-rouge">await</code>, we are able to take advantage of the Generators control we have for resuming its execution.
@@ -73,10 +78,12 @@ This allows us to wait for the resolution or rejection of the yielded promise be
 
 <p>Below is a contrived example of using co-routines to coordinate the returned result of a collection of random promises (similar to a <code class="language-plaintext highlighter-rouge">Promise.all</code> use-case).</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">randomPromise</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.3</span> <span class="p">?</span> <span class="nx">res</span> <span class="p">:</span> <span class="nx">rej</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="nx">value</span><span class="p">));</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">randomPromise</span> <span class="o">=</span> <span class="nx">value</span> <span class="o">=&gt;</span>
+  <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">setTimeout</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.3</span> <span class="p">?</span> <span class="nx">res</span> <span class="p">:</span> <span class="nx">rej</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>
+  <span class="p">);</span>
 
-<span class="kd">const</span> <span class="nx">run</span> <span class="o">=</span> <span class="nx">spawn</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span><span class="p">(</span><span class="nx">values</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">const</span> <span class="nx">run</span> <span class="o">=</span> <span class="nx">spawn</span><span class="p">(</span><span class="kd">function</span><span class="o">*</span> <span class="p">(</span><span class="nx">values</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="p">[];</span>
 
   <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">val</span> <span class="k">of</span> <span class="nx">values</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">randomPromise</span><span class="p">))</span> <span class="p">{</span>
@@ -92,7 +99,7 @@ This allows us to wait for the resolution or rejection of the yielded promise be
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">time</span><span class="p">(</span><span class="dl">'</span><span class="s1">run</span><span class="dl">'</span><span class="p">);</span>
 <span class="nx">run</span><span class="p">([</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">baz</span><span class="dl">'</span><span class="p">])</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">timeEnd</span><span class="p">(</span><span class="dl">'</span><span class="s1">run</span><span class="dl">'</span><span class="p">);</span>
   <span class="p">})</span>

@@ -52,16 +52,17 @@
     <time datetime="2016-01-06T00:00:00+00:00" class="post-date">06 Jan 2016</time>
     <p>An interesting technique for managing perceived tail-call optimised algorithms in an environment that does not provide such capabilities is to use a concept called a ‘trampoline’.
 The following two examples provide all their work within the recursive function invocation and are in tail-call position.
-However in environments without such optimisations (before ES2015), a single stack-frame is not reused and instead has the pain of O(n) memory complexity.
-</p>
+However in environments without such optimisations (before ES2015), a single stack-frame is not reused and instead has the pain of O(n) memory complexity.</p>
+
+
 
 <h2 id="odd-and-even">Odd and Even</h2>
 
 <p>The mutually recursive implementation documented below is a trivial manner in which to calculate if a given value is odd or even.
 It should be noted that modulo arithmetic would be a more performant approach, but would not highlight the issue at hand.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+<span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 
 <span class="nx">odd</span><span class="p">(</span><span class="mi">100000</span><span class="p">);</span>
 <span class="c1">// RangeError: Maximum call stack size exceeded</span>
@@ -70,19 +71,19 @@ It should be noted that modulo arithmetic would be a more performant approach, b
 <p>As you can see we sadly hit the call stack size with a sufficiently sized value.
 However, with a technique called ‘trampolining’ we are able to return to the desired single call stack frame, with the larger heap taking the load.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">trampoline</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">fn</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">fn</span><span class="p">;</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">trampoline</span> <span class="o">=</span> <span class="nx">fn</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">while</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">fn</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">fn</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">fn</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div></div>
 
 <p>The above implementation does not handle the use-case that the desired returned value is a function itself.
 This can be easily addressed however with a more advanced implementation, of which I will write about in a <a href="/posts/even-higher-trampolining-in-javascript/">future article</a>.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
 
 <span class="nx">trampoline</span><span class="p">(</span><span class="nx">odd</span><span class="p">(</span><span class="mi">100000</span><span class="p">));</span>
 </code></pre></div></div>
@@ -93,7 +94,7 @@ This can be easily addressed however with a more advanced implementation, of whi
 
 <p>Another example of which could be deemed tail-call optimised is the factorial implementation documented below.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">?</span> <span class="nx">acc</span> <span class="p">:</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">acc</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="p">?</span> <span class="nx">acc</span> <span class="p">:</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">acc</span><span class="p">));</span>
 
 <span class="c1">// factorial(100000);</span>
 <span class="c1">// RangeError: Maximum call stack size exceeded</span>
@@ -102,9 +103,12 @@ This can be easily addressed however with a more advanced implementation, of whi
 <p>However, this is similarly not the case - but with a little function wrapper addition and invocation via the ‘trampoline’ method we are able to maintain the succinct manner of the algorithm whilst gaining the single stack-frame.
 The only point to note is a computational result such as this will require the concept of a BigInt to achieve.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">?</span> <span class="nx">acc</span> <span class="p">:</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">acc</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span>
+  <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="p">()</span> <span class="o">=&gt;</span>
+    <span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="p">?</span> <span class="nx">acc</span> <span class="p">:</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">acc</span><span class="p">);</span>
 
-<span class="nx">trampoline</span><span class="p">(</span><span class="nx">factorial</span><span class="p">(</span><span class="mi">100000</span><span class="p">))</span> <span class="c1">// BigInt required</span>
+<span class="nx">trampoline</span><span class="p">(</span><span class="nx">factorial</span><span class="p">(</span><span class="mi">100000</span><span class="p">));</span> <span class="c1">// BigInt required</span>
 </code></pre></div></div>
 
 </article>

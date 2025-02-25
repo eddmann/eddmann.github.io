@@ -1,13 +1,14 @@
 ---
 layout: post
 title: 'Implementing Classical Inheritance in JavaScript'
-meta: 'Demystifying the syntactic sugar that is required to provide Classical Inheritance in JavaScript'
+meta: 'A comprehensive guide on implementing classical inheritance in JavaScript using ES6 syntactic sugar to simplify object-oriented programming principles.'
+tags: javascript
 ---
 
-Developers who are well versed in class-based languages such as Java and C++ may find JavaScript's prototypical and in my heart true object-oriented nature confusing.
+Developers who are well versed in class-based languages such as Java and C++ may find JavaScript's prototypical and, in my heart, true object-oriented nature confusing.
 With the addition of the `class` keyword in ES6 it has become extremely easy to crossover these class-based principles into JavaScript.
 However, it should be noted that this is nothing more than syntactic sugar over an extremely expressive and flexible language construct. <!--more-->
-In fact it is very easy to build our own Class implementation, using specially constructed 'class' functions as templates for the 'new' instances we wish to use.
+In fact, it is very easy to build our own Class implementation, using specially constructed 'class' functions as templates for the 'new' instances we wish to use.
 Below is an example implementation highlighting how to simply create a classical inheritance hierarchy within JavaScript.
 
 ```js
@@ -32,13 +33,13 @@ var Class = function (parent, properties) {
 };
 ```
 
-Looking at the example above you will notice that we take into consideration the possibility of either a new class being defined (one parameter) or an inherited class being supplied.
+Looking at the example above, you will notice that we take into consideration the possibility of either a new class being defined (one parameter) or an inherited class being supplied.
 The new 'class functions' prototype is composed of its parents, along with any new properties supplied.
 The constructed function which is returned will be invoked as a constructor function throughout its lifetime, creating new instances of the defined class.
-We also include a simple `super` function which allows the user to call its parents method implementation.
+We also include a simple `super` function which allows the user to call its parent's method implementation.
 
 We are now able to use this implementation in a contrived representation of both a User and Admin class.
-You will notice how we call the parent classes (User) `init` and `getName` implementation within the Admin class.
+You will notice how we call the parent class (User)'s `init` and `getName` implementation within the Admin class.
 
 ```js
 var User = Class({

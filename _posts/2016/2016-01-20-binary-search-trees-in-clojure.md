@@ -1,7 +1,8 @@
 ---
 layout: post
 title: 'Binary Search Trees in Clojure'
-meta: 'Exploring Binary Search Trees and associated actions in Clojure'
+meta: 'A comprehensive exploration of binary search trees implemented in Clojure, detailing insertion, removal, traversal, and invariant assertion techniques.'
+tags: clojure data-structures
 ---
 
 This weekend I was able to spend some more time exploring Clojure.
@@ -16,8 +17,8 @@ We start by creating a simple record definition which describes the contents of 
 
 ## Insertion
 
-Using this Node record, we are able to now construct an insertion function which uses Clojure's parameter deconstruction to great effect.
-Using the `cond` macro helps document an extremely succinct algorithm for inserting a new node into a provided tree.
+Using this Node record, we are now able to construct an insertion function which uses Clojure's parameter deconstruction to great effect.
+The use of the `cond` macro clearly documents an extremely succinct algorithm for inserting a new node into a provided tree.
 
 ```clojure
 (defn insert [{:keys [el left right] :as tree} value]
@@ -30,9 +31,9 @@ Using the `cond` macro helps document an extremely succinct algorithm for insert
 
 ## Removal
 
-Removing a given value from the tree requires a little more work than its' insertion counterpart.
-However, `cond` (again) allows us to clearly document these actions, handling the three different states the given values Node could be in.
-Note that the third state requires the use of the followingly documented `min` function.
+Removing a given value from the tree requires a little more work than its insertion counterpart.
+However, `cond` (again) allows us to clearly document these actions, handling the three different states the given node could be in.
+Note that the third state requires the use of the documented `min` function below.
 
 ```clojure
 (defn remove [{:keys [el left right] :as tree} value]
@@ -48,7 +49,7 @@ Note that the third state requires the use of the followingly documented `min` f
 
 ## Minimum and Maximum Value
 
-As a Binary Search Tree's invariant is for every Nodes left branch to be less, and right branch to be greater, we can implement simple functions which return the minimum and maximum values present in the tree.
+As a Binary Search Tree's invariant is that every node's left branch is less and the right branch is greater, we can implement simple functions which return the minimum and maximum values present in the tree.
 
 ```clojure
 (defn min [{:keys [el left]}]
@@ -66,7 +67,7 @@ As a Binary Search Tree's invariant is for every Nodes left branch to be less, a
 
 ## Contains
 
-Following a similar traversal pattern found in the insertion algorithm we are able to check if a given value is present in the tree using the following function.
+Following a similar traversal pattern to that found in the insertion algorithm, we are able to check if a given value is present in the tree using the following function.
 
 ```clojure
 (defn contains? [{:keys [el left right] :as tree} value]
@@ -79,7 +80,7 @@ Following a similar traversal pattern found in the insertion algorithm we are ab
 
 ## Count and Height
 
-Statistical analysis on the created tree can be carried out in the form of checking the height of the tree (depth), along with the total Node count.
+Statistical analysis on the created tree can be carried out in the form of checking the height of the tree (depth), along with the total node count.
 
 ```clojure
 (defn count [{:keys [left right] :as tree}]
@@ -115,14 +116,16 @@ We are able to assert that the given tree maintains the invariance required to b
 
 ## Creating and Displaying the Tree
 
-Using the following function we are able to create a new tree from a supplied sequence - which uses a `reduce` to insert each value into the tree, building up the final result along the way.
+Using the following function, we are able to create a new tree from a supplied sequence.
+This function utilises a `reduce` to insert each value into the tree, building up the final result along the way.
 
 ```clojure
 (def to-tree #(reduce insert nil %))
 ```
 
-There are many ways to concatenate sequences within Clojure, however, I feel that the approach below clearly expresses the desired intent.
-Using a combination of 'syntax-quote' and 'unquote-splicing' we are able to build up a list of the supplied tree's contents.
+There are many ways to concatenate sequences within Clojure.
+However, I feel that the approach below clearly expresses the desired intent.
+Using a combination of 'syntax-quote' and 'unquote-splicing', we are able to build up a list of the supplied tree's contents.
 
 ```clojure
 (defn to-list [{:keys [el left right] :as tree}]

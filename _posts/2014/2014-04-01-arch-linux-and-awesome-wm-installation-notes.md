@@ -1,7 +1,8 @@
 ---
 layout: post
 title: 'Arch Linux and Awesome WM Installation Notes'
-meta: 'Simple notes for my Arch Linux and Awesome WM installation setup.'
+meta: 'Concise installation notes for setting up Arch Linux and Awesome WM on a 64-bit system with Intel HD Graphics'
+tags: arch linux
 ---
 
 I have been a big fan of [Arch Linux](https://www.archlinux.org/) (inc. it's philosophy) and the [Awesome](http://awesome.naquadah.org/) Window Manager for just under a year now.

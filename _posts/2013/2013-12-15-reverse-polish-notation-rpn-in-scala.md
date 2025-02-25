@@ -2,7 +2,7 @@
 layout: post
 title: 'Reverse Polish Notation (RPN) in Scala'
 meta: 'Learn how to evaluate Reverse Polish Notation (RPN) expressions in Scala using both mutable stack and functional programming approaches with practical code examples.'
-tags: scala functional-programming
+tags: scala functional-programming algorithm
 ---
 
 Continuing on with my exploration of the Scala language, I decided to solve the widely documented problem of evaluating a mathematical [Reverse Polish notation](http://en.wikipedia.org/wiki/Reverse_Polish_Notation) string.

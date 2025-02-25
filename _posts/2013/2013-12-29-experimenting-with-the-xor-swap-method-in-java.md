@@ -2,7 +2,7 @@
 layout: post
 title: 'Experimenting with the XOR Swap Method in Java'
 meta: 'Explore the implementation and theory behind the XOR swap method in Java, a unique technique for swapping variable values without a temporary variable, complete with code examples and detailed explanations.'
-tags: java
+tags: java algorithm
 ---
 
 The exclusive disjunction (or XOR) swap algorithm is a little trick to swap values of the same data type without the use of a temporary variable.

@@ -3,11 +3,11 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An example of the coalescing operation in PHP, useful for default values.">
+    <meta name="description" content="Learn how to utilise the coalescing operation in PHP for default values to write cleaner, more efficient code.">
 
     <title>
         
-            Coalescing operation in PHP (for default values) &middot; Edd Mann
+            Coalescing Operation in PHP (for Default Values) &middot; Edd Mann
         
     </title>
 
@@ -48,13 +48,15 @@
 
             <main>
                 <article class="post">
-    <h1 class="post-title">Coalescing operation in PHP (for default values)</h1>
+    <h1 class="post-title">Coalescing Operation in PHP (for Default Values)</h1>
     <time datetime="2013-11-28T00:00:00+00:00" class="post-date">28 Nov 2013</time>
-    <p>Over the past week or so I have been reading discussions on the <a href="http://news.php.net/php.internals">PHP internals</a> mailing-list about proposed updates to what the ?: operator currently does.
-If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator.
+    <p>Over the past week or so, I have been reading discussions on the <a href="http://news.php.net/php.internals">PHP internals</a> mailing list about proposed updates to what the ?: operator currently does.
+If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator.</p>
 
-It however is a simple example of syntaxic sugar to cut down on code noise, allowing you to specify an alternative (default) value if the supplied variable is <a href="http://php.net/manual/en/language.types.boolean.php">falsey</a>.
-In effect, assuming a null defined variable ‘$a’, the examples below will all equate to the same result ‘b’.</p>
+
+
+<p>It, however, is a simple example of syntactic sugar to reduce code noise, allowing you to specify an alternative (default) value if the supplied variable is <a href="http://php.net/manual/en/language.types.boolean.php">falsey</a>.
+In effect, assuming that the variable ‘$a’ is defined as null, the examples below will all equate to the same result: ‘b’.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="nv">$a</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
 <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
@@ -62,18 +64,18 @@ In effect, assuming a null defined variable ‘$a’, the examples below will al
 <span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>However, issues arise when the variable has not already been declared, in such a case notice messages will be displayed.
-This is due to attempting to use the non-existent variable out right, without checking with the ‘is_set’ or ‘empty’ functions first.
+<p>However, issues arise when the variable has not already been declared, and in such a case, notice messages will be displayed.
+This occurs due to attempting to use the non-existent variable outright, without first checking with the ‘isset’ or ‘empty’ functions.
 This is one of the key areas being addressed in the proposed update.
-The examples below, more verbosely than desired, address this issue at present.</p>
+The examples below, more verbose than desired, address this issue at present.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="k">empty</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
 <span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
 <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>In regard to the middle one, we are taking advantage of OR/AND’s lower <a href="http://php.net/manual/en/language.operators.precedence.php">operator precedence</a>, removing the need for brackets (found in the last one).
-I should point out however, that mixing the two can be a recipe for debug-hell, and it would be best practise to maintain expressing such statements using &amp;&amp; and ||.</p>
+<p>Regarding the middle example, we are taking advantage of the lower <a href="http://php.net/manual/en/language.operators.precedence.php">operator precedence</a> of OR/AND, thereby removing the need for brackets (as seen in the last example).
+I should point out, however, that mixing the two can be a recipe for debugging difficulties, and it would be best practice to continue expressing such statements using &amp;&amp; and ||.</p>
 
 </article>
 

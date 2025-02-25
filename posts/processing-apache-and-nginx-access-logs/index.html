@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gathering useful information from the data stored in Apache and Nginx access logs.">
+    <meta name="description" content="Discover efficient methods to process Apache and Nginx access logs using simple Unix commands. Extract valuable insights such as 404 errors, user agents, IP addresses and more to optimise your server analysis.">
 
     <title>
         
@@ -50,11 +50,12 @@
                 <article class="post">
     <h1 class="post-title">Processing Apache and Nginx Access Logs</h1>
     <time datetime="2013-12-21T00:00:00+00:00" class="post-date">21 Dec 2013</time>
-    <p>Tools such as <a href="http://awstats.sourceforge.net/">AWStats</a> and <a href="http://code.google.com/p/logstalgia/">Logstalgia</a> are great, but sometimes they can be over-kill for the problem we are trying to solve.
-It turns out that with a couple of simple Unix commands we can gather a lot of useful information from the data stored in our the access logs.
-Both Apache and Nginx by default use the <a href="http://httpd.apache.org/docs/1.3/logs.html#combined">combined</a> log format which I will be basing this posts examples on.
-Below are two different methods of accessing either an uncompressed single file or multiple compressed files (following the supplied wild-card pattern).
-</p>
+    <p>Tools such as <a href="http://awstats.sourceforge.net/">AWStats</a> and <a href="http://code.google.com/p/logstalgia/">Logstalgia</a> are great, but sometimes they can be overkill for the problem we are trying to solve.
+It turns out that with a couple of simple Unix commands we can gather a lot of useful information from the data stored in the access logs.
+Both Apache and Nginx by default use the <a href="http://httpd.apache.org/docs/1.3/logs.html#combined">combined</a> log format, which I will be basing this post’s examples on.
+Below are two different methods of accessing either an uncompressed single file or multiple compressed files (following the supplied wild-card pattern).</p>
+
+
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log <span class="c"># uncompressed file</span>
 <span class="nv">$ </span>zcat access.log-<span class="k">*</span>.gz <span class="c"># compressed files i.e. access.log-20131221.gz</span>
@@ -62,34 +63,37 @@ Below are two different methods of accessing either an uncompressed single file 
 
 <h2 id="log-data-to-information">Log Data to Information</h2>
 
-<p>404 Request Responses</p>
+<h3 id="404-request-responses">404 Request Responses</h3>
+
+<p>Using ‘awk’ we are able to filter the access log entries down to only the ones that include the 404 status code.
+In this case we are then displaying the most requested pages of this type, in descending order.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'($9 ~ /404/)'</span> | <span class="nb">awk</span> <span class="s1">'{ print $7 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
 </code></pre></div></div>
 
-<p>Using ‘awk’ we are able to filter the access log entires down to only the ones that include the 404 status code.
-In this case we are then displaying the most requested pages of this type, in descending order.</p>
+<h3 id="request-user-agents">Request User Agents</h3>
 
-<p>Request User Agents</p>
+<p>The command below displays the top 25 user agents (browser, operating system) that have requested a resource from the web server.
+The ‘awk’ command in this instance uses a defined field separator of “ to successfully parse the user agent string.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="nt">-F</span><span class="se">\"</span> <span class="s1">'{ print $6 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-frn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
 </code></pre></div></div>
 
-<p>The command above displays the top 25 user agents (browser, operating system) that have requested a resource from the web server.
-The ‘awk’ command in this instance uses a defined field separator of “ to successfully parse the user agent string.</p>
+<h3 id="request-ip-addresses">Request IP Addresses</h3>
 
-<p>Request IP Addresses</p>
+<p>Below are two examples of displaying the top 25 IP addresses based on total requests.
+The second command uses the GeoIP package to include the country the IP address originates from.
+This package can be installed on a CentOS setup using the <a href="https://fedoraproject.org/wiki/EPEL">EPEL</a> repository.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
 <span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25 | <span class="se">\</span>
     <span class="nb">awk</span> <span class="s1">'{ printf("%5d\t%-15s\t", $1, $2); system("geoiplookup " $2 " | cut -d \\: -f2 ") }'</span>
 </code></pre></div></div>
 
-<p>Above are two examples of displaying the top 25 IP addresses based on total requests.
-The second command uses the GeoIP package to include the country the IP address originates from.
-This package can be installed on a CentOS setup using the <a href="https://fedoraproject.org/wiki/EPEL">EPEL</a> repository.</p>
+<h3 id="count-unique-visits">Count Unique Visits</h3>
 
-<p>Count Unique Visits</p>
+<p>The commands below provide you with a total count of unique visits based on IP address.
+You are also able to run the log file through the ‘grep’ command before processing, to only include entries that have occurred today or this month.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">wc</span> <span class="nt">-l</span>
 <span class="c"># or today</span>
@@ -98,24 +102,25 @@ This package can be installed on a CentOS setup using the <a href="https://fedor
 <span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">grep</span> <span class="sb">`</span><span class="nb">date</span> <span class="s1">'+%b/%G'</span><span class="sb">`</span> | <span class="nb">awk</span> <span class="s1">'{ print $1 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">wc</span> <span class="nt">-l</span>
 </code></pre></div></div>
 
-<p>The commands above will provide you with a total count of unique visits based on IP address.
-You are also able to run the log file through the ‘grep’ command before processing, to only include entries that have occurred today or this month.</p>
+<h3 id="ranked-by-response-codes">Ranked by Response Codes</h3>
 
-<p>Ranked by Response Codes</p>
+<p>This simple command is very useful to quickly observe the total counts based on returned response code.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $9 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span>
 </code></pre></div></div>
 
-<p>This simple command is very useful to quickly observe the total counts based on returned response code.</p>
+<h3 id="most-popular-urls">Most Popular URLS</h3>
 
-<p>Most Popular URLS</p>
+<p>A trivial replacement for some Google Analytics statistics, reporting how many hits the top 25 resources have tallied.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat </span>access.log | <span class="nb">awk</span> <span class="s1">'{ print $7 }'</span> | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">sort</span> <span class="nt">-rn</span> | <span class="nb">head</span> <span class="nt">-n</span> 25
 </code></pre></div></div>
 
-<p>A trivial replacement for some Google Analytics statistics, reporting how many hits the top 25 resources have tallied.</p>
+<h3 id="real-time-ip-page-requests">Real-time IP-Page Requests</h3>
 
-<p>Real-time IP-Page Requests</p>
+<p>The final two commands are most likely my favourite as they provide me with real-time access information.
+These commands report on each IP address, request and response that have recently occurred on the server.
+Using <a href="http://linuxcommand.org/man_pages/tailf1.html">tailf</a> instead of a typical <code class="language-plaintext highlighter-rouge">tail -f</code> has the benefit of not accessing the file when it is not growing.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tailf access.log | <span class="nb">awk</span> <span class="s1">'{ printf("%-15s\t%s\t%s\t%s\n", $1, $6, $9, $7) }'</span>
 <span class="nv">$ </span>tailf access.log | <span class="nb">awk</span> <span class="s1">'{
@@ -123,10 +128,6 @@ You are also able to run the log file through the ‘grep’ command before proc
     printf("%-15s\t%s\t%s\t%-20s\t%s\n", $1, $6, $9, geo, $7);
   }'</span>
 </code></pre></div></div>
-
-<p>The final two commands are most likely my favorite as they provide me with real-time access information.
-These commands report on each IP address, request and response that have recently occurred on the server.
-Using <a href="http://linuxcommand.org/man_pages/tailf1.html">tailf</a> instead of a typical ‘tail -f’ has the benefit of not accessing the file when it is not growing.</p>
 
 <h2 id="resources">Resources</h2>
 

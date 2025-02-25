@@ -3,11 +3,11 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simple ways to alter a past or present commit date (timestamp).">
+    <meta name="description" content="Learn how to modify commit timestamps in Git, including author and committer dates, with simple commands and best practices.">
 
     <title>
         
-            Changing the timestamp of a previous Git commit &middot; Edd Mann
+            Changing the Timestamp of a Previous Git Commit &middot; Edd Mann
         
     </title>
 
@@ -48,36 +48,38 @@
 
             <main>
                 <article class="post">
-    <h1 class="post-title">Changing the timestamp of a previous Git commit</h1>
+    <h1 class="post-title">Changing the Timestamp of a Previous Git Commit</h1>
     <time datetime="2013-12-14T00:00:00+00:00" class="post-date">14 Dec 2013</time>
     <p>Git has two different types of timestamp associated with a commit.
-Although both may typically hold the same value they are used in subtly different ways.
-The author (GIT_AUTHOR_DATE) is the user who originally created the work (i.e. a patch), where as the committer (GIT_COMMITTER_DATE) is the user who last applied the work (i.e. applied patch or rebase).
-The author date is the one displayed when the log is accessed, however, the commit date is used when given the filter (–since, –until) options, which seems a little odd.
-To avoid confusion you can include the committer date within your log display by setting the –format option.
-</p>
+Although both typically hold the same value, they are used in subtly different ways.
+The author (GIT_AUTHOR_DATE) is the user who originally created the work (i.e. a patch), whereas the committer (GIT_COMMITTER_DATE) is the user who last applied the work (i.e. applied patch or rebase).
+The author date is the one displayed when the log is accessed.
+However, the commit date is used when applying the <code class="language-plaintext highlighter-rouge">--since</code> and <code class="language-plaintext highlighter-rouge">--until</code> filter options, which seems a little odd.
+To avoid confusion, you can include the committer date within your log display by setting the <code class="language-plaintext highlighter-rouge">--format</code> option.</p>
+
+
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log <span class="nt">--format</span><span class="o">=</span>fuller
 </code></pre></div></div>
 
 <h2 id="ch-ch-changes">Ch-ch-Changes…</h2>
 
-<p>A tendency I have picked up is to be very commit happy when developing locally, and then find myself rebasing a lot before pushing to a remote.
-As a result of this I sometimes am required to alter timestamps of certain commits to make them more meaningful.
-I found that the simplest of which is adding a specified timestamp to the current commit.
-The author date is specified with the –date option where as the committer timestamp has to be changed with an environment variable.</p>
+<p>A tendency I have picked up is to be very commit-happy when developing locally, and then I often find myself rebasing frequently before pushing to a remote.
+As a result, I am sometimes required to alter the timestamps of certain commits to make them more meaningful.
+I found that the simplest approach is to add a specified timestamp to the current commit.
+The author date is specified with the –date option, whereas the committer timestamp must be changed using an environment variable.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit <span class="nt">--date</span><span class="o">=</span><span class="s2">"Sat, 14 Dec 2013 12:40:00 +0000"</span> <span class="c"># only author</span>
 <span class="nv">$ GIT_COMMITTER_DATE</span><span class="o">=</span><span class="s2">"</span><span class="sb">`</span><span class="nb">date</span> <span class="nt">-R</span><span class="sb">`</span><span class="s2">"</span> git commit <span class="nt">--date</span> <span class="s2">"</span><span class="sb">`</span><span class="nb">date</span> <span class="nt">-R</span><span class="sb">`</span><span class="s2">"</span> <span class="c"># for both</span>
 </code></pre></div></div>
 
-<p>If on the other hand we wish to amend the last author commit you can execute the following, very similar command.
-I should warn you to be wary of running these next commands on a branch with commits that you have already pushed to a remote - due to Git’s hashing nature this will alter the SHA’s of all commits that come after the desired commit as well.</p>
+<p>If, on the other hand, we wish to amend the last author commit, we can execute the following similar command.
+I should warn you to be wary of running these commands on a branch with commits that have already been pushed to a remote, as Git’s hashing nature will alter the SHAs of all subsequent commits.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit <span class="nt">--amend</span> <span class="nt">--date</span> <span class="s2">"</span><span class="sb">`</span><span class="nb">date</span> <span class="nt">-R</span><span class="sb">`</span><span class="s2">"</span> <span class="c"># include '-C HEAD' to bypass commit message editing</span>
 </code></pre></div></div>
 
-<p>Finally, to alter a previous commit by SHA reference hash, you can run the following command (altered from <a href="http://git.wiki.kernel.org/index.php/GitFaq#How_can_I_tweak_the_date_of_a_commit_in_the_repo.3F">GitFaq</a>).</p>
+<p>Finally, to alter a previous commit by its SHA reference hash, you can run the following command (adapted from <a href="http://git.wiki.kernel.org/index.php/GitFaq#How_can_I_tweak_the_date_of_a_commit_in_the_repo.3F">GitFaq</a>).</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git filter-branch <span class="nt">--env-filter</span> <span class="se">\</span>
 <span class="s2">"if test </span><span class="se">\$</span><span class="s2">GIT_COMMIT = 'e6dbcffca68e4b51887ef660e2389052193ba4f4'
@@ -89,7 +91,8 @@ fi"</span> <span class="o">&amp;&amp;</span> <span class="nb">rm</span> <span cl
 
 <h2 id="viewing-the-alterations">Viewing the alterations</h2>
 
-<p>We can now check out our handy work by looking at the log again, providing –since and –until options to filter the results.</p>
+<p>We can now review our alterations by checking the log again.
+This is achieved by using the <code class="language-plaintext highlighter-rouge">--since</code> and <code class="language-plaintext highlighter-rouge">--until</code> options to filter the results.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log <span class="nt">--since</span><span class="o">=</span><span class="s2">"yesterday"</span>
 <span class="nv">$ </span>git log <span class="nt">--since</span><span class="o">=</span><span class="s2">"1 month ago"</span> <span class="nt">--until</span><span class="o">=</span><span class="s2">"yesterday"</span>

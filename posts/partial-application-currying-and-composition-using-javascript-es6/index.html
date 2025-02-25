@@ -70,9 +70,8 @@ I too find this paradigm very interesting to investigate, and through recent com
 There are many examples of implementing such behavior in JavaScript, all typically following an imperative mindset.
 The implementation shown below instead uses recursion along with some of the new features present in ES6 to succinctly codify the definition of what partial application truly is.</p>
 
-<!-- prettier-ignore -->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">curry</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">_curry</span> <span class="o">=</span> <span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="kd">let</span> <span class="nx">_curry</span> <span class="o">=</span> <span class="nx">args</span> <span class="o">=&gt;</span>
     <span class="nx">args</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">length</span>
       <span class="p">?</span> <span class="p">(...</span><span class="nx">_args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">_curry</span><span class="p">([...</span><span class="nx">args</span><span class="p">,</span> <span class="p">...</span><span class="nx">_args</span><span class="p">])</span>
       <span class="p">:</span> <span class="nx">fn</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
@@ -92,8 +91,12 @@ This example also takes advantage of the arrow functions behaviour to return the
 <p>Another Functional building block is the ability to create new functionality by way of function composition.
 In a similar manner to how we implemented partial application, we are also able to use ES6’s new features to aid us in creating a composition function.</p>
 
-<!-- prettier-ignore -->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">compose</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">fns</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">fns</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">f</span><span class="p">(</span><span class="nx">g</span><span class="p">(...</span><span class="nx">args</span><span class="p">)));</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">compose</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">fns</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nx">fns</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">f</span><span class="p">(</span><span class="nx">g</span><span class="p">(...</span><span class="nx">args</span><span class="p">))</span>
+  <span class="p">);</span>
 </code></pre></div></div>
 
 <p>The one-line implementation shown above clearly highlights how explicit we are able to be when using the new arrow and rest-spread syntax.

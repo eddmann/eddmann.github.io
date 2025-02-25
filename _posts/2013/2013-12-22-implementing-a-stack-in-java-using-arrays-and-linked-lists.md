@@ -1,18 +1,20 @@
 ---
 layout: post
-title: "Implementing a Stack in Java using Arrays and Linked Lists"
-meta: "Two alternative methods of implementing the common place Stack data-structure."
+title: 'Implementing a Stack in Java using Arrays and Linked Lists'
+meta: 'Discover two alternative methods for implementing the commonplace stack data structure in Java using arrays and linked lists to achieve efficient data manipulation.'
+tags: java data-structures
 ---
 
-The stack is a fundamental data-structure used extensively in algorithm design and program implementation.
-At an abstract level it can be described very simply, as it only allows for addition (pushing) of new and removal (popping) of existing elements from the top of the stack.
+The stack is a fundamental data structure used extensively in algorithm design and program implementation.
+At an abstract level, it can be described very simply, as it only allows for the addition (pushing) of new elements and the removal (popping) of existing elements from the top of the stack.
 This description can be abbreviated to LIFO, which stands for Last-In-First-Out.
-Although you will most likely not have to implement such a structure for practical use-cases, it can be very useful to 'look under the hood' to gain a better understanding of what is going on.
-Doing so will make you more aware of when this data-structure can be best used.
+Although you will most likely not have to implement such a structure for practical use cases, it can be very useful to 'look under the hood' to gain a better understanding of what is going on.
+Doing so will make you more aware of when this data structure can be best used.
+
 <!--more-->
 
-The following examples solve the same problem, and as such I have created a simple interface that each implementation must fulfill.
-Contractual agreements like this are great when you do not want the implementation details to effect the API that is available, allowing the user to use them interchangeably.
+The following examples solve the same problem, and as such I have created a simple interface that each implementation must fulfil.
+Contractual agreements like this are great when you do not want the implementation details to affect the API that is available, allowing the user to use them interchangeably.
 
 ```java
 interface Stack<T> {
@@ -23,17 +25,19 @@ interface Stack<T> {
 
 ## Array-based implementation
 
-The first implementation I would like to discuss stores the stack contents in an underlying fixed-sized array.
-Using such a method provides constant time 'O(1)' lookup of all items in the collection, however in the stacks case this benefit is not warranted.
-An initial array (size of 2) is first initialised, and when new elements are added the running total is incremented.
-Additions to the array occur in constant amortized time 'O(1)', as they are inserted at the end.
-If the array reaches its limit we then have to do the linear time 'O(n)' task of creating a new array of double the size, and then copying the contents over.
-Using the 'System.arraycopy' method call is a more [performant](http://stackoverflow.com/questions/8526907/is-javas-system-arraycopy-efficient-for-small-arrays) alternative to building up the new array ourselves.
-When an element is removed (popped) from the stack a check is done to see if the array is now a quarter full, if so the array is again resized, but this time cut in half.
-As resizing the array is a very costly act we want to do it as infrequently as possible, using the double and quarter rules provides us with a good balance in typical use-cases.
+The first implementation I would like to discuss stores the stack contents in an underlying fixed-size array.
+Using such a method provides constant time 'O(1)' lookup of all items in the collection; however, in the stack's case this benefit is not warranted.
+An initial array (of size 2) is first initialised, and when new elements are added, the running total is incremented.
+Additions to the array occur in constant amortised time 'O(1)', as they are inserted at the end.
+If the array reaches its limit, we then have to perform the linear time 'O(n)' task of creating a new array of double the size and copying the contents over.
+Using the `System.arraycopy` method call is a more [performant](http://stackoverflow.com/questions/8526907/is-javas-system-arraycopy-efficient-for-small-arrays) alternative to building the new array ourselves.
+When an element is removed (popped) from the stack, a check is performed to see if the array is now a quarter full.
+If so, the array is resized again, but this time it is halved.
+As resizing the array is a very costly operation, we want to do it as infrequently as possible.
+Using the double and quarter rules provides a good balance in typical use cases.
 
-One point you can pick up from this example is maybe the overlooked initial capacity parameter you can initialise an [ArrayList](http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html) with.
-Implemented conceptional the same, doing so can increase performance greatly if you have an estimate (heuristics) on how large the list is going to grow.
+One point to note from this example is the often-overlooked initial capacity parameter with which you can initialise an [ArrayList](http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html).
+Implemented conceptually in the same manner, doing so can greatly increase performance if you have an estimate (heuristics) of how large the list is going to grow.
 
 ```java
 public class StackArray<T> implements Stack<T> {
@@ -81,15 +85,16 @@ public class StackArray<T> implements Stack<T> {
 
 ## Linked-List implementation
 
-The second example is more on par with what you might expect from a language implementation.
-Using a Linked-List is tailor made to store the contents of a stack, handling the actions required with great performance results.
-Unlike the array implementation, using a Linked-List provides us with constant time 'O(1)' guarantees when adding an element, as no underlying array requires resizing.
-On top of this it also provides constant time 'O(1)' guarantees when removing (popping) an element, as only a reference requires modification.
-This implementation differs in that it creates a new node instance per addition, each storing their supplied value and reference to the following node.
-These links allow us to keep the stack intact and eventually traverse the entire collection, once emptied.
-No upfront memory costs result when using a Linked-List as you only consume the space required per node, when a new value is pushed to the stack.
+The second example is more in line with what you might expect from a language implementation.
+Using a linked list is tailor-made to store the contents of a stack, handling the required actions with excellent performance.
+Unlike the array implementation, using a linked list provides constant time 'O(1)' guarantees when adding an element, as no underlying array requires resizing.
+Furthermore, it also provides constant time 'O(1)' guarantees when removing (popping) an element, as only a reference requires modification.
+This implementation differs in that it creates a new node instance for each addition, each storing its supplied value and a reference to the following node.
+These links allow us to maintain the stack and eventually traverse the entire collection once it is emptied.
+There are no upfront memory costs when using a linked list, as you only consume the space required for each node when a new value is pushed to the stack.
 However, the overhead of each node being an object instance should be taken into consideration.
-Another limitation of a Linked-List is the linear 'O(n)' traversal time, however, this is not an issue in this case as we are only concerned with the first (most recent) element.
+Another limitation of a linked list is its linear 'O(n)' traversal time.
+Nevertheless, this is not an issue in this case as we are only concerned with the first (most recent) element.
 
 ```java
 public class StackLinkedList<T> implements Stack<T> {
@@ -117,7 +122,7 @@ public class StackLinkedList<T> implements Stack<T> {
 
     public T pop()
     {
-        if (first == null) new java.util.NoSuchElementException();
+        if (first == null) throw new java.util.NoSuchElementException();
         T ele = first.ele;
         first = first.next;
         total--;
@@ -141,8 +146,8 @@ public class StackLinkedList<T> implements Stack<T> {
 
 ## Example Usage
 
-Below is an example showing the array implementation in action.
-As you can see I have declared the variable instance as the Stack interface type, doing so allows me to easily switch out the implementation if future requirements warrant it.
+Below is an example demonstrating the array implementation in action.
+As you can see, I have declared the variable instance as the Stack interface type, which allows me to easily switch out the implementation if future requirements warrant it.
 
 ```java
 Stack<String> greeting = new StackArray<>();

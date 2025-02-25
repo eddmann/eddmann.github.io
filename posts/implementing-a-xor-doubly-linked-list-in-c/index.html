@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simple C implementation of a XOR Doubly Linked-List.">
+    <meta name="description" content="Learn how to implement a memory efficient XOR doubly linked-list in C for effective low-level memory management.">
 
     <title>
         
@@ -50,17 +50,27 @@
                 <article class="post">
     <h1 class="post-title">Implementing a XOR Doubly Linked-List in C</h1>
     <time datetime="2014-01-03T00:00:00+00:00" class="post-date">03 Jan 2014</time>
-    <p>After experimenting with the <a href="/posts/experimenting-with-the-xor-swap-method-in-java/">XOR swap method in Java</a> I had hoped to follow it up with exploration of the XOR double linked-list.
-Java objects however, are not directly accessible through pointer reference.
-This is by no means a limitation, allowing the Garbage collector to efficiently and safely handle memory allocation.
-Sometimes it is desired to have such access however, and you can take advantage of <a href="http://en.wikipedia.org/wiki/Java_Native_Interface">JNI</a> to call assembly, or C/C++ code from within Java.
-Another option is to use the <a href="http://mishadoff.github.io/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/">sun.misc.Unsafe</a> class, providing many ‘unsafe’ operations, one of which is to retrieve object memory address locations.
-</p>
+    <p>This post examines the implementation of a XOR doubly linked-list in C.
+It provides a detailed explanation of how pointer arithmetic combined with the XOR operation can reduce memory usage in a linked list.
+The discussion covers both the benefits and the challenges of managing memory at a low level in C.</p>
 
-<p>Despite these alternatives, I felt compelled to follow on with my exploration of C, and implement this data-structure using a language with great (scary) low-level memory-management support.
-From previous posts you are aware that a doubly linked-list stores items with pointers present in both directions.
-This allows for traversal both forwards and backwards, at the expense of having to store two pointers per element.
-Through the magic of the bitwise XOR operation however, we are able to store each nodes previous and next pointers in the memory allocated to just one.</p>
+
+
+<h2 id="what-about-java">What about Java?</h2>
+
+<p>After experimenting with the <a href="/posts/experimenting-with-the-xor-swap-method-in-java/">XOR swap method in Java</a> I had hoped to follow it up with an exploration of the XOR doubly linked-list.
+Java objects, however, are not directly accessible through pointer reference.
+This is by no means a limitation, as it allows the garbage collector to efficiently and safely handle memory allocation.
+Sometimes it is desired to have such access, and you can take advantage of <a href="http://en.wikipedia.org/wiki/Java_Native_Interface">JNI</a> to call assembly, or C/C++ code from within Java.
+Another option is to use the <a href="http://mishadoff.github.io/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/">sun.misc.Unsafe</a> class, which provides many <em>unsafe</em> operations, one of which is to retrieve object memory address locations.</p>
+
+<h2 id="time-for-some-c">Time for some C</h2>
+
+<p>Despite these alternatives, I felt compelled to continue my exploration of C.
+I implemented this data structure using a language with robust (albeit scary) low-level memory-management support.
+From previous posts you are aware that a doubly linked list stores items with pointers in both directions.
+This allows for traversal both forwards and backwards, albeit at the expense of having to store two pointers per element.
+Through the magic of the bitwise XOR operation, however, we are able to store each node’s previous and next pointers in the memory allocated to just one.</p>
 
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 #include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
@@ -156,11 +166,11 @@ Through the magic of the bitwise XOR operation however, we are able to store eac
 </code></pre></div></div>
 
 <p>Firstly, I would like to credit <a href="http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/">this</a> post and <a href="http://stackoverflow.com/a/3532455">this</a> StackOverflow answer, which helped shape my implementation.
-Since in C we are unable to perform XOR operations on pointers directly, we must first convert them to integers using the ‘uintptr_t’ data type and then cast back, which can be seen in the ‘xor’ function.
-At its root the implementation works by storing the resulting XOR value from the previous and next pointer locations, per node.
-From this value we are then able to ‘undo’ the operation using the supplied known pointer, returning the other pointers value.
-If the node appears at the head or tail of the list, the known pointers value is XOR with 0 (NULL), in effect doing nothing.
-Below shows the different operations that are used to build-up and then traverse the list.</p>
+Since in C we are unable to perform XOR operations on pointers directly, we must first convert them to integers using the <code class="language-plaintext highlighter-rouge">uintptr_t</code> data type and then cast back, as can be seen in the ‘xor’ function.
+At its root, the implementation works by storing the resulting XOR value from the previous and next pointer locations for each node.
+From this value we are then able to ‘undo’ the operation using the supplied known pointer, returning the other pointer’s value.
+If the node appears at the head or tail of the list, the known pointer’s value is XORed with 0 (<code class="language-plaintext highlighter-rouge">NULL</code>), effectively doing nothing.
+Below are the different operations that are used to build up and then traverse the list:</p>
 
 <ul>
   <li>previous ^ next = value (stored in node)</li>
@@ -168,9 +178,9 @@ Below shows the different operations that are used to build-up and then traverse
   <li>value ^ next = previous (backward)</li>
 </ul>
 
-<p>Looking at the ‘list’ method you can see that we are able to traverse the list (in either direction) by calculating the next pointer using the current value and the previous nodes value (starting with NULL).
-An issue with this implementation is that it only works if you start traversal from the head or tail, as you are required to know the previous pointers value.
-This takes away one of the big advantages of using a doubly linked-list, which is being able to remove any given node by its reference alone.</p>
+<p>Looking at the <code class="language-plaintext highlighter-rouge">list</code> method, you can see that we are able to traverse the list in either direction by calculating the next pointer using the current value and the previous node’s value (starting with NULL).
+An issue with this implementation is that it only works if you start traversal from the head or tail, as you are required to know the previous pointer’s value.
+This diminishes one of the main advantages of using a doubly linked list, which is the ability to remove any given node by its reference alone.</p>
 
 <h2 id="resources">Resources</h2>
 

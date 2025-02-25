@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Representing Graphs using Graphviz and SVG in PHP.">
+    <meta name="description" content="Learn how to integrate Graphviz with SVG output in PHP to create interactive, scalable graphs within your markdown posts.">
 
     <title>
         
@@ -50,21 +50,23 @@
                 <article class="post">
     <h1 class="post-title">Using Graphviz with SVG Output in PHP</h1>
     <time datetime="2014-01-13T00:00:00+00:00" class="post-date">13 Jan 2014</time>
-    <p>Since adding the functionality to process syntax highlighting through <a href="http://pygments.org/">Pygments</a> I had been on the look out for similar external tools I could integrate.
+    <p>Since adding the functionality to process syntax highlighting through <a href="http://pygments.org/">Pygments</a> I had been on the lookout for similar external tools that I could integrate.
 One area that I felt was lacking in my posts was accompanying visual aids, which would be useful when explaining a new concept or algorithm.
-Like most developers I feel at home in an editor, so delving into another software package did not appeal to me.
+Like most developers, I feel at home in an editor, so delving into another software package did not appeal to me.</p>
 
-It was highly desirable to maintain my current work-flow and store all content related to a post (unless necessary) within the single markdown file.
-<a href="http://www.graphviz.org/">Graphviz</a> was the tool for job, enabling graphs to be described using a small DSL and results outputted in a variety of formats.
-Along with the ability to describe graphs in plain-text, the option to output results in <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a> allowed me keep post dependencies down to a minimum.
-SVG (Scalable Vector Graphics) is an XML-based vector image format, providing lossless-scaling and small file sizes.
-This allowed me to embedded outputted graphs within the rendered post, similar in process to syntax highlighting with Pygments.</p>
+
+
+<p>It was highly desirable to maintain my current workflow and store all content related to a post (unless necessary) within a single markdown file.
+<a href="http://www.graphviz.org/">Graphviz</a> was the tool for the job, enabling graphs to be described using a small DSL and output in a variety of formats.
+Along with the ability to describe graphs in plain text, the option to output results in <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a> allowed me to keep post dependencies to a minimum.
+SVG (Scalable Vector Graphics) is an XML-based vector image format, providing lossless scaling and small file sizes.
+This allowed me to embed outputted graphs within the rendered post, similar to the process of syntax highlighting with Pygments.</p>
 
 <h2 id="implementation">Implementation</h2>
 
 <p>Below is a simple example implementation to output SVG variants of each defined graph within a supplied string (post).
 I made the assumption that the ‘dot’ command (provided by Graphviz) is present in the user’s path (this can be easily altered).
-For consistency I decided to declare graph definitions using Markdown Extra’s <a href="http://michelf.ca/projects/php-markdown/extra/#fenced-code-blocks">fenced blocks</a> notation, discussed further in the <a href="/posts/using-pythons-pygments-syntax-highlighter-in-php/">Pygments post</a>.
+For consistency, I decided to declare graph definitions using Markdown Extra’s <a href="http://michelf.ca/projects/php-markdown/extra/#fenced-code-blocks">fenced blocks</a> notation, discussed further in the <a href="/posts/using-pythons-pygments-syntax-highlighter-in-php/">Pygments post</a>.
 Providing the code block with a unique ‘.dot-show’ language type-hint allowed me to be sure of no conflicting pre-processes.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">graphviz</span><span class="p">(</span><span class="nv">$post</span><span class="p">)</span>
@@ -102,18 +104,18 @@ Providing the code block with a unique ‘.dot-show’ language type-hint allowe
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Looking at the example above you will notice the use of the same regular expression replacement and process command calls found in the Pygments implementation.
-All that has been altered is the processing occurred on the outputted result and of course the command itself.
+<p>Looking at the example above, you will notice the use of the same regular expression replacement and process command calls found in the Pygments implementation.
+All that has been altered is the processing that occurred on the outputted result and, of course, the command itself.
 Comments and unnecessary headers are removed from the resulting output, along with the inclusion of random ‘id’ element names (as multiple graphs may use the same names).
-The ‘max-height’ style replaces the defined width and height of the SVG element to fix an issue I found in maintaining height ratio when resizing the graph.</p>
+The ‘max-height’ style replaces the defined width and height of the SVG element to fix an issue I found in maintaining the height ratio when resizing the graph.</p>
 
 <h2 id="examples">Examples</h2>
 
-<p>Now that we have an example implementation to work with, lets see some of the impressive results we can achieve when using Graphviz and SVG output.</p>
+<p>Now that we have an example implementation to work with, let’s see some of the impressive results we can achieve when using Graphviz and SVG output.</p>
 
 <h3 id="uml-class-diagram">UML Class Diagram</h3>
 
-<p>Inspired by the great article found <a href="http://www.ffnn.nl/pages/articles/media/uml-diagrams-using-graphviz-dot.php">here</a>, I was able to describe a simple UML Class Diagram in .dot notation and output the results in SVG.</p>
+<p>Inspired by the excellent article found <a href="http://www.ffnn.nl/pages/articles/media/uml-diagrams-using-graphviz-dot.php">here</a>, I was able to describe a simple UML Class Diagram in .dot notation and output the results in SVG.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>digraph G
 {

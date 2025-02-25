@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Implementing a memoization method in PHP, with simple and recursive examples.">
+    <meta name="description" content="Learn how to implement memoization in PHP with simple examples and recursive calls, improving performance through caching.">
 
     <title>
         
@@ -50,15 +50,17 @@
                 <article class="post">
     <h1 class="post-title">Implementing and Using Memoization in PHP</h1>
     <time datetime="2014-01-13T00:00:00+00:00" class="post-date">13 Jan 2014</time>
-    <p>Memoization is a simple optimisation technique to understand and in most cases implement.
+    <p>Memoization is a simple optimisation technique to understand and, in most cases, implement.
 The base idea is to speed up function calls by avoiding the re-calculation of previously processed input results (very cache-like).
-Storing these results in a key-value lookup store can result in major speed increases when repetitive function calls occur.
+Storing these results in a key-value lookup store can result in major speed increases when repetitive function calls occur.</p>
 
-<a href="http://en.wikipedia.org/wiki/Dynamic_programming">Dynamic programming</a> algorithms such as the <a href="http://en.wikipedia.org/wiki/Knapsack_problem">Knapsack problem</a> benefit greatly from using this technique.
-However, the trade off is that due to its caching underpinnings, functions with side-effects and reliance on external factors such as the current time may return incorrect results.
-Having spent sometime looking into languages such as <a href="http://groovy.codehaus.org/">Groovy</a> which include this <a href="http://mrhaki.blogspot.co.uk/2011/05/groovy-goodness-cache-closure-results.html">functionality</a> out of the box, I wished to see if it was possible to create an implementation in PHP.
+
+
+<p><a href="http://en.wikipedia.org/wiki/Dynamic_programming">Dynamic programming</a> algorithms such as the <a href="http://en.wikipedia.org/wiki/Knapsack_problem">Knapsack problem</a> benefit greatly from using this technique.
+However, the trade-off is that due to its caching underpinnings, functions with side-effects and reliance on external factors such as the current time may return incorrect results.
+I have spent some time looking into languages such as <a href="http://groovy.codehaus.org/">Groovy</a> which include this <a href="http://mrhaki.blogspot.co.uk/2011/05/groovy-goodness-cache-closure-results.html">functionality</a> out of the box, and I wished to see if it was possible to create an implementation in PHP.
 Further research found <a href="http://github.com/arraypad/php-memoize">php-memoize</a> which looks like a great C module, showing promise in implementing the concept at a language library level.
-Though I am impressed with the discussed module I wished to see if it was possible to create an implementation in PHP userspace.</p>
+Although I am impressed with the discussed module, I wished to see if it was possible to create an implementation in PHP userspace.</p>
 
 <h2 id="implementation">Implementation</h2>
 
@@ -82,14 +84,14 @@ Though I am impressed with the discussed module I wished to see if it was possib
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Using a static ‘cache’ array allows us to keep a persistent lookup table between calls of the returned function.
+<p>Using a static <code class="language-plaintext highlighter-rouge">$cache</code> array allows us to keep a persistent lookup table between calls of the returned function.
 In conjunction with this, hashing the serialised arguments array allows us to create a unique key we can set and lookup in the associative array per call.
-The method supports either anonymous or string identified functions, using the ‘call_user_func_array’ method.</p>
+The method supports either anonymous or string-identified functions, using the <code class="language-plaintext highlighter-rouge">call_user_func_array</code> method.</p>
 
 <h2 id="profiling">Profiling</h2>
 
-<p>Now that we have an implementation it is time to benchmark its performance, to see the resulting gains.
-Below is a simple function which prints out the resulting time duration taken for the supplied function to run.</p>
+<p>Now that we have an implementation, it is time to benchmark its performance, to see the resulting gains.
+Below is a simple function which prints out the time duration taken for the supplied function to run.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$timer</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$func</span><span class="p">)</span>
 <span class="p">{</span>
@@ -103,7 +105,7 @@ Below is a simple function which prints out the resulting time duration taken fo
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We can now use the above function to benchmark the performance of the side-effect free ‘sleepz’ function declared below.</p>
+<p>We can now use the above function to benchmark the performance of the <code class="language-plaintext highlighter-rouge">sleepz</code> function declared below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">sleepz</span><span class="p">(</span><span class="nv">$time</span><span class="p">)</span>
 <span class="p">{</span>
@@ -126,17 +128,18 @@ Below is a simple function which prints out the resulting time duration taken fo
 </code></pre></div></div>
 
 <p>As you can deduce from the output, the second call to the memoized function is significantly quicker than the first.
-Comparing the non-memoized and first memoized function calls results in very similar time duration, as they are doing the same work.
-Once the function calls result has been stored in the memoized cache, the second call simply needs to lookup the result hit and return the contents.
-At an API level this call looks the same as any other, but thanks to the cache, performance gains occur.</p>
+Comparing the non-memoized and first memoized function calls results in very similar time durations, as they are doing the same work.
+Once the function call result has been stored in the memoized cache, the second call simply needs to look up the result and return the contents.
+At an API level, this call looks the same as any other, but thanks to the cache, performance gains occur.</p>
 
 <h2 id="recursive-calls">Recursive Calls</h2>
 
-<p>One issue that appears when you spend a little time with the above implementation are recursive function calls.
-Unlike other languages this high-level implementation is unable to rewrite internal function calls, however, to get around this we are able to use PHP’s first-class function support.
-Declaring use of a reference to the function assignment variable successfully allows us to recursively call the memoized implementation.
-This detail now requires the code logic be present in an anonymous function.
-As this is a thought exercise rather than a production ready implementation I am happy with the capabilities currently available in the language.</p>
+<p>One issue that appears when you spend a little time with the above implementation is recursive function calls.
+Unlike in other languages, this high-level implementation is unable to rewrite internal function calls.
+However, to get around this, we are able to use PHP’s first-class function support.
+Declaring the use of a reference to the function assignment variable successfully allows us to recursively call the memoized implementation.
+This detail now requires the code logic to be present in an anonymous function.
+As this is a thought exercise rather than a production-ready implementation, I am happy with the capabilities currently available in the language.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$factorial</span> <span class="o">=</span> <span class="nv">$memoize</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$factorial</span><span class="p">)</span>
 <span class="p">{</span>

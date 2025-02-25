@@ -51,8 +51,7 @@
     <h1 class="post-title">Providing Local JS and CSS Resources for CDN Fallbacks</h1>
     <time datetime="2014-01-29T00:00:00+00:00" class="post-date">29 Jan 2014</time>
     <p>In a recent <a href="http://threedevsandamaybe.com/posts/html-experiences-part-1/">podcast</a> the topic of using Content Delivery Networks (CDN) to host common-place resources such as jQuery and Twitter Bootstrap came up.
-The merits of having access to large scale delivery infrastructures provided by Google and the possibility that the client will already have these asset cached are huge wins.
-
+The merits of having access to large scale delivery infrastructures provided by Google and the possibility that the client will already have these asset cached are huge wins. 
 One pessimistic comment which can arise however, is what happens if these CDN’s suddenly become unavailable.
 Though highly unlikely in the case of Google’s <a href="https://developers.google.com/speed/libraries/devguide">Hosted Libraries</a>, similar acts such development whilst offline may likely result in the same effect.
 To get around this, hosting fallback local version of the assets is a worthwhile investment.
@@ -65,19 +64,23 @@ Inspired by the <a href="http://html5boilerplate.com/">HTML5 Boilerplates</a> jQ
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- jQuery --&gt;</span>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script&gt;</span><span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">||</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;script src="/js/jquery-1.10.2.min.js"&gt;&lt;</span><span class="se">\</span><span class="s1">/script&gt;</span><span class="dl">'</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">||</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;script src="/js/jquery-1.10.2.min.js"&gt;&lt;</span><span class="se">\</span><span class="s1">/script&gt;</span><span class="dl">'</span><span class="p">);</span>
+<span class="nt">&lt;/script&gt;</span>
 
 <span class="c">&lt;!-- Bootstrap --&gt;</span>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script&gt;</span><span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">modal</span> <span class="o">||</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;script src="/js/bootstrap-3.0.3.min.js"&gt;&lt;</span><span class="se">\</span><span class="s1">/script&gt;</span><span class="dl">'</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
 <span class="nt">&lt;script&gt;</span>
-    <span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="dl">'</span><span class="s1">color</span><span class="dl">'</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">rgb(51, 51, 51)</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">head</span><span class="dl">'</span><span class="p">).</span><span class="nx">prepend</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;link rel="stylesheet" href="/css/bootstrap-3.0.3.min.css"&gt;</span><span class="dl">'</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">});</span>
-    <span class="p">})(</span><span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">);</span>
+  <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">modal</span> <span class="o">||</span> <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;script src="/js/bootstrap-3.0.3.min.js"&gt;&lt;</span><span class="se">\</span><span class="s1">/script&gt;</span><span class="dl">'</span><span class="p">);</span>
+<span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+  <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="dl">'</span><span class="s1">color</span><span class="dl">'</span><span class="p">)</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">rgb(51, 51, 51)</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">head</span><span class="dl">'</span><span class="p">).</span><span class="nx">prepend</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;link rel="stylesheet" href="/css/bootstrap-3.0.3.min.css"&gt;</span><span class="dl">'</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">})(</span><span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">);</span>
 <span class="nt">&lt;/script&gt;</span>
 </code></pre></div></div>
 
@@ -91,22 +94,26 @@ This example uses jQuery for ease of explanation, as we can be confident at this
 <p>The second example takes advantage of the great <a href="http://yepnopejs.com/">YepNope</a> library, providing us with the ability to test for existence of a predicate and act upon this result.
 Including YepNope and the provided CSS plugin extension in the document head, we are able to be sure that the ‘complete’ callbacks will only be invoked when either the related JS or CSS assets have been fully loaded.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yepnope</span><span class="p">([{</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yepnope</span><span class="p">([</span>
+  <span class="p">{</span>
     <span class="na">load</span><span class="p">:</span> <span class="dl">'</span><span class="s1">//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/js/jquery-1.10.2.min.js</span><span class="dl">'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">},</span> <span class="p">{</span>
+    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/js/jquery-1.10.2.min.js</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
     <span class="na">load</span><span class="p">:</span> <span class="dl">'</span><span class="s1">timeout=1000!//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="dl">'</span><span class="s1">color</span><span class="dl">'</span><span class="p">)</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">rgb(51, 51, 51)</span><span class="dl">'</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/css/bootstrap-3.0.3.min.css</span><span class="dl">'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">},</span> <span class="p">{</span>
+    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">body</span><span class="dl">'</span><span class="p">).</span><span class="nx">css</span><span class="p">(</span><span class="dl">'</span><span class="s1">color</span><span class="dl">'</span><span class="p">)</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">rgb(51, 51, 51)</span><span class="dl">'</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/css/bootstrap-3.0.3.min.css</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
     <span class="na">load</span><span class="p">:</span> <span class="dl">'</span><span class="s1">//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-        <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">modal</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/js/bootstrap-3.0.3.min.js</span><span class="dl">'</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}]);</span>
+    <span class="na">complete</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">modal</span> <span class="o">||</span> <span class="nx">yepnope</span><span class="p">(</span><span class="dl">'</span><span class="s1">/js/bootstrap-3.0.3.min.js</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">]);</span>
 </code></pre></div></div>
 
 <p>You will notice that this example is very similar to the basic implementation, testing for the existence of window variables and CSS body properties.
@@ -120,21 +127,22 @@ So as to improve the clients viewing experience a one second timeout has been sp
 This can be seen by how simple the API is to use, with default checking of window variable existence based on the assets key name.
 Similar to the features provided in YepNope such as loading resources asynchronously we are able to increase page loading times with minimal hassle.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fallback</span><span class="p">.</span><span class="nx">load</span><span class="p">({</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fallback</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span>
+  <span class="p">{</span>
     <span class="na">bootstrapCss</span><span class="p">:</span> <span class="dl">'</span><span class="s1">//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">jQuery</span><span class="p">:</span> <span class="p">[</span>
-        <span class="dl">'</span><span class="s1">//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js</span><span class="dl">'</span><span class="p">,</span>
-        <span class="dl">'</span><span class="s1">/js/jquery-1.10.2.min.js</span><span class="dl">'</span>
+    <span class="na">jQuery</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/js/jquery-1.10.2.min.js</span><span class="dl">'</span><span class="p">],</span>
+    <span class="dl">'</span><span class="s1">jQuery.fn.modal</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span>
+      <span class="c1">// bootstrap</span>
+      <span class="dl">'</span><span class="s1">//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js</span><span class="dl">'</span><span class="p">,</span>
+      <span class="dl">'</span><span class="s1">/js/bootstrap-3.0.3.min.js</span><span class="dl">'</span><span class="p">,</span>
     <span class="p">],</span>
-    <span class="dl">'</span><span class="s1">jQuery.fn.modal</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span> <span class="c1">// bootstrap</span>
-        <span class="dl">'</span><span class="s1">//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js</span><span class="dl">'</span><span class="p">,</span>
-        <span class="dl">'</span><span class="s1">/js/bootstrap-3.0.3.min.js</span><span class="dl">'</span>
-    <span class="p">]</span>
-<span class="p">},</span> <span class="p">{</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
     <span class="na">shim</span><span class="p">:</span> <span class="p">{</span>
-        <span class="dl">'</span><span class="s1">jQuery.fn.modal</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span> <span class="dl">'</span><span class="s1">jQuery</span><span class="dl">'</span> <span class="p">]</span> <span class="c1">// bootstrap</span>
-    <span class="p">}</span>
-<span class="p">});</span>
+      <span class="dl">'</span><span class="s1">jQuery.fn.modal</span><span class="dl">'</span><span class="p">:</span> <span class="p">[</span><span class="dl">'</span><span class="s1">jQuery</span><span class="dl">'</span><span class="p">],</span> <span class="c1">// bootstrap</span>
+    <span class="p">},</span>
+  <span class="p">}</span>
+<span class="p">);</span>
 </code></pre></div></div>
 
 <p>The one issue with this library is that it is tied into checking the window object for resource existence.

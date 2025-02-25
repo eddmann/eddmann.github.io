@@ -52,13 +52,14 @@
     <time datetime="2014-02-17T00:00:00+00:00" class="post-date">17 Feb 2014</time>
     <p>Coming from a strongly PHP background, initially looking at the web-development landscape whilst delving into Python seemed a little confusing.
 As Python was not developed for the web from an offset, a specification was accepted called <a href="http://www.python.org/dev/peps/pep-0333/">PEP 333</a> which standardised the required interface between Web servers and Python Web Frameworks/Applications.
-Despite the additional complexity, the manner in which middle-ware applications can be integrated, along with the server choice add possibilities that I find hard to locate a comparable in PHP.
-</p>
+Despite the additional complexity, the manner in which middle-ware applications can be integrated, along with the server choice add possibilities that I find hard to locate a comparable in PHP.</p>
+
+
 
 <h2 id="basic-example">Basic Example</h2>
 
 <p>Simply put a WSGI (Web Sever Gateway Interface) compliant application must supply a callable (function, class) which accepts a ‘environ’ dictionary and ‘start_response’ function.
-For a familiar PHP comparison, you can think of the ‘environ’ dictionary as a combined ‘$_SERVER’, ‘$_GET’ and ‘$_POST’, with extra processing required.
+For a familiar PHP comparison, you can think of the ‘environ’ dictionary as a combined <code class="language-plaintext highlighter-rouge">$_SERVER</code>, <code class="language-plaintext highlighter-rouge">$_GET</code> and <code class="language-plaintext highlighter-rouge">$_POST</code>, with extra processing required.
 This callable is expected to invoke the ‘start_response’ function with the desired response-code/header-data, and then return a byte iterable with the response body.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">app</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>

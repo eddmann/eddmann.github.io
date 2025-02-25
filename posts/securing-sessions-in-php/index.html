@@ -53,8 +53,9 @@
     <p>Following on from my previous post on <a href="/posts/self-signed-ssl-certificates-with-nginx-and-apache/">Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Broken Authentication and Session Management</a>).
 When delving into the subject I was unable to find a definitive resource for an PHP implementation.
 Due to this, I set out to combine all the best practice I could find into a single Session handler, to help protect against the common attack vectors.
-Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default ‘SessionHandler’ class.
-</p>
+Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default ‘SessionHandler’ class.</p>
+
+
 
 <p>In my initial research I found multiple commonly mis-configured options that should be addressed, these are presented below in the ‘setup’ method.
 Here we specify that sessions should only be passed via cookies, removing the possibility of the session identifier being sent as a ‘GET’ parameter.
@@ -107,7 +108,7 @@ It is recommended that you override the path and domain based on the application
 
 <p>With the environment successfully configured we are now able to safety start, destroy and regenerate the current session using the provided methods below.
 The ‘start’ method in-principle wraps the ‘session_start’ function, however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
-The ‘forget’ method removes the contents of the ‘$_SESSION’ array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
+The ‘forget’ method removes the contents of the <code class="language-plaintext highlighter-rouge">$_SESSION</code> array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
 Finally, the ‘refresh’ method replaces the current session identifier with a new one.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">function</span> <span class="n">start</span><span class="p">()</span>

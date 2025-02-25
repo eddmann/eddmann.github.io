@@ -52,8 +52,9 @@
     <time datetime="2014-04-06T00:00:00+00:00" class="post-date">06 Apr 2014</time>
     <p>Functional languages provide you with the ability to concisely define the intension of a program, without low-level issues getting in the way.
 This can be clearly seen when implementing the Quick sort algorithm.
-Often referred to as ‘partition-exchange’ sort, this divide and conquer algorithm recursively divides a list into two sub-lists, based on a chosen pivot element.
-</p>
+Often referred to as ‘partition-exchange’ sort, this divide and conquer algorithm recursively divides a list into two sub-lists, based on a chosen pivot element.</p>
+
+
 
 <h2 id="scala">Scala</h2>
 
@@ -76,55 +77,57 @@ As well as this, the leftmost element is chosen as the pivot, causing worst-case
 <p>Having been impressed by how well documented the intension’s of the program were when writing in a functional style, I decided on attempting to implement the same example in JavaScript.
 Before I was able to achieve this however, I was required to setup a couple of array helper functions, shown below.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">partition</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">xs</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">ys</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">len</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">e</span><span class="p">;</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">partition</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">xs</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="nx">ys</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="nx">len</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
+    <span class="nx">i</span><span class="p">,</span>
+    <span class="nx">e</span><span class="p">;</span>
 
-    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">e</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-        <span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">?</span> <span class="nx">xs</span> <span class="p">:</span> <span class="nx">ys</span><span class="p">).</span><span class="nx">push</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
-    <span class="p">}</span>
+  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">e</span> <span class="o">=</span> <span class="k">this</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+    <span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">?</span> <span class="nx">xs</span> <span class="p">:</span> <span class="nx">ys</span><span class="p">).</span><span class="nx">push</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+  <span class="p">}</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">ys</span><span class="p">];</span>
+  <span class="k">return</span> <span class="p">[</span><span class="nx">xs</span><span class="p">,</span> <span class="nx">ys</span><span class="p">];</span>
 <span class="p">};</span>
 
-<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">head</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">head</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
 <span class="p">};</span>
 
-<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">tail</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">tail</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 <span class="p">};</span>
 
-<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isEmpty</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="o">!</span> <span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+<span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isEmpty</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
 <span class="p">};</span>
 </code></pre></div></div>
 
 <p>As you can see the functions defined are similar to functionality already present in Scala’s standard libraries.
 Variable unpacking is planned for inclusion in ECMAScript 6, though at this time, I decided to use a workaround within the current JavaScript specification that achieves a similar affect.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">unpack</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">el</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">unpack</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">el</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
 <p>Finally, with the required helper functionality in place we are then able to define the Quick sort algorithm in JavaScript, using the same rules as the Scala implementation.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">qsort</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">())</span>
-        <span class="k">return</span> <span class="p">[];</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Array</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">qsort</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">())</span> <span class="k">return</span> <span class="p">[];</span>
 
-    <span class="kd">var</span> <span class="nx">head</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">head</span><span class="p">();</span>
+  <span class="kd">var</span> <span class="nx">head</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">head</span><span class="p">();</span>
 
-    <span class="k">return</span> <span class="nx">unpack</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">low</span><span class="p">,</span> <span class="nx">high</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">low</span><span class="p">.</span><span class="nx">qsort</span><span class="p">(),</span> <span class="nx">head</span><span class="p">,</span> <span class="nx">high</span><span class="p">.</span><span class="nx">qsort</span><span class="p">());</span>
-    <span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">().</span><span class="nx">partition</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">_</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">_</span> <span class="o">&lt;</span> <span class="nx">head</span><span class="p">;</span> <span class="p">}));</span>
+  <span class="k">return</span> <span class="nx">unpack</span><span class="p">(</span>
+    <span class="kd">function</span> <span class="p">(</span><span class="nx">low</span><span class="p">,</span> <span class="nx">high</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">low</span><span class="p">.</span><span class="nx">qsort</span><span class="p">(),</span> <span class="nx">head</span><span class="p">,</span> <span class="nx">high</span><span class="p">.</span><span class="nx">qsort</span><span class="p">());</span>
+    <span class="p">},</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tail</span><span class="p">().</span><span class="nx">partition</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">_</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">_</span> <span class="o">&lt;</span> <span class="nx">head</span><span class="p">;</span>
+    <span class="p">})</span>
+  <span class="p">);</span>
 <span class="p">};</span>
 </code></pre></div></div>
 

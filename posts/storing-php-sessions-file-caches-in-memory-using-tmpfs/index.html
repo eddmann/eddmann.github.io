@@ -53,8 +53,9 @@
     <p>Yesterday I was looking through some application logs and noticed a significant bottleneck with I/O reads in the implemented file cache.
 This cache is used to temporary store processed views and records for a set duration.
 I looked into a couple of solutions to alleviate the intense spinning disk usage, ranging from <a href="http://memcached.org/">Memcache</a> to <a href="http://redis.io/">Redis</a>.
-These products are great for large-scale applications (spread over multiple systems), however, in my case simply required a single local configuration.
-</p>
+These products are great for large-scale applications (spread over multiple systems), however, in my case simply required a single local configuration.</p>
+
+
 
 <p>This was when I found ‘tmpfs’, saving me from all sorts of issues relating to adding yet another application to the production stack.
 ‘tmpfs’ appears as a mounted partition on your system, however, under the hood it allocates and uses a section of physical memory (non-persistent through reboots).

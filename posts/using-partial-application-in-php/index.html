@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Implementing a partial application function in PHP, with typical use-cases.">
+    <meta name="description" content="Learn how to implement partial application in PHP with practical examples and detailed explanations on currying, closures, and variadic functions for effective functional programming.">
 
     <title>
         
@@ -50,17 +50,18 @@
                 <article class="post">
     <h1 class="post-title">Using Partial Application in PHP</h1>
     <time datetime="2013-12-26T00:00:00+00:00" class="post-date">26 Dec 2013</time>
-    <p>Partial function application is a common place feature found in many languages that lean towards the functional paradigm.
-Unlike some functional concepts (monads) it can be simply explained as taking a function and binding argument values to one or more of its parameters, resulting in a new function.
+    <p>Partial function application is a commonplace feature found in many languages that lean towards the functional paradigm.
+Unlike some functional concepts (monads), it can be simply explained as taking a function and binding argument values to one or more of its parameters, resulting in a new function.
 Function argument size in computer science circles is described as its <a href="http://en.wikipedia.org/wiki/Arity">arity</a>, and through this process we are reducing the arity based on the partial application call.
-Discussion of partial application typically brings up the related topic of <a href="http://en.wikipedia.org/wiki/Currying">currying</a>, which follows the stricter rule of transforming a multiple argument function into a chain of single argument calls.
-This is useful as it helps simplify the study of functions in theoretical computer sciences, such as lambda calculus.
-Currying however is not that useful in general-purpose languages, dissimilar to Haskell which at its core only supports the mathematical notion of single argument functions.
-Using a combination of syntactic sugar and currying, the language is able to give the misguided impression of multi-argument calls, when in-fact it is just a chain of single argument curried calls.
-</p>
+Discussion of partial application typically brings up the related topic of <a href="http://en.wikipedia.org/wiki/Currying">currying</a>, which follows the stricter rule of transforming a multiple-argument function into a chain of single-argument calls.
+This is useful as it helps simplify the study of functions in theoretical computer science, such as lambda calculus.
+Currying, however, is not that useful in general-purpose languages, unlike Haskell which, at its core, only supports the mathematical notion of single-argument functions.
+Using a combination of syntactic sugar and currying, the language is able to give the misguided impression of multi-argument calls, when in fact it is just a chain of single-argument curried calls.</p>
+
+
 
 <p>Below is a simple implementation of a partial application function in PHP, taking advantage of its first-class function and closure support.
-The solution I was able to come up is very similar to the one documented <a href="http://allthingsphp.blogspot.co.uk/2012/02/currying-vs-partial-application.html">here</a>, and will fortunately be more clearly expressed with the inclusion of <a href="https://wiki.php.net/rfc/variadics">variadic function syntax</a> in 5.6.</p>
+The solution I was able to come up with is very similar to the one documented <a href="http://allthingsphp.blogspot.co.uk/2012/02/currying-vs-partial-application.html">here</a>, and will fortunately be more clearly expressed with the inclusion of <a href="https://wiki.php.net/rfc/variadics">variadic function syntax</a> in PHP 5.6.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">partial</span><span class="p">(</span><span class="cm">/* $func, $args... */</span><span class="p">)</span>
 <span class="p">{</span>
@@ -74,8 +75,8 @@ The solution I was able to come up is very similar to the one documented <a href
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using the above implementation many very useful functions based on pre-existing function behavior can be created.
-The example below defines an addition function which with partial application can be used to produce increment and decrement functions.</p>
+<p>Using the above implementation, many very useful functions based on pre-existing function behaviour can be created.
+The example below defines an addition function which, with partial application, can be used to produce increment and decrement functions.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">add</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span>
 <span class="p">{</span>
@@ -86,7 +87,7 @@ The example below defines an addition function which with partial application ca
 <span class="nv">$dec</span> <span class="o">=</span> <span class="nf">partial</span><span class="p">(</span><span class="s1">'add'</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>In a similar manner a multiplication function can be defined with double and half functions created from it with partial application.</p>
+<p>In a similar manner, a multiplication function can be defined, with double and half functions created from it using partial application.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">times</span><span class="p">(</span><span class="nv">$a</span><span class="p">,</span> <span class="nv">$b</span><span class="p">)</span>
 <span class="p">{</span>
@@ -103,8 +104,8 @@ The example below defines an addition function which with partial application ca
 <span class="nv">$dec</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="nv">$double</span><span class="p">(</span><span class="mf">2.5</span><span class="p">);</span> <span class="c1">// 10</span>
 </code></pre></div></div>
 
-<p>The earlier discussed post also details another example were partial application can come in very useful, when using the date function.
-On a per-project basis I typically create functions which fill in the date format of the function, all of which can now be taken care of with the generalised partial function.</p>
+<p>The earlier discussed post also details another example where partial application can be very useful when using the date function.
+On a per-project basis, I typically create functions which fill in the date format for the function, all of which can now be handled by the generalised partial function.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$rssFormat</span> <span class="o">=</span> <span class="nf">partial</span><span class="p">(</span><span class="s1">'date'</span><span class="p">,</span> <span class="no">DATE_RSS</span><span class="p">);</span>
 <span class="nv">$rssFormat</span><span class="p">(</span><span class="mi">1388534400</span><span class="p">);</span> <span class="c1">// Wed, 01 Jan 2014 00:00:00 +0000</span>

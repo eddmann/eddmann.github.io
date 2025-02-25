@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Radix sort using an iterative bucket and queue implementation.">
+    <meta name="description" content="Discover how to implement a queue-based Least Significant Digit (LSD) Radix Sort in Java with detailed code examples and explanations.">
 
     <title>
         
@@ -50,14 +50,15 @@
                 <article class="post">
     <h1 class="post-title">Least Significant Digit (LSD) Radix Sort in Java</h1>
     <time datetime="2013-12-28T00:00:00+00:00" class="post-date">28 Dec 2013</time>
-    <p>Radix sort is a O(digits·keys) sorting algorithm which relies on integer key grouping to successfully process and naturally order the specified data set.
-Basing the sort on structure and positional notation, many other data types which can be represented in integer form (i.e. ASCII characters) can take advantage of the algorithm.
-Sorting occurs by acting on the comparison between item digits in the same position.
-Two alternative version of the algorithm exists, both tackling the problem from the opposite direction.
-In this post I will be describing an iterative lowest significant digit implementation which as the name hints at, starts processing from the right most digit position.
-This implementation results in a <a href="http://en.wikipedia.org/wiki/Stable_sort#Stability">stable</a> sort, where as the other implementation, tackles the most significant digit first and can not make such guarantees.
-In a stable sorting algorithm the initial ordering of equal keys is left unchanged in the result.
-</p>
+    <p>Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset.
+Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm.
+Sorting occurs by comparing digits in the same position of the items.
+Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction.
+In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position.
+This implementation results in a <a href="http://en.wikipedia.org/wiki/Stable_sort#Stability">stable</a> sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability.
+In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result.</p>
+
+
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">radixSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
 <span class="o">{</span>
@@ -68,7 +69,7 @@ In a stable sorting algorithm the initial ordering of equal keys is left unchang
     <span class="kt">boolean</span> <span class="n">sorted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
     <span class="kt">int</span> <span class="n">expo</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
 
-    <span class="k">while</span> <span class="o">(</span> <span class="o">!</span> <span class="n">sorted</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">while</span> <span class="o">(!</span><span class="n">sorted</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">sorted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 
         <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">item</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
@@ -81,7 +82,7 @@ In a stable sorting algorithm the initial ordering of equal keys is left unchang
         <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
 
         <span class="k">for</span> <span class="o">(</span><span class="nc">Queue</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">bucket</span> <span class="o">:</span> <span class="n">buckets</span><span class="o">)</span>
-            <span class="k">while</span> <span class="o">(</span> <span class="o">!</span> <span class="n">bucket</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
+            <span class="k">while</span> <span class="o">(!</span><span class="n">bucket</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
                 <span class="n">arr</span><span class="o">[</span><span class="n">index</span><span class="o">++]</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
     <span class="o">}</span>
 
@@ -89,10 +90,10 @@ In a stable sorting algorithm the initial ordering of equal keys is left unchang
 <span class="o">}</span>
 </code></pre></div></div>
 
-<p>Above shows an example of a queue-based least significant digit radix sorting implementation.
-Starting from the right-most digit, the process occurs over multiple passes, distributing each item into calculated buckets, based on positional key.
-After each pass through the collection the items are retrieved in order from each bucket.
-This process is repeated up and including to the length of the longest key.</p>
+<p>The above code shows an example of a queue-based least significant digit radix sort implementation.
+Starting from the right-most digit, the process occurs over multiple passes, distributing each item into calculated buckets based on its positional key.
+After each pass through the collection, the items are retrieved in order from each bucket.
+This process is repeated up to and including the pass corresponding to the length of the longest key.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isSorted</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
 <span class="o">{</span>
@@ -104,9 +105,9 @@ This process is repeated up and including to the length of the longest key.</p>
 <span class="o">}</span>
 </code></pre></div></div>
 
-<p>To make sure that the resulting processed data set is correctly sorted an assertion was included.
-Using such a feature is great in development, allowing you to verify the correctness of a specific invariant.
-This assertion can be activated at run-time by inclusion of the ‘-ea’ option in the ‘java’ command.</p>
+<p>To ensure that the resulting dataset is correctly sorted, an assertion is included.
+This feature is particularly useful in development, as it allows you to verify the correctness of a specific invariant.
+This assertion can be activated at runtime by including the ‘-ea’ option in the ‘java’ command.</p>
 
 <h2 id="resources">Resources</h2>
 

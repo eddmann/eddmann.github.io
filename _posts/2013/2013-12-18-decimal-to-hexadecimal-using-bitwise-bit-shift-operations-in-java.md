@@ -2,7 +2,7 @@
 layout: post
 title: 'Decimal to Hexadecimal using Bitwise, Bit Shift Operations in Java'
 meta: 'Learn how to convert decimal numbers to hexadecimal using bitwise and bit shift operations in Java. Discover a custom method for random web colour generation and detailed insights into low-level data conversion techniques.'
-tags: java
+tags: java algorithm
 ---
 
 I recently wanted to create a simple function in JavaScript which allowed me to generate a random background colour for a small [experiment](http://workshop.eddmann.com/copacabana/) I was working on.

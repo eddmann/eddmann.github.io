@@ -1,16 +1,18 @@
 ---
 layout: post
-title: "Least Significant Digit (LSD) Radix Sort in Java"
-meta: "Radix sort using an iterative bucket and queue implementation."
+title: 'Least Significant Digit (LSD) Radix Sort in Java'
+meta: 'Discover how to implement a queue-based Least Significant Digit (LSD) Radix Sort in Java with detailed code examples and explanations.'
+tags: java algorithm
 ---
 
-Radix sort is a O(digits·keys) sorting algorithm which relies on integer key grouping to successfully process and naturally order the specified data set.
-Basing the sort on structure and positional notation, many other data types which can be represented in integer form (i.e. ASCII characters) can take advantage of the algorithm.
-Sorting occurs by acting on the comparison between item digits in the same position.
-Two alternative version of the algorithm exists, both tackling the problem from the opposite direction.
-In this post I will be describing an iterative lowest significant digit implementation which as the name hints at, starts processing from the right most digit position.
-This implementation results in a [stable](http://en.wikipedia.org/wiki/Stable_sort#Stability) sort, where as the other implementation, tackles the most significant digit first and can not make such guarantees.
-In a stable sorting algorithm the initial ordering of equal keys is left unchanged in the result.
+Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset.
+Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm.
+Sorting occurs by comparing digits in the same position of the items.
+Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction.
+In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position.
+This implementation results in a [stable](http://en.wikipedia.org/wiki/Stable_sort#Stability) sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability.
+In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result.
+
 <!--more-->
 
 ```java
@@ -23,7 +25,7 @@ public static void radixSort(int[] arr)
     boolean sorted = false;
     int expo = 1;
 
-    while ( ! sorted) {
+    while (!sorted) {
         sorted = true;
 
         for (int item : arr) {
@@ -36,7 +38,7 @@ public static void radixSort(int[] arr)
         int index = 0;
 
         for (Queue<Integer> bucket : buckets)
-            while ( ! bucket.isEmpty())
+            while (!bucket.isEmpty())
                 arr[index++] = bucket.remove();
     }
 
@@ -44,10 +46,10 @@ public static void radixSort(int[] arr)
 }
 ```
 
-Above shows an example of a queue-based least significant digit radix sorting implementation.
-Starting from the right-most digit, the process occurs over multiple passes, distributing each item into calculated buckets, based on positional key.
-After each pass through the collection the items are retrieved in order from each bucket.
-This process is repeated up and including to the length of the longest key.
+The above code shows an example of a queue-based least significant digit radix sort implementation.
+Starting from the right-most digit, the process occurs over multiple passes, distributing each item into calculated buckets based on its positional key.
+After each pass through the collection, the items are retrieved in order from each bucket.
+This process is repeated up to and including the pass corresponding to the length of the longest key.
 
 ```java
 private static boolean isSorted(int[] arr)
@@ -60,9 +62,9 @@ private static boolean isSorted(int[] arr)
 }
 ```
 
-To make sure that the resulting processed data set is correctly sorted an assertion was included.
-Using such a feature is great in development, allowing you to verify the correctness of a specific invariant.
-This assertion can be activated at run-time by inclusion of the '-ea' option in the 'java' command.
+To ensure that the resulting dataset is correctly sorted, an assertion is included.
+This feature is particularly useful in development, as it allows you to verify the correctness of a specific invariant.
+This assertion can be activated at runtime by including the '-ea' option in the 'java' command.
 
 ## Resources
 

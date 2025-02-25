@@ -51,6 +51,25 @@
     
         <article class="post">
             <h1 class="post-title">
+                <a href="/posts/reversing-a-unicode-string-in-php-using-utf-16-be-le/">
+                    Reversing a Unicode String in PHP using UTF-16BE/LE
+                </a>
+            </h1>
+
+            <time datetime="2014-05-11T00:00:00+00:00" class="post-date">11 May 2014</time>
+
+            <p>Last week I was bit by the Unicode encoding issue when trying to naively manipulate a user’s input using PHP’s built-in string functions.
+PHP simply assumes that all characters are a single byte (octet) and the provided functions use this assumption when processing a string.
+In this article I will not be going into depth on the subject of Unicode representations, I feel this topic deserves it’s own series of articles.
+However, you should be aware that in ‘Western Europe’ we commonly only use the basic <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a> character-set (consisting of 7 bytes).
+This makes the transition to the popular ‘UTF-8’ Unicode representation almost seamless, as the two map one-to-one.
+I wish to however, discuss how to reverse a Unicode string (UTF-8) using a combination of <a href="http://en.wikipedia.org/wiki/Endianness">endianness</a> magic and the <a href="http://www.php.net/manual/en/function.strrev.php">‘strrev’</a> function.</p>
+
+
+        </article>
+    
+        <article class="post">
+            <h1 class="post-title">
                 <a href="/posts/reversing-a-string-in-php/">
                     Reversing a String in PHP
                 </a>
@@ -111,23 +130,6 @@ These products are great for large-scale applications (spread over multiple syst
             <p>The Caesar cipher (shift cipher) is an extremely simple encryption technique.
 Substitutions of this kind rely on the invariant - replace each plain-text letter by the letter some fixed number of positions across the alphabet.
 The recipient is then able to successfully decode the encoded message if they are aware of the chosen position system.</p>
-
-
-        </article>
-    
-        <article class="post">
-            <h1 class="post-title">
-                <a href="/posts/securing-sessions-in-php/">
-                    Securing Sessions in PHP
-                </a>
-            </h1>
-
-            <time datetime="2014-04-09T00:00:00+00:00" class="post-date">09 Apr 2014</time>
-
-            <p>Following on from my previous post on <a href="/posts/self-signed-ssl-certificates-with-nginx-and-apache/">Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Broken Authentication and Session Management</a>).
-When delving into the subject I was unable to find a definitive resource for an PHP implementation.
-Due to this, I set out to combine all the best practice I could find into a single Session handler, to help protect against the common attack vectors.
-Since PHP 5.4, you are able to set the Session handler based on a class instance that extends the default ‘SessionHandler’ class.</p>
 
 
         </article>

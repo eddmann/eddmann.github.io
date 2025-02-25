@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Compiling PHP 5.5 from source, with ZTS and pthreads support on CentOS 6.5">
+    <meta name="description" content="A comprehensive guide to compiling PHP 5.5 from source with ZTS and pthreads support on CentOS 6.5.">
 
     <title>
         
@@ -51,25 +51,26 @@
     <h1 class="post-title">Compiling PHP 5.5 with ZTS and pthreads Support</h1>
     <time datetime="2014-01-30T00:00:00+00:00" class="post-date">30 Jan 2014</time>
     <p><a href="http://en.wikipedia.org/wiki/POSIX_Threads">POSIX Threads</a> are a standard for threading implementations available in many Unix-like operating systems.
-Written in C they provide developers with high-level thread management methods, synchronization etc. 
+Written in C, they provide developers with high-level thread management methods, synchronisation, etc. 
 Support for these methods in PHP is provided by an extension called <a href="http://pthreads.org/">pthreads</a>, enabling user-land multi-threaded applications to be built.
-Designed in a similar manner to the implementation specified in Java, PHP can now ‘can create, read, write, execute and synchronize with Threads, Workers and Stackables’.
-This is a major step in the right direction for PHP development, providing better suited solutions than simply <a href="http://en.wikipedia.org/wiki/Fork_(system_call)">forking</a> (process copying).
-To experiment with this extension however, it is required to have a PHP built with ZTS enabled (Thread-safety support).
-This option can only be specified at compile-time and as such I felt that it would be an ideal time to provide a simple guide to compile PHP from source.
-For this example I am working with a base CentOS 6.5 installation.</p>
+Designed in a similar manner to the implementation specified in Java, PHP can now create, read, write, execute and synchronise with Threads, Workers and Stackables.
+This is a major step in the right direction for PHP development, providing better-suited solutions than simply <a href="http://en.wikipedia.org/wiki/Fork_(system_call)">forking</a> (process copying).
+To experiment with this extension, however, it is required to have a PHP built with ZTS enabled (thread-safety support).
+This option can only be specified at compile-time, and as such I felt that it would be an ideal time to provide a simple guide to compile PHP from source.
+For this example, I am working with a base CentOS 6.5 installation.</p>
 
 <h2 id="compiling-php-55-with-zts-support">Compiling PHP 5.5 with ZTS Support</h2>
 
-<p>To compile PHP from source we must first make sure the development tools required are present (such as GCC).
+<p>To compile PHP from source, we must first make sure the required development tools are present (such as GCC).
 One issue that cropped up when trying to install the ‘Development Tools’ group was the complaint of not having access to kernel packages.
-To overcome this problem I simply removed ‘kernal*’ from the excluded list provided in ‘/etc/yum.conf’.</p>
+To overcome this problem, I simply removed <code class="language-plaintext highlighter-rouge">kernel*</code> from the excluded list provided in <code class="language-plaintext highlighter-rouge">/etc/yum.conf</code>.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\e</span><span class="s2">xclude.*</span><span class="nv">$/</span><span class="s2">exclude=/g"</span> /etc/yum.conf
 <span class="nv">$ </span>yum groupinstall <span class="nt">-y</span> <span class="s1">'Development Tools'</span>
 </code></pre></div></div>
 
-<p>Looking at the first command above we remove all excludes that have currently been set, in my case this was only ‘kernal*’, but I recommend you check your setup first.
+<p>Looking at the first command above, we remove all excludes that have currently been set.
+In my case, this was only <code class="language-plaintext highlighter-rouge">kernel*</code>, but I recommend you check your setup first.
 We are now able to install the required packages to download the compressed source code and compile the XML library provided in PHP.
 I decided to set a global variable with the desired version of PHP I wished to compile, making the command listing more flexible when updates arise.</p>
 
@@ -85,11 +86,11 @@ I decided to set a global variable with the desired version of PHP I wished to c
 <span class="nv">$ </span><span class="nb">cp </span>php.ini-development /etc/php.ini
 </code></pre></div></div>
 
-<p>We download and uncompress the source code into the preferred ‘/usr/local/src’ directorty.
-From here we configure the build to meet are requirements.
-As I only desire to use this build to test pthreads (on the CLI) I only specify that the binary file should be placed in ‘/usr/bin’, configuration location at ‘/etc’ and enable ZTS.
+<p>We download and uncompress the source code into the preferred <code class="language-plaintext highlighter-rouge">/usr/local/src</code> directory.
+From here, we configure the build to meet our requirements.
+As I only desire to use this build to test pthreads (on the CLI), I specify that the binary file should be placed in <code class="language-plaintext highlighter-rouge">/usr/bin</code>, the configuration location at <code class="language-plaintext highlighter-rouge">/etc</code>, and enable ZTS.
 With the options in place, we can now make the build and then install the compilation using the provided Makefile.
-Finally I copy across the development ‘php.ini’ file to the specified ‘/etc’ directory.</p>
+Finally, I copy across the development <code class="language-plaintext highlighter-rouge">php.ini</code> file to the specified <code class="language-plaintext highlighter-rouge">/etc</code> directory.</p>
 
 <h2 id="compiling-pthreads-extension">Compiling pthreads Extension</h2>
 
@@ -100,8 +101,8 @@ We can instead just run the installation command below.</p>
 <span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"extension=pthreads.so"</span> <span class="o">&gt;&gt;</span> /etc/php.ini
 </code></pre></div></div>
 
-<p>With the extension now successfully installed, we must now include the extension to be loaded in the ‘php.ini’ configuration file.
-We can test that the extension has been successfully loaded with the PHP interpretor by running and inspecting the output from the following command.</p>
+<p>With the extension now successfully installed, we must include the extension to be loaded in the <code class="language-plaintext highlighter-rouge">php.ini</code> configuration file.
+We can test that the extension has been successfully loaded with the PHP interpreter by running and inspecting the output from the following command.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>php <span class="nt">-m</span> | <span class="nb">grep </span>pthreads
 </code></pre></div></div>

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Using traits to implement prototype Getter/Setter and Singleton capabilities.">
+    <meta name="description" content="Learn how to implement accessors (getter/setter) and singleton traits in PHP to reduce boilerplate code and accelerate development.">
 
     <title>
         
@@ -52,17 +52,17 @@
     <time datetime="2014-01-28T00:00:00+00:00" class="post-date">28 Jan 2014</time>
     <p>Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared.
 One such instance is the reduction in boilerplate code when prototyping a new idea.
-Though these should be implemented within the project before completion, I have found using the two traits below to help speed up the development life-cycle.</p>
+Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle.</p>
 
 
 
 <h2 id="accessors-gettersetter">Accessors (Getter/Setter)</h2>
 
-<p>With encapsulation being an incredibly important aspect of Object-oriented programming, accessors and mutator methods provide the user with an interface to interact with a class instance in an controlled manner.
-However, during the early stages of development creating these methods can be very cumbersome and time consuming.
-Sure you can let your IDE do all the boilerplate insertion, or maybe we should all move to a language such as C# which has great syntactic sugar for the these properties.
-The trait below however, dynamically sets and gets instance properties based on the common place method naming pattern.
-For example, ‘setFirstName’ will set the ‘firstName’ property, where as ‘getFirstName’ will return the instances value.</p>
+<p>With encapsulation being an incredibly important aspect of object-oriented programming, accessors and mutator methods provide the user with an interface to interact with a class instance in a controlled manner.
+However, during the early stages of development, creating these methods can be very cumbersome and time-consuming.
+Sure, you can let your IDE do all the boilerplate insertion, or maybe we should all move to a language such as C# which has great syntactic sugar for these properties.
+The trait below, however, dynamically sets and gets instance properties based on the common method naming pattern.
+For example, <code class="language-plaintext highlighter-rouge">setFirstName</code> will set the <code class="language-plaintext highlighter-rouge">firstName</code> property, whereas <code class="language-plaintext highlighter-rouge">getFirstName</code> will return the instance’s value.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Accessors</span> <span class="p">{</span>
 
@@ -91,9 +91,9 @@ For example, ‘setFirstName’ will set the ‘firstName’ property, where as 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Looking at the code above you will notice that we use PHP’s <code class="language-plaintext highlighter-rouge">__call</code> magic method to see if the users invoked method is of interest to us.
-To keep control of this traits ‘magic’, the call only looks for properties that exist within the class that the trait has been used in.
-You are however able to replace <code class="language-plaintext highlighter-rouge">__CLASS__</code> with ‘$this’ to provide the entire classes properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
+<p>Looking at the code above, you will notice that we use PHP’s <code class="language-plaintext highlighter-rouge">__call</code> magic method to determine if the user’s invoked method is of interest to us.
+To maintain control of this trait’s <em>magic</em>, the call only looks for properties that exist within the class that the trait has been used in.
+However, you are able to replace <code class="language-plaintext highlighter-rouge">__CLASS__</code> with <code class="language-plaintext highlighter-rouge">$this</code> to provide the entire class’s properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
 Below is an example use-case for including this trait.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">User</span> <span class="p">{</span>
@@ -111,7 +111,7 @@ Below is an example use-case for including this trait.</p>
 <h2 id="singleton">Singleton</h2>
 
 <p>Another trait that I have found very useful in the initial stages of development is for implementing the <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton pattern</a>.
-Below is an example implementation which on the first ‘getInstance’ invocation creates a class instance with the provided arguments.</p>
+Below is an example implementation which, on the first <code class="language-plaintext highlighter-rouge">getInstance</code> invocation, creates a class instance with the provided arguments.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Singleton</span> <span class="p">{</span>
 
@@ -134,7 +134,7 @@ Below is an example implementation which on the first ‘getInstance’ invocati
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>The code snippet above uses the <a href="http://www.php.net/manual/en/class.reflectionclass.php">ReflectionClass</a> provided by PHP to enable classes it is incorporated into still define a unique constructor method.
+<p>The code snippet above uses PHP’s <a href="http://www.php.net/manual/en/class.reflectionclass.php">ReflectionClass</a> to enable classes that incorporate it to still define a unique constructor method.
 Below is an example that highlights the trait in action.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Logger</span> <span class="p">{</span>

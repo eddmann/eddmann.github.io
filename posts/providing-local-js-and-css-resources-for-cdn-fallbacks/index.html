@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Including JS and CSS fallback options for resources hosted by CDN's">
+    <meta name="description" content="Learn how to provide reliable local JavaScript and CSS fallback options for CDN-hosted assets such as jQuery and Twitter Bootstrap.">
 
     <title>
         
@@ -50,17 +50,18 @@
                 <article class="post">
     <h1 class="post-title">Providing Local JS and CSS Resources for CDN Fallbacks</h1>
     <time datetime="2014-01-29T00:00:00+00:00" class="post-date">29 Jan 2014</time>
-    <p>In a recent <a href="http://threedevsandamaybe.com/posts/html-experiences-part-1/">podcast</a> the topic of using Content Delivery Networks (CDN) to host common-place resources such as jQuery and Twitter Bootstrap came up.
-The merits of having access to large scale delivery infrastructures provided by Google and the possibility that the client will already have these asset cached are huge wins. 
-One pessimistic comment which can arise however, is what happens if these CDN’s suddenly become unavailable.
-Though highly unlikely in the case of Google’s <a href="https://developers.google.com/speed/libraries/devguide">Hosted Libraries</a>, similar acts such development whilst offline may likely result in the same effect.
-To get around this, hosting fallback local version of the assets is a worthwhile investment.
+    <p>In a recent <a href="http://threedevsandamaybe.com/posts/html-experiences-part-1/">podcast</a> the topic of using Content Delivery Networks (CDN) to host commonly used resources such as jQuery and Twitter Bootstrap came up.
+The merits of having access to large-scale delivery infrastructure provided by Google etc. are significant.
+There is also the possibility that the client will already have these assets cached. 
+One pessimistic comment which can arise, however, is what happens if these CDNs suddenly become unavailable.
+Though highly unlikely in the case of Google’s <a href="https://developers.google.com/speed/libraries/devguide">Hosted Libraries</a>, similar issues during development whilst offline may result in the same effect.
+To overcome this, hosting a local fallback version of the assets is a worthwhile investment.
 In this post I will go over three different techniques for achieving this by loading an arbitrary example of jQuery, Twitter Bootstrap JS and CSS.</p>
 
 <h2 id="basic">Basic</h2>
 
 <p>The example implementation below is the simplest example of providing the client with fallback options.
-Inspired by the <a href="http://html5boilerplate.com/">HTML5 Boilerplates</a> jQuery fallback example, I have expanded this solution to cater for Twitter Bootstrap.</p>
+Inspired by the <a href="http://html5boilerplate.com/">HTML5 Boilerplate</a> jQuery fallback example, I have expanded this solution to cater for Twitter Bootstrap.</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!-- jQuery --&gt;</span>
 <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
@@ -84,15 +85,16 @@ Inspired by the <a href="http://html5boilerplate.com/">HTML5 Boilerplates</a> jQ
 <span class="nt">&lt;/script&gt;</span>
 </code></pre></div></div>
 
-<p>To check the Bootstrap JavaScript is loaded we test for the existence of one of the provided plugins, in this case ‘modal’.
-The CSS is a little more tricky, on top of including the CDN provided stylesheet in the head, we wait for the page to be fully loaded and check to see if the body color matches are expectations.
-If this is not the case we appended the local stylesheet to the head.
+<p>To check that the Bootstrap JavaScript is loaded, we test for the existence of one of the provided plugins – in this case, ‘modal’.
+The CSS is a little more tricky.
+In addition to including the CDN-provided stylesheet in the head, we wait for the page to be fully loaded and then check to see if the body colour matches our expectations.
+If this is not the case, we append the local stylesheet to the head.
 This example uses jQuery for ease of explanation, as we can be confident at this stage that at least the local version is in effect.</p>
 
 <h2 id="yepnope">YepNope</h2>
 
-<p>The second example takes advantage of the great <a href="http://yepnopejs.com/">YepNope</a> library, providing us with the ability to test for existence of a predicate and act upon this result.
-Including YepNope and the provided CSS plugin extension in the document head, we are able to be sure that the ‘complete’ callbacks will only be invoked when either the related JS or CSS assets have been fully loaded.</p>
+<p>The second example takes advantage of the excellent <a href="http://yepnopejs.com/">YepNope</a> library, which provides us with the ability to test for the existence of a predicate and act upon the result.
+By including YepNope and the provided CSS plugin extension in the document head, we are able to ensure that the ‘complete’ callbacks are only invoked when the related JS or CSS assets have been fully loaded.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yepnope</span><span class="p">([</span>
   <span class="p">{</span>
@@ -116,16 +118,16 @@ Including YepNope and the provided CSS plugin extension in the document head, we
 <span class="p">]);</span>
 </code></pre></div></div>
 
-<p>You will notice that this example is very similar to the basic implementation, testing for the existence of window variables and CSS body properties.
-However, using this library provides you with the ability to load these assets asynchronously and in parallel (based on the ordering provided).
-Supplying a sequence of resources to load allows us to be sure that jQuery will be loaded before Bootstrap, which requires this dependency.
-So as to improve the clients viewing experience a one second timeout has been specified for checking if the bootstrap CSS file has been successfully loaded, before returning the local fallback.</p>
+<p>You will notice that this example is very similar to the basic implementation, as it tests for the existence of window variables and CSS body properties.
+However, using this library provides the ability to load these assets asynchronously and in parallel (based on the ordering provided).
+Supplying a sequence of resources to load ensures that jQuery will be loaded before Bootstrap, which depends on it.
+To improve the client’s viewing experience, a one-second timeout has been specified for checking whether the Bootstrap CSS file has been successfully loaded before returning the local fallback.</p>
 
 <h2 id="fallbackjs">Fallback.js</h2>
 
-<p>The final example uses the incredibly small library <a href="http://fallback.io/">Fallback.js</a>, that was designed for this use-case in mind.
-This can be seen by how simple the API is to use, with default checking of window variable existence based on the assets key name.
-Similar to the features provided in YepNope such as loading resources asynchronously we are able to increase page loading times with minimal hassle.</p>
+<p>The final example utilises the extremely small library <a href="http://fallback.io/">Fallback.js</a>, which was designed specifically for this use-case.
+This is evident from the simplicity of its API, with default checking of window variable existence based on the asset key name.
+Similar to the features provided by YepNope – such as loading resources asynchronously – we can improve page loading times with minimal hassle.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fallback</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span>
   <span class="p">{</span>
@@ -145,9 +147,9 @@ Similar to the features provided in YepNope such as loading resources asynchrono
 <span class="p">);</span>
 </code></pre></div></div>
 
-<p>The one issue with this library is that it is tied into checking the window object for resource existence.
-This does not work well in the case of checking for the successful loading of CSS assets, as we are unable to override the predicate to check for body styling.
-Though this is a little bit of a pain I still feel that this is the best solution to deploy, even just for the super simple API for loading JS resources.</p>
+<p>The one issue with this library is that it is tied to checking the window object for resource existence.
+This does not work well when checking for the successful loading of CSS assets, as we are unable to override the predicate to check for body styling.
+Although this is a minor inconvenience, I still feel that this is the best solution to deploy, particularly given the extremely simple API for loading JS resources.</p>
 
 <h2 id="resources">Resources</h2>
 

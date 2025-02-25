@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Using Basic Auth. and Decorators in Python's Flask"
-meta: 'An in-depth guide to implementing basic authentication in Python\'s Flask using decorators and virtual environments.'
+meta: 'An in-depth guide to implementing basic authentication in Pythons Flask using decorators and virtual environments.'
 tags: flask python
 ---
 

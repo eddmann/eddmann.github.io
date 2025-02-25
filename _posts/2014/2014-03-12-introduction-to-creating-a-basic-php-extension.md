@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Introduction to Creating a Basic PHP Extension'
-meta: 'A comprehensive beginner\'s guide to setting up and building a PHP extension on CentOS, including environment setup, coding and testing.'
+meta: 'A comprehensive beginners guide to setting up and building a PHP extension on CentOS, including environment setup, coding and testing.'
 tags: php-extension c php
 ---
 

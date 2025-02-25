@@ -1,15 +1,18 @@
 ---
 layout: post
-title: "Implementing a Doubly Linked-List in C"
-meta: "Simple C implementation of a Doubly Linked-List."
+title: 'Implementing a Doubly Linked List in C'
+meta: 'A comprehensive guide to implementing a doubly linked list in C, covering structure, memory management and forward declarations.'
+tags: c data-structures
 ---
 
-Following on from the discussion on implementing a [singly linked-list](/posts/implementing-a-singly-linked-list-in-c/) in C, a logical follow-up data-structure is the doubly linked-list.
-In a similar fashion, the structure is composed from a set of sequentially linked nodes, each now containing references (pointers) to not only the next node but the previous one to.
-This structure is useful if the use-case dictates the desire to traverse the list both forwards and backwards, or quickly determine preceding and following elements from a given node.
-The head and tail nodes can be terminated with either [sentinel nodes](http://en.wikipedia.org/wiki/Sentinel_node) (referred to as 'circularly linked' if only one is used) or like in the implementation shown below, NULL.
-An observational implementation difference between the two structures is that through storing the previous and next reference, it can significantly simplify the complexity and running time of certain operations (removal from the tail being the most obvious).
+Following on from the discussion on implementing a [singly linked list](/posts/implementing-a-singly-linked-list-in-c/) in C, a logical follow-up data structure is the doubly linked list.
+
 <!--more-->
+
+In a similar fashion to the singly linked list, the structure is composed of a set of sequentially linked nodes, each now containing references (pointers) not only to the next node but also to the previous one.
+This structure is useful if the use case requires the ability to traverse the list both forwards and backwards, or to quickly determine preceding and following elements from a given node.
+The head and tail nodes can be terminated with either [sentinel nodes](http://en.wikipedia.org/wiki/Sentinel_node) (referred to as _circularly linked_ if only one is used) or, as in the implementation shown below, `NULL`.
+One notable implementation difference between the two structures is that by storing both the previous and next references, the complexity and running time of certain operations (with removal from the tail being the most obvious) can be significantly simplified.
 
 ```c
 #include <stdio.h>
@@ -94,15 +97,15 @@ int main(int argc, char *argv[])
 }
 ```
 
-Looking at the implementation above you will notice the omission of the list traversal when removing a node from the tail, as the previous nodes reference is already at hand.
-The 'list' method only takes into consideration forward iteration over the list, however, it would be very easy to modify the code to perform backwards traversal.
-It is good practice to not only free the memory that you do not require anymore, but also NULL any related pointers, as these pointers still have access to the now unowned memory location.
+Looking at the implementation above, you will notice the omission of list traversal when removing a node from the tail, as the reference to the previous node is already at hand.
+The `list` function only takes into consideration forward iteration over the list, however, it would be very easy to modify the code to perform backwards traversal.
+It is good practice to not only free the memory that is no longer required, but also to set any related pointers to `NULL`, as these pointers would otherwise still refer to memory that has been deallocated.
 
-One C implementation detail I would like to discuss is the use of 'typedef struct' when declaring the node structure.
-In C there are two different namespaces for types, a namespace for 'struct' tags and one for 'typedef' names.
-Referring to a 'struct' can be very verbose and to get around this we can declare both a node 'struct' and a plain node in the 'typedef' namespace.
-These both refer to the same type, and we are then able to omit the 'struct' keyword.
-Using only the 'typedef' declaration however, would not allow us to perform [forward declaration](http://en.wikipedia.org/wiki/Forward_declaration), which gives us the ability to use an identifier before giving the compiler the complete definition.
+One C implementation detail I would like to discuss is the use of `typedef struct` when declaring the node structure.
+In C, there are two different namespaces: one for `struct` tags and one for `typedef` names.
+Referring to a `struct` can be very verbose, and to avoid this we can declare both a node `struct` and a plain node in the `typedef` namespace.
+Both refer to the same type, allowing us to omit the `struct` keyword.
+However, using only the `typedef` declaration would not allow us to perform a [forward declaration](http://en.wikipedia.org/wiki/Forward_declaration), which gives us the ability to use an identifier before providing the complete definition to the compiler.
 
 ## Resources
 

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Multiple ways of implementing the Stream data-structure using PHP">
+    <meta name="description" content="A comprehensive guide to implementing streams in PHP using class-based and generator approaches for efficient lazy evaluation and infinite list generation.">
 
     <title>
         
@@ -50,19 +50,20 @@
                 <article class="post">
     <h1 class="post-title">Implementing Streams in PHP</h1>
     <time datetime="2015-01-16T00:00:00+00:00" class="post-date">16 Jan 2015</time>
-    <p>Typically, when we think about a list of elements we assume there is both a start and finite end.
+    <p>Typically, when we think about a list of elements we assume there is both a start and a finite end.
 In this example the list has been precomputed and stored for subsequent traversal and transformation.
 If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists. 
 Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
-This concept is called a <a href="http://en.wikipedia.org/wiki/Stream_(computing)">Stream</a>, commonly also referred to as a lazy list, and is a foundational concept in languages such as Haskell.
+This concept is called a <a href="http://en.wikipedia.org/wiki/Stream_(computing)">Stream</a> and is commonly also referred to as a lazy list.
+It is a foundational concept in languages such as Haskell.
 Streams are not interacted with in the same manner as finite lists, as they cannot be operated on as a whole.
-Instead they should be thought of as ‘codata’ (infinite) or an Object-oriented <a href="http://en.wikipedia.org/wiki/Iterator">Iterable</a>, as a opposed to just simply ‘data’ (finite).
+Instead, they should be thought of as ‘codata’ (infinite) or an object-oriented <a href="http://en.wikipedia.org/wiki/Iterator">Iterable</a>, as opposed to simply ‘data’ (finite).
 As well as being able to create a Stream based on a supplied promise, we are also able to compose new Streams using ‘map’ and ‘filter’ methods.
-In this article I will discuss two examples of implementing the Stream data-structure, using both class-based and generator approaches in PHP.</p>
+In this article, I will discuss two examples of implementing the Stream data-structure, using both class-based and generator approaches in PHP.</p>
 
 <h2 id="class-based-approach">Class-based Approach</h2>
 
-<p>The first implementation I will be discussing uses a ‘Classical’ approach, relying on a tail-promise function to return the next element in the Stream.</p>
+<p>The first implementation I will discuss uses a ‘classical’ approach, relying on a tail-promise function to return the next element in the Stream.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Stream</span> <span class="kd">implements</span> <span class="nc">Iterator</span>
 <span class="p">{</span>
@@ -161,10 +162,10 @@ In this article I will discuss two examples of implementing the Stream data-stru
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Looking at the above implementation you can see how much boilerplate code is required to make the Stream iterable.
-Through use of the tail promise we are able to defer execution of calculating the next element in the Stream until absolutely required.
+<p>Looking at the above implementation, you can see how much boilerplate code is required to make the Stream iterable.
+Through the use of the tail promise, we are able to defer execution of calculating the next element in the Stream until absolutely required.
 The inclusion of a ‘nil’ sentinel simplifies the design, as we are not required to use polymorphism and separate Nil and Cons implementations.
-So as to not detract from the following examples intent, we will be using the following function to display the returned iterators.</p>
+So as not to detract from the following example’s intent, we will be using the following function to display the returned iterators.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">sprint</span><span class="p">(</span><span class="nv">$xs</span><span class="p">)</span>
 <span class="p">{</span>
@@ -172,7 +173,7 @@ So as to not detract from the following examples intent, we will be using the fo
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using this helper function we are now able to experiment with this initial implementation.</p>
+<p>Using this helper function, we are now able to experiment with this initial implementation.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
 
@@ -192,13 +193,13 @@ So as to not detract from the following examples intent, we will be using the fo
 <span class="nf">sprint</span><span class="p">((</span><span class="k">new</span> <span class="nc">Stream</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$fibonacci</span><span class="p">))</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="c1">// [0, 1, 1, 2, 3]</span>
 </code></pre></div></div>
 
-<p>To implement the Fibonacci sequence stream using this approach we are required to use a self-invoked function to wrap the previous value state required.
-Along with this we also need to provide a reference to the returned function itself, so as to invoke it again as the tail promise.
-These details, coupled with the requirement to return a new Stream instance in the tail-promise, seems to unnecessary cloud the solutions intent.</p>
+<p>To implement the Fibonacci sequence stream using this approach, we are required to use a self-invoked function to wrap the previous value state required.
+Along with this, we also need to provide a reference to the returned function itself, so as to invoke it again as the tail promise.
+These details, coupled with the requirement to return a new Stream instance in the tail-promise, seem to unnecessarily cloud the solution’s intent.</p>
 
 <h2 id="generator-approach">Generator Approach</h2>
 
-<p>Fortunately, as of PHP 5.5 we are able to take advantage of Generators and create a more succinct implementation which easily describes its purpose.
+<p>Fortunately, as of PHP 5.5 we are able to take advantage of generators and create a more succinct implementation which easily describes its purpose.
 Generators allow us to implement the Stream without the need to handle the deferred tail execution and implement the class-based Iterator interface.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">stream</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
@@ -239,9 +240,9 @@ Generators allow us to implement the Stream without the need to handle the defer
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>As you can see we have been able to instead flatten the class-based approach into top-level functions.
+<p>As you can see, we have been able to flatten the class-based approach into top-level functions.
 Each function is aided by type-hints, describing what it is tasked to do far more clearly.
-Using the generators ‘valid’ method we are able to implement all but the ‘take’ method using imperative while loops.
+Using the generator’s <code class="language-plaintext highlighter-rouge">valid</code> method, we are able to implement all but the <code class="language-plaintext highlighter-rouge">take</code> method using imperative while loops.
 This implementation is able to compute the previous examples, as shown below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
@@ -262,9 +263,9 @@ This implementation is able to compute the previous examples, as shown below.</p
 </code></pre></div></div>
 
 <p>As you can see by looking at the above examples, the Fibonacci sequence code has been simplified greatly.
-We have been able to remove the need to return a new Stream instance each time, and instead able to focus solely on the generation of the next value.
+We have been able to remove the need to return a new Stream instance each time, and instead focus solely on the generation of the next value.
 Although both implementations solve the problem at hand, by now you will certainly see the stronger case put forth by the generator approach.
-Not only is it less code, it also provides us with a clearer way to expressively compose the functions together.</p>
+Not only is it less code, but it also provides us with a clearer and more expressive way to compose the functions together.</p>
 
 </article>
 

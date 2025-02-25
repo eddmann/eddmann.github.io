@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring optional value control-flows using multiple PHP features">
+    <meta name="description" content="Discover elegant techniques to handle optional values in PHP using traits, magic methods, and composition to streamline control flows and reduce boilerplate code.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/optional-value-control-flows-in-php-using-traits-and-magic-methods/" />
     
 
     <script>
@@ -52,13 +50,13 @@
                 <article class="post">
     <h1 class="post-title">Optional Value Control-flows in PHP using Traits and Magic-methods</h1>
     <time datetime="2015-06-10T00:00:00+00:00" class="post-date">10 Jun 2015</time>
-    <p>Recently I have been interested in experimenting with different ways to handle optional values.
-Their are many examples that exist demonstrating the use of the Maybe/Optional structure within the PHP landscape.
-I would instead like to focus my attention on only looking into the concept of ‘orElse’, which I have found to be a prominent control-flow whilst using these types of value.</p>
+    <p>Recently, I have been interested in experimenting with different ways to handle optional values.
+There are many examples that exist demonstrating the use of the Maybe/Optional structure within the PHP landscape.
+I would instead like to focus my attention on only looking into the concept of <code class="language-plaintext highlighter-rouge">orElse</code>, which I have found to be a prominent control-flow when using these types of values.</p>
 
 
 
-<p>Typically, in an imperative mind-set we are accustom to evaluating a value, and based on its existence — defined as falsely in this regard — follow a different course of action, and by-way result.
+<p>Typically, in an imperative mindset we are accustomed to evaluating a value, and based on its existence — defined as falsy in this context — we follow a different course of action.
 This can be clearly seen in the following two examples:</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$repository</span><span class="o">-&gt;</span><span class="nf">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
@@ -67,12 +65,12 @@ This can be clearly seen in the following two examples:</p>
 <span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$repository</span><span class="o">-&gt;</span><span class="nf">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">?:</span> <span class="k">new</span> <span class="nc">ShoppingCart</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>These two examples both attempt to fetch a shopping cart from a repository, which by looking at the defined guards may not exist.
-As a result of this, we are required to write extra boilerplate code to handle the presence of failure - using either a conditional block with reassignment or the ternary null trick provided within PHP.</p>
+<p>These two examples both attempt to fetch a shopping cart from a repository, which, by looking at the defined guards, may not exist.
+As a result of this, we are required to write extra boilerplate code to handle the possibility of failure, using either a conditional block with reassignment or the ternary null trick provided within PHP.</p>
 
 <h3 id="using-traits">Using Traits</h3>
 
-<p>I was interested to see if there were any other ways of more clearly expressing this intent, following the discussed popular control-flow provided within Optional types.</p>
+<p>I was interested to see if there were any other ways of more clearly expressing this intent, following the popular control-flow concept provided within Optional types.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">OrElse</span>
 <span class="p">{</span>
@@ -97,21 +95,24 @@ As a result of this, we are required to write extra boilerplate code to handle t
 </code></pre></div></div>
 
 <p>This trait takes advantage of PHP’s dynamic message passing nature, essentially wrapping calls with the boilerplate code typically required.
-Any unknown method calls are checked to see if they end in ‘OrElse’ and include at least a single argument.
-If this is the case, the last argument is popped off the supplied parameters array and the intended method (excluding OrElse) is invoked with the remaining arguments.
-Finally, the boilerplate guard logic that we typically see handling the occurrence of falsely values is encapsulated into this single location.
-If a falsely value is returned from the method invocation the user defined literal or function value is returned instead.
-The code initially described could now be rewritten as follows, assuming that the repository included the trait in its definition.</p>
+Any unknown method calls are checked to see if they end in <code class="language-plaintext highlighter-rouge">OrElse</code> and include at least one argument.
+If this is the case, the last argument is removed from the supplied parameters array and the intended method (excluding <code class="language-plaintext highlighter-rouge">OrElse</code>) is invoked with the remaining arguments.
+Finally, the boilerplate guard logic that we typically see handling the occurrence of falsy values is encapsulated into this single location.
+If a falsy value is returned from the method invocation, the user-defined literal or function value is returned instead.
+The code initially described could now be rewritten as follows, assuming that the repository includes the trait in its definition.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$repository</span><span class="o">-&gt;</span><span class="nf">findByIdOrElse</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">new</span> <span class="nc">ShoppingCart</span><span class="p">);</span>
 <span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$repository</span><span class="o">-&gt;</span><span class="nf">findByIdOrElse</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="nc">ShoppingCart</span><span class="p">;</span> <span class="p">});</span>
 </code></pre></div></div>
 
-<p>You can see from looking at the examples above how we have been able to be more expressive within the method call, describing its intent more clearly. This method now reads as one that expects the possibility of an non-existent/alternative return value. The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation — resulting in the possibility of a new cart being created but never required. Instead the value is wrapped in a function which is lazily called by the trait implementation if needs be.</p>
+<p>You can see from the examples above how we have been able to be more expressive within the method call, describing its intent more clearly.
+This method now reads as one that expects the possibility of a non-existent or alternative return value.
+The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation — resulting in the possibility of a new cart being created but never required.
+Instead, the value is wrapped in a function which is lazily called by the trait implementation if needed.</p>
 
 <h3 id="using-composition">Using Composition</h3>
 
-<p>If you are against the idea of altering the behavior of the class by adding a trait — and instead wish to do such actions ad-hoc — the following example shows how the same can be achieved through composition.</p>
+<p>If you are against the idea of altering the behaviour of the class by adding a trait — and instead wish to perform such actions ad hoc — the following example shows how the same can be achieved through composition.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">OrElse</span>
 <span class="p">{</span>
@@ -135,8 +136,8 @@ The code initially described could now be rewritten as follows, assuming that th
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using a proxy class we are able to direct any existing method calls to the supplied object, handling non-existent methods by-way of the OrElse trait.
-This implementation can then be used, in the following manner.</p>
+<p>Using a proxy class, we are able to direct any existing method calls to the supplied object, handling non-existent methods via the <code class="language-plaintext highlighter-rouge">OrElse</code> trait.
+This implementation can then be used in the following manner.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$orElseRepository</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">OrElse</span><span class="p">(</span><span class="nv">$repository</span><span class="p">);</span>
 <span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$orElseRepository</span><span class="o">-&gt;</span><span class="nf">findByIdOrElse</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">new</span> <span class="nc">ShoppingCart</span><span class="p">);</span>
@@ -144,7 +145,7 @@ This implementation can then be used, in the following manner.</p>
 
 <h3 id="using-basic-functions">Using Basic Functions</h3>
 
-<p>Finally, a completely different way to control the flow of returned values is by coding up a simple function like so.</p>
+<p>Finally, a completely different way to control the flow of returned values is by coding up a simple function as follows.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">_or</span><span class="p">(...</span><span class="nv">$args</span><span class="p">)</span>
 <span class="p">{</span>
@@ -156,7 +157,7 @@ This implementation can then be used, in the following manner.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This function simply iterates over all its arguments, evaluating each until one returns a truthy value which it subsequently returns.
+<p>This function simply iterates over all its arguments, evaluating each until one returns a truthy value, which it subsequently returns.
 This is by far the least obstructive manner in which to implement such control flow capabilities, but in my opinion does not read as nicely as the above two examples.
 This example can be used to achieve the same results as before, using the following approach.</p>
 
@@ -164,7 +165,7 @@ This example can be used to achieve the same results as before, using the follow
 </code></pre></div></div>
 
 <p>I hope you have enjoyed this thought experiment into how we can extract and use concepts from different paradigms in our day-to-day code.
-Also, it may have sparked some interest in seeing how you can take advantage of PHP Traits along with Magic method invocation.</p>
+Also, it may have sparked some interest in seeing how you can take advantage of PHP Traits along with magic method invocation.</p>
 
 </article>
 

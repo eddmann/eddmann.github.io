@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into implementing Cons cell Lists and Fold operations in PHP">
+    <meta name="description" content="A comprehensive exploration of implementing Cons cell lists and fold operations in PHP for efficient data manipulation.">
 
     <title>
         
@@ -52,8 +52,8 @@
     <time datetime="2015-01-02T00:00:00+00:00" class="post-date">02 Jan 2015</time>
     <p>Cons cells are used to (cons)truct a data object which represents an ordered pair.
 The elements in this pair can be identified as ‘car’ and ‘cdr’ accordingly.
-Using this simple representation we are able to not only hold ordered pairs, but also create more complex data-structures, such as a List. 
-Below is an example interface that we will be using to implement the two different kinds of Cons cell required to create this List data-structure.</p>
+Using this simple representation, we are able not only to hold ordered pairs but also to create more complex data structures, such as a List. 
+Below is an example interface that we will be using to implement the two different kinds of Cons cell required to create this List data structure.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">interface</span> <span class="nc">ConsCell</span>
 <span class="p">{</span>
@@ -68,13 +68,13 @@ Below is an example interface that we will be using to implement the two differe
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>As you can see we have also included a couple of other useful methods that will be used to traverse the list.
-Providing a defined closure which will be invoked on each element returning either a predicate or new value.</p>
+<p>As you can see, we have also included a couple of other useful methods that will be used to traverse the list.
+A defined closure is provided which will be invoked on each element, returning either a predicate or a new value.</p>
 
 <h2 id="nil">Nil</h2>
 
-<p>The first such type of cell that is used to represent this structure is the empty list.
-Commonly called Nil, it is treated as a <a href="http://en.wikipedia.org/wiki/Sentinel_node">sentinel</a> node, distinguishing the end of the list and used as a recursive base-case.</p>
+<p>The first type of cell used to represent this structure is the empty list.
+Commonly called Nil, it is treated as a <a href="http://en.wikipedia.org/wiki/Sentinel_node">sentinel</a> node, distinguishing the end of the list and used as a recursive base case.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
 <span class="p">{</span>
@@ -91,9 +91,8 @@ Commonly called Nil, it is treated as a <a href="http://en.wikipedia.org/wiki/Se
 
 <h2 id="cons">Cons</h2>
 
-<p>The other type of cell that is required stores the first element in its left-hand value (‘car’) and the next Cons cell in its right (‘cdr’).
-In this implementation we use alternative, more meaningful names for the ‘car’ and ‘cdr’ values.
-Following the head and tail naming convention instead.</p>
+<p>The other type of cell required stores the first element in its left-hand value (‘car’) and the next Cons cell in its right-hand value (‘cdr’).
+In this implementation, we use alternative, more meaningful names for the ‘car’ and ‘cdr’ values by following the head and tail naming convention instead.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Cons</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
 <span class="p">{</span>
@@ -139,16 +138,16 @@ Following the head and tail naming convention instead.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>As you can see, the Cons implementation does the majority of the work in-regards to the methods we use to traverse the list.
-After supplying how each of the different folds are to be implemented, we are able to use these to create the map and filter methods.
-A fold is used to analyse a recursive data-structure and create a returning value from this completed process.
-The ‘foldr’ method is used to do the more common action of iterating over each element in the list (in order) from left to right.
-The ‘foldl’ method on the other hand can be considered the opposite, going right to left instead.
-These methods can be typically achieved using ‘array_reduce’ in PHP, with ‘array_reverse’ invoked first in the case of ‘foldl’.</p>
+<p>As you can see, the Cons implementation does the majority of the work with regard to the methods we use to traverse the list.
+After defining how each of the different folds is to be implemented, we are able to use these to create the map and filter methods.
+A fold is used to analyse a recursive data structure and to create a returning value from this completed process.
+The <code class="language-plaintext highlighter-rouge">foldr</code> method is used to perform the more common action of iterating over each element in the list (in order) from left to right.
+The <code class="language-plaintext highlighter-rouge">foldl</code> method, on the other hand, can be considered the opposite, going from right to left instead.
+These methods can typically be achieved using <code class="language-plaintext highlighter-rouge">array_reduce</code> in PHP, with <code class="language-plaintext highlighter-rouge">array_reverse</code> invoked first in the case of <code class="language-plaintext highlighter-rouge">foldl</code>.</p>
 
 <h2 id="other-use-cases">Other Use-cases</h2>
 
-<p>We are able to use the ‘foldl’ method to easily add a ‘reverse’ method to our List implementation, as shown below.</p>
+<p>We are able to use the <code class="language-plaintext highlighter-rouge">foldl</code> method to easily add a <code class="language-plaintext highlighter-rouge">reverse</code> method to our List implementation, as shown below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
 <span class="p">{</span>
@@ -170,7 +169,7 @@ These methods can be typically achieved using ‘array_reduce’ in PHP, with �
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>We can also implement a ‘toArray’ method which converts the List representation into an PHP array - which makes it easier to reason about the resulting output.</p>
+<p>We can also implement a <code class="language-plaintext highlighter-rouge">toArray</code> method which converts the List representation into a PHP array, making it easier to reason about the resulting output.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Nil</span> <span class="kd">implements</span> <span class="nc">ConsCell</span>
 <span class="p">{</span>
@@ -192,7 +191,7 @@ These methods can be typically achieved using ‘array_reduce’ in PHP, with �
 
 <h2 id="examples">Examples</h2>
 
-<p>Lets first try out a combination of a couple of the List methods, invoked via chaining.</p>
+<p>Let’s first try out a combination of a couple of the List methods, invoked via chaining.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
 <span class="nv">$starify</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"*</span><span class="nv">$x</span><span class="s2">*"</span><span class="p">;</span> <span class="p">};</span>
@@ -204,9 +203,9 @@ These methods can be typically achieved using ‘array_reduce’ in PHP, with �
     <span class="o">-&gt;</span><span class="nf">toArray</span><span class="p">();</span> <span class="c1">// ['*10*','*8*','*6*','*4*','*2*']</span>
 </code></pre></div></div>
 
-<p>In the example above we are creating a Cons list which represents the numbers from 1 to 10.
+<p>In the example above, we are creating a Cons list which represents the numbers from 1 to 10.
 We then subsequently filter out any elements that are not even, apply some pretty printing to each of the resulting elements and then reverse this output.
-Finally, we convert the Cons representation into an array to be easily output.</p>
+Finally, we convert the Cons representation into an array to facilitate easy output.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isFibonacci</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span>
     <span class="nv">$isWholeNumber</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="nv">$y</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="nv">$y</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.0001</span><span class="p">;</span> <span class="p">};</span>
@@ -222,8 +221,8 @@ Finally, we convert the Cons representation into an array to be easily output.</
     <span class="o">-&gt;</span><span class="nf">foldr</span><span class="p">(</span><span class="nv">$count</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// 10</span>
 </code></pre></div></div>
 
-<p>The example above tallies up the total number of Fibonacci numbers there are between 1 and 100.
-Using the ‘filter’ method with a supplied predicate function and the ‘foldr’ reduce method, we are correctly returned the total of 10.</p>
+<p>The example above tallies up the total number of Fibonacci numbers between 1 and 100.
+Using the ‘filter’ method with a supplied predicate function and the ‘foldr’ reduce method, we correctly return the total of 10.</p>
 
 </article>
 

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploration into Binary (Search) Trees and implementing common-place operations using PHP">
+    <meta name="description" content="Learn how to implement insertion, removal and inversion operations on binary search trees in PHP using both mutable and immutable approaches.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/insertion-removal-and-inversion-operations-on-binary-search-trees-in-php/" />
     
 
     <script>
@@ -54,18 +52,18 @@
     <time datetime="2015-07-22T00:00:00+00:00" class="post-date">22 Jul 2015</time>
     <p>Recently Max Howell (creator of <a href="http://brew.sh/">Homebrew</a>) posted an interesting <a href="https://twitter.com/mxcl/status/608682016205344768">tweet</a> in regard to Google’s interview process.
 In this tweet he mentioned how one of the proposed questions was to white-board a solution to invert a binary tree.
-Over the past couple of years I have been interested in exploring fundamental Computer Science data-structures and algorithms.
-As a result, I thought it would be interesting to explore this structure and associated operations in more depth - using immutable and mutable PHP implementations to clearly highlight the benefits garnered from each approach.</p>
+Over the past couple of years I have been interested in exploring fundamental computer science data structures and algorithms.
+As a result, I thought it would be interesting to explore this structure and its associated operations in more depth - using immutable and mutable PHP implementations to clearly highlight the benefits garnered from each approach.</p>
 
 
 
-<p>Binary trees are a form of tree data-structure, comprised of nodes with assigned values and at-most two child nodes (left and right).
-To expand on this problem I will be documenting the creation of an <a href="https://en.wikipedia.org/wiki/Binary_search_tree">Binary Search Tree</a>, which has the additional invariant that any left child be less than, and any right child be greater than, the current nodes value.
+<p>Binary trees are a form of tree data structure, comprised of nodes with assigned values and at most two child nodes (left and right).
+To expand on this problem I will be documenting the creation of a <a href="https://en.wikipedia.org/wiki/Binary_search_tree">binary search tree</a>, which has the additional invariant that any left child is less than, and any right child is greater than, the current node’s value.
 This allows us to perform unambiguous node deletion from the structure.</p>
 
 <h2 id="node-representation">Node Representation</h2>
 
-<p>Throughout all these examples I leaned towards a simple function, as opposed to class-based approach, relying on namespaces to infer relation.
+<p>Throughout all these examples I have leaned towards a simple function, as opposed to a class-based approach, relying on namespaces to infer relation.
 The following function can be used to create a simple object representation of a tree node.
 Providing a value and optional left and right nodes, it simply returns the aggregate.</p>
 
@@ -78,7 +76,7 @@ Providing a value and optional left and right nodes, it simply returns the aggre
 <h2 id="insertion">Insertion</h2>
 
 <p>Now that we are able to represent tree nodes, the next logical step is to provide insertion capabilities.
-Accessible from the root tree node (initially NULL), we are able to recursively traverse the structure until we either find a leaf or the node already present.
+Accessible from the root tree node (initially NULL), we are able to recursively traverse the structure until we either find a leaf or the node is already present.
 To decide which child to traverse down we use the discussed comparator invariant.
 Below is a small diagram depicting the insertion of a value within an existing tree.</p>
 
@@ -115,7 +113,7 @@ Notice the explicit reassignment of the right and left child node references.</p
 
 <p>Below is an immutable implementation of the insertion process starting from a rooted tree node.
 As opposed to modifying pre-existing state, we instead build up a modified representation, creating new nodes when required.
-This allows us to the use both the new and old tree representations simultaneously.</p>
+This allows us to use both the new and old tree representations simultaneously.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">insert</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
 <span class="p">{</span>
@@ -138,14 +136,14 @@ This allows us to the use both the new and old tree representations simultaneous
 <h2 id="removal">Removal</h2>
 
 <p>With the ability to now insert nodes into the tree, we can expand on this by performing the inverse operation, that being removal.
-When removing a node from the tree, there are three different use-cases that need to be addressed.
-The first two are relativity simple cases, met when the node in question has zero or one child.
+When removing a node from the tree, there are three different use cases that need to be addressed.
+The first two are relatively simple cases, met when the node in question has zero or one child.
 When no children are present we are able to just remove the reference to the node.
-However, in the case of a single child node we can replace the nodes parent reference with its child node.
+However, in the case of a single child node we can replace the node’s parent reference with its child node.
 The third case is a little more tricky, requiring us to rearrange the structure to find a new node to replace this one, maintaining the desired invariant.</p>
 
 <p>There are two common techniques to achieve this, either finding the in-order successor or in-order predecessor and replacing the current node with this result.
-In these examples I have opted for the in-order successor, which requires us to find the minimal value of the current nodes right tree.
+In these examples I have opted for the in-order successor, which requires us to find the minimal value of the current node’s right tree.
 This operation can be succinctly codified recursively as shown below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">minValue</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
@@ -158,7 +156,7 @@ This operation can be succinctly codified recursively as shown below.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Below is a small diagram depicting the removal of a node which meets the third use-case.</p>
+<p>Below is a small diagram depicting the removal of a node which meets the third use case.</p>
 
 <p style="text-align:center;">
     <img src="/uploads/binary-search-trees-in-php/removal.png" style="width:338px" alt="Binary Search Tree Removal" />
@@ -166,8 +164,8 @@ This operation can be succinctly codified recursively as shown below.</p>
 
 <h3 id="mutable-1">Mutable</h3>
 
-<p>In a similar fashion to how mutable insertion can be carried out, we reassign both the nodes right and left references when required.
-We also replace the current nodes value, if the operation falls into the described third use-case.</p>
+<p>In a similar fashion to how mutable insertion can be carried out, we reassign both the node’s right and left references when required.
+We also replace the current node’s value, if the operation falls into the described third use case.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
 <span class="p">{</span>
@@ -208,7 +206,7 @@ We also replace the current nodes value, if the operation falls into the describ
 <h3 id="immutable-1">Immutable</h3>
 
 <p>In the immutable instance we instead return new nodes in place of the reassignment that would have occurred in the mutable version.
-This allows us to maintain and access the entire original tree structure, whilst reusing unmodified references in the new tree.</p>
+This allows us to maintain and access the entire original tree structure whilst reusing unmodified references in the new tree.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">remove</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="nv">$root</span><span class="p">)</span>
 <span class="p">{</span>
@@ -240,12 +238,12 @@ This allows us to maintain and access the entire original tree structure, whilst
 
 <h2 id="inversion">Inversion</h2>
 
-<p>Now that we have the ability to insert and remove nodes from a binary tree, another operation which can be performed is inversion (like the tweet mentioned).
-I should note that this operation does not typically occur on Binary Search Trees as it violates the additional invariant.</p>
+<p>Now that we have the ability to insert and remove nodes from a binary tree, another operation which can be performed is inversion (as mentioned in the tweet).
+I should note that this operation does not typically occur on binary search trees as it violates the additional invariant.</p>
 
 <h3 id="mutable-2">Mutable</h3>
 
-<p>From a mutable perspective we are able to invert the tree in a memory efficient manner, with only references being altered.</p>
+<p>From a mutable perspective we are able to invert the tree in a memory-efficient manner, with only references being altered.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">invert</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
 <span class="p">{</span>
@@ -264,7 +262,7 @@ I should note that this operation does not typically occur on Binary Search Tree
 <h3 id="immutable-2">Immutable</h3>
 
 <p>In the case of immutability, an entirely new tree is required to be built.
-As to maintain the ability to reuse the current tree we are not able to manipulate any of the existing nodes references.</p>
+In order to maintain the ability to reuse the current tree we are not able to manipulate any of the existing node references.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">invert</span><span class="p">(</span><span class="nv">$root</span><span class="p">)</span>
 <span class="p">{</span>
@@ -294,7 +292,7 @@ Notice the use of the mutable insert operation to save on memory costs.</p>
 </code></pre></div></div>
 
 <p>We can then visualise the generated tree by using the following render function.
-This function displays the tree from left to right, as opposed to the typical top down approach.</p>
+This function displays the tree from left to right, as opposed to the typical top-down approach.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">render</span><span class="p">(</span><span class="nv">$root</span><span class="p">,</span> <span class="nv">$depth</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
 <span class="p">{</span>
@@ -327,7 +325,6 @@ This function displays the tree from left to right, as opposed to the typical to
                 ~
         1
                 ~
-
 */</span>
 
 <span class="nf">BinaryTree\Mutable\invert</span><span class="p">(</span><span class="nv">$b</span><span class="p">);</span>

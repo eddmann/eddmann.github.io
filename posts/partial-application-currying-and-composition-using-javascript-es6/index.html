@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Expressing Partial Application, Currying and Composition in a succinct manner using ES2015">
+    <meta name="description" content="Discover how to implement partial application, currying and composition in JavaScript ES6 using modern, succinct techniques for cleaner, more functional code.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/partial-application-currying-and-composition-using-javascript-es6/" />
     
 
     <script>
@@ -59,15 +57,15 @@
 
 <p>At this time many of the popular browsers support a subset of the <a href="https://github.com/lukehoban/es6features">new features</a> present in the proposed standard.
 This is great for experimentation but can be seen as an issue if you wish to target your currently supported browser list.
-However, with the use of transpilers such as <a href="https://github.com/google/traceur-compiler">Traceur</a> or <a href="https://babeljs.io/">Babel</a> (formally 6to5), we can write code using the latest standards which in-turn gets automatically transformed into a representation compatible with ECMAScript 5 runtimes.</p>
+However, with the use of transpilers such as <a href="https://github.com/google/traceur-compiler">Traceur</a> or <a href="https://babeljs.io/">Babel</a> (formerly 6to5), we can write code using the latest standards which in-turn gets automatically transformed into a representation compatible with ECMAScript 5 runtimes.</p>
 
-<p>On a completely separate topic, as Sten’s <a href="https://tech.mybuilder.com/folds/">previous article</a> may have shown, the team is currently also very interested in Functional programming and the concepts that accompany it.
-I too find this paradigm very interesting to investigate, and through recent completion of a <a href="https://frontendmasters.com/courses/functional-javascript/">Front-end masters course</a> on the subject I found a way to meld my desire to explore ES6 along with some of these functional concepts.</p>
+<p>On a completely separate topic, as Sten’s <a href="https://tech.mybuilder.com/folds/">previous article</a> may have shown, the team is currently also very interested in functional programming and the concepts that accompany it.
+I too find this paradigm very interesting to investigate, and through the recent completion of a <a href="https://frontendmasters.com/courses/functional-javascript/">Front-end Masters course</a> on the subject I found a way to meld my desire to explore ES6 along with some of these functional concepts.</p>
 
 <h2 id="partial-application-and-currying">Partial Application and Currying</h2>
 
 <p>The ability to partially apply (or even more strictly <a href="http://en.wikipedia.org/wiki/Currying">curry</a>) functions is incredibly important within this paradigm, allowing us to reuse functions in many different ways.
-There are many examples of implementing such behavior in JavaScript, all typically following an imperative mindset.
+There are many examples of implementing such behaviour in JavaScript, all typically following an imperative mindset.
 The implementation shown below instead uses recursion along with some of the new features present in ES6 to succinctly codify the definition of what partial application truly is.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">curry</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -81,14 +79,14 @@ The implementation shown below instead uses recursion along with some of the new
 </code></pre></div></div>
 
 <p>Reading the small example above you will first notice the use of the ‘var’ replacement <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let">‘let’</a> keyword, which provides you with block-scoped binding and no implicit variable hoisting.
-The variadic functions definition uses the new <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow syntax</a> along with the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters">rest operator</a> to collect any arguments that are supplied along with the function to eventually apply.
-Following this, a private recursive function is called, which in its base-case applies all the collected arguments to the specified function and returns the result.
+The variadic function definition uses the new <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">arrow syntax</a> along with the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters">rest operator</a> to collect any arguments that are supplied along with the function to eventually apply.
+Following this, a private recursive function is called, which in its base case applies all the collected arguments to the specified function and returns the result.
 If this condition has not yet been met, a new function is instead returned with a call to the internal function, supplying it with the accumulated and new arguments using the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator">spread operator</a>.
-This example also takes advantage of the arrow functions behaviour to return the result if only one statement has been defined, removing the need for unnecessary ‘return’ keywords.</p>
+This example also takes advantage of the arrow function’s behaviour to return the result if only one statement has been defined, removing the need for unnecessary ‘return’ keywords.</p>
 
 <h2 id="composition">Composition</h2>
 
-<p>Another Functional building block is the ability to create new functionality by way of function composition.
+<p>Another functional building block is the ability to create new functionality by way of function composition.
 In a similar manner to how we implemented partial application, we are also able to use ES6’s new features to aid us in creating a composition function.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">compose</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">fns</span><span class="p">)</span> <span class="o">=&gt;</span>

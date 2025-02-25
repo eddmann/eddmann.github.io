@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Using the concept of a Trampoline to maintain a single call stack frame in Clojure">
+    <meta name="description" content="Explore how Clojure utilises the trampoline to maintain a single call stack frame for efficient recursion and to avoid stack overflows.">
 
     <title>
         
@@ -50,7 +50,7 @@
                 <article class="post">
     <h1 class="post-title">Recursive Functions using a Trampoline in Clojure</h1>
     <time datetime="2016-01-07T00:00:00+00:00" class="post-date">07 Jan 2016</time>
-    <p>Following on from yesterdays post that discussed <a href="/posts/recursive-functions-using-a-trampoline-in-javascript/">‘Trampolining’ in JavaScript</a>, I thought it would be interesting to see what Clojure has to offer.</p>
+    <p>Following on from yesterday’s post that discussed <a href="/posts/recursive-functions-using-a-trampoline-in-javascript/">‘Trampolining’ in JavaScript</a>, I thought it would be interesting to see what Clojure has to offer.</p>
 
 
 
@@ -74,7 +74,8 @@
 </span><span class="c1">; Caused by: java.lang.StackOverflowError: null</span><span class="w">
 </span></code></pre></div></div>
 
-<p>However, with a little function wrapper addition and the use of the ‘trampoline’ we are able to return back to a single call stack-frame being used, as opposed to the O(n) memory complexity faced at this time.</p>
+<p>However, with a little function wrapper addition and the use of the <em>trampoline</em>, we are able to return to a single call stack frame being used.
+This is in contrast to the O(n) memory complexity otherwise encountered.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">declare</span><span class="w"> </span><span class="n">is-even?</span><span class="p">)</span><span class="w">
 
@@ -91,11 +92,12 @@
 </span><span class="p">(</span><span class="nf">trampoline</span><span class="w"> </span><span class="p">(</span><span class="nf">is-odd?</span><span class="w"> </span><span class="mi">10000</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Thanks to the anonymous function shorthand macro and core ‘trampoline’ function there is not a lot of boilerplate that is required to make this algorithm more efficient.</p>
+<p>Thanks to the anonymous function shorthand macro and the core <code class="language-plaintext highlighter-rouge">trampoline</code> function, there is not a lot of boilerplate required to make this algorithm more efficient.</p>
 
 <h2 id="factorial">Factorial</h2>
 
-<p>We can also take advantage of the trampoline when faced with self-recursive tail-position calls in an environment which does not implicitly optimise for such a case.</p>
+<p>We can also take advantage of the trampoline when faced with self-recursive tail-position calls.
+This is useful in an environment which does not implicitly optimise for such cases.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">factorial</span><span class="w">
   </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">
@@ -105,7 +107,8 @@
 </span><span class="c1">; Caused by: java.lang.StackOverflowError: null</span><span class="w">
 </span></code></pre></div></div>
 
-<p>It should be noted that with such a large input value you may face an integer overflow exception before any stack-overflow occurs, to accommodate for this the use of a BigInt (using the <code class="language-plaintext highlighter-rouge">*'</code> function) has been incorporated.</p>
+<p>It should be noted that with such a large input value, you may face an integer overflow exception before any stack overflow occurs.
+To accommodate this, the use of a <code class="language-plaintext highlighter-rouge">BigInt</code> (using the <code class="language-plaintext highlighter-rouge">*'</code> function) has been incorporated.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">factorial</span><span class="w">
   </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">factorial</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w">

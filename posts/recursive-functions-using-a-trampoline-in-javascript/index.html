@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Using the concept of a Trampoline to maintain a single call stack frame in JavaScript">
+    <meta name="description" content="Learn how to implement recursive functions using trampolining in JavaScript, enabling tail-call optimisation even in environments without native support.">
 
     <title>
         
@@ -50,16 +50,16 @@
                 <article class="post">
     <h1 class="post-title">Recursive Functions using a Trampoline in JavaScript</h1>
     <time datetime="2016-01-06T00:00:00+00:00" class="post-date">06 Jan 2016</time>
-    <p>An interesting technique for managing perceived tail-call optimised algorithms in an environment that does not provide such capabilities is to use a concept called a ‘trampoline’.
+    <p>An interesting technique for managing perceived tail-call optimised algorithms in an environment that does not provide such capabilities is to use a concept called a <em>trampoline</em>.
 The following two examples provide all their work within the recursive function invocation and are in tail-call position.
-However in environments without such optimisations (before ES2015), a single stack-frame is not reused and instead has the pain of O(n) memory complexity.</p>
+However, in environments without such optimisations (before ES2015), a single stack frame is not reused and instead incurs the burden of O(n) memory complexity.</p>
 
 
 
 <h2 id="odd-and-even">Odd and Even</h2>
 
-<p>The mutually recursive implementation documented below is a trivial manner in which to calculate if a given value is odd or even.
-It should be noted that modulo arithmetic would be a more performant approach, but would not highlight the issue at hand.</p>
+<p>The mutually recursive implementation documented below is a trivial manner in which to calculate whether a given value is odd or even.
+It should be noted that modulo arithmetic would be a more performant approach, but it would not highlight the issue at hand.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
 <span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
@@ -68,7 +68,7 @@ It should be noted that modulo arithmetic would be a more performant approach, b
 <span class="c1">// RangeError: Maximum call stack size exceeded</span>
 </code></pre></div></div>
 
-<p>As you can see we sadly hit the call stack size with a sufficiently sized value.
+<p>As you can see, we unfortunately hit the call stack limit with a sufficiently large value.
 However, with a technique called ‘trampolining’ we are able to return to the desired single call stack frame, with the larger heap taking the load.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">trampoline</span> <span class="o">=</span> <span class="nx">fn</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -79,8 +79,8 @@ However, with a technique called ‘trampolining’ we are able to return to the
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>The above implementation does not handle the use-case that the desired returned value is a function itself.
-This can be easily addressed however with a more advanced implementation, of which I will write about in a <a href="/posts/even-higher-trampolining-in-javascript/">future article</a>.</p>
+<p>The above implementation does not handle the use case where the desired returned value is a function itself.
+This can be easily addressed, however, with a more advanced implementation, of which I will write about in a <a href="/posts/even-higher-trampolining-in-javascript/">future article</a>.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">odd</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">false</span> <span class="p">:</span> <span class="nx">even</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
 <span class="kd">const</span> <span class="nx">even</span> <span class="o">=</span> <span class="nx">n</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">true</span> <span class="p">:</span> <span class="nx">odd</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
@@ -88,11 +88,11 @@ This can be easily addressed however with a more advanced implementation, of whi
 <span class="nx">trampoline</span><span class="p">(</span><span class="nx">odd</span><span class="p">(</span><span class="mi">100000</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>Simply by wrapping the two recursive calls in functions we are able to supply the initial call to the trampoline function and enjoy the fruits of our labor.</p>
+<p>Simply by wrapping the two recursive calls in functions we are able to supply the initial call to the trampoline function and enjoy the fruits of our labour.</p>
 
 <h2 id="factorial">Factorial</h2>
 
-<p>Another example of which could be deemed tail-call optimised is the factorial implementation documented below.</p>
+<p>Another example of what could be deemed tail-call optimised is the factorial implementation documented below.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="p">?</span> <span class="nx">acc</span> <span class="p">:</span> <span class="nx">factorial</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">n</span> <span class="o">*</span> <span class="nx">acc</span><span class="p">));</span>
 
@@ -100,8 +100,8 @@ This can be easily addressed however with a more advanced implementation, of whi
 <span class="c1">// RangeError: Maximum call stack size exceeded</span>
 </code></pre></div></div>
 
-<p>However, this is similarly not the case - but with a little function wrapper addition and invocation via the ‘trampoline’ method we are able to maintain the succinct manner of the algorithm whilst gaining the single stack-frame.
-The only point to note is a computational result such as this will require the concept of a BigInt to achieve.</p>
+<p>However, this is similarly not the case - but with a little function wrapper addition and invocation via the <em>trampoline</em> method we are able to maintain the succinct nature of the algorithm whilst gaining the benefit of a single stack frame.
+The only point to note is that a computational result such as this will require the concept of a <code class="language-plaintext highlighter-rouge">BigInt</code> to be achieved.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">factorial</span> <span class="o">=</span>
   <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span>

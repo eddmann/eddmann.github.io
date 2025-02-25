@@ -1,13 +1,15 @@
 ---
 layout: post
-title: "Processing Apache and Nginx Access Logs"
-meta: "Gathering useful information from the data stored in Apache and Nginx access logs."
+title: 'Processing Apache and Nginx Access Logs'
+meta: 'Discover efficient methods to process Apache and Nginx access logs using simple Unix commands. Extract valuable insights such as 404 errors, user agents, IP addresses and more to optimise your server analysis.'
+tags: apache nginx
 ---
 
-Tools such as [AWStats](http://awstats.sourceforge.net/) and [Logstalgia](http://code.google.com/p/logstalgia/) are great, but sometimes they can be over-kill for the problem we are trying to solve.
-It turns out that with a couple of simple Unix commands we can gather a lot of useful information from the data stored in our the access logs.
-Both Apache and Nginx by default use the [combined](http://httpd.apache.org/docs/1.3/logs.html#combined) log format which I will be basing this posts examples on.
+Tools such as [AWStats](http://awstats.sourceforge.net/) and [Logstalgia](http://code.google.com/p/logstalgia/) are great, but sometimes they can be overkill for the problem we are trying to solve.
+It turns out that with a couple of simple Unix commands we can gather a lot of useful information from the data stored in the access logs.
+Both Apache and Nginx by default use the [combined](http://httpd.apache.org/docs/1.3/logs.html#combined) log format, which I will be basing this post's examples on.
 Below are two different methods of accessing either an uncompressed single file or multiple compressed files (following the supplied wild-card pattern).
+
 <!--more-->
 
 ```bash
@@ -17,25 +19,29 @@ $ zcat access.log-*.gz # compressed files i.e. access.log-20131221.gz
 
 ## Log Data to Information
 
-404 Request Responses
+### 404 Request Responses
+
+Using 'awk' we are able to filter the access log entries down to only the ones that include the 404 status code.
+In this case we are then displaying the most requested pages of this type, in descending order.
 
 ```bash
 $ cat access.log | awk '($9 ~ /404/)' | awk '{ print $7 }' | sort | uniq -c | sort -rn | head -n 25
 ```
 
-Using 'awk' we are able to filter the access log entires down to only the ones that include the 404 status code.
-In this case we are then displaying the most requested pages of this type, in descending order.
+### Request User Agents
 
-Request User Agents
+The command below displays the top 25 user agents (browser, operating system) that have requested a resource from the web server.
+The 'awk' command in this instance uses a defined field separator of " to successfully parse the user agent string.
 
 ```bash
 $ cat access.log | awk -F\" '{ print $6 }' | sort | uniq -c | sort -frn | head -n 25
 ```
 
-The command above displays the top 25 user agents (browser, operating system) that have requested a resource from the web server.
-The 'awk' command in this instance uses a defined field separator of " to successfully parse the user agent string.
+### Request IP Addresses
 
-Request IP Addresses
+Below are two examples of displaying the top 25 IP addresses based on total requests.
+The second command uses the GeoIP package to include the country the IP address originates from.
+This package can be installed on a CentOS setup using the [EPEL](https://fedoraproject.org/wiki/EPEL) repository.
 
 ```bash
 $ cat access.log | awk '{ print $1 }' | sort | uniq -c | sort -rn | head -n 25
@@ -43,11 +49,10 @@ $ cat access.log | awk '{ print $1 }' | sort | uniq -c | sort -rn | head -n 25 |
     awk '{ printf("%5d\t%-15s\t", $1, $2); system("geoiplookup " $2 " | cut -d \\: -f2 ") }'
 ```
 
-Above are two examples of displaying the top 25 IP addresses based on total requests.
-The second command uses the GeoIP package to include the country the IP address originates from.
-This package can be installed on a CentOS setup using the [EPEL](https://fedoraproject.org/wiki/EPEL) repository.
+### Count Unique Visits
 
-Count Unique Visits
+The commands below provide you with a total count of unique visits based on IP address.
+You are also able to run the log file through the 'grep' command before processing, to only include entries that have occurred today or this month.
 
 ```bash
 $ cat access.log | awk '{ print $1 }' | sort | uniq -c | wc -l
@@ -57,26 +62,27 @@ $ cat access.log | grep `date '+%e/%b/%G'` | awk '{ print $1 }' | sort | uniq -c
 $ cat access.log | grep `date '+%b/%G'` | awk '{ print $1 }' | sort | uniq -c | wc -l
 ```
 
-The commands above will provide you with a total count of unique visits based on IP address.
-You are also able to run the log file through the 'grep' command before processing, to only include entries that have occurred today or this month.
+### Ranked by Response Codes
 
-Ranked by Response Codes
+This simple command is very useful to quickly observe the total counts based on returned response code.
 
 ```bash
 $ cat access.log | awk '{ print $9 }' | sort | uniq -c | sort -rn
 ```
 
-This simple command is very useful to quickly observe the total counts based on returned response code.
+### Most Popular URLS
 
-Most Popular URLS
+A trivial replacement for some Google Analytics statistics, reporting how many hits the top 25 resources have tallied.
 
 ```bash
 $ cat access.log | awk '{ print $7 }' | sort | uniq -c | sort -rn | head -n 25
 ```
 
-A trivial replacement for some Google Analytics statistics, reporting how many hits the top 25 resources have tallied.
+### Real-time IP-Page Requests
 
-Real-time IP-Page Requests
+The final two commands are most likely my favourite as they provide me with real-time access information.
+These commands report on each IP address, request and response that have recently occurred on the server.
+Using [tailf](http://linuxcommand.org/man_pages/tailf1.html) instead of a typical `tail -f` has the benefit of not accessing the file when it is not growing.
 
 ```bash
 $ tailf access.log | awk '{ printf("%-15s\t%s\t%s\t%s\n", $1, $6, $9, $7) }'
@@ -85,10 +91,6 @@ $ tailf access.log | awk '{
     printf("%-15s\t%s\t%s\t%-20s\t%s\n", $1, $6, $9, geo, $7);
   }'
 ```
-
-The final two commands are most likely my favorite as they provide me with real-time access information.
-These commands report on each IP address, request and response that have recently occurred on the server.
-Using [tailf](http://linuxcommand.org/man_pages/tailf1.html) instead of a typical 'tail -f' has the benefit of not accessing the file when it is not growing.
 
 ## Resources
 

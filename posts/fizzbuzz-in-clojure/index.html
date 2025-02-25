@@ -52,8 +52,9 @@
     <time datetime="2015-12-31T00:00:00+00:00" class="post-date">31 Dec 2015</time>
     <p>This past Christmas break I had the chance to finally pick up <a href="https://www.manning.com/books/the-joy-of-clojure">The Joy of Clojure</a> book and delve into the world of Lisp.
 Along with the common-place Merge-sort algorithm I find it beneficial to explore a new language and its capabilities by solving the <a href="http://rosettacode.org/wiki/FizzBuzz">FizzBizz</a> code kata.
-In this post I will be explaining a couple of the implementations that I created.
-</p>
+In this post I will be explaining a couple of the implementations that I created.</p>
+
+
 
 <p>Each of the four solutions below share the following predicate functions.</p>
 
@@ -106,7 +107,7 @@ In the case of a match not being found the supplied number is returned instead.<
 
 <p>The final solution uses a couple of great Clojure features, including multi-arity overloading to supply a default lookup map, as well as an array map which maintains insertion order.
 Each entry in the map is deconstructed into its predicate and return word (key, value) and then used to test against the supplied number.
-If the predicate passes, the entry is kept and finally joined together to return the output using ‘apply’ and  ‘str’ functions.</p>
+If the predicate passes, the entry is kept and finally joined together to return the output using ‘apply’ and ‘str’ functions.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w">
   </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">fizzbuzz</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">(</span><span class="nb">array-map</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="s">"Fizz"</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">)))</span><span class="w">

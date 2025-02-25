@@ -51,14 +51,13 @@
     <h1 class="post-title">Implementing the Shunting Yard algorithm in JavaScript</h1>
     <time datetime="2015-08-29T00:00:00+00:00" class="post-date">29 Aug 2015</time>
     <p>Following on from my <a href="/posts/small-rpn-implementation-in-javascript">recent post</a> on implementing a small RPN parser using JavaScript, we can expand on this by handling infix expressions.
-This can be achieved by initially parsing the expression into its postfix (RPN) counterpart, highlighting another use case where a stack based approach works well.
-
+This can be achieved by initially parsing the expression into its postfix (RPN) counterpart, highlighting another use case where a stack based approach works well. 
 Looping over each token we either push the token to the output if it is numeric, pop from the operator stack based on precedence if an operator or handle brackets accordingly.
 You can find a more in-depth description of the algorithm using Java as the example language in a <a href="/posts/shunting-yard-implementation-in-java">previous post</a>.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">yard</span> <span class="o">=</span> <span class="p">(</span><span class="nx">infix</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">ops</span> <span class="o">=</span> <span class="p">{</span><span class="dl">'</span><span class="s1">+</span><span class="dl">'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:</span> <span class="mi">2</span><span class="p">};</span>
-  <span class="kd">let</span> <span class="nx">peek</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">[</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">yard</span> <span class="o">=</span> <span class="nx">infix</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">ops</span> <span class="o">=</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">+</span><span class="dl">'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:</span> <span class="mi">2</span> <span class="p">};</span>
+  <span class="kd">let</span> <span class="nx">peek</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">[</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
   <span class="kd">let</span> <span class="nx">stack</span> <span class="o">=</span> <span class="p">[];</span>
 
   <span class="k">return</span> <span class="nx">infix</span>
@@ -79,8 +78,7 @@ You can find a more in-depth description of the algorithm using Java as the exam
       <span class="p">}</span>
 
       <span class="k">if</span> <span class="p">(</span><span class="nx">token</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">while</span> <span class="p">(</span><span class="nx">peek</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="o">!=</span> <span class="dl">'</span><span class="s1">(</span><span class="dl">'</span><span class="p">)</span>
-          <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nx">pop</span><span class="p">());</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nx">peek</span><span class="p">(</span><span class="nx">stack</span><span class="p">)</span> <span class="o">!=</span> <span class="dl">'</span><span class="s1">(</span><span class="dl">'</span><span class="p">)</span> <span class="nx">output</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nx">pop</span><span class="p">());</span>
         <span class="nx">stack</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
       <span class="p">}</span>
 
@@ -91,7 +89,7 @@ You can find a more in-depth description of the algorithm using Java as the exam
 <span class="p">};</span>
 
 <span class="nx">yard</span><span class="p">(</span><span class="dl">'</span><span class="s1">3 + 4 * 5 / (3 + 2)</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// 3 4 5 * 3 2 + / +</span>
-<span class="nx">rpn</span><span class="p">(</span><span class="nx">yard</span><span class="p">(</span><span class="dl">'</span><span class="s1">3 + 4 * 5 / (3 + 2)</span><span class="dl">'</span><span class="p">))</span> <span class="c1">// 7</span>
+<span class="nx">rpn</span><span class="p">(</span><span class="nx">yard</span><span class="p">(</span><span class="dl">'</span><span class="s1">3 + 4 * 5 / (3 + 2)</span><span class="dl">'</span><span class="p">));</span> <span class="c1">// 7</span>
 </code></pre></div></div>
 
 </article>

@@ -51,23 +51,24 @@
     <h1 class="post-title">Cartesian Product in JavaScript</h1>
     <time datetime="2015-10-04T00:00:00+00:00" class="post-date">04 Oct 2015</time>
     <p>This weekend I have had the chance to explore Cartesian products.
-The Cartesian product (cross-product) is essentially an operation which returns a product set from multiple supplied sets.
-
+The Cartesian product (cross-product) is essentially an operation which returns a product set from multiple supplied sets. 
 When applied to more than a pair of sets it can be typically described as the n-fold Cartesian product.
 Below is a simple JavaScript implementation which codifies this operation in an immutable, functional manner.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">flatten</span> <span class="o">=</span> <span class="p">(</span><span class="nx">arr</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">.</span><span class="nx">apply</span><span class="p">([],</span> <span class="nx">arr</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">flatten</span> <span class="o">=</span> <span class="nx">arr</span> <span class="o">=&gt;</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">.</span><span class="nx">apply</span><span class="p">([],</span> <span class="nx">arr</span><span class="p">);</span>
 
 <span class="kd">const</span> <span class="nx">product</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">sets</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nx">sets</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">acc</span><span class="p">,</span> <span class="kd">set</span><span class="p">)</span> <span class="o">=&gt;</span>
-    <span class="nx">flatten</span><span class="p">(</span><span class="nx">acc</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="kd">set</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">y</span> <span class="o">=&gt;</span> <span class="p">[</span> <span class="p">...</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">]))),</span>
-    <span class="p">[[]]);</span>
+  <span class="nx">sets</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="kd">set</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">flatten</span><span class="p">(</span><span class="nx">acc</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="kd">set</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">y</span> <span class="o">=&gt;</span> <span class="p">[...</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">]))),</span>
+    <span class="p">[[]]</span>
+  <span class="p">);</span>
 
 <span class="nx">product</span><span class="p">(</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">small</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">medium</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">large</span><span class="dl">'</span><span class="p">],</span> 
-  <span class="p">[</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">green</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span><span class="p">],</span> 
-  <span class="p">[</span><span class="dl">'</span><span class="s1">shirt</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">jeans</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">shoes</span><span class="dl">'</span><span class="p">]);</span>
-  <span class="c1">// [["small", "red", "shirt"], ["small", "red", "jeans"] ...</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">small</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">medium</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">large</span><span class="dl">'</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">green</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">blue</span><span class="dl">'</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">shirt</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">jeans</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">shoes</span><span class="dl">'</span><span class="p">]</span>
+<span class="p">);</span>
+<span class="c1">// [["small", "red", "shirt"], ["small", "red", "jeans"] ...</span>
 </code></pre></div></div>
 
 </article>

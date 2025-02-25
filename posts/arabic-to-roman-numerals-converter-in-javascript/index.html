@@ -50,37 +50,38 @@
                 <article class="post">
     <h1 class="post-title">Arabic to Roman Numerals converter in JavaScript</h1>
     <time datetime="2015-10-20T00:00:00+00:00" class="post-date">20 Oct 2015</time>
-    <p>Having an hour to spare recently I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals.
-
+    <p>Having an hour to spare recently I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals. 
 Below are two different solutions to solving this problem, taking advantage of many ES2015 additions in the process.
 Both implementations use the lookup table provided below to handle translation of the seven symbols, along with the subtractive form used to avoid four characters being repeated in a row.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">chart</span> <span class="o">=</span> <span class="p">[</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">M</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">CM</span><span class="dl">'</span><span class="p">,</span>  <span class="mi">900</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">D</span><span class="dl">'</span><span class="p">,</span>  <span class="mi">500</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">CD</span><span class="dl">'</span><span class="p">,</span>  <span class="mi">400</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">C</span><span class="dl">'</span><span class="p">,</span>  <span class="mi">100</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">XC</span><span class="dl">'</span><span class="p">,</span>   <span class="mi">90</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">L</span><span class="dl">'</span><span class="p">,</span>   <span class="mi">50</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">XL</span><span class="dl">'</span><span class="p">,</span>   <span class="mi">40</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">X</span><span class="dl">'</span><span class="p">,</span>   <span class="mi">10</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">IX</span><span class="dl">'</span><span class="p">,</span>    <span class="mi">9</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">V</span><span class="dl">'</span><span class="p">,</span>    <span class="mi">5</span><span class="p">],</span>
-  <span class="p">[</span><span class="dl">'</span><span class="s1">IV</span><span class="dl">'</span><span class="p">,</span>    <span class="mi">4</span><span class="p">],</span>
-  <span class="p">[</span> <span class="dl">'</span><span class="s1">I</span><span class="dl">'</span><span class="p">,</span>    <span class="mi">1</span><span class="p">]</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">M</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1000</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">CM</span><span class="dl">'</span><span class="p">,</span> <span class="mi">900</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">D</span><span class="dl">'</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">CD</span><span class="dl">'</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">C</span><span class="dl">'</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">XC</span><span class="dl">'</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">L</span><span class="dl">'</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">XL</span><span class="dl">'</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">X</span><span class="dl">'</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">IX</span><span class="dl">'</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">V</span><span class="dl">'</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">IV</span><span class="dl">'</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+  <span class="p">[</span><span class="dl">'</span><span class="s1">I</span><span class="dl">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
 <span class="p">];</span>
 </code></pre></div></div>
 
 <h2 id="solution-1">Solution 1</h2>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toRoman</span> <span class="o">=</span> <span class="p">(</span><span class="nx">decimal</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nx">chart</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">numeral</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="p">[</span><span class="nx">roman</span><span class="p">,</span> <span class="nx">remainder</span><span class="p">]</span> <span class="o">=</span> <span class="nx">acc</span><span class="p">;</span>
-    <span class="kd">const</span> <span class="p">[</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">value</span><span class="p">]</span> <span class="o">=</span> <span class="nx">numeral</span><span class="p">;</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nx">roman</span> <span class="o">+</span> <span class="nx">letter</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="nx">value</span><span class="p">),</span>
-            <span class="nx">remainder</span> <span class="o">%</span> <span class="nx">value</span><span class="p">];</span>
-  <span class="p">},</span> <span class="p">[</span><span class="dl">''</span><span class="p">,</span> <span class="nx">decimal</span><span class="p">])[</span><span class="mi">0</span><span class="p">];</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toRoman</span> <span class="o">=</span> <span class="nx">decimal</span> <span class="o">=&gt;</span>
+  <span class="nx">chart</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
+    <span class="p">(</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">numeral</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">roman</span><span class="p">,</span> <span class="nx">remainder</span><span class="p">]</span> <span class="o">=</span> <span class="nx">acc</span><span class="p">;</span>
+      <span class="kd">const</span> <span class="p">[</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">value</span><span class="p">]</span> <span class="o">=</span> <span class="nx">numeral</span><span class="p">;</span>
+      <span class="k">return</span> <span class="p">[</span><span class="nx">roman</span> <span class="o">+</span> <span class="nx">letter</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="nx">value</span><span class="p">),</span> <span class="nx">remainder</span> <span class="o">%</span> <span class="nx">value</span><span class="p">];</span>
+    <span class="p">},</span>
+    <span class="p">[</span><span class="dl">''</span><span class="p">,</span> <span class="nx">decimal</span><span class="p">]</span>
+  <span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
 </code></pre></div></div>
 
 <p>The solution above uses the higher-order fold function to <code class="language-plaintext highlighter-rouge">reduce</code> the supplied Arabic number into a Roman numeral equivalent.
@@ -88,14 +89,13 @@ Combined with using a two element array as a form of tuple that we are able to d
 
 <p>## Solution 2</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toRoman</span> <span class="o">=</span> <span class="p">(</span><span class="nx">decimal</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">toRoman</span> <span class="o">=</span> <span class="nx">decimal</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">function</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">remainder</span><span class="p">,</span> <span class="nx">chart</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">remainder</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="dl">''</span><span class="p">;</span>
     <span class="kd">const</span> <span class="p">[[</span><span class="nx">numeral</span><span class="p">,</span> <span class="nx">value</span><span class="p">],</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">chart</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nx">numeral</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="nx">value</span><span class="p">)</span> <span class="o">+</span>
-           <span class="nx">recur</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">%</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">tail</span><span class="p">);</span>
-  <span class="p">};</span>
-  
+    <span class="k">return</span> <span class="nx">numeral</span><span class="p">.</span><span class="nx">repeat</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="nx">value</span><span class="p">)</span> <span class="o">+</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">%</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">tail</span><span class="p">);</span>
+  <span class="p">}</span>
+
   <span class="k">return</span> <span class="nx">recur</span><span class="p">(</span><span class="nx">decimal</span><span class="p">,</span> <span class="nx">chart</span><span class="p">);</span>
 <span class="p">};</span>
 </code></pre></div></div>

@@ -51,16 +51,16 @@
     <h1 class="post-title">Small RPN Implementation in JavaScript</h1>
     <time datetime="2015-08-25T00:00:00+00:00" class="post-date">25 Aug 2015</time>
     <p>This morning I decided to quickly write up a small reverse polish notation evaluator in JavaScript.
-Evaluation of these expressions highlights the perfect use case for a stack based approach.
-
+Evaluation of these expressions highlights the perfect use case for a stack based approach. 
 Looping over each of the supplied tokens we push to the stack either the item if it is a number or the evaluation of the last two numbers if it is an operator.
 Once this iteration has been complete we end up with a single element in the stack which is the answer to the supplied expression.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">rpn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ts</span><span class="p">,</span> <span class="nx">s</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">ts</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1"> </span><span class="dl">'</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span>
-    <span class="nx">s</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span> <span class="o">==</span> <span class="o">+</span><span class="nx">t</span> <span class="p">?</span> <span class="nx">t</span> <span class="p">:</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">t</span> <span class="o">+</span> <span class="nx">s</span><span class="p">.</span><span class="nx">pop</span><span class="p">())));</span>
+    <span class="nx">s</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">t</span> <span class="o">==</span> <span class="o">+</span><span class="nx">t</span> <span class="p">?</span> <span class="nx">t</span> <span class="p">:</span> <span class="nb">eval</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">t</span> <span class="o">+</span> <span class="nx">s</span><span class="p">.</span><span class="nx">pop</span><span class="p">()))</span>
+  <span class="p">);</span>
   <span class="k">return</span> <span class="nx">s</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="p">}</span>
+<span class="p">};</span>
 
 <span class="nx">rpn</span><span class="p">(</span><span class="dl">'</span><span class="s1">26 4 + 2 *</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// 60</span>
 </code></pre></div></div>

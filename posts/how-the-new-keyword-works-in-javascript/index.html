@@ -51,8 +51,7 @@
     <h1 class="post-title">How the 'new' keyword works in JavaScript</h1>
     <time datetime="2015-09-03T00:00:00+00:00" class="post-date">03 Sep 2015</time>
     <p>The <code class="language-plaintext highlighter-rouge">new</code> keyword in JavaScript can sometimes slip up new and experienced programmers alike.
-We typically associate this word with Classical-based Object-oriented languages (such as Java etc.), where as in JavaScript it works a little different.
-
+We typically associate this word with Classical-based Object-oriented languages (such as Java etc.), where as in JavaScript it works a little different. 
 In fact due to the languages prototypical behavior any function can be used as a constructor call, which adds more fuel to the confusion.
 To demystify the process that occurs this article will take you through the four operations that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is invoked on a Function.
 After describing these steps we will then work through codifying a user-land function that mimics its’ behavior.</p>
@@ -68,13 +67,13 @@ After describing these steps we will then work through codifying a user-land fun
 
 <p>Now that we know the basic steps that occur when the <code class="language-plaintext highlighter-rouge">new</code> keyword is called, we can create a user-land function that mimic this behavior.</p>
 
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">isObj</span> <span class="o">=</span> <span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">;</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">isObj</span> <span class="o">=</span> <span class="nx">o</span> <span class="o">=&gt;</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span> <span class="o">||</span> <span class="k">typeof</span> <span class="nx">o</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">function</span><span class="dl">'</span><span class="p">;</span>
 
 <span class="kd">function</span> <span class="nx">new_</span><span class="p">(</span><span class="nx">cons</span><span class="p">,</span> <span class="p">...</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">obj</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">cons</span><span class="p">.</span><span class="nx">prototype</span><span class="p">);</span> <span class="c1">// step 1 and 2</span>
   <span class="kd">let</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nx">cons</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span> <span class="c1">// step 3</span>
   <span class="k">return</span> <span class="nx">isObj</span><span class="p">(</span><span class="nx">ret</span><span class="p">)</span> <span class="p">?</span> <span class="nx">ret</span> <span class="p">:</span> <span class="nx">obj</span><span class="p">;</span> <span class="c1">// step 4</span>
-<span class="p">};</span>
+<span class="p">}</span>
 </code></pre></div></div>
 
 </article>

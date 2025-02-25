@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creating a small infix-calculator in Clojure using the Shunting Yard algorithm and RPN evaluation">
+    <meta name="description" content="Discover how to implement an infix calculator in Clojure using the Shunting Yard algorithm and Reverse Polish Notation evaluation to process expressions efficiently.">
 
     <title>
         
@@ -51,14 +51,14 @@
     <h1 class="post-title">Infix Calculator in Clojure</h1>
     <time datetime="2016-01-03T00:00:00+00:00" class="post-date">03 Jan 2016</time>
     <p>Following on from my previous post, I have continued my exploration into Clojure by implementing a simple infix calculator - using the Shunting Yard algorithm and RPN evaluation.
-The documented implementation is split into three distinct parts of which I will describe piece-by-piece, before composing them together to result in the final calculator.</p>
+The documented implementation is split into three distinct parts, of which I will describe piece-by-piece before composing them together to result in the final calculator.</p>
 
 
 
 <h2 id="tokenization">Tokenization</h2>
 
-<p>The first problem to solve is to correctly split up the supplied infix expression into the tokenized output.
-The implementation below ‘reduces’ over each of the characters in the expression producing an output list which correctly merges co-located digits.</p>
+<p>The first problem to solve is to correctly split up the supplied infix expression into the tokenised output.
+The implementation below <em>reduces</em> over each of the characters in the expression, producing an output list which correctly merges co-located digits.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">tokenize</span><span class="w"> </span><span class="p">[</span><span class="n">expr</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">to-chars</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">clojure.string/split</span><span class="w"> </span><span class="p">(</span><span class="nf">clojure.string/replace</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="s">" "</span><span class="w"> </span><span class="s">""</span><span class="p">)</span><span class="w"> </span><span class="o">#</span><span class="s">""</span><span class="p">)</span><span class="w">
@@ -74,8 +74,8 @@ The implementation below ‘reduces’ over each of the characters in the expres
 
 <h2 id="shunting-yard-algorithm">Shunting Yard Algorithm</h2>
 
-<p>To produce the desired Reverse Polish notation required to evaluate the expression into its final result, we can use the Shunting Yard algorithm invented by Edsger Dijkstra.
-The implementation below follows a similar pattern to a previous one I documented in JavaScript however, I feel that Clojure has been able to more succinctly codify its intent.</p>
+<p>To produce the desired Reverse Polish Notation required to evaluate the expression into its final result, we can use the Shunting Yard algorithm invented by Edsger Dijkstra.
+The implementation below follows a similar pattern to a previous one I documented in JavaScript, however I feel that Clojure has been able to more succinctly codify its intent.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">shunting-yard</span><span class="w"> </span><span class="p">[</span><span class="n">tokens</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">ops</span><span class="w"> </span><span class="p">{</span><span class="s">"+"</span><span class="w"> </span><span class="mi">1</span><span class="n">,</span><span class="w"> </span><span class="s">"-"</span><span class="w"> </span><span class="mi">1</span><span class="n">,</span><span class="w"> </span><span class="s">"*"</span><span class="w"> </span><span class="mi">2</span><span class="n">,</span><span class="w"> </span><span class="s">"/"</span><span class="w"> </span><span class="mi">2</span><span class="p">}]</span><span class="w">
@@ -93,11 +93,11 @@ The implementation below follows a similar pattern to a previous one I documente
         </span><span class="n">tokens</span><span class="p">))))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Looking at the implementation above you will notice that we have been able to use a two element vector to represent the output notation and stack which are then joined at the end to return the final output.</p>
+<p>Looking at the implementation above, you will notice that we have been able to use a two-element vector to represent the output notation and stack, which are then joined at the end to return the final output.</p>
 
 <h2 id="rpn-evaluation">RPN Evaluation</h2>
 
-<p>With the expression now represented in RPN we can use the following implementation to evaluate this token sequence, returning the final result.</p>
+<p>With the expression now represented in RPN, we can use the following implementation to evaluate this token sequence, returning the final result.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="p">[</span><span class="n">tokens</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">ops</span><span class="w"> </span><span class="p">{</span><span class="s">"+"</span><span class="w"> </span><span class="n">+,</span><span class="w"> </span><span class="s">"-"</span><span class="w"> </span><span class="n">-,</span><span class="w"> </span><span class="s">"*"</span><span class="w"> </span><span class="n">*,</span><span class="w"> </span><span class="s">"/"</span><span class="w"> </span><span class="nb">/</span><span class="p">}]</span><span class="w">
@@ -113,12 +113,12 @@ The implementation below follows a similar pattern to a previous one I documente
 <h2 id="calculator">Calculator</h2>
 
 <p>With all the pieces now created, we can compose the calculator function from these constituent parts.
-We are able to document the transformation from expression to result using the following ‘log’ function, which can be thought of as an identity function with the side-effect of printing out the supplied parameter.</p>
+We are able to document the transformation from expression to result using the following <code class="language-plaintext highlighter-rouge">log</code> function, which can be thought of as an identity function with the side-effect of printing out the supplied parameter.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">log</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">do</span><span class="w"> </span><span class="p">(</span><span class="nb">println</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>With this function now declared we can create the ‘calc’ function which is a composition of the implemented functions above.</p>
+<p>With this function now declared, we can create the <code class="language-plaintext highlighter-rouge">calc</code> function which is a composition of the implemented functions above.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">calc</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">rpn</span><span class="w"> </span><span class="n">shunting-yard</span><span class="w"> </span><span class="n">tokenize</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>

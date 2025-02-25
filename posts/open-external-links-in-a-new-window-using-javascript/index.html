@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Small, useful snippet in raw JavaScript and jQuery.">
+    <meta name="description" content="Discover an easy and effective method to automatically open external links in a new window using JavaScript and jQuery.">
 
     <title>
         
@@ -50,20 +50,23 @@
                 <article class="post">
     <h1 class="post-title">Open external links in a new window using JavaScript</h1>
     <time datetime="2013-12-09T00:00:00+00:00" class="post-date">09 Dec 2013</time>
-    <p>It is good practise to open external links in a new window, however, it can be a bit tedious having to remember to include <code class="language-plaintext highlighter-rouge">'target="_blank"'</code>, especially in Markdown.
-To get around this I have incorporated a simple raw JavaScript solution, which can be found below.
-</p>
+    <p>It is good practise to open external links in a new window.
+However, it can be a bit tedious to remember to include <code class="language-plaintext highlighter-rouge">target="_blank"</code>, especially in Markdown.
+To get around this, I have incorporated a simple raw JavaScript solution, which can be found below.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">),</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">links</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">link</span> <span class="o">=</span> <span class="nx">links</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">href</span><span class="dl">'</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">link</span><span class="p">.</span><span class="nx">hostname</span> <span class="o">!==</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">)</span>
-        <span class="nx">link</span><span class="p">.</span><span class="nx">target</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">_blank</span><span class="dl">'</span><span class="p">;</span>
+
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">links</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">),</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">links</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">l</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">link</span> <span class="o">=</span> <span class="nx">links</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">link</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="dl">'</span><span class="s1">href</span><span class="dl">'</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">link</span><span class="p">.</span><span class="nx">hostname</span> <span class="o">!==</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">)</span> <span class="nx">link</span><span class="p">.</span><span class="nx">target</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">_blank</span><span class="dl">'</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>If you have access to jQuery on the page then a more elegant solution presented below would be more appealing.</p>
+<p>If you have access to jQuery on the page, then a more elegant solution presented below would be more appealing.</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">a[href^="http"]</span><span class="dl">'</span><span class="p">).</span><span class="nx">not</span><span class="p">(</span><span class="dl">'</span><span class="s1">[href*="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"]</span><span class="dl">'</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">target</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">_blank</span><span class="dl">'</span><span class="p">);</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">a[href^="http"]</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">not</span><span class="p">(</span><span class="dl">'</span><span class="s1">[href*="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"]</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">target</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">_blank</span><span class="dl">'</span><span class="p">);</span>
 </code></pre></div></div>
 
 </article>

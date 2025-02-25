@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simple guide on how to setup password-less SSH login on CentOS 6.4.">
+    <meta name="description" content="Learn how to configure SSH public key authentication on CentOS 6.4 with this comprehensive guide.">
 
     <title>
         
@@ -51,20 +51,23 @@
     <h1 class="post-title">Configuring SSH Public Key Authentication on CentOS 6.4</h1>
     <time datetime="2013-12-12T00:00:00+00:00" class="post-date">12 Dec 2013</time>
     <p>Having to use password authentication each time you wish to access your server can be a serious pain.
-Not only does it require extra keystrokes, it is also less secure and far more susceptible to successful brute-force attacks.
-Enter public-key authentication, were instead you use asymmetric cryptography.
-The first thing to do is generate a key-pair on your client machine, you can optional provide a passphrase to unlock the private key if you so wish.
-</p>
+Not only does it require extra keystrokes, it is also less secure and far more susceptible to successful brute-force attacks.</p>
+
+
+
+<p>Enter public-key authentication, where you instead use asymmetric cryptography.
+The first thing to do is generate a key-pair on your client machine.
+You can optionally provide a passphrase to unlock the private key if you so wish.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh-keygen <span class="nt">-q</span> <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"your@email.com"</span>
 </code></pre></div></div>
 
-<p>We now need to add the clients public-key to the list of authorised keys for the server’s specifed user.</p>
+<p>We now need to add the client’s public key to the list of authorised keys for the server’s specified user.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> ~/.ssh/id_rsa.pub | ssh user@hostname <span class="s2">"cat &gt;&gt; ~/.ssh/authorized_keys"</span>
 </code></pre></div></div>
 
-<p>Once this has been successfully copied across we just need to enable the daemon to use the new form of authentication.
+<p>Once this has been successfully copied across, we just need to enable the daemon to use the new form of authentication.
 This will be the last time you will have to authenticate via password.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh user@hostname

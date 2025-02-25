@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into how to use for-comprehensions in Scala.">
+    <meta name="description" content="Discover how to utilise for-comprehensions in Scala to write cleaner, more efficient code with functional programming techniques, complete with examples and practical applications.">
 
     <title>
         
@@ -50,18 +50,19 @@
                 <article class="post">
     <h1 class="post-title">Using For-Comprehensions in Scala</h1>
     <time datetime="2013-12-11T00:00:00+00:00" class="post-date">11 Dec 2013</time>
-    <p>Scala can be a very deceptive language, type-inference is a very good example of this.
-Another less understood example that you will soon be welcome to upon closer exploration of the language is the ‘for-comprehension’.
+    <p>Scala can be a very deceptive language, as type inference is a good example of this.
+Another less understood example that you will soon be introduced to upon closer exploration of the language is the ‘for-comprehension’.
 The first point I wish to highlight is that in Scala everything is an expression which returns a value, even if this be Unit (which is equivalent to nothing).
 This is a fundamental design principle of Scala which allows for productive use of its functional nature.
-In an imperative manner for example, we have become very accustom to maybe declaring and assigning a default value, only to reassign it with another if a condition is meet on the next line.
-Due to the expressive nature of the language this can instead be condensed into one-line, immutably and as a result less prone to error.
-</p>
+In an imperative manner, for example, we have become very accustomed to declaring and assigning a default value, only to reassign it with another if a condition is met on the next line.
+Due to the expressive nature of the language, this can instead be condensed into one line, immutably and as a result is less prone to error.</p>
+
+
 
 <h2 id="simple-expressions">Simple Expressions</h2>
 
-<p>Below are a couple of simple for-comprehension examples which use ranges, and in the case of the second one a condition to filter the result.
-The resulting value is a <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.immutable.Vector">Vector</a> which is the default implementation of a immutable indexed sequence in Scala - chosen as it has a good balance between selection and update speed.</p>
+<p>Below are a couple of simple for-comprehension examples which use ranges, and in the case of the second one, a condition to filter the result.
+The resulting value is a <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.immutable.Vector">Vector</a> which is the default implementation of an immutable indexed sequence in Scala - chosen as it has a good balance between selection and update speed.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">10</span> <span class="nf">until</span> <span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="o">-</span><span class="mi">2</span><span class="o">))</span>
     <span class="k">yield</span> <span class="n">i</span>
@@ -74,10 +75,10 @@ The resulting value is a <a href="http://www.scala-lang.org/api/current/index.ht
 <span class="c1">// Vector(2, 4, 6, 8, 10)</span>
 </code></pre></div></div>
 
-<p>At a birds-eye view for-comprehensions look and react like their imperative for-each counterparts, however, they can do so much more.
-If you have had any experience with Python comprehensions, you will be pleasantly suprised at their similarities.
-Not only can you iterate over a single collection, you can also iterate over collections within collections.
-You can be doing this whilst also including filters and subsequently like the ‘if-expression’ example yield (return) new immutable collections.</p>
+<p>At a birds-eye view, for-comprehensions look and react like their imperative for-each counterparts, however, they can do so much more.
+If you have had any experience with Python comprehensions, you will be pleasantly surprised at their similarities.
+Not only can you iterate over a single collection, but you can also iterate over collections within collections.
+You can do this whilst also including filters and, subsequently, like the ‘if-expression’ example, yield (return) new immutable collections.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">for</span> <span class="o">(</span><span class="n">i</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">10</span><span class="o">;</span> <span class="n">j</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="n">i</span><span class="o">)</span>
     <span class="nf">yield</span> <span class="o">(</span><span class="n">i</span><span class="o">,</span> <span class="n">j</span><span class="o">)</span>
@@ -91,19 +92,19 @@ You can be doing this whilst also including filters and subsequently like the �
 <span class="c1">// Vector((2,1), (3,1), (3,2), ...)</span>
 </code></pre></div></div>
 
-<p>What blew my mind when I was first explained this in the <a href="http://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> course was that all this added functionality simply reduces down into familiar high-order ‘map’, ‘flatMap’ and ‘withFilter’ chained function calls.
+<p>What blew my mind when I was first explained this in the <a href="http://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> course was that all this added functionality simply reduces down into familiar higher-order ‘map’, ‘flatMap’ and ‘withFilter’ chained function calls.
 The two above examples both evaluate to the same result, and in fact the first one is rewritten internally by the compiler into the second one (try ‘scala -Xprint:typer $filename’).
-So in essence it simply is syntactic sugar over already tried and tested functional concepts.
-In the case of an expression that does not yield a meaningful result (Unit) the compiler will instead rewrite this to use a ‘foreach’ method call.</p>
+So in essence, it simply is syntactic sugar over already tried and tested functional concepts.
+In the case of an expression that does not yield a meaningful result (Unit), the compiler will instead rewrite this to use a ‘foreach’ method call.</p>
 
-<p>I should back-track a little and just recap on what a higher-order function actually is.
-Simply put they are a function that accepts another function as a parameter or returns a function as its value.</p>
+<p>I should backtrack a little and just recap on what a higher-order function actually is.
+Simply put, they are functions that accept another function as a parameter or return a function as their value.</p>
 
 <h2 id="a-contrived-example">A Contrived Example</h2>
 
 <p>I will now demonstrate these comprehensions in a more defined example.
 What better time to discuss basketball?
-Below I am creating a case class (which for this purpose saves me having to define getter and setters) for an individual player, and then creating the starting line-up for the Heat.</p>
+Below I am creating a case class (which for this purpose saves me having to define getters and setters) for an individual player, and then creating the starting line-up for the Heat.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">case</span> <span class="k">class</span> <span class="nc">Player</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">position</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
 
@@ -116,12 +117,12 @@ Below I am creating a case class (which for this purpose saves me having to defi
 <span class="o">)</span>
 </code></pre></div></div>
 
-<p>With the lineup now ready I am now going to filter the players into their respective positions.
-As you can see below I have purposly used different means of producing the same result, but in regard to the centre only returning the first item.
+<p>With the line-up now ready, I am going to filter the players into their respective positions.
+As you can see below, I have purposely used different means of producing the same result, with regard to the centre only returning the first item.
 The two last examples use the discussed ‘withFilter’ method for the first time.
 When a filter is added, instead of running the familiar ‘filter’ method over all items at that time, a view (projection) is generated which returns a type-compatible wrapper around the collection.
-The wrapper allows Scala to delay evaluation of the condition until the last moment (lazy-evaluation).
-This makes it a feasible way of chaining multiple filters together without the fear of redudant iteration steps in-between.</p>
+The wrapper allows Scala to delay evaluation of the condition until the last moment (lazy evaluation).
+This makes it a feasible way of chaining multiple filters together without the fear of redundant iteration steps in-between.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">guards</span> <span class="k">=</span>
     <span class="nf">for</span> <span class="o">(</span><span class="n">player</span> <span class="k">&lt;-</span> <span class="n">heat</span> <span class="k">if</span> <span class="nv">player</span><span class="o">.</span><span class="py">position</span> <span class="n">endsWith</span> <span class="s">"G"</span><span class="o">)</span>
@@ -140,8 +141,8 @@ This makes it a feasible way of chaining multiple filters together without the f
 <p>Now that we know the team, it is time to generate some game statistics to work with.
 Below I am using a for-comprehension to create an empty score-sheet (player name and score tuples), which I then call ‘map’ on to return random point totals for three different games.
 All three examples highlight different ways to use a tuple in a map context and then return the game statistics.
-To tally up the results for all the games we concatenate the collections together and then use the ‘groupBy’ method (similar in-kind to SQL) on the player’s name.
-From this step we map these names to the total summation of the player’s game scores.</p>
+To tally up the results for all the games, we concatenate the collections together and then use the ‘groupBy’ method (similar in-kind to SQL) on the player’s name.
+From this step, we map these names to the total summation of the player’s game scores.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="nv">scoreSheet</span> <span class="k">=</span> <span class="nf">for</span> <span class="o">(</span><span class="nc">Player</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">&lt;-</span> <span class="n">heat</span><span class="o">)</span> <span class="nf">yield</span> <span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span>
 
@@ -160,9 +161,9 @@ From this step we map these names to the total summation of the player’s game 
 <span class="c1">// Map(Mario Chamlers -&gt; 38, Udonis Haslem -&gt; 32, LeBron Jame -&gt; 72, Chris Bosh -&gt; 52, Dwayne Wade -&gt; 44)</span>
 </code></pre></div></div>
 
-<p>Finally I wish to display the point totals in an easy to read format.
+<p>Finally, I wish to display the point totals in an easy-to-read format.
 Returned from our total scores computation is a <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.immutable.Map">Map</a> which I would now like to be sorted by the total score.
-As a basic Map does not have a total order we must convert it into a list and then once sucessfully sorted clean up the output to display neatly.</p>
+As a basic Map does not have a total order, we must convert it into a list and then, once successfully sorted, clean up the output to display neatly.</p>
 
 <div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">totalScores</span>
     <span class="o">.</span><span class="py">toList</span>

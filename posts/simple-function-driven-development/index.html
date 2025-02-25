@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sometimes it pays-off to keep development simple.">
+    <meta name="description" content="Discover the power of simplicity in PHP with function driven development techniques, optimised caching, and templating for efficient backend design.">
 
     <title>
         
@@ -51,12 +51,13 @@
     <h1 class="post-title">Simple Function Driven-Development</h1>
     <time datetime="2013-12-09T00:00:00+00:00" class="post-date">09 Dec 2013</time>
     <p>I recently had the chance to rewrite the backend of my <a href="http://github.com/eddmann/eddmann">personal website</a>.
-I was surprised at how accustom I had become to using heavy-weight web frameworks (with plenty of accompanying depencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
+I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
 As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read.
-I find myself sometimes being blinded by the need to abstract everything with the Object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
-Simple, single purpose functions that can be used for multiple use-cases within your application is a very good mind-set to try and incorporate.
-In this post I wish to discuss a couple of the functions that I created to keep the file so simple.
-</p>
+I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
+Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate.
+In this post I wish to discuss a couple of the functions that I created to keep the file so simple.</p>
+
+
 
 <h2 id="configuration">Configuration</h2>
 
@@ -88,8 +89,8 @@ It then attempts to split up the supplied key, traversing through the configurat
 
 <p>Being a file-based blogging platform with meta-data and Markdown content to parse, caching the results is a very desired process to include.
 Again, a very general implementation has been implemented for greater flexibility.
-The key is hashed and it’s value stored in a file of that name.
-If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and result stored in the described file.
+The key is hashed and its value stored in a file of that name.
+If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and the result stored in the described file.
 Provided is also a check to make sure a false boolean was not returned, allowing us to have control within the closure of whether to cache the result or not.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">cache</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$value</span><span class="p">,</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./cache/'</span><span class="p">)</span>
@@ -115,8 +116,8 @@ Provided is also a check to make sure a false boolean was not returned, allowing
 <h2 id="template">Template</h2>
 
 <p>This simple function allows you to easily parse template files with the provided available variables.
-I have found this to be very useful in splitting-up business logic from complex presentations (separation of concerns) in multiple examples.
-I have been alittle relaxed with my use of the dreaded ‘eval’ function but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.</p>
+I have found this to be very useful in splitting up business logic from complex presentations (separation of concerns) in multiple examples.
+I have been a little relaxed with my use of the dreaded <code class="language-plaintext highlighter-rouge">eval</code> function, but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">tmpl</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$vars</span> <span class="o">=</span> <span class="p">[],</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./templates/'</span><span class="p">)</span>
 <span class="p">{</span>
@@ -132,8 +133,8 @@ I have been alittle relaxed with my use of the dreaded ‘eval’ function but a
 
 <h2 id="example">Example</h2>
 
-<p>To piece all these functions together into a collective example I have decided to demonstrate with a cached fibonacci calculatation, the desired number being stored in a configuration file.
-Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th fibonacci number.</p>
+<p>To piece all these functions together into a collective example I have decided to demonstrate with a cached Fibonacci calculation, the desired number being stored in a configuration file.
+Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th Fibonacci number.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># config.php</span>
 
@@ -144,7 +145,7 @@ Below is the example multi-level configuration file we will be using, defining t
 <span class="p">];</span>
 </code></pre></div></div>
 
-<p>The below template is a simple example of splitting the presentation from code-logic.</p>
+<p>The below template is a simple example of splitting the presentation from code logic.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fibonacci.tmpl.php</span>
 

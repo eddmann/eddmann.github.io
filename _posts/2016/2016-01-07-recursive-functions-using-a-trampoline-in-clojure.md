@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'Recursive Functions using a Trampoline in Clojure'
-meta: 'Using the concept of a Trampoline to maintain a single call stack frame in Clojure'
+meta: 'Explore how Clojure utilises the trampoline to maintain a single call stack frame for efficient recursion and to avoid stack overflows.'
+tags: clojure functional-programming
 ---
 
-Following on from yesterdays post that discussed ['Trampolining' in JavaScript](/posts/recursive-functions-using-a-trampoline-in-javascript/), I thought it would be interesting to see what Clojure has to offer.
+Following on from yesterday's post that discussed ['Trampolining' in JavaScript](/posts/recursive-functions-using-a-trampoline-in-javascript/), I thought it would be interesting to see what Clojure has to offer.
 
 <!--more-->
 
@@ -29,7 +30,8 @@ Using a mutually recursive algorithm such as the odd/even value checker below sh
 ; Caused by: java.lang.StackOverflowError: null
 ```
 
-However, with a little function wrapper addition and the use of the 'trampoline' we are able to return back to a single call stack-frame being used, as opposed to the O(n) memory complexity faced at this time.
+However, with a little function wrapper addition and the use of the _trampoline_, we are able to return to a single call stack frame being used.
+This is in contrast to the O(n) memory complexity otherwise encountered.
 
 ```clojure
 (declare is-even?)
@@ -47,11 +49,12 @@ However, with a little function wrapper addition and the use of the 'trampoline'
 (trampoline (is-odd? 10000))
 ```
 
-Thanks to the anonymous function shorthand macro and core 'trampoline' function there is not a lot of boilerplate that is required to make this algorithm more efficient.
+Thanks to the anonymous function shorthand macro and the core `trampoline` function, there is not a lot of boilerplate required to make this algorithm more efficient.
 
 ## Factorial
 
-We can also take advantage of the trampoline when faced with self-recursive tail-position calls in an environment which does not implicitly optimise for such a case.
+We can also take advantage of the trampoline when faced with self-recursive tail-position calls.
+This is useful in an environment which does not implicitly optimise for such cases.
 
 ```clojure
 (defn factorial
@@ -62,7 +65,8 @@ We can also take advantage of the trampoline when faced with self-recursive tail
 ; Caused by: java.lang.StackOverflowError: null
 ```
 
-It should be noted that with such a large input value you may face an integer overflow exception before any stack-overflow occurs, to accommodate for this the use of a BigInt (using the `*'` function) has been incorporated.
+It should be noted that with such a large input value, you may face an integer overflow exception before any stack overflow occurs.
+To accommodate this, the use of a `BigInt` (using the `*'` function) has been incorporated.
 
 ```clojure
 (defn factorial

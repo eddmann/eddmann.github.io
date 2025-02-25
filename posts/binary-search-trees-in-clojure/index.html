@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring Binary Search Trees and associated actions in Clojure">
+    <meta name="description" content="A comprehensive exploration of binary search trees implemented in Clojure, detailing insertion, removal, traversal, and invariant assertion techniques.">
 
     <title>
         
@@ -61,8 +61,8 @@ We start by creating a simple record definition which describes the contents of 
 
 <h2 id="insertion">Insertion</h2>
 
-<p>Using this Node record, we are able to now construct an insertion function which uses Clojure’s parameter deconstruction to great effect.
-Using the <code class="language-plaintext highlighter-rouge">cond</code> macro helps document an extremely succinct algorithm for inserting a new node into a provided tree.</p>
+<p>Using this Node record, we are now able to construct an insertion function which uses Clojure’s parameter deconstruction to great effect.
+The use of the <code class="language-plaintext highlighter-rouge">cond</code> macro clearly documents an extremely succinct algorithm for inserting a new node into a provided tree.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -74,9 +74,9 @@ Using the <code class="language-plaintext highlighter-rouge">cond</code> macro h
 
 <h2 id="removal">Removal</h2>
 
-<p>Removing a given value from the tree requires a little more work than its’ insertion counterpart.
-However, <code class="language-plaintext highlighter-rouge">cond</code> (again) allows us to clearly document these actions, handling the three different states the given values Node could be in.
-Note that the third state requires the use of the followingly documented <code class="language-plaintext highlighter-rouge">min</code> function.</p>
+<p>Removing a given value from the tree requires a little more work than its insertion counterpart.
+However, <code class="language-plaintext highlighter-rouge">cond</code> (again) allows us to clearly document these actions, handling the three different states the given node could be in.
+Note that the third state requires the use of the documented <code class="language-plaintext highlighter-rouge">min</code> function below.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">remove</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -91,7 +91,7 @@ Note that the third state requires the use of the followingly documented <code c
 
 <h2 id="minimum-and-maximum-value">Minimum and Maximum Value</h2>
 
-<p>As a Binary Search Tree’s invariant is for every Nodes left branch to be less, and right branch to be greater, we can implement simple functions which return the minimum and maximum values present in the tree.</p>
+<p>As a Binary Search Tree’s invariant is that every node’s left branch is less and the right branch is greater, we can implement simple functions which return the minimum and maximum values present in the tree.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">min</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="p">]}]</span><span class="w">
   </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nb">left</span><span class="w">
@@ -107,7 +107,7 @@ Note that the third state requires the use of the followingly documented <code c
 
 <h2 id="contains">Contains</h2>
 
-<p>Following a similar traversal pattern found in the insertion algorithm we are able to check if a given value is present in the tree using the following function.</p>
+<p>Following a similar traversal pattern to that found in the insertion algorithm, we are able to check if a given value is present in the tree using the following function.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">contains?</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -119,7 +119,7 @@ Note that the third state requires the use of the followingly documented <code c
 
 <h2 id="count-and-height">Count and Height</h2>
 
-<p>Statistical analysis on the created tree can be carried out in the form of checking the height of the tree (depth), along with the total Node count.</p>
+<p>Statistical analysis on the created tree can be carried out in the form of checking the height of the tree (depth), along with the total node count.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
   </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">tree</span><span class="w">
@@ -152,13 +152,15 @@ Note that the third state requires the use of the followingly documented <code c
 
 <h2 id="creating-and-displaying-the-tree">Creating and Displaying the Tree</h2>
 
-<p>Using the following function we are able to create a new tree from a supplied sequence - which uses a <code class="language-plaintext highlighter-rouge">reduce</code> to insert each value into the tree, building up the final result along the way.</p>
+<p>Using the following function, we are able to create a new tree from a supplied sequence.
+This function utilises a <code class="language-plaintext highlighter-rouge">reduce</code> to insert each value into the tree, building up the final result along the way.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">to-tree</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="n">nil</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>There are many ways to concatenate sequences within Clojure, however, I feel that the approach below clearly expresses the desired intent.
-Using a combination of ‘syntax-quote’ and ‘unquote-splicing’ we are able to build up a list of the supplied tree’s contents.</p>
+<p>There are many ways to concatenate sequences within Clojure.
+However, I feel that the approach below clearly expresses the desired intent.
+Using a combination of ‘syntax-quote’ and ‘unquote-splicing’, we are able to build up a list of the supplied tree’s contents.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">to-list</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
   </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="n">tree</span><span class="w">

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring Multi-Methods in Clojure using some simple examples">
+    <meta name="description" content="Discover how to implement multi-methods in Clojure with practical examples including FizzBuzz, factorial, Rock-Paper-Scissors, and odd-even evaluation.">
 
     <title>
         
@@ -50,15 +50,15 @@
                 <article class="post">
     <h1 class="post-title">Exploring Multi-Methods in Clojure</h1>
     <time datetime="2016-01-21T00:00:00+00:00" class="post-date">21 Jan 2016</time>
-    <p>Currently reading through the <a href="https://www.manning.com/books/the-joy-of-clojure">Joy of Clojure</a> book I have recently been introduced to Clojure’s multi-method support.
+    <p>Currently reading through the <a href="https://www.manning.com/books/the-joy-of-clojure">Joy of Clojure</a> book, I have recently been introduced to Clojure’s multi-method support.
 I decided that it would be interesting to see this feature in action, so I opened up LightTable and codified some example use-cases.</p>
 
 
 
 <h2 id="fizzbuzz">FizzBuzz</h2>
 
-<p>The implementation below carries on from were my article about <a href="/posts/fizzbuzz-in-clojure/">FizzBuzz in Clojure</a> left off.
-Using the two documented <code class="language-plaintext highlighter-rouge">fizz?</code> and <code class="language-plaintext highlighter-rouge">buzz?</code> helpers, followed by the <a href="https://clojuredocs.org/clojure.core/juxt"><code class="language-plaintext highlighter-rouge">juxt</code></a> core function we are able to codify the problem in a highly descriptive manner.</p>
+<p>The implementation below carries on from where my article about <a href="/posts/fizzbuzz-in-clojure/">FizzBuzz in Clojure</a> left off.
+Using the two documented <code class="language-plaintext highlighter-rouge">fizz?</code> and <code class="language-plaintext highlighter-rouge">buzz?</code> helpers, followed by the <a href="https://clojuredocs.org/clojure.core/juxt"><code class="language-plaintext highlighter-rouge">juxt</code></a> core function, we are able to codify the problem in a highly descriptive manner.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">3</span><span class="p">)))</span><span class="w">
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">5</span><span class="p">)))</span><span class="w">
@@ -74,8 +74,8 @@ Using the two documented <code class="language-plaintext highlighter-rouge">fizz
 
 <h2 id="factorial">Factorial</h2>
 
-<p>We are also able to use multi-methods in a similar manner to pattern-matching found in languages such as Scala and Haskell.
-The below implementation recursively computes the supplied arguments factorial value, handling the base-case of 0 using the function <code class="language-plaintext highlighter-rouge">identity</code> as the dispatch call.</p>
+<p>We are also able to use multi-methods in a similar manner to the pattern-matching found in languages such as Scala and Haskell.
+The implementation below recursively computes the supplied argument’s factorial value, handling the base-case of 0 using the function <code class="language-plaintext highlighter-rouge">identity</code> as the dispatch call.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">factorial</span><span class="w"> </span><span class="nb">identity</span><span class="p">)</span><span class="w">
 </span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">factorial</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w">
@@ -86,8 +86,8 @@ The below implementation recursively computes the supplied arguments factorial v
 
 <h2 id="rock-paper-scissors">Rock-Paper-Scissors</h2>
 
-<p>We are able to expand upon the rules based approach laid out in the previous examples by documenting the Rock-Paper-Scissors game in code.
-Using this multi-method allows us to compute all the possible winning-moves for both players.</p>
+<p>We are able to expand upon the rules-based approach laid out in the previous examples by documenting the Rock-Paper-Scissors game in code.
+This multi-method allows us to compute all the possible winning moves for both players.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="nb">vector</span><span class="p">)</span><span class="w">
 </span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">beats?</span><span class="w"> </span><span class="p">[</span><span class="no">:paper</span><span class="w"> </span><span class="no">:rock</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="n">_</span><span class="w"> </span><span class="n">_</span><span class="p">]</span><span class="w"> </span><span class="n">true</span><span class="p">)</span><span class="w">
@@ -103,18 +103,18 @@ Using this multi-method allows us to compute all the possible winning-moves for 
         </span><span class="no">:when</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="n">one-wins</span><span class="w"> </span><span class="n">two-wins</span><span class="p">)]</span><span class="w">
     </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">one-wins</span><span class="w"> </span><span class="p">[</span><span class="s">"1"</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="p">]</span><span class="w"> </span><span class="p">[</span><span class="s">"2"</span><span class="w"> </span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="p">])))</span><span class="w">
 </span><span class="c1">; [2 :rock :paper] [1 :rock :scissors] [1 :paper :rock]</span><span class="w">
-</span><span class="c1">; [2 :paper :scissors] [2 :scissors :rock] [1 :scissors :paper])</span><span class="w">
+</span><span class="c1">; [2 :paper :scissors] [2 :scissors :rock] [1 :scissors :paper]</span><span class="w">
 </span></code></pre></div></div>
 
 <h2 id="odd-or-even">Odd or Even</h2>
 
-<p>Finally we can use the core <code class="language-plaintext highlighter-rouge">odd?</code> function to polymorphically return a string depicting the supplied values odd-even status.</p>
+<p>Finally, we can use the core <code class="language-plaintext highlighter-rouge">odd?</code> function to polymorphically return a string depicting the supplied value’s odd-even status.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defmulti</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">odd?</span><span class="p">)</span><span class="w">
 </span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">true</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">" is Odd"</span><span class="p">))</span><span class="w">
 </span><span class="p">(</span><span class="k">defmethod</span><span class="w"> </span><span class="n">odd-even</span><span class="w"> </span><span class="n">false</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">" is Even"</span><span class="p">))</span><span class="w">
 
-</span><span class="p">(</span><span class="nf">odd-even?</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="c1">; 5 is Odd</span><span class="w">
+</span><span class="p">(</span><span class="nf">odd-even</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="c1">; 5 is Odd</span><span class="w">
 </span></code></pre></div></div>
 
 </article>

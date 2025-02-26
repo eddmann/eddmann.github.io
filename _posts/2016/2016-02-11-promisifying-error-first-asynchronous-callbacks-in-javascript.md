@@ -1,12 +1,13 @@
 ---
 layout: post
 title: 'Promisifying Error-First Asynchronous Callbacks in JavaScript'
-meta: 'Abstracting asynchronous error-first callbacks found in Node into a Promise'
+meta: 'Learn how to abstract asynchronous error-first callbacks in Node.js into Promises for cleaner, modern JavaScript code.'
+tags: javascript
 ---
 
-I have been writing a lot about Promises in JavaScript the past couple of weeks.
-What happens however, when you wish to use an asynchronous function which does not return a Promise, such as those found in Node?
-It is actually pretty simple to abstract away the error-first asynchronous function callback into a Promise we can handle.
+I have been writing a lot about Promises in JavaScript over the past couple of weeks.
+What happens, however, when you wish to use an asynchronous function that does not return a Promise, such as those found in Node.js?
+It is actually quite simple to abstract away the error-first asynchronous function callback into a Promise we can handle.
 
 <!--more-->
 
@@ -19,7 +20,7 @@ const promisify =
     );
 ```
 
-We are now able to wrap a function which uses the error-first callback paradigm into a Promise, as demoed below.
+We are now able to wrap a function that uses the error-first callback paradigm into a Promise, as demonstrated below.
 
 ```js
 promisify(fs.readFile)('./hello.txt', 'utf8')

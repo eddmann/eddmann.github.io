@@ -1,40 +1,41 @@
 ---
 layout: post
 title: 'Designing Immutable Concepts with Transient Mutation in PHP'
-canonical: https://tech.mybuilder.com/designing-immutable-concepts-with-transient-mutation-in-php/
-meta: 'Looking into designing Immutable concepts with Transient Mutation in PHP'
+meta: 'Explore how transient mutation can optimise immutable concepts in PHP, improving performance while maintaining immutability.'
+tags: php
 ---
 
-In a recent project we felt it beneficial to introduce the Money pattern.
-There are many good [resources](http://martinfowler.com/eaaCatalog/money.html) on this pattern, so I will delegate to those for further definition.
-We decided that encapsulating this into a [immutable value object](http://hangar.runway7.net/punditry/immutability-value-objects) allowed for a cleaner API and removed the fear of any unexpected mutation bugs.
-However, we noticed a spike in memory and processor usage when wishing to perform many successive actions on such values i.e. summation.
+In a recent project, we found it beneficial to introduce the Money pattern.
+There are many good [resources](http://martinfowler.com/eaaCatalog/money.html) on this pattern, so I will defer to those for further definition.
+We decided that encapsulating this into an [immutable value object](http://hangar.runway7.net/punditry/immutability-value-objects) allowed for a cleaner API and removed the fear of unexpected mutation bugs.
+However, we noticed a spike in memory and processor usage when performing many successive actions on such values, such as summation.
 
 <!--more-->
 
-In such a case, new 'temporary' `Money` objects would be instantiated upon each applied addition.
-As many of these objects were simply a stepping stone to generating the final result, they were just left for the Garbage collector to clean-up.
+In such cases, new 'temporary' `Money` objects would be instantiated upon each applied addition.
+Since many of these objects were merely stepping stones to generating the final result, they were simply left for the garbage collector to clean up.
 
-### Using Transient Mutation
+## Using Transient Mutation
 
-Instead of running all the way back to mutation, we remembered a pattern found in Clojure called [Transients](http://clojure.org/reference/transients).
+Instead of reverting entirely to mutation, we recalled a pattern found in Clojure called [Transients](http://clojure.org/reference/transients).
 
 > If a tree falls in the woods, does it make a sound?
 > If a pure function mutates some local data in order to produce an immutable return value, is that ok?
 
-This is an interesting proposition; as long as the resulting value is immutable, is it of concern to the caller how it is derived?
-Providing we could explicitly control when mutation was permitted, we could safely reap the benefits that mutable constructs give us.
-We ended up settling on adding a single method `withMutation` to the API.
-The caller would provide a `callable` that would in-turn be passed a mutable copy of the `Money` instance.
-This allowed the user to interact with the API in a mutable manner, but the caveat being only within the scope of the callable.
-The value that was finally returned would subsequently be made immutable again.
-In respect to the caller, the action that had occurred would seem immutable in-nature.
+This is an interesting proposition.
+As long as the resulting value is immutable, does it matter to the caller how it is derived?
+Provided we could explicitly control when mutation was permitted, we could safely reap the benefits of mutable constructs.
+We ultimately settled on adding a single method, `withMutation`, to the API.
+The caller would provide a `callable`, which would, in turn, be passed a mutable copy of the `Money` instance.
+This allowed the user to interact with the API in a mutable manner, but only within the scope of the callable.
+The final returned value would then be made immutable again.
+To the caller, the operation would appear to have been performed immutably.
 
-### The Implementation
+## The Implementation
 
 Below is a trait-based generalisation of the concept we introduced into our Money pattern implementation.
 
-```php?start_inline=1
+```php
 trait WithMutable
 {
     private $mutable = false;
@@ -57,11 +58,11 @@ trait WithMutable
 }
 ```
 
-As you can see, we provide a `isMutable` flag to decide between (im)mutable modes.
-We are then able to use `withMutable` in any process that would benefit from explicit mutable constructs.
-Below you can see how we improved upon the performance characteristics of the `sum` example initially discussed.
+As you can see, we provide an `isMutable` flag to switch between immutable and mutable modes.
+We can then use `withMutable` in any process that benefits from explicit mutable constructs.
+Below, you can see how we improved the performance characteristics of the `sum` example discussed earlier.
 
-```php?start_inline=1
+```php
 class Money
 {
     use WithMutable;
@@ -101,5 +102,5 @@ class Money
 }
 ```
 
-Providing such capabilities gives the user the freedom to use mutation when applicable in a controlled setting.
-This helps reduce wasted memory and processor usage, whilst keeping all mutation decisions within the abstraction.
+Providing such capabilities gives the user the freedom to use mutation when appropriate in a controlled setting.
+This helps reduce wasted memory and processor usage while keeping all mutation decisions encapsulated within the abstraction.

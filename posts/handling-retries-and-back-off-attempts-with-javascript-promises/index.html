@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into handling Retries and Back-off Attempts with JavaScript Promises">
+    <meta name="description" content="Learn how to handle retries and implement exponential back-off attempts with JavaScript Promises for more resilient asynchronous operations.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/handling-retries-and-back-off-attempts-with-javascript-promises/" />
     
 
     <script>
@@ -53,35 +51,39 @@
     <h1 class="post-title">Handling Retries and Back-off Attempts with JavaScript Promises</h1>
     <time datetime="2017-04-21T00:00:00+00:00" class="post-date">21 Apr 2017</time>
     <p>Promises are an invaluable abstraction around ‘eventual’ results within asynchronous operations.
-I recently had the need to be able to retry a Promise-based action in the event of a failure.
+I recently needed to retry a Promise-based action in the event of a failure.
 It turned out to be very easy to implement such a process using simple recursive constructs.</p>
 
 
 
-<p>Initially I only required the ability to retry a desired amount of times, before eventually failing if still unsuccessful.
-You can see how easy it was to describe this problem in Promise-form within the function below.</p>
+<p>Initially, I only required the ability to retry a desired number of times before eventually failing if still unsuccessful.
+You can see how easy it was to describe this problem in Promise form within the function below.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">retry</span> <span class="o">=</span> <span class="p">(</span><span class="nx">retries</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nx">fn</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">retries</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">?</span> <span class="nx">retry</span><span class="p">(</span><span class="nx">retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">)));</span>
+  <span class="nx">fn</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span>
+    <span class="nx">retries</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">?</span> <span class="nx">retry</span><span class="p">(</span><span class="nx">retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+  <span class="p">);</span>
 </code></pre></div></div>
 
-<p>However, what I eventually required was the ability to ‘back-off’ and provide an increasing grace-period between the operation attempts.
-Again, it was very easy to describe this within a Promise as shown below.</p>
+<p>However, what I eventually required was the ability to ‘back off’ and provide an increasing grace period between operation attempts.
+Again, it was very easy to describe this within a Promise, as shown below.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">pause</span> <span class="o">=</span> <span class="nx">duration</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="nx">duration</span><span class="p">));</span>
 
 <span class="kd">const</span> <span class="nx">backoff</span> <span class="o">=</span> <span class="p">(</span><span class="nx">retries</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">delay</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">fn</span><span class="p">().</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span>
-    <span class="nx">retries</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">?</span> <span class="nx">pause</span><span class="p">(</span><span class="nx">delay</span><span class="p">).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">backoff</span><span class="p">(</span><span class="nx">retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">delay</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span> <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+    <span class="nx">retries</span> <span class="o">&gt;</span> <span class="mi">1</span>
+      <span class="p">?</span> <span class="nx">pause</span><span class="p">(</span><span class="nx">delay</span><span class="p">).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">backoff</span><span class="p">(</span><span class="nx">retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">fn</span><span class="p">,</span> <span class="nx">delay</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+      <span class="p">:</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
   <span class="p">);</span>
 </code></pre></div></div>
 
-<p>As you can see, both implementations use a recursive structure with decrementing <code class="language-plaintext highlighter-rouge">retries</code> to hit the base-case.
-What I find so impressive with the Promise abstraction is how easy it is to codify complex problems such as this with minimal code.</p>
+<p>As you can see, both implementations use a recursive structure with decrementing <code class="language-plaintext highlighter-rouge">retries</code> to hit the base case.
+What I find so impressive about the Promise abstraction is how easy it is to codify complex problems such as this with minimal code.</p>
 
-<h3 id="demo">Demo</h3>
+<h2 id="demo">Demo</h2>
 
-<p>Below you can see a JSBin demo which uses an intentionally unreliable Promise to exercise the two functions retrying behaviour.</p>
+<p>Below, you can see a JSBin demo that uses an intentionally unreliable Promise to exercise the two functions’ retrying behaviour.</p>
 
 <p><a class="jsbin-embed" href="http://jsbin.com/topagew/1/embed?js,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.41.10"></script></p>
 

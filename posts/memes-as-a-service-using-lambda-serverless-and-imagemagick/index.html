@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creating a 'Memes as a Service' using Lambda, Serverless and ImageMagick">
+    <meta name="description" content="Learn how to create a 'Memes as a Service' platform using AWS Lambda, the Serverless Framework, and ImageMagick. A step-by-step guide with code examples.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/memes-as-a-service-using-lambda-serverless-and-imagemagick/" />
     
 
     <script>
@@ -52,32 +50,32 @@
                 <article class="post">
     <h1 class="post-title">'Memes as a Service' using Lambda, Serverless and ImageMagick</h1>
     <time datetime="2017-12-04T00:00:00+00:00" class="post-date">04 Dec 2017</time>
-    <p>I’ve recently been getting really interested in the concept of Functions as a Service (FaaS) and the <a href="https://serverless.com/">Serverless Framework</a>.
-I decided to make a little experimental AWS Lambda, to see how I could use it to manipulate images.
-For this contrived example I came up with the (silly) idea of ‘Memes as a Service’ (everything needs to be a service nowadays).</p>
+    <p>I’ve recently become really interested in the concept of Functions as a Service (FaaS) and the <a href="https://serverless.com/">Serverless Framework</a>.
+I decided to create a small experimental AWS Lambda function to explore how it could be used to manipulate images.
+For this contrived example, I came up with the (silly) idea of ‘Memes as a Service’ (everything needs to be a service nowadays).</p>
 
 
 
 <p>The consumer will be able to supply top and bottom text, along with specifying the desired supporting image.
-Fortunately the stock Lambda Node.js environment comes equipped with support for the popular <a href="https://www.imagemagick.org/">ImageMagick</a>.
-In this blog post I wish to present how I went about solving this problem using the Serverless Framework.</p>
+Fortunately, the stock Lambda Node.js environment comes equipped with support for the popular <a href="https://www.imagemagick.org/">ImageMagick</a>.
+In this blog post, I will present how I went about solving this problem using the Serverless Framework.</p>
 
-<h3 id="setup-and-configuration">Setup and Configuration</h3>
+<h2 id="setup-and-configuration">Setup and Configuration</h2>
 
-<p>I am going to assume that you already have the Serverless Framework and a AWS Access Key present on your development machine.
-With these installed we are first going to create a new Serverless application, based on the provided template.</p>
+<p>I will assume that you already have the Serverless Framework and an AWS Access Key set up on your development machine.
+With these installed, we first create a new Serverless application based on the provided template.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless create <span class="nt">--template</span> aws-nodejs <span class="nt">--path</span> memes-as-a-service
 </code></pre></div></div>
 
-<p>We should now be able to go into the newly created <code class="language-plaintext highlighter-rouge">memes-as-a-service</code> directory.
-As we are wanting to interact with ImageMagick, we also need to include the <a href="http://aheckmann.github.io/gm/">suitable package</a> for Node.js.</p>
+<p>We should now be able to navigate into the newly created <code class="language-plaintext highlighter-rouge">memes-as-a-service</code> directory.
+As we want to interact with ImageMagick, we also need to include the <a href="http://aheckmann.github.io/gm/">suitable package</a> for Node.js.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>gm <span class="nt">--save</span>
 </code></pre></div></div>
 
-<p>The next step is to open up the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file.
-This file outlines the provider information (as the framework can handle other platforms such as <a href="https://cloud.google.com/">Google Cloud</a>), desired supporting resources and necessary function wiring.
+<p>The next step is to open the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file.
+This file outlines the provider information (as the framework can handle other platforms such as <a href="https://cloud.google.com/">Google Cloud</a>), the required supporting resources, and the necessary function wiring.
 Replace the sample contents of this file with the YAML definition below:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">meme-as-a-service</span>
@@ -109,18 +107,18 @@ Replace the sample contents of this file with the YAML definition below:</p>
           <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
 </code></pre></div></div>
 
-<p>Within this definition we are simply configuring an AWS Lambda Node.js based container.
-We are providing a couple of environment variables which are going to be accessible within our function implementations.
-We then use a <a href="https://github.com/maciejtreder/serverless-apigw-binary">Serverless plugin</a> to correctly add the desired binary support to the API Gateway.
-Finally, we define the single function, taking advantage of how the framework works with <a href="https://aws.amazon.com/cloudformation/">CloudFormation</a> to correctly wire it up to <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>.
-Before continuing we should include the Serverless plugin we have defined as a development dependency.</p>
+<p>In this definition, we configure an AWS Lambda Node.js-based container.
+We provide a couple of environment variables that will be accessible within our function implementations.
+We then use a <a href="https://github.com/maciejtreder/serverless-apigw-binary">Serverless plugin</a> to correctly add the required binary support to the API Gateway.
+Finally, we define the single function, taking advantage of how the framework integrates with <a href="https://aws.amazon.com/cloudformation/">CloudFormation</a> to correctly wire it up to <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>.
+Before continuing, we should include the Serverless plugin as a development dependency.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>serverless-apigw-binary <span class="nt">--save-dev</span>
 </code></pre></div></div>
 
-<h3 id="implementation">Implementation</h3>
+<h2 id="implementation">Implementation</h2>
 
-<p>Now with the blueprint in-place we can go about creating the implementation.
+<p>Now, with the blueprint in place, we can create the implementation.
 Replace the sample <code class="language-plaintext highlighter-rouge">handler.js</code> contents with the following:</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
@@ -164,24 +162,24 @@ Replace the sample <code class="language-plaintext highlighter-rouge">handler.js
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>The function simply takes in the query string input from the client and uses ImageMagick to add the provided text at the top and bottom of the desired image.
-The Lambda itself contains a directory (specified within the environment) of all the available images that the client can choose from.
-We also include the font in the distribution that we want to print the text as.
-An interesting piece is the action of Base-64 encoding the image response.
-API Gateway supports <a href="https://aws.amazon.com/about-aws/whats-new/2016/11/binary-data-now-supported-by-api-gateway/">binary responses</a>, but to enable this we must provide the <code class="language-plaintext highlighter-rouge">isBase64Encoded</code> flag along with the desired <code class="language-plaintext highlighter-rouge">Content-Type</code>.
-We have previously configured the media types that we wish to be treated as binary within API Gateway, using the added plugin.
-As by-default the framework configures each API Gateway route to be in proxy mode, this is all that is required from us to return the generated contents.</p>
+<p>The function takes the query string input from the client and uses ImageMagick to add the provided text at the top and bottom of the selected image.
+The Lambda function contains a directory (specified in the environment variables) of all available images that the client can choose from.
+We also include the font in the distribution that we want to use for the text.
+An interesting aspect is the Base64 encoding of the image response.
+API Gateway supports <a href="https://aws.amazon.com/about-aws/whats-new/2016/11/binary-data-now-supported-by-api-gateway/">binary responses</a>, but to enable this, we must provide the <code class="language-plaintext highlighter-rouge">isBase64Encoded</code> flag along with the correct <code class="language-plaintext highlighter-rouge">Content-Type</code>.
+We previously configured the media types that we want to be treated as binary within API Gateway using the added plugin.
+Since the framework configures each API Gateway route to be in proxy mode by default, this is all we need to return the generated content.</p>
 
-<h3 id="deployment">Deployment</h3>
+<h2 id="deployment">Deployment</h2>
 
-<p>Finally, we are now able to try out this service by running:</p>
+<p>Finally, we can test this service by running:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless deploy <span class="nt">-v</span>
 </code></pre></div></div>
 
-<p>I always tend to provide the <code class="language-plaintext highlighter-rouge">verbose</code> flag as it gives you good insight into what is happening within the framework under-the-hood.
-With this now deployed you can visit the resulting API Gateway endpoint and begin experimenting with generating your own memes!
-You can find the code in its entirety, along with supporting assets in <a href="https://github.com/eddmann/memes-as-a-service-serverless">this</a> GitHub repository.</p>
+<p>I always use the <code class="language-plaintext highlighter-rouge">verbose</code> flag as it provides useful insight into what is happening within the framework under the hood.
+Once deployed, you can visit the resulting API Gateway endpoint and experiment with generating your own memes!
+You can find the complete code, along with supporting assets, in <a href="https://github.com/eddmann/memes-as-a-service-serverless">this</a> GitHub repository.</p>
 
 <p><img src="/uploads/memes-as-a-service/memes.jpg" alt="Memes as a Service" /></p>
 

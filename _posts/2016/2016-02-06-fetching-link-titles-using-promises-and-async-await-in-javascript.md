@@ -1,15 +1,16 @@
 ---
 layout: post
 title: 'Fetching Link Titles using Promises and Async/Await in JavaScript'
-meta: 'Exploring ways to use Promises and Async/Await to fetch Link Titles from the Clipboard'
+meta: 'Explore how to fetch link titles from the clipboard using Promises and Async/Await in JavaScript.'
+tags: javascript
 ---
 
-One tool that I use on a regular basis when compiling the notes for a [Three Devs and a Maybe](http://threedevsandamaybe.com/) episode is a tool for converting a clipboard full of links into a Markdown formatted list.
+One tool that I use on a regular basis when compiling the notes for a [Three Devs and a Maybe](http://threedevsandamaybe.com/) episode is a tool for converting a clipboard full of links into a Markdown-formatted list.
 I created this tool a while back in Python and thought it would be interesting to see how it may look in JavaScript when combined with Promises and Async/Await functions.
 
 <!--more-->
 
-The implementations below uses the following Node dependencies.
+The implementations below use the following Node dependencies.
 
 ```js
 import fetch from 'node-fetch';
@@ -34,8 +35,8 @@ const fetchClipboardLinks = () => fromClipboard().then(toLinks);
 
 ## Fetching and Extracting Link Titles
 
-Now that we have the desired input we can fetch and extract the titles for each of the links.
-Notice how I have created functions which handle an individual link transformation, and then used a `Promise.all` invocation to handle the array provided.
+Now that we have the desired input, we can fetch and extract the titles for each of the links.
+Notice how I have created functions that handle an individual link transformation and then used a `Promise.all` invocation to handle the array provided.
 
 ```js
 const extractTitle = r =>
@@ -61,10 +62,10 @@ const toMarkdownList = arr =>
 const toClipboard = x => new Promise((res, _) => copy(x, () => res(x)));
 ```
 
-## Putting it Together
+## Putting It Together
 
-The functions we have created are very small, and as a result very descriptive/composable in their nature.
-Below is a basic Promise based approach to stitching the functions together to solve the problem laid out.
+The functions we have created are very small and, as a result, very descriptive and composable in their nature.
+Below is a basic Promise-based approach to stitching the functions together to solve the problem laid out.
 
 ```js
 fetchClipboardLinks()
@@ -75,7 +76,7 @@ fetchClipboardLinks()
   .catch(console.error);
 ```
 
-We are also able to take advantage of a proposed ES2016 feature which will add async/await capabilites to JavaScript.
+We are also able to take advantage of a proposed ES2016 feature that will add async/await capabilities to JavaScript.
 You will notice that the solution below follows a more sequential flow, allowing you to clearly see how each asynchronous part is built up and combined to produce the result.
 
 ```js

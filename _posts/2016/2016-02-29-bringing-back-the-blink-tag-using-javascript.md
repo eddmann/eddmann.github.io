@@ -1,11 +1,12 @@
 ---
 layout: post
 title: 'Bringing Back the Blink Tag using JavaScript'
-meta: 'Quick implementation to bring back the Blink tag to modern browsers'
+meta: 'A quick JavaScript implementation to revive the nostalgic Blink tag in modern browsers.'
+tags: javascript
 ---
 
-Who doesn't miss the the `blink` tag that was ever-present in years past.
-I thought it would be fun to quickly code up a JavaScript implementation which replicated the functionality that has 'sadly' been removed in modern browsers.
+Who doesn't miss the `blink` tag that was ever-present in years past?
+I thought it would be fun to quickly code up a JavaScript implementation that replicates the functionality that has 'sadly' been removed in modern browsers.
 
 <!--more-->
 

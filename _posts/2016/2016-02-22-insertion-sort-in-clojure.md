@@ -1,12 +1,14 @@
 ---
 layout: post
-title: 'Insertion-sort in Clojure'
-meta: 'Implementing the Insertion-sort algorithm in Clojure'
+title: 'Insertion Sort in Clojure'
+meta: 'Learn how to implement the Insertion Sort algorithm in Clojure using a functional approach.'
+tags: clojure algorithms functional-programming
 ---
 
-The next sorting algorithm I have decided to explore is the Insertion-sort.
-This sorting technique can be completed in-place, however, using Clojure we will instead be using a `reduce` to accumulate the final sorted collection.
-Each element is iteratively inserted into a 'new' collection which maintains a sorted invariant as shown in the implementation documented below.
+The next sorting algorithm I have decided to explore is the Insertion Sort.
+This sorting technique can be completed in-place.
+However, using Clojure, we will instead use `reduce` to accumulate the final sorted collection.
+Each element is iteratively inserted into a 'new' collection, which maintains a sorted invariant, as shown in the implementation documented below.
 
 <!--more-->
 
@@ -23,5 +25,5 @@ Each element is iteratively inserted into a 'new' collection which maintains a s
 (insertion-sort [3 2 1]) ; [1 2 3]
 ```
 
-The `reduce` provides us with the infrastructure required around accumulating and iterating over each element within the provided collection.
-The use of a private helper function gives us the ability to correctly insert the target element within the resulting collection.
+The `reduce` function provides us with the necessary infrastructure for accumulating and iterating over each element within the provided collection.
+The use of a private helper function allows us to correctly insert the target element into the resulting collection.

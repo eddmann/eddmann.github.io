@@ -68,7 +68,7 @@ This can be clearly seen in the following two examples:</p>
 <p>These two examples both attempt to fetch a shopping cart from a repository, which, by looking at the defined guards, may not exist.
 As a result of this, we are required to write extra boilerplate code to handle the possibility of failure, using either a conditional block with reassignment or the ternary null trick provided within PHP.</p>
 
-<h3 id="using-traits">Using Traits</h3>
+<h2 id="using-traits">Using Traits</h2>
 
 <p>I was interested to see if there were any other ways of more clearly expressing this intent, following the popular control-flow concept provided within Optional types.</p>
 
@@ -110,7 +110,7 @@ This method now reads as one that expects the possibility of a non-existent or a
 The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation — resulting in the possibility of a new cart being created but never required.
 Instead, the value is wrapped in a function which is lazily called by the trait implementation if needed.</p>
 
-<h3 id="using-composition">Using Composition</h3>
+<h2 id="using-composition">Using Composition</h2>
 
 <p>If you are against the idea of altering the behaviour of the class by adding a trait — and instead wish to perform such actions ad hoc — the following example shows how the same can be achieved through composition.</p>
 
@@ -143,7 +143,7 @@ This implementation can then be used in the following manner.</p>
 <span class="nv">$cart</span> <span class="o">=</span> <span class="nv">$orElseRepository</span><span class="o">-&gt;</span><span class="nf">findByIdOrElse</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">new</span> <span class="nc">ShoppingCart</span><span class="p">);</span>
 </code></pre></div></div>
 
-<h3 id="using-basic-functions">Using Basic Functions</h3>
+<h2 id="using-basic-functions">Using Basic Functions</h2>
 
 <p>Finally, a completely different way to control the flow of returned values is by coding up a simple function as follows.</p>
 

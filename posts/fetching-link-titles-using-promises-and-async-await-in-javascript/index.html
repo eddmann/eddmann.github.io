@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring ways to use Promises and Async/Await to fetch Link Titles from the Clipboard">
+    <meta name="description" content="Explore how to fetch link titles from the clipboard using Promises and Async/Await in JavaScript.">
 
     <title>
         
@@ -50,12 +50,12 @@
                 <article class="post">
     <h1 class="post-title">Fetching Link Titles using Promises and Async/Await in JavaScript</h1>
     <time datetime="2016-02-06T00:00:00+00:00" class="post-date">06 Feb 2016</time>
-    <p>One tool that I use on a regular basis when compiling the notes for a <a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> episode is a tool for converting a clipboard full of links into a Markdown formatted list.
+    <p>One tool that I use on a regular basis when compiling the notes for a <a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> episode is a tool for converting a clipboard full of links into a Markdown-formatted list.
 I created this tool a while back in Python and thought it would be interesting to see how it may look in JavaScript when combined with Promises and Async/Await functions.</p>
 
 
 
-<p>The implementations below uses the following Node dependencies.</p>
+<p>The implementations below use the following Node dependencies.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">fetch</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-fetch</span><span class="dl">'</span><span class="p">;</span>
 <span class="k">import</span> <span class="p">{</span> <span class="nx">AllHtmlEntities</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">html-entities</span><span class="dl">'</span><span class="p">;</span>
@@ -78,8 +78,8 @@ You will notice that I am wrapping the callback-based <code class="language-plai
 
 <h2 id="fetching-and-extracting-link-titles">Fetching and Extracting Link Titles</h2>
 
-<p>Now that we have the desired input we can fetch and extract the titles for each of the links.
-Notice how I have created functions which handle an individual link transformation, and then used a <code class="language-plaintext highlighter-rouge">Promise.all</code> invocation to handle the array provided.</p>
+<p>Now that we have the desired input, we can fetch and extract the titles for each of the links.
+Notice how I have created functions that handle an individual link transformation and then used a <code class="language-plaintext highlighter-rouge">Promise.all</code> invocation to handle the array provided.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">extractTitle</span> <span class="o">=</span> <span class="nx">r</span> <span class="o">=&gt;</span>
   <span class="nx">r</span><span class="p">.</span><span class="nx">ok</span> <span class="p">?</span> <span class="nx">r</span><span class="p">.</span><span class="nx">text</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">t</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/&lt;title</span><span class="se">[^</span><span class="sr">&gt;</span><span class="se">]</span><span class="sr">*&gt;</span><span class="se">([^</span><span class="sr">&lt;</span><span class="se">]</span><span class="sr">+</span><span class="se">)</span><span class="sr">&lt;</span><span class="se">\/</span><span class="sr">title&gt;/</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="p">:</span> <span class="dl">''</span><span class="p">;</span>
@@ -103,10 +103,10 @@ Notice how I have created functions which handle an individual link transformati
 <span class="kd">const</span> <span class="nx">toClipboard</span> <span class="o">=</span> <span class="nx">x</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">_</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">copy</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">(</span><span class="nx">x</span><span class="p">)));</span>
 </code></pre></div></div>
 
-<h2 id="putting-it-together">Putting it Together</h2>
+<h2 id="putting-it-together">Putting It Together</h2>
 
-<p>The functions we have created are very small, and as a result very descriptive/composable in their nature.
-Below is a basic Promise based approach to stitching the functions together to solve the problem laid out.</p>
+<p>The functions we have created are very small and, as a result, very descriptive and composable in their nature.
+Below is a basic Promise-based approach to stitching the functions together to solve the problem laid out.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fetchClipboardLinks</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">ls</span> <span class="o">=&gt;</span> <span class="nx">fetchTitlesForLinks</span><span class="p">(</span><span class="nx">ls</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">zip</span><span class="p">(</span><span class="nx">ls</span><span class="p">)))</span>
@@ -116,7 +116,7 @@ Below is a basic Promise based approach to stitching the functions together to s
   <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>We are also able to take advantage of a proposed ES2016 feature which will add async/await capabilites to JavaScript.
+<p>We are also able to take advantage of a proposed ES2016 feature that will add async/await capabilities to JavaScript.
 You will notice that the solution below follows a more sequential flow, allowing you to clearly see how each asynchronous part is built up and combined to produce the result.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">async</span> <span class="kd">function</span> <span class="nx">linksToMarkdownList</span><span class="p">()</span> <span class="p">{</span>

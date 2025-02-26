@@ -24,7 +24,7 @@ $cart = $repository->findById(1) ?: new ShoppingCart;
 These two examples both attempt to fetch a shopping cart from a repository, which, by looking at the defined guards, may not exist.
 As a result of this, we are required to write extra boilerplate code to handle the possibility of failure, using either a conditional block with reassignment or the ternary null trick provided within PHP.
 
-### Using Traits
+## Using Traits
 
 I was interested to see if there were any other ways of more clearly expressing this intent, following the popular control-flow concept provided within Optional types.
 
@@ -68,7 +68,7 @@ This method now reads as one that expects the possibility of a non-existent or a
 The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation — resulting in the possibility of a new cart being created but never required.
 Instead, the value is wrapped in a function which is lazily called by the trait implementation if needed.
 
-### Using Composition
+## Using Composition
 
 If you are against the idea of altering the behaviour of the class by adding a trait — and instead wish to perform such actions ad hoc — the following example shows how the same can be achieved through composition.
 
@@ -103,7 +103,7 @@ $orElseRepository = new OrElse($repository);
 $cart = $orElseRepository->findByIdOrElse(1, new ShoppingCart);
 ```
 
-### Using Basic Functions
+## Using Basic Functions
 
 Finally, a completely different way to control the flow of returned values is by coding up a simple function as follows.
 

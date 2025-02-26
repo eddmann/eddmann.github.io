@@ -1,20 +1,22 @@
 ---
 layout: post
 title: 'AVL Trees in Clojure'
-meta: 'Implementing the self-balancing AVL binary search tree in Clojure'
+meta: 'Learn how to implement a self-balancing AVL binary search tree in Clojure, ensuring optimal search performance through automatic rebalancing.'
+tags: clojure data-structures functional-programming
 ---
 
-An AVL tree is a self-balancing binary search tree, where-by the height of a node's children differ by at most one.
-In the event that this property is violated a re-balancing process takes place. <!--more-->
-In the past I have discussed how to implement a [Binary Search Tree in Clojure](/posts/binary-search-trees-in-clojure/), providing average time complexity of O(log n).
-However, in the event that the order of insertion is sequential (either every value greater than, or every value less than the last), time complexity increases to be linear, the same as a linked-list.
-Self-balancing trees such as the AVL variant provide us with the familiar worst-case of O(log n), thanks to it's re-balancing phase.
+An AVL tree is a self-balancing binary search tree, whereby the height of a node's children differs by at most one.
+In the event that this property is violated, a rebalancing process takes place. <!--more-->
+In the past, I have discussed how to implement a [Binary Search Tree in Clojure](/posts/binary-search-trees-in-clojure/), providing an average time complexity of O(log n).
+However, if the order of insertion is sequential (where each value is either greater than or less than the last), time complexity increases to be linear, the same as a linked list.
+Self-balancing trees, such as the AVL variant, provide us with a worst-case complexity of O(log n), thanks to their rebalancing phase.
 
-### Balance Factor
+## Balance Factor
 
-Using the previous Binary Search Tree implementation as a base, we are able to expand upon this to include the AVL property.
-For the sake of performance you would typically store the height of each nodes children within the structure, however, as I wish to re-use the existing implementation I will instead calculate their height upon `factor` invocation.
-The balance factor per. node is calculated by the difference between the two child node's heights, as shown below.
+Using the previous Binary Search Tree implementation as a base, we can expand upon this to include the AVL property.
+For the sake of performance, you would typically store the height of each node's children within the structure.
+However, as I wish to reuse the existing implementation, I will instead calculate their height upon `factor` invocation.
+The balance factor of a node is calculated as the difference between the heights of its two child nodes, as shown below.
 
 ```clojure
 (defn height
@@ -29,11 +31,11 @@ The balance factor per. node is calculated by the difference between the two chi
   (- (height left) (height right)))
 ```
 
-The above two functions provide us with the described behavior, allowing us to supply a root node and return it's balance factor.
+The above two functions provide the described behaviour, allowing us to supply a root node and return its balance factor.
 
-### Rotations
+## Rotations
 
-So as to complete the final re-balancing step we must also be able to rotate a given node both left and right within the tree structure.
+To complete the final rebalancing step, we must also be able to rotate a given node both left and right within the tree structure.
 
 ```clojure
 (defn rotate-left [{:keys [el left right] :as tree}]
@@ -49,9 +51,9 @@ So as to complete the final re-balancing step we must also be able to rotate a g
 
 This can be achieved as shown above, taking advantage of an immutable approach.
 
-### Re-balancing Phase
+## Rebalancing Phase
 
-With the balance factor and rotation actions now available, we are able to begin work on the four different situations a node could be placed in that would require a tree rotation.
+With the balance factor and rotation actions now available, we can begin working on the four different situations where a node's placement requires a tree rotation.
 
 ![Left Right, Left Left Cases](/uploads/avl-trees-in-clojure/lr-ll-cases.png)
 
@@ -73,7 +75,7 @@ With the balance factor and rotation actions now available, we are able to begin
   (and (is-right-case? tree) (< (factor (:left tree)) 0)))
 ```
 
-With these conditions now locatable, we can apply the desired tree rotations which can be seen visualised in the diagrams above.
+With these conditions now identifiable, we can apply the desired tree rotations, as visualised in the diagrams above.
 
 ```clojure
 (defn balance [{:keys [el left right] :as tree}]
@@ -85,9 +87,9 @@ With these conditions now locatable, we can apply the desired tree rotations whi
     :else tree))
 ```
 
-### Example Usage
+## Example Usage
 
-Finally, we are able to create a new AVL insertion/deletion variant, that is a composition of the Binary Search Tree functions and the newly created `balance` one.
+Finally, we can create new AVL insertion and deletion variants by composing the Binary Search Tree functions with the newly created `balance` function.
 
 ```clojure
 (def avl-insert (comp balance insert))
@@ -95,11 +97,11 @@ Finally, we are able to create a new AVL insertion/deletion variant, that is a c
 (def seq->avl (partial reduce avl-insert nil))
 ```
 
-These created data-structures can then be visualised using the following function.
+These data structures can then be visualised using the following function.
 
 ```clojure
 (defn tabs [n]
-  (clojure.string/join(repeat n "\t")))
+  (clojure.string/join (repeat n "\t")))
 
 (defn visualise
   ([tree] (visualise tree 0))

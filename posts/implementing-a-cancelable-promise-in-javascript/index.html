@@ -3,11 +3,11 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creating a Promise in JavaScript that can be cancelled">
+    <meta name="description" content="Learn how to implement a cancellable Promise in JavaScript to prevent React state updates on unmounted components.">
 
     <title>
         
-            Implementing a Cancelable Promise in JavaScript &middot; Edd Mann
+            Implementing a Cancellable Promise in JavaScript &middot; Edd Mann
         
     </title>
 
@@ -48,11 +48,11 @@
 
             <main>
                 <article class="post">
-    <h1 class="post-title">Implementing a Cancelable Promise in JavaScript</h1>
+    <h1 class="post-title">Implementing a Cancellable Promise in JavaScript</h1>
     <time datetime="2016-01-28T00:00:00+00:00" class="post-date">28 Jan 2016</time>
-    <p>I recently was working on a React component which complained about its state being set when it was not mounted.
-This was due to a uncompleted promise being resolved when the component had since been unmounted.
-To solve this issue I was able to use the concept of a cancelable promise which would be canceled before the component was unmounted.</p>
+    <p>I was recently working on a React component that complained about its state being set when it was not mounted.
+This was due to an uncompleted promise being resolved after the component had already been unmounted.
+To solve this issue, I used the concept of a cancellable promise, which could be cancelled before the component was unmounted.</p>
 
 
 
@@ -72,7 +72,7 @@ To solve this issue I was able to use the concept of a cancelable promise which 
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With the above implementation we are now able to produce some contrived examples to highlight its use.</p>
+<p>With the above implementation, we can now produce some contrived examples to highlight its use.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">log</span> <span class="o">=</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">console</span><span class="p">);</span>
 

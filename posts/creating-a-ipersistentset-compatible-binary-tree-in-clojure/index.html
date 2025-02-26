@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Implementing IPersistentSet as a Binary Tree in Clojure">
+    <meta name="description" content="Learn how to implement IPersistentSet using a Binary Tree in Clojure, making it compatible with existing Clojure functions and libraries.">
 
     <title>
         
@@ -50,13 +50,13 @@
                 <article class="post">
     <h1 class="post-title">Creating a IPersistentSet compatible Binary Tree in Clojure</h1>
     <time datetime="2016-01-27T00:00:00+00:00" class="post-date">27 Jan 2016</time>
-    <p>Following on from my article on Binary Search Trees <a href="/posts/binary-search-trees-in-clojure/">last week</a>, I decided to see how I could use types and interfaces to implement the glue that is required to make the Binary Tree implementation compatible with the <code class="language-plaintext highlighter-rouge">clojure.lang.IPersistentSet</code> interface. 
-In doing so, this would allow any library or function requiring an <code class="language-plaintext highlighter-rouge">IPersistentSet</code> to use the Binary Tree data-structure.</p>
+    <p>Following on from my article on Binary Search Trees <a href="/posts/binary-search-trees-in-clojure/">last week</a>, I decided to explore how I could use types and interfaces to implement the glue required to make the Binary Tree implementation compatible with the <code class="language-plaintext highlighter-rouge">clojure.lang.IPersistentSet</code> interface. 
+By doing so, any library or function requiring an <code class="language-plaintext highlighter-rouge">IPersistentSet</code> would be able to use the Binary Tree data structure seamlessly.</p>
 
 <h2 id="prerequisites">Prerequisites</h2>
 
-<p>At the end of the previous article we were left with a handful of useful functions which worked with the Binary Search Tree data-structure we had developed.
-For a recap, below are the definitions for each of the functions.</p>
+<p>At the end of the previous article, we had a handful of useful functions that worked with the Binary Search Tree data structure we had developed.
+For a recap, below are the definitions for each of these functions.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">defrecord</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">])</span><span class="w">
 
@@ -67,10 +67,10 @@ For a recap, below are the definitions for each of the functions.</p>
 </span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">search</span><span class="w"> </span><span class="p">[</span><span class="n">tree</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w"> </span><span class="n">...</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="implementing-the-ipersistentset-interface">Implementing the IPersistentSet interface</h2>
+<h2 id="implementing-the-ipersistentset-interface">Implementing the IPersistentSet Interface</h2>
 
-<p>In the code laid out below we are providing a wrapper around the functions that we have already developed - for the contract that is needed to become a <code class="language-plaintext highlighter-rouge">IPersistentSet</code>.
-Creating a new type called <code class="language-plaintext highlighter-rouge">BinaryTree</code> which holds a root tree node, allows us to easily handle the use-case of an empty set, along with logical proxying to the existing functions.</p>
+<p>In the code below, we provide a wrapper around the functions that we have already developed, ensuring they conform to the contract required for an <code class="language-plaintext highlighter-rouge">IPersistentSet</code>.
+Creating a new type called <code class="language-plaintext highlighter-rouge">BinaryTree</code>, which holds a root tree node, allows us to easily handle the use case of an empty set while logically proxying to the existing functions.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">deftype</span><span class="w"> </span><span class="n">BinaryTree</span><span class="w"> </span><span class="p">[</span><span class="n">tree</span><span class="p">]</span><span class="w">
   </span><span class="n">clojure.lang.IPersistentSet</span><span class="w">
@@ -87,10 +87,10 @@ Creating a new type called <code class="language-plaintext highlighter-rouge">Bi
   </span><span class="p">(</span><span class="nf">invoke</span><span class="w"> </span><span class="p">[</span><span class="n">this</span><span class="w"> </span><span class="n">value</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="n">this</span><span class="w"> </span><span class="n">value</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<h2 id="example">Example</h2>
+<h2 id="example-usage">Example Usage</h2>
 
-<p>We are now able to supply a <code class="language-plaintext highlighter-rouge">BinaryTree</code> in any place that desires a <code class="language-plaintext highlighter-rouge">IPersistentSet</code> compatible type.
-When the function is invoked Clojure polymorphically dispatches to the correct types function implementation.</p>
+<p>We can now use a <code class="language-plaintext highlighter-rouge">BinaryTree</code> anywhere that requires an <code class="language-plaintext highlighter-rouge">IPersistentSet</code>-compatible type.
+When a function is invoked, Clojure polymorphically dispatches to the correct type’s function implementation.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">xs</span><span class="w"> </span><span class="p">(</span><span class="nb">into</span><span class="w"> </span><span class="p">(</span><span class="nf">BinaryTree.</span><span class="w"> </span><span class="n">nil</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">range</span><span class="w"> </span><span class="mi">10</span><span class="p">)))</span><span class="w"> </span><span class="c1">; #{0 1 2 3 4 5 6 7 8 9}</span><span class="w">
 </span><span class="p">(</span><span class="nb">disj</span><span class="w"> </span><span class="n">xs</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="c1">; #{0 1 2 3 5 6 7 8 9}</span><span class="w">

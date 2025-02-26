@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explaining solutions to implementing Promise.all and Promise.race in JavaScript">
+    <meta name="description" content="Learn how to implement Promise.all and Promise.race in JavaScript, handling multiple asynchronous operations efficiently.">
 
     <title>
         
@@ -50,16 +50,16 @@
                 <article class="post">
     <h1 class="post-title">Implementing Promise.all and Promise.race in JavaScript</h1>
     <time datetime="2016-01-22T00:00:00+00:00" class="post-date">22 Jan 2016</time>
-    <p>Throughout the past couple of months much of the JavaScript development I have been involved with has revolved around <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>.
+    <p>Throughout the past couple of months, much of the JavaScript development I have been involved with has revolved around <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a>.
 Promises are a simple abstraction to handle deferred and asynchronous computations.
-This lunchtime I decided to see how one would go about implementing two concepts that are present in the Promise standard (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all"><code class="language-plaintext highlighter-rouge">all</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race"><code class="language-plaintext highlighter-rouge">race</code></a>).</p>
+This lunchtime, I decided to see how one would go about implementing two concepts that are present in the Promise standard: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all"><code class="language-plaintext highlighter-rouge">all</code></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race"><code class="language-plaintext highlighter-rouge">race</code></a>.</p>
 
 
 
 <h2 id="promiseall">Promise.all</h2>
 
 <p>This function is used to compose multiple supplied promises into a single returned promise that provides the resulting values in array form.
-Looking at the implementation documented below you can see how relativity easy it is to compose these promises together, adding logic in-between resolutions to accumulate the final value returned.</p>
+Looking at the implementation documented below, you can see how relatively easy it is to compose these promises together, adding logic in between resolutions to accumulate the final value returned.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">all</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">promises</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">results</span> <span class="o">=</span> <span class="p">[];</span>
@@ -73,7 +73,7 @@ Looking at the implementation documented below you can see how relativity easy i
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We are able to use this solution in a couple of contrived examples, initially highlighting the ‘happy path’ of three separate promises being resolved, before moving on to handling the case were a promise is rejected.</p>
+<p>We can use this solution in a couple of contrived examples, initially highlighting the ‘happy path’ of three separate promises being resolved before moving on to handling the case where a promise is rejected.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">p1</span> <span class="o">=</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">);</span>
 <span class="kd">const</span> <span class="nx">p2</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">bar</span><span class="dl">'</span><span class="p">;</span>
@@ -94,9 +94,9 @@ Looking at the implementation documented below you can see how relativity easy i
 
 <h2 id="promiserace">Promise.race</h2>
 
-<p>Following on from the <code class="language-plaintext highlighter-rouge">all</code> implementation we are able to implement the <code class="language-plaintext highlighter-rouge">race</code> function that is also present in the standard.
-This function returns the first complete (resolved or rejected) promise from a supplied collection.
-Wrapping the supplied promises within a new promise who’s resolved and rejected function are called based on their actions, allows you to see how the race condition works.</p>
+<p>Following on from the <code class="language-plaintext highlighter-rouge">all</code> implementation, we can implement the <code class="language-plaintext highlighter-rouge">race</code> function that is also present in the standard.
+This function returns the first completed (resolved or rejected) promise from a supplied collection.
+Wrapping the supplied promises within a new promise whose resolved and rejected functions are called based on their actions allows you to see how the race condition works.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">race</span> <span class="o">=</span> <span class="p">(...</span><span class="nx">promises</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -104,7 +104,7 @@ Wrapping the supplied promises within a new promise who’s resolved and rejecte
   <span class="p">});</span>
 </code></pre></div></div>
 
-<p>We are able to highlight this implementation in an example, first depicting the ‘happy path’, followed by a rejection which is returned due to ‘winning the race’.</p>
+<p>We can highlight this implementation in an example, first depicting the ‘happy path’, followed by a rejection which is returned due to ‘winning the race’.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">p1</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">res</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="dl">'</span><span class="s1">foo</span><span class="dl">'</span><span class="p">);</span>

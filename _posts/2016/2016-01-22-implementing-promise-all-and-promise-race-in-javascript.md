@@ -1,19 +1,20 @@
 ---
 layout: post
 title: 'Implementing Promise.all and Promise.race in JavaScript'
-meta: 'Explaining solutions to implementing Promise.all and Promise.race in JavaScript'
+meta: 'Learn how to implement Promise.all and Promise.race in JavaScript, handling multiple asynchronous operations efficiently.'
+tags: javascript
 ---
 
-Throughout the past couple of months much of the JavaScript development I have been involved with has revolved around [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+Throughout the past couple of months, much of the JavaScript development I have been involved with has revolved around [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).
 Promises are a simple abstraction to handle deferred and asynchronous computations.
-This lunchtime I decided to see how one would go about implementing two concepts that are present in the Promise standard ([`all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) and [`race`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race)).
+This lunchtime, I decided to see how one would go about implementing two concepts that are present in the Promise standard: [`all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) and [`race`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race).
 
 <!--more-->
 
 ## Promise.all
 
 This function is used to compose multiple supplied promises into a single returned promise that provides the resulting values in array form.
-Looking at the implementation documented below you can see how relativity easy it is to compose these promises together, adding logic in-between resolutions to accumulate the final value returned.
+Looking at the implementation documented below, you can see how relatively easy it is to compose these promises together, adding logic in between resolutions to accumulate the final value returned.
 
 ```js
 const all = (...promises) => {
@@ -28,7 +29,7 @@ const all = (...promises) => {
 };
 ```
 
-We are able to use this solution in a couple of contrived examples, initially highlighting the 'happy path' of three separate promises being resolved, before moving on to handling the case were a promise is rejected.
+We can use this solution in a couple of contrived examples, initially highlighting the 'happy path' of three separate promises being resolved before moving on to handling the case where a promise is rejected.
 
 ```js
 const p1 = Promise.resolve('foo');
@@ -50,9 +51,9 @@ all(p1, p2, p3, p4)
 
 ## Promise.race
 
-Following on from the `all` implementation we are able to implement the `race` function that is also present in the standard.
-This function returns the first complete (resolved or rejected) promise from a supplied collection.
-Wrapping the supplied promises within a new promise who's resolved and rejected function are called based on their actions, allows you to see how the race condition works.
+Following on from the `all` implementation, we can implement the `race` function that is also present in the standard.
+This function returns the first completed (resolved or rejected) promise from a supplied collection.
+Wrapping the supplied promises within a new promise whose resolved and rejected functions are called based on their actions allows you to see how the race condition works.
 
 ```js
 const race = (...promises) =>
@@ -61,7 +62,7 @@ const race = (...promises) =>
   });
 ```
 
-We are able to highlight this implementation in an example, first depicting the 'happy path', followed by a rejection which is returned due to 'winning the race'.
+We can highlight this implementation in an example, first depicting the 'happy path', followed by a rejection which is returned due to 'winning the race'.
 
 ```js
 const p1 = new Promise((res, rej) => {

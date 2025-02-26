@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploration of the Maybe type in JavaScript">
+    <meta name="description" content="Explore the Maybe type in JavaScript, including its implementation and practical examples for safe handling of null and undefined values.">
 
     <title>
         
@@ -50,16 +50,19 @@
                 <article class="post">
     <h1 class="post-title">Maybe in JavaScript</h1>
     <time datetime="2016-06-08T00:00:00+00:00" class="post-date">08 Jun 2016</time>
-    <p>Recently I have been delving into the concepts of <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">Functors</a> and <a href="http://learnyouahaskell.com/a-fistful-of-monads">Monads</a>.
-There are many good <a href="https://curiosity-driven.org/monads-in-javascript">resources</a> available online that will do a far better job of explaining these concepts than me, however, I do wish to document an example Maybe type I have implemented in JavaScript.
-Again, there are many good external <a href="http://sean.voisen.org/blog/2013/10/intro-monads-maybe/">resources</a> which highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more.
-</p>
+    <p>Recently, I have been delving into the concepts of <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">Functors</a> and <a href="http://learnyouahaskell.com/a-fistful-of-monads">Monads</a>.
+There are many good <a href="https://curiosity-driven.org/monads-in-javascript">resources</a> available online that will do a far better job of explaining these concepts than I could.
+However, I do wish to document an example of a Maybe type I have implemented in JavaScript.
+Again, there are many excellent external <a href="http://sean.voisen.org/blog/2013/10/intro-monads-maybe/">resources</a> that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more.</p>
+
+
 
 <h3 id="implementation">Implementation</h3>
 
 <p>The Maybe type encapsulates the concept of Some (contains a value) and None (no value present).
-With these two abstractions we are able to safety handle the event of no value being present, without NullPointerException’s being thrown and null checks.</p>
+With these two abstractions, we can safely handle cases where no value is present, avoiding NullPointerException errors and excessive null checks.</p>
 
+<!--prettier-ignore-->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">Maybe</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">Some</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span> <span class="p">};</span>
   <span class="nx">Some</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fmap</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">Maybe</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">));</span> <span class="p">};</span>
@@ -86,9 +89,10 @@ We then return the ability to take a value of a plain type and put it into a May
 <h3 id="division-by-zero-example">Division by Zero Example</h3>
 
 <p>The first example of using the Maybe type I will demonstrate is in the case of handling division by zero errors.
-In the event that the denominator is zero instead of throwing an exception or returning null (as shown in the basic <code class="language-plaintext highlighter-rouge">div</code> implementation) we will instead lift the function into the Maybe type and return a Some or None.
-This may not seem like much of a win at this time but when we later look at examples of composing these expressions together you will be shown its full power.</p>
+If the denominator is zero, instead of throwing an exception or returning null (as shown in the basic <code class="language-plaintext highlighter-rouge">div</code> implementation), we lift the function into the Maybe type and return a Some or None.
+This may not seem like much of a win at this point, but when we later look at examples of composing these expressions together, you will see its full power.</p>
 
+<!--prettier-ignore-->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">null</span> <span class="p">:</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span><span class="p">;</span>
 <span class="kd">const</span> <span class="nx">mdiv</span> <span class="o">=</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">lift</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
 
@@ -99,9 +103,10 @@ This may not seem like much of a win at this time but when we later look at exam
 
 <h3 id="property-retrieval-example">Property Retrieval Example</h3>
 
-<p>Another case were <code class="language-plaintext highlighter-rouge">undefined</code> values may appear in JavaScript is whilst retrieving properties from objects that may(not) be present.
-Again, we are able to highlight how the basic <code class="language-plaintext highlighter-rouge">get</code> function returns the object property or undefined if not present, were as lifting it into the Maybe type provides us with the Some and None abstractions.</p>
+<p>Another case where <code class="language-plaintext highlighter-rouge">undefined</code> values may appear in JavaScript is when retrieving properties from objects that may (or may not) be present.
+Again, we highlight how the basic <code class="language-plaintext highlighter-rouge">get</code> function returns the object property or undefined if not present, whereas lifting it into the Maybe type provides us with the Some and None abstractions.</p>
 
+<!--prettier-ignore-->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="kd">get</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">prop</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">]);</span>
 <span class="kd">const</span> <span class="nx">mget</span> <span class="o">=</span> <span class="p">(</span><span class="nx">prop</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">lift</span><span class="p">(</span><span class="kd">get</span><span class="p">(</span><span class="nx">prop</span><span class="p">));</span>
 
@@ -118,15 +123,17 @@ Again, we are able to highlight how the basic <code class="language-plaintext hi
 <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">age</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(25)</span>
 </code></pre></div></div>
 
-<p>We are then able to compose multiple <code class="language-plaintext highlighter-rouge">mget</code> functions together, handling application on the Maybe containers using <code class="language-plaintext highlighter-rouge">fmap</code> and <code class="language-plaintext highlighter-rouge">bind</code>.</p>
+<p>We can then compose multiple <code class="language-plaintext highlighter-rouge">mget</code> functions together, handling application on the Maybe containers using <code class="language-plaintext highlighter-rouge">fmap</code> and <code class="language-plaintext highlighter-rouge">bind</code>.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">fmap</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">functor</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">functor</span><span class="p">.</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
 <span class="kd">const</span> <span class="nx">bind</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">monad</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>You will notice that <code class="language-plaintext highlighter-rouge">fmap</code> double wraps the resulting value, this is due to as being a Functor definition its’ action is to wrap the resulting value (from our provided function) back into the given container.
-However, in the case of the <code class="language-plaintext highlighter-rouge">bind</code> Monad definition, it instead does not wrap the value back into the container upon completion, but instead relies on the function itself to return the correctly typed value.</p>
+<p>You will notice that <code class="language-plaintext highlighter-rouge">fmap</code> double-wraps the resulting value.
+This is because, as a Functor definition, its action is to wrap the resulting value (from our provided function) back into the given container.
+However, in the case of the <code class="language-plaintext highlighter-rouge">bind</code> Monad definition, it does not wrap the value back into the container upon completion but instead relies on the function itself to return the correctly typed value.</p>
 
+<!--prettier-ignore-->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getStreet</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">street</span><span class="dl">'</span><span class="p">)),</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">address</span><span class="dl">'</span><span class="p">));</span>
 <span class="nx">getStreet</span><span class="p">({</span> <span class="na">address</span><span class="p">:</span> <span class="p">{}</span> <span class="p">});</span> <span class="c1">// Some(None)</span>
 <span class="nx">getStreet</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(Some(Cinder Drive))</span>
@@ -138,10 +145,11 @@ However, in the case of the <code class="language-plaintext highlighter-rouge">b
 
 <h3 id="mimicking-do-notation-in-javascript">Mimicking Do Notation in JavaScript</h3>
 
-<p>You will notice when looking through Haskell examples how succinct the do notation is at handling the containers used.
-We are able to take advantage of the ability to phase JavaScript functions as strings to rewrite a language similar to this notation into one that can be executed.
-This allows us to clearly express the intent of the code as opposed to muddling it with the plumbing required to make it work with the containers.</p>
+<p>When looking at Haskell examples, you will notice how succinct the do notation is at handling the containers used.
+We can take advantage of JavaScript’s ability to parse functions as strings to rewrite a language similar to this notation into one that can be executed.
+This allows us to clearly express the intent of the code rather than cluttering it with the plumbing required to make it work with the containers.</p>
 
+<!--prettier-ignore-->
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">doM</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">tokenize</span> <span class="o">=</span> <span class="p">(</span><span class="nx">exp</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">exp</span>
     <span class="p">.</span><span class="nx">toString</span><span class="p">()</span>

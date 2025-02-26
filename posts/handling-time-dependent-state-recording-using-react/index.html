@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploration into handling Time-Dependent State Recording using React">
+    <meta name="description" content="Learn how to handle time-dependent state recording in React, including event logging, playback, and state management for seamless user interaction tracking.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/handling-time-dependent-state-recording-using-react/" />
     
 
     <script>
@@ -52,20 +50,21 @@
                 <article class="post">
     <h1 class="post-title">Handling Time-Dependent State Recording using React</h1>
     <time datetime="2016-02-24T00:00:00+00:00" class="post-date">24 Feb 2016</time>
-    <p>Sometimes you look at a feature request and think that it maybe a very tricky implementation to develop.
-I felt this way in regard to recording input fields in an recent application I have been working on.
-The idea was to be able to record a user’s interaction with a HTML component (in this case a textarea), and be able to replay these events (in real-time) at a later date.
+    <p>Sometimes, you look at a feature request and think that it may be a very tricky implementation to develop.
+I felt this way regarding recording input fields in a recent application I have been working on.
+The idea was to be able to record a user’s interaction with an HTML component (in this case, a textarea) and be able to replay these events (in real-time) at a later date.
 Thinking about how I would go about creating such an implementation in trivial JavaScript, with all the browser nuances and user input differences, was not very appealing.</p>
 
 
 
 <h2 id="enter-react">Enter React</h2>
 
-<p>Fortunately, we have recently added React into our stack, which when applied to a problem domain such as this made codifying a solution a breeze.
-Instead of thinking of each intricate DOM event, I was able to reason about the problem on a higher level, alternatively thinking in the manner of state changes.
-All the boilerplate required to handle <code class="language-plaintext highlighter-rouge">onChange</code> events was already provided within the library, and instead, I was able to take advantage of how React handles components’ internal state for my own extra requirements.
+<p>Fortunately, we have recently added React into our stack, which, when applied to a problem domain such as this, made codifying a solution a breeze.
+Instead of thinking of each intricate DOM event, I was able to reason about the problem on a higher level, alternatively thinking in terms of state changes.
+All the boilerplate required to handle <code class="language-plaintext highlighter-rouge">onChange</code> events was already provided within the library.
+Instead, I was able to take advantage of how React handles components’ internal state for my own extra requirements.
 The recording component documented below is really just logging each of the intermittent states that the component is in during its lifetime, in respect to its present value.
-These state changes (‘events’) are stored along with their respective timestamp, so as to provide the possibility for later time-dependent processing.</p>
+These state changes (‘events’) are stored along with their respective timestamp to provide the possibility for later time-dependent processing.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">RecordableTextArea</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">state</span> <span class="o">=</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="dl">''</span><span class="p">,</span> <span class="na">events</span><span class="p">:</span> <span class="p">[]</span> <span class="p">};</span>
@@ -101,9 +100,9 @@ These state changes (‘events’) are stored along with their respective timest
 
 <h2 id="handling-playback">Handling Playback</h2>
 
-<p>Now that we had a log of the state the textarea was in throughout its lifetime, the next step was to be able to replay these events.
-To achieve this a small amount of processing needed to occur in transforming the events timestamps into relative durations, which could be used within the implementation.
-With this in place, playback of each sequential event could be achieved by a simple <code class="language-plaintext highlighter-rouge">setTimeout</code> call which applied the associated state change to the playback value output.</p>
+<p>Now that we had a log of the states the textarea was in throughout its lifetime, the next step was to be able to replay these events.
+To achieve this, a small amount of processing needed to occur in transforming the event timestamps into relative durations, which could be used within the implementation.
+With this in place, playback of each sequential event could be achieved by a simple <code class="language-plaintext highlighter-rouge">setTimeout</code> call, which applied the associated state change to the playback value output.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">EventPlayback</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>
   <span class="nx">timer</span><span class="p">;</span>
@@ -154,7 +153,7 @@ With this in place, playback of each sequential event could be achieved by a sim
 
 <h2 id="putting-it-all-together">Putting It All Together</h2>
 
-<p>So as to highlight how simple the implementation truly is, you can wire-up the two components using the following component (demoable in <a href="http://output.jsbin.com/mupucu">this JSBin</a>) and experiment with how it works.
+<p>To highlight how simple the implementation truly is, you can wire up the two components using the following component (demoable in <a href="http://output.jsbin.com/mupucu">this JSBin</a>) and experiment with how it works.
 This implementation is really a proof-of-concept in many regards, and further work could be done to make a more generic component that could handle all kinds of time-dependent state logging and eventual playback.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">Demo</span> <span class="kd">extends</span> <span class="nx">React</span><span class="p">.</span><span class="nx">Component</span> <span class="p">{</span>

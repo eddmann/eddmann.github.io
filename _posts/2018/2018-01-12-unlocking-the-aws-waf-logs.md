@@ -52,7 +52,7 @@ Using a composition of several Promises, the below piece of code takes in the de
 We then query for all the present rules which are applied to this Web ACL, and then fetch these individual rule hits.
 Once we have this data, we flattern the results into a single dimensional array, which we then subsequently clean-up the client supplied headers.
 
-```javascript
+```js
 'use strict';
 
 const AWS = require('aws-sdk');

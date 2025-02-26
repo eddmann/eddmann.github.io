@@ -41,7 +41,7 @@ To get around this we took advantage of a [Origin Response Lambda](https://docs.
 To ensure that CloudFront had access to this Lambda we had to define it within the `us-east-1` region.
 Using the simple handler below we published a new version of the Lambda and copied the ARN into the CloudFront Distribution settings.
 
-```javascript
+```js
 'use strict';
 
 exports.handler = (event, context, callback) => {

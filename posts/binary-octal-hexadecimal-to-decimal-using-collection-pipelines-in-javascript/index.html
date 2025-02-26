@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Converting between numbering systems using JavaScript and Collection Pipelines">
+    <meta name="description" content="Learn how to convert binary, octal, and hexadecimal numbers to decimal using collection pipelines in JavaScript.">
 
     <title>
         
@@ -50,12 +50,12 @@
                 <article class="post">
     <h1 class="post-title">Binary/Octal/Hexadecimal to Decimal using Collection Pipelines in JavaScript</h1>
     <time datetime="2016-04-18T00:00:00+00:00" class="post-date">18 Apr 2016</time>
-    <p>In a recent <a href="https://twitter.com/adamwathan/status/720432624548900864">tweet</a> from Adam Wathan highlighting one of the examples in his <a href="http://adamwathan.me/refactoring-to-collections/">upcoming book</a>, he demonstrated breaking down the process of converting from binary to decimal representation using a pipeline of transformations.
-I thought it would again be interesting to see how I would go about performing this process in JavaScript.</p>
+    <p>In a recent <a href="https://twitter.com/adamwathan/status/720432624548900864">tweet</a> from Adam Wathan, highlighting one of the examples in his <a href="http://adamwathan.me/refactoring-to-collections/">upcoming book</a>, he demonstrated breaking down the process of converting from binary to decimal representation using a pipeline of transformations.
+I thought it would be interesting to see how I would go about performing this process in JavaScript.</p>
 
 
 
-<h3 id="binary">Binary</h3>
+<h2 id="binary">Binary</h2>
 
 <p>I began by implementing the binary to decimal function, following the signature present in PHP’s <code class="language-plaintext highlighter-rouge">bindec</code> function.</p>
 
@@ -71,9 +71,9 @@ I thought it would again be interesting to see how I would go about performing t
 <p>Looking at the implementation above, you will notice how we are able to break up the problem into a list of transformations.
 Starting by splitting up the string binary representation into characters, we then reverse this sequence and reduce the collection down into the single decimal result.</p>
 
-<h3 id="octal">Octal</h3>
+<h2 id="octal">Octal</h2>
 
-<p>From here I decided to see how easy it would be to re-create the <code class="language-plaintext highlighter-rouge">octdec</code> function.</p>
+<p>From here, I decided to see how easy it would be to re-create the <code class="language-plaintext highlighter-rouge">octdec</code> function.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">octdec</span> <span class="o">=</span> <span class="nx">octal</span> <span class="o">=&gt;</span>
   <span class="nx">octal</span>
@@ -87,9 +87,9 @@ Starting by splitting up the string binary representation into characters, we th
 <span class="nx">octdec</span><span class="p">(</span><span class="dl">'</span><span class="s1">144</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// 100</span>
 </code></pre></div></div>
 
-<p>Again following a similar shape to the transformations present in the previous example we only have to update the logic present in the reduce phase.</p>
+<p>Again, following a similar shape to the transformations present in the previous example, we only have to update the logic present in the reduce phase.</p>
 
-<h3 id="hexadecimal">Hexadecimal</h3>
+<h2 id="hexadecimal">Hexadecimal</h2>
 
 <p>Finally, I decided to explore an implementation to convert hexadecimal representations into decimal.
 This transformation pipeline requires an additional mapping phase to transform the alphabetical representations (A to F) into their decimal equivalents.</p>

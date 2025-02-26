@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creating simple podcast stats stored in YAML front-matter using PHP">
+    <meta name="description" content="Creating simple podcast stats stored in YAML front-matter using PHP.">
 
     <title>
         
@@ -50,15 +50,15 @@
                 <article class="post">
     <h1 class="post-title">Generating Podcast Stats in PHP</h1>
     <time datetime="2016-06-07T00:00:00+00:00" class="post-date">07 Jun 2016</time>
-    <p>In the <a href="http://threedevsandamaybe.com/the-one-hundredth-episode/">100th episode</a> of Three Devs and a Maybe I decided to generate some stats relating to the previous 99 episodes and formed a small quiz out of these findings.
-All information relating to each podcast is stored in separate Markdown files within YAML front-matter, which makes it easy to pull out and process.
+    <p>In the <a href="http://threedevsandamaybe.com/the-one-hundredth-episode/">100th episode</a> of <em>Three Devs and a Maybe</em>, I decided to generate some stats relating to the previous 99 episodes and formed a small quiz out of these findings.
+All information relating to each podcast is stored in separate Markdown files within YAML front-matter, which makes it easy to extract and process.
 I thought it would be interesting to go over the code I used to achieve this.</p>
 
 
 
-<h3 id="parsing-the-yaml-front-matter">Parsing the YAML front-matter</h3>
+<h2 id="parsing-the-yaml-front-matter">Parsing the YAML front-matter</h2>
 
-<p>The first job we need to do is to parse each of the podcasts front-matter into a format that we can processed in PHP.</p>
+<p>The first task is to parse each podcast’s front-matter into a format that can be processed in PHP.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$podcasts</span> <span class="o">=</span> <span class="nb">array_reduce</span><span class="p">(</span><span class="nb">scandir</span><span class="p">(</span><span class="no">POSTS_DIR</span><span class="p">),</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$meta</span><span class="p">,</span> <span class="nv">$fileName</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$fileName</span><span class="p">,</span> <span class="s1">'.'</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
@@ -73,9 +73,9 @@ I thought it would be interesting to go over the code I used to achieve this.</p
 <span class="p">},</span> <span class="p">[]);</span>
 </code></pre></div></div>
 
-<h3 id="stats-stats-stats">Stats, stats, stats</h3>
+<h2 id="stats-stats-stats">Stats, stats, stats</h2>
 
-<p>With the podcast meta-data now in a format with can process, we can now go about generating some stats.</p>
+<p>With the podcast metadata now in a format we can process, we can generate some statistics.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Total size</span>
 <span class="nb">array_sum</span><span class="p">(</span><span class="nb">array_column</span><span class="p">(</span><span class="nv">$podcasts</span><span class="p">,</span> <span class="s1">'size'</span><span class="p">));</span>
@@ -91,7 +91,9 @@ I thought it would be interesting to go over the code I used to achieve this.</p
 <span class="nv">$days</span> <span class="o">=</span> <span class="nb">array_count_values</span><span class="p">(</span>
     <span class="nb">array_map</span><span class="p">(</span>
         <span class="k">function</span> <span class="p">(</span><span class="nv">$meta</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">date_create</span><span class="p">(</span><span class="nv">$meta</span><span class="p">[</span><span class="s1">'date'</span><span class="p">])</span><span class="o">-&gt;</span><span class="nf">format</span><span class="p">(</span><span class="s1">'D'</span><span class="p">);</span> <span class="p">},</span>
-        <span class="nv">$podcasts</span><span class="p">));</span>
+        <span class="nv">$podcasts</span>
+    <span class="p">)</span>
+<span class="p">);</span>
 <span class="nb">arsort</span><span class="p">(</span><span class="nv">$days</span><span class="p">);</span>
 <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$day</span><span class="p">,</span> <span class="nv">$total</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"</span><span class="nv">$day</span><span class="s2"> (</span><span class="nv">$total</span><span class="s2">)"</span><span class="p">;</span> <span class="p">},</span> <span class="nb">array_keys</span><span class="p">(</span><span class="nv">$days</span><span class="p">),</span> <span class="nv">$days</span><span class="p">));</span>
 
@@ -99,7 +101,9 @@ I thought it would be interesting to go over the code I used to achieve this.</p
 <span class="nv">$months</span> <span class="o">=</span> <span class="nb">array_count_values</span><span class="p">(</span>
     <span class="nb">array_map</span><span class="p">(</span>
         <span class="k">function</span> <span class="p">(</span><span class="nv">$meta</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">date_create</span><span class="p">(</span><span class="nv">$meta</span><span class="p">[</span><span class="s1">'date'</span><span class="p">])</span><span class="o">-&gt;</span><span class="nf">format</span><span class="p">(</span><span class="s1">'M'</span><span class="p">);</span> <span class="p">},</span>
-        <span class="nv">$podcasts</span><span class="p">));</span>
+        <span class="nv">$podcasts</span>
+    <span class="p">)</span>
+<span class="p">);</span>
 <span class="nb">arsort</span><span class="p">(</span><span class="nv">$months</span><span class="p">);</span>
 <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span><span class="k">function</span> <span class="p">(</span><span class="nv">$month</span><span class="p">,</span> <span class="nv">$total</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"</span><span class="nv">$month</span><span class="s2"> (</span><span class="nv">$total</span><span class="s2">)"</span><span class="p">;</span> <span class="p">},</span> <span class="nb">array_keys</span><span class="p">(</span><span class="nv">$months</span><span class="p">),</span> <span class="nv">$months</span><span class="p">));</span>
 </code></pre></div></div>
@@ -109,7 +113,8 @@ I thought it would be interesting to go over the code I used to achieve this.</p
     <span class="nb">array_reduce</span><span class="p">(</span><span class="nv">$podcasts</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$words</span><span class="p">,</span> <span class="nv">$m</span><span class="p">)</span> <span class="p">{</span>
         <span class="nv">$t</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">preg_replace</span><span class="p">(</span><span class="s1">'/[^a-z\s]/i'</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="nb">strtolower</span><span class="p">(</span><span class="nv">$m</span><span class="p">[</span><span class="s1">'title'</span><span class="p">])));</span>
         <span class="k">return</span> <span class="nb">array_merge</span><span class="p">(</span><span class="nv">$words</span><span class="p">,</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span> <span class="nv">$t</span><span class="p">));</span>
-    <span class="p">},</span> <span class="p">[]));</span>
+    <span class="p">},</span> <span class="p">[])</span>
+<span class="p">);</span>
 <span class="nb">arsort</span><span class="p">(</span><span class="nv">$words</span><span class="p">);</span>
 <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="nb">array_keys</span><span class="p">(</span><span class="nb">array_slice</span><span class="p">(</span><span class="nv">$words</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)));</span>
 </code></pre></div></div>

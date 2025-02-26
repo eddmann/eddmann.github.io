@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into managing background processes within Symfony">
+    <meta name="description" content="Discover how to efficiently manage background processes within Symfony, leveraging Cron, Supervisor, and continuous process management techniques.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/managing-background-processes-within-symfony/" />
     
 
     <script>
@@ -52,23 +50,23 @@
                 <article class="post">
     <h1 class="post-title">Managing Background Processes within Symfony</h1>
     <time datetime="2016-12-01T00:00:00+00:00" class="post-date">01 Dec 2016</time>
-    <p>When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response life-cycle.
-You may find yourself wishing to for example - batch up and send queued emails at particular intervals, or process payments asynchronous to the point in-time the user made the initial request.
-In this post I would like to discuss our changing use of background processes (both time-dependent and continuous) due to increasing throughput demands.</p>
+    <p>When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle.
+You may find yourself wishing to, for example, batch up and send queued emails at particular intervals or process payments asynchronously to the point in time when the user made the initial request.
+In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands.</p>
 
 
 
 <h2 id="using-cron">Using Cron</h2>
 
-<p>At MyBuilder we have grown to rely heavily on background processes, helping manage the day-to-day activities of the business.
-For time-dependent tasks (i.e. run a specific command every 30 minutes) we use the Cron job scheduler, to declare and execute the processes at desired intervals.
-We found ourselves using this so frequently in-fact that we created <a href="https://github.com/mybuilder/cronos">Cronos</a> and the <a href="https://github.com/mybuilder/cronos-bundle">Cronos Symfony Bundle</a>, which allows us to decorate Commands we wish to run using a PHP <code class="language-plaintext highlighter-rouge">@Cron</code> annotation.
+<p>At MyBuilder, we have grown to rely heavily on background processes, helping manage the day-to-day activities of the business.
+For time-dependent tasks (i.e. run a specific command every 30 minutes), we use the Cron job scheduler to declare and execute the processes at desired intervals.
+We found ourselves using this so frequently, in fact, that we created <a href="https://github.com/mybuilder/cronos">Cronos</a> and the <a href="https://github.com/mybuilder/cronos-bundle">Cronos Symfony Bundle</a>, which allow us to decorate commands we wish to run using a PHP <code class="language-plaintext highlighter-rouge">@Cron</code> annotation.
 Using this system allows us to ‘dump’ the new <code class="language-plaintext highlighter-rouge">crontab</code> declaration upon each deployment cycle.
-This ensures that our background processes remain in-sync with the current released build.
-Upon reflection, this also proved to be a success in-regard to code-base understandability.
-It has been found that keeping the interval definition close to the code, makes it easier to reason about when entering a piece of functionality.</p>
+This ensures that our background processes remain in sync with the current released build.
+Upon reflection, this also proved to be a success in regard to codebase understandability.
+We have found that keeping the interval definition close to the code makes it easier to reason about when entering a piece of functionality.</p>
 
-<p>Below is an example use-case of how we would use the <code class="language-plaintext highlighter-rouge">@Cron</code> annotation within a trivial Symfony command.</p>
+<p>Below is an example use case of how we would use the <code class="language-plaintext highlighter-rouge">@Cron</code> annotation within a trivial Symfony command.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
  * @Cron(minute="/30")
@@ -84,18 +82,17 @@ It has been found that keeping the interval definition close to the code, makes 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Above we are specifying that we would like to send out any queued emails every 30 minute interval.</p>
+<p>Above, we are specifying that we would like to send out any queued emails every 30-minute interval.</p>
 
 <h2 id="the-need-for-more">The Need for More</h2>
 
-<p>However, over-time the demand on these commands and throughput required has grown and grown.
-Reducing the invocation times gave us short-term aid, but eventually we were in need of always running processes.
-We even found that in some cases the need was so great that a single instance would not suffice, and having multiple workers running would be a requirement too.
-With this need to address we created the concept of a <code class="language-plaintext highlighter-rouge">RunManager</code>, which allowed us to provide Command’s with a looping process construct.</p>
+<p>However, over time, the demand on these commands and the required throughput has grown significantly.
+Reducing the invocation times gave us short-term relief, but eventually, we needed always-running processes.
+We even found that, in some cases, a single instance would not suffice, and having multiple workers running would be a requirement too.
+To address this need, we created the concept of a <code class="language-plaintext highlighter-rouge">RunManager</code>, which allowed us to provide commands with a looping process construct.</p>
 
-<p>Looking at the problem of sending queued emails again as a concrete example.
-Lets say that to mange the load at which we now enqueue emails to be sent, would require us to have an always running instance of the sender command.
-Below we have made some amendments, which will now iterativity keep processing queued emails that are present.</p>
+<p>Looking at the problem of sending queued emails again as a concrete example, let’s say that to manage the load at which we now enqueue emails to be sent, we require an always-running instance of the sender command.
+Below, we have made some amendments that will now iteratively keep processing queued emails that are present.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">SendQueuedEmailsCommand</span> <span class="kd">extends</span> <span class="nc">Command</span>
 <span class="p">{</span>
@@ -114,12 +111,12 @@ Below we have made some amendments, which will now iterativity keep processing q
 
 <h3 id="run-forever">Run Forever</h3>
 
-<p>In an ideal scenario we would kick off a process and it would run ‘forever’.
-Unfortunately certain events may occur throughout its life where-by the cheapest way of managing its state is to restart it (i.e. allocated memory exceeded).
-We got around this problem by firstly declaring (using the <code class="language-plaintext highlighter-rouge">RunManager</code>) how many of a process we wished to be present at a time.
-We were then able to employ our initial Cron infrastructure, to attempt to start the process at a given interval.
+<p>In an ideal scenario, we would kick off a process and it would run ‘forever’.
+Unfortunately, certain events may occur throughout its life where the cheapest way of managing its state is to restart it (e.g. allocated memory exceeded).
+We got around this problem by first declaring (using the <code class="language-plaintext highlighter-rouge">RunManager</code>) how many of a process we wished to be present at a time.
+We then employed our initial Cron infrastructure to attempt to start the process at a given interval.
 This meant that if a process did die, the next Cron invocation would spawn a new instance.
-Guarding the command with a maximum process count, meant that we could be sure that only a certain amount of instances would be running at a given time.</p>
+Guarding the command with a maximum process count ensured that only a certain number of instances would be running at a given time.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
  * @Cron(minute="/1")
@@ -139,35 +136,37 @@ Guarding the command with a maximum process count, meant that we could be sure t
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Although this solved the problem of spawning a capped number of new processes, it did introduce a couple of issues.
-One of which was when you desired to have multiple of a given process running to accommodate for a particular expected load.
-From a cold-start you would have to wait for multiple invocation attempts from Cron to occur before you were at the desired processing power.
-Another point of contention was the unnecessary work Cron would do every interval in an attempt to create a new ‘potential’ process.
-More often than not the processes created by the Cron invocation would be ended immediately due to the maximum process cap.
-It seemed that although possible to use a time-based approach to represent ‘almost’ continuous processes, we needed to take a step back and review our thinking.</p>
+<p>Although this solved the problem of spawning a capped number of new processes, it introduced a couple of issues.
+One of these was when you desired multiple instances of a given process to accommodate a particular expected load.
+From a cold start, you would have to wait for multiple Cron invocation attempts before reaching the desired processing power.
+Another issue was the unnecessary work Cron would perform at every interval attempting to create a new ‘potential’ process.
+More often than not, the processes created by the Cron invocation would end immediately due to the maximum process cap.
+Although a time-based approach could represent ‘almost’ continuous processes, we needed to take a step back and review our thinking.</p>
 
 <h2 id="enter-supervisor">Enter Supervisor</h2>
 
-<p>As the story above highlights; there was a gradual transition from the need to always have a time-based approach (run every 30 minutes) to sometimes warranting a continuous approach (have two processes running at all times).
-As the demands increased we slowly innovated on our existing solution to cater for the throughput, however, what we needed to do was change our way of thinking.
-We needed to explicitly separate the concept of a time-based task which fitted well within the Cron philosophy and a continuous task.</p>
+<p>As the story above highlights, there was a gradual transition from a time-based approach (run every 30 minutes) to sometimes warranting a continuous approach (have two processes running at all times).
+As demands increased, we slowly innovated on our existing solution to cater to the throughput.
+However, what we needed was a change in our way of thinking.
+We needed to explicitly separate the concept of a time-based task, which fitted well within the Cron philosophy, from a continuous task.</p>
 
 <h3 id="changing-our-thinking">Changing our Thinking</h3>
 
-<p>After some research we decided that <a href="http://supervisord.org/">Supervisor</a> would be a worthwhile investment to incorporate into our stack.
-Supervisor is a process control system written in Python, which provides the infrastructure to achieve the exact goals we desired from a continuous process.
-Spawning processes as a child of the main Supervisor process, it allows the system to manage how many of a given process are currently running and the health of each one.
-When a child process dies for whatever reason the <code class="language-plaintext highlighter-rouge">SIGCHLD</code> signal is sent to Supervisor, which is then able to decide what action to perform (i.e. restart the process).
-Being able to now change our way of thinking from ‘when do I need to attempt to begin running a process’ to ‘I want this many processes running at all times’ was a hugely beneficial gain.
-Following experimentation it was time to try and incorporate this approach into our system, and transition over our ‘almost’ continuous processes, into true continuous processes.</p>
+<p>After some research, we decided that <a href="http://supervisord.org/">Supervisor</a> would be a worthwhile investment to incorporate into our stack.
+Supervisor is a process control system written in Python, providing the infrastructure to achieve exactly the goals we desired for a continuous process.
+Spawning processes as children of the main Supervisor process allows the system to manage how many instances of a given process are currently running and their health.
+When a child process dies for whatever reason, the <code class="language-plaintext highlighter-rouge">SIGCHLD</code> signal is sent to Supervisor, which then decides what action to perform (e.g. restart the process).
+This shift in thinking, from “when do I need to attempt to begin running a process” to “I want this many processes running at all times,” was hugely beneficial.
+Following experimentation, it was time to incorporate this approach into our system and transition our ‘almost’ continuous processes into true continuous processes.</p>
 
 <h3 id="the-transition">The Transition</h3>
 
-<p>Transitioning from one system to another can be a challenging task, especially when it is so critical to the business.
-With this in mind, we felt it would be ideal not to have to change much in-way of the code relating to the existing continuous commands.
-As a result of this desire we created the <a href="https://github.com/mybuilder/supervisor-bundle">Supervisor Symfony Bundle</a>, which in a similar manner to its Cronos counterpart allows you to decorate Commands with a PHP <code class="language-plaintext highlighter-rouge">@Supervisor</code> annotation.
-These annotations are then parsed during the ‘dump’ phase and a Supervisor specific configuration is made available.
-Due to the similarities this meant that all that was required was to replace the <code class="language-plaintext highlighter-rouge">@Cron</code> with <code class="language-plaintext highlighter-rouge">@Supervisor</code> annotations (as shown in the example below).</p>
+<p>Transitioning from one system to another can be challenging, especially when it is critical to the business.
+With this in mind, we felt it would be ideal to avoid making significant code changes to existing continuous commands.
+As a result, we created the <a href="https://github.com/mybuilder/supervisor-bundle">Supervisor Symfony Bundle</a>.
+Similar to its Cronos counterpart, this bundle allows you to decorate commands with a PHP <code class="language-plaintext highlighter-rouge">@Supervisor</code> annotation.
+These annotations are then parsed during the ‘dump’ phase, generating Supervisor-specific configuration.
+Due to these similarities, the only required change was to replace the <code class="language-plaintext highlighter-rouge">@Cron</code> annotation with <code class="language-plaintext highlighter-rouge">@Supervisor</code>, as shown in the example below.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
  * @Supervisor(processes=2)
@@ -189,10 +188,9 @@ Due to the similarities this meant that all that was required was to replace the
 
 <p>The transition of these processes from Cron to Supervisor was successfully spaced out over a couple of days. As we had become accustom to automatically dumping out the <code class="language-plaintext highlighter-rouge">crontab</code> upon each deploy, we were only required to do the same for the Supervisor configuration.</p>
 
-<h2 id="lets-be-safe">Lets be Safe</h2>
+<h2 id="lets-be-safe">Let’s be Safe</h2>
 
-<p>There has been one key omission from this story so far, that I would now like to discuss.
-Another pain point within our Cron setup, was how to safely handle the transition from one version of a process to another.
+<p>One major omission from this story so far is how to safely handle the transition from one version of a process to another.
 At this time the <code class="language-plaintext highlighter-rouge">RunManager</code> was only able to safely exit activity based on memory, processor and duration limits.
 If we were to attempt to terminate a process mid-way through a critical activity we would not know of the lasting side-effects.
 This meant that we would have to wait for all process duration limits to be exceeded before we could be sure that processes were stopped, and new versions could be started.
@@ -234,9 +232,9 @@ Unlike the duration-based limits we relied upon in the past, we could now be sur
 
 <h2 id="sigstop">SIGSTOP</h2>
 
-<p>Upon review, I feel that this change has been a great addition to our stack and process.
-We are now able to clearly differentiate between a time-based command (of which there are many still present) and a continuous process.
-Although complexity of course has increased in-regard to the inclusion of Supervisor, using the right tool for the job has paid off greatly.</p>
+<p>This transition has been a significant improvement to our stack.
+We can now clearly differentiate between time-based commands and continuous processes.
+Although the inclusion of Supervisor adds complexity, using the right tool for the job has paid off greatly.</p>
 
 </article>
 

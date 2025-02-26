@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into Throttling and Debouncing Function Invocation in JavaScript">
+    <meta name="description" content="Learn the differences between throttling and debouncing in JavaScript, with practical examples and implementations for optimising function invocation in event handling.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/throttling-and-debouncing-function-invocation-in-javascript/" />
     
 
     <script>
@@ -52,16 +50,16 @@
                 <article class="post">
     <h1 class="post-title">Throttling and Debouncing Function Invocation in JavaScript</h1>
     <time datetime="2016-11-22T00:00:00+00:00" class="post-date">22 Nov 2016</time>
-    <p>Whilst working on resolving a recent JavaScript event handler bug, it deemed necessary to implement a form of throttling to make sure a race-condition would not occur.
-Throughout the fix I found myself seeking a clear definition of what both <code class="language-plaintext highlighter-rouge">throttling</code> and <code class="language-plaintext highlighter-rouge">debouncing</code> a function actually entailed; as it can be very easy to mix the two subtly different concepts.</p>
+    <p>Whilst working on resolving a recent JavaScript event handler bug, it became necessary to implement a form of throttling to ensure a race condition would not occur.
+Throughout the fix, I found myself seeking a clear definition of what both <code class="language-plaintext highlighter-rouge">throttling</code> and <code class="language-plaintext highlighter-rouge">debouncing</code> a function actually entailed, as it can be very easy to mix up these subtly different concepts.</p>
 
 
 
-<h3 id="throttling">Throttling</h3>
+<h2 id="throttling">Throttling</h2>
 
-<p>Throttling is beneficial when you wish to prevent sequential function invocation within a defined time-frame.
-In the case of the scrolling example below, as the scroll handler is being fired many times sequentially - we have decided to throttle the invocation of the event handler to every 500ms.
-An trivial implementation of such a throttling function is provided below.</p>
+<p>Throttling is beneficial when you wish to prevent sequential function invocation within a defined time frame.
+In the case of the scrolling example below, as the scroll handler is being fired many times sequentially, we have decided to throttle the invocation of the event handler to every 500ms.
+A trivial implementation of such a throttling function is provided below.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">throttle</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">delay</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">timer</span><span class="p">;</span>
@@ -74,12 +72,12 @@ An trivial implementation of such a throttling function is provided below.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<h3 id="debouncing">Debouncing</h3>
+<h2 id="debouncing">Debouncing</h2>
 
-<p>Debouncing is beneficial when you wish to prevent a function from being invoked, if it is still being called within a defined time-frame.
-This provides you with the confidence that the specified function will be invoked once upon completion of however many sequential call-attempts have been made.
-In the case of the scrolling example below, as the scroll handler is being fired many times sequentially - we have decided to debounce the invocation of the function to occur 500ms after the final call has been made.
-An trivial implementation of such a debouncing function is provided below.</p>
+<p>Debouncing is beneficial when you wish to prevent a function from being invoked if it is still being called within a defined time frame.
+This provides you with the confidence that the specified function will be invoked once upon completion of however many sequential call attempts have been made.
+In the case of the scrolling example below, as the scroll handler is being fired many times sequentially, we have decided to debounce the invocation of the function to occur 500ms after the final call has been made.
+A trivial implementation of such a debouncing function is provided below.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">debounce</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">delay</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">timer</span><span class="p">;</span>
@@ -90,7 +88,7 @@ An trivial implementation of such a debouncing function is provided below.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<h3 id="scrolling-example">Scrolling Example</h3>
+<h2 id="scrolling-example">Scrolling Example</h2>
 
 <p>You can clearly differentiate between the two techniques whilst experimenting with the example below.
 This highlights how and when the function invocations occur, based on the choice of throttling or debouncing.</p>

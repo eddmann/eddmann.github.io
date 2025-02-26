@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Implementing the self-balancing AVL binary search tree in Clojure">
+    <meta name="description" content="Learn how to implement a self-balancing AVL binary search tree in Clojure, ensuring optimal search performance through automatic rebalancing.">
 
     <title>
         
@@ -50,17 +50,18 @@
                 <article class="post">
     <h1 class="post-title">AVL Trees in Clojure</h1>
     <time datetime="2016-09-03T00:00:00+00:00" class="post-date">03 Sep 2016</time>
-    <p>An AVL tree is a self-balancing binary search tree, where-by the height of a node’s children differ by at most one.
-In the event that this property is violated a re-balancing process takes place. 
-In the past I have discussed how to implement a <a href="/posts/binary-search-trees-in-clojure/">Binary Search Tree in Clojure</a>, providing average time complexity of O(log n).
-However, in the event that the order of insertion is sequential (either every value greater than, or every value less than the last), time complexity increases to be linear, the same as a linked-list.
-Self-balancing trees such as the AVL variant provide us with the familiar worst-case of O(log n), thanks to it’s re-balancing phase.</p>
+    <p>An AVL tree is a self-balancing binary search tree, whereby the height of a node’s children differs by at most one.
+In the event that this property is violated, a rebalancing process takes place. 
+In the past, I have discussed how to implement a <a href="/posts/binary-search-trees-in-clojure/">Binary Search Tree in Clojure</a>, providing an average time complexity of O(log n).
+However, if the order of insertion is sequential (where each value is either greater than or less than the last), time complexity increases to be linear, the same as a linked list.
+Self-balancing trees, such as the AVL variant, provide us with a worst-case complexity of O(log n), thanks to their rebalancing phase.</p>
 
-<h3 id="balance-factor">Balance Factor</h3>
+<h2 id="balance-factor">Balance Factor</h2>
 
-<p>Using the previous Binary Search Tree implementation as a base, we are able to expand upon this to include the AVL property.
-For the sake of performance you would typically store the height of each nodes children within the structure, however, as I wish to re-use the existing implementation I will instead calculate their height upon <code class="language-plaintext highlighter-rouge">factor</code> invocation.
-The balance factor per. node is calculated by the difference between the two child node’s heights, as shown below.</p>
+<p>Using the previous Binary Search Tree implementation as a base, we can expand upon this to include the AVL property.
+For the sake of performance, you would typically store the height of each node’s children within the structure.
+However, as I wish to reuse the existing implementation, I will instead calculate their height upon <code class="language-plaintext highlighter-rouge">factor</code> invocation.
+The balance factor of a node is calculated as the difference between the heights of its two child nodes, as shown below.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">height</span><span class="w">
   </span><span class="p">([</span><span class="n">tree</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">
@@ -74,11 +75,11 @@ The balance factor per. node is calculated by the difference between the two chi
   </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="nb">left</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">height</span><span class="w"> </span><span class="nb">right</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>The above two functions provide us with the described behavior, allowing us to supply a root node and return it’s balance factor.</p>
+<p>The above two functions provide the described behaviour, allowing us to supply a root node and return its balance factor.</p>
 
-<h3 id="rotations">Rotations</h3>
+<h2 id="rotations">Rotations</h2>
 
-<p>So as to complete the final re-balancing step we must also be able to rotate a given node both left and right within the tree structure.</p>
+<p>To complete the final rebalancing step, we must also be able to rotate a given node both left and right within the tree structure.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">rotate-left</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
   </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nb">right</span><span class="w">
@@ -93,9 +94,9 @@ The balance factor per. node is calculated by the difference between the two chi
 
 <p>This can be achieved as shown above, taking advantage of an immutable approach.</p>
 
-<h3 id="re-balancing-phase">Re-balancing Phase</h3>
+<h2 id="rebalancing-phase">Rebalancing Phase</h2>
 
-<p>With the balance factor and rotation actions now available, we are able to begin work on the four different situations a node could be placed in that would require a tree rotation.</p>
+<p>With the balance factor and rotation actions now available, we can begin working on the four different situations where a node’s placement requires a tree rotation.</p>
 
 <p><img src="/uploads/avl-trees-in-clojure/lr-ll-cases.png" alt="Left Right, Left Left Cases" /></p>
 
@@ -115,7 +116,7 @@ The balance factor per. node is calculated by the difference between the two chi
   </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nf">is-right-case?</span><span class="w"> </span><span class="n">tree</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="p">(</span><span class="nf">factor</span><span class="w"> </span><span class="p">(</span><span class="no">:left</span><span class="w"> </span><span class="n">tree</span><span class="p">))</span><span class="w"> </span><span class="mi">0</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>With these conditions now locatable, we can apply the desired tree rotations which can be seen visualised in the diagrams above.</p>
+<p>With these conditions now identifiable, we can apply the desired tree rotations, as visualised in the diagrams above.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">el</span><span class="w"> </span><span class="nb">left</span><span class="w"> </span><span class="nb">right</span><span class="p">]</span><span class="w"> </span><span class="no">:as</span><span class="w"> </span><span class="n">tree</span><span class="p">}]</span><span class="w">
   </span><span class="p">(</span><span class="k">cond</span><span class="w">
@@ -126,19 +127,19 @@ The balance factor per. node is calculated by the difference between the two chi
     </span><span class="no">:else</span><span class="w"> </span><span class="n">tree</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<h3 id="example-usage">Example Usage</h3>
+<h2 id="example-usage">Example Usage</h2>
 
-<p>Finally, we are able to create a new AVL insertion/deletion variant, that is a composition of the Binary Search Tree functions and the newly created <code class="language-plaintext highlighter-rouge">balance</code> one.</p>
+<p>Finally, we can create new AVL insertion and deletion variants by composing the Binary Search Tree functions with the newly created <code class="language-plaintext highlighter-rouge">balance</code> function.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">avl-insert</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="n">insert</span><span class="p">))</span><span class="w">
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">avl-remove</span><span class="w"> </span><span class="p">(</span><span class="nb">comp</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="nb">remove</span><span class="p">))</span><span class="w">
 </span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">seq-&gt;avl</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="nb">reduce</span><span class="w"> </span><span class="n">avl-insert</span><span class="w"> </span><span class="n">nil</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>These created data-structures can then be visualised using the following function.</p>
+<p>These data structures can then be visualised using the following function.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">tabs</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">clojure.string/join</span><span class="p">(</span><span class="nb">repeat</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">"\t"</span><span class="p">)))</span><span class="w">
+  </span><span class="p">(</span><span class="nf">clojure.string/join</span><span class="w"> </span><span class="p">(</span><span class="nb">repeat</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="s">"\t"</span><span class="p">)))</span><span class="w">
 
 </span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">visualise</span><span class="w">
   </span><span class="p">([</span><span class="n">tree</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">visualise</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span><span class="w">

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into using Constraint-based Ordering in PHP">
+    <meta name="description" content="Learn how to implement constraint-based ordering in PHP to evenly distribute shortlist fees in a dataset, improving aesthetics and readability.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/using-constraint-based-ordering-in-php/" />
     
 
     <script>
@@ -53,15 +51,15 @@
     <h1 class="post-title">Using Constraint-based Ordering in PHP</h1>
     <time datetime="2016-11-24T00:00:00+00:00" class="post-date">24 Nov 2016</time>
     <p>An interesting problem arose last week when we wished to generate a listing of recently completed jobs (along with their shortlist fees).
-Upon review of some earlier attempts, we did not like the aesthetics present when many of a particular shortlist fee were clustered together (i.e. two or more adjacent jobs with the same shortlist fee).
-What we were instead looking for was to create a constraint-based ordering that when applied to the recently completed jobs, would give an even distribution of shortlist fees (data-set permitting).</p>
+Upon reviewing some earlier attempts, we did not like the aesthetics present when many of a particular shortlist fee were clustered together (i.e. two or more adjacent jobs with the same shortlist fee).
+What we were instead looking for was to create a constraint-based ordering that, when applied to the recently completed jobs, would give an even distribution of shortlist fees (data-set permitting).</p>
 
 
 
 <h3 id="initial-solution">Initial Solution</h3>
 
-<p>The first approach I took to achieving this end-goal was to apply a low-high ordering pattern.
-So as to make the process easier, I decided that initially sorting the jobs based on shortlist fee would alleviate us from any intensive comparison checks later on.
+<p>The first approach I took to achieving this end goal was to apply a low-high ordering pattern.
+To make the process easier, I decided that initially sorting the jobs based on shortlist fees would alleviate us from any intensive comparison checks later on.
 I was then able to use a single pass through the list to create a result that guaranteed ‘as good of’ a low-high constraint applied as possible.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">orderFeesByLowHigh</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$fees</span><span class="p">)</span>
@@ -81,13 +79,14 @@ I was then able to use a single pass through the list to create a result that gu
 
 <h3 id="taking-another-approach">Taking Another Approach</h3>
 
-<p>Upon reflection however, I did not feel that the resulting list looked ‘random’ enough, and over the weekend thought maybe incorporating a middle value would hinder a better outcome.
-I decided to try and implement such an approach in a more functional manner, thinking about the declarative steps that were required to create the result.
-I was able to break down the process into three seperate actions, as shown in the example below:</p>
+<p>Upon reflection, however, I did not feel that the resulting list looked ‘random’ enough.
+Over the weekend, I thought that maybe incorporating a middle value would help achieve a better outcome.
+I decided to try and implement such an approach in a more functional manner, thinking about the declarative steps required to create the result.
+I was able to break down the process into three separate actions, as shown in the example below:</p>
 
 <p><img src="/uploads/using-constraint-based-ordering-in-php/idea.png" style="width:auto;" /></p>
 
-<p>Unfortuantly PHP does not include the ability to <code class="language-plaintext highlighter-rouge">partition</code> or <code class="language-plaintext highlighter-rouge">interleave</code> arrays, so I created a couple of simple implementations to aid my solution.</p>
+<p>Unfortunately, PHP does not include the ability to <code class="language-plaintext highlighter-rouge">partition</code> or <code class="language-plaintext highlighter-rouge">interleave</code> arrays, so I created a couple of simple implementations to aid my solution.</p>
 
 <div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">partition</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$arr</span><span class="p">,</span> <span class="nv">$total</span><span class="p">)</span>
 <span class="p">{</span>
@@ -97,7 +96,8 @@ I was able to break down the process into three seperate actions, as shown in th
 
     <span class="k">return</span> <span class="nb">array_merge</span><span class="p">(</span>
         <span class="p">[</span><span class="nb">array_slice</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">$size</span><span class="p">)],</span>
-        <span class="nf">partition</span><span class="p">(</span><span class="nb">array_slice</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span> <span class="nv">$size</span><span class="p">),</span> <span class="nv">$total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">));</span>
+        <span class="nf">partition</span><span class="p">(</span><span class="nb">array_slice</span><span class="p">(</span><span class="nv">$arr</span><span class="p">,</span> <span class="nv">$size</span><span class="p">),</span> <span class="nv">$total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">);</span>
 <span class="p">}</span>
 
 <span class="k">function</span> <span class="n">interleave</span><span class="p">(</span><span class="cm">/* array */</span> <span class="p">...</span><span class="nv">$arrs</span><span class="p">)</span>
@@ -106,7 +106,8 @@ I was able to break down the process into three seperate actions, as shown in th
 
     <span class="k">return</span> <span class="nb">array_merge</span><span class="p">(</span>
         <span class="nb">array_map</span><span class="p">(</span><span class="s1">'head'</span><span class="p">,</span> <span class="nv">$arrs</span><span class="p">),</span>
-        <span class="nf">interleave</span><span class="p">(</span><span class="mf">...</span><span class="nb">array_filter</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="s1">'tail'</span><span class="p">,</span> <span class="nv">$arrs</span><span class="p">))));</span>
+        <span class="nf">interleave</span><span class="p">(</span><span class="mf">...</span><span class="nb">array_filter</span><span class="p">(</span><span class="nb">array_map</span><span class="p">(</span><span class="s1">'tail'</span><span class="p">,</span> <span class="nv">$arrs</span><span class="p">)))</span>
+    <span class="p">);</span>
 <span class="p">}</span>
 
 <span class="k">function</span> <span class="n">head</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$arr</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">reset</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span> <span class="p">}</span>
@@ -123,11 +124,11 @@ I was able to break down the process into three seperate actions, as shown in th
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Following the sort present in the previous implementation, we then wish to partition the fees into three seperate chunks.
-With these chunks we then interleave the encompassing fees into the resulting listing.
-I feel the output generated from this function yielded a more aesthetically pleasing result and did not look as much of a pattern as the previous low-high solution.
-This could be due to the combination of not only a middle fee, but also where the fee is taken from.
-In the imperative low-high solution we always take the next lowest and highest fees, which can be very disjoint from one another and noticeable to someone browsing the list.</p>
+<p>Following the sorting step in the previous implementation, we then wish to partition the fees into three separate chunks.
+With these chunks, we then interleave the encompassing fees into the resulting listing.
+I feel the output generated from this function yielded a more aesthetically pleasing result and did not look as much like a pattern as the previous low-high solution.
+This could be due to the combination of not only a middle fee but also where the fee is taken from.
+In the imperative low-high solution, we always take the next lowest and highest fees, which can be very disjoint from one another and noticeable to someone browsing the list.</p>
 
 </article>
 

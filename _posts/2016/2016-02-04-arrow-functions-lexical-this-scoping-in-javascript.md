@@ -1,12 +1,13 @@
 ---
 layout: post
 title: "Arrow Functions Lexical 'this' Scoping in JavaScript"
-meta: "Describing the Arrow Functions lexical 'this' scoping, with previous alternative solutions"
+meta: "Exploring the lexical scoping of 'this' in Arrow Functions and previous alternative solutions in JavaScript."
+tags: javascript
 ---
 
-One feature of ES2015 that I feel can be a stumbling block (but extremely useful) is Arrow Functions lexical scoping of `this`.
-Before this addition, every new function defined its own `this` - meaning we were required to explicitly bind or locally store the `this` reference that we desired in many use-cases. <!--more-->
-The two technique used to overcome this problem are highlighted below, using a locally stored `this` reference or a bound function.
+One feature of ES2015 that I feel can be a stumbling block (but is extremely useful) is Arrow Functions' lexical scoping of `this`.
+Before this addition, every new function defined its own `this`, meaning we were required to explicitly bind or locally store the `this` reference that we desired in many use cases. <!--more-->
+The two techniques used to overcome this problem are highlighted below, using a locally stored `this` reference or a bound function.
 
 ```js
 function Counter() {
@@ -27,7 +28,7 @@ function Counter() {
 }
 ```
 
-The contrived example usage below shows passing the counters `inc` method to a high-order function and asserting the desired `this` behavior.
+The contrived example usage below shows passing the counter's `inc` method to a higher-order function and asserting the desired `this` behaviour.
 
 ```js
 var c = new Counter();
@@ -39,7 +40,7 @@ setInterval(function () {
 // 1, 2, 3, 4, 5
 ```
 
-With the introduction of Arrow functions, the `this` value is instead captured based on the enclosing context, resulting in more readable code.
+With the introduction of Arrow Functions, the `this` value is instead captured based on the enclosing context, resulting in more readable code.
 
 ```js
 function Counter() {

@@ -3,11 +3,11 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Making use of the 'IS (NOT) DISTINCT FROM' SQL comparators to handle NULL values">
+    <meta name="description" content="Learn how to use the 'IS (NOT) DISTINCT FROM' SQL comparators to handle NULL values effectively in SQL queries.">
 
     <title>
         
-            Using the 'IS (NOT) DISTINCT FROM' SQL comparators &middot; Edd Mann
+            Using the 'IS (NOT) DISTINCT FROM' SQL Comparators &middot; Edd Mann
         
     </title>
 
@@ -48,12 +48,13 @@
 
             <main>
                 <article class="post">
-    <h1 class="post-title">Using the 'IS (NOT) DISTINCT FROM' SQL comparators</h1>
+    <h1 class="post-title">Using the 'IS (NOT) DISTINCT FROM' SQL Comparators</h1>
     <time datetime="2016-03-17T00:00:00+00:00" class="post-date">17 Mar 2016</time>
-    <p>In a recent SQL statement I stumbled upon an issue in-regard to handling <code class="language-plaintext highlighter-rouge">NULL</code> values within a given predicate.
-Coming from languages (such as PHP) which are very liberal in their type coercion (<code class="language-plaintext highlighter-rouge">NULL</code> can be treated as a falsey value), I was surprised to find how the inclusion of such a value resulted in a sort of predicate short-circuiting. 
-This occurs as <code class="language-plaintext highlighter-rouge">NULL</code> in its strictest sense is an unknown value, and as such the entire condition should be deemed unknown in the event of its presence.
-However, if you wish to weaken this constraint within a comparison you are able to take advantage of <code class="language-plaintext highlighter-rouge">IS DISTINCT FROM</code> which instead treats <code class="language-plaintext highlighter-rouge">NULL</code> as a known value.
+    <p>In a recent SQL statement, I stumbled upon an issue regarding the handling of <code class="language-plaintext highlighter-rouge">NULL</code> values within a given predicate.
+Coming from languages such as PHP, which are very liberal in their type coercion (<code class="language-plaintext highlighter-rouge">NULL</code> can be treated as a falsy value), I was surprised to find how the inclusion of such a value resulted in a sort of predicate short-circuiting. 
+This occurs because <code class="language-plaintext highlighter-rouge">NULL</code>, in its strictest sense, is an unknown value.
+As such, the entire condition is deemed unknown in the event of its presence.
+However, if you wish to weaken this constraint within a comparison, you can take advantage of <code class="language-plaintext highlighter-rouge">IS DISTINCT FROM</code>, which instead treats <code class="language-plaintext highlighter-rouge">NULL</code> as a known value.
 This difference can be best highlighted in a small logic table, where we first describe how the presence of a <code class="language-plaintext highlighter-rouge">NULL</code> value takes over the entire predicate result.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">NULL</span> <span class="o">!=</span> <span class="k">NULL</span> <span class="o">=</span> <span class="k">NULL</span>
@@ -61,7 +62,7 @@ This difference can be best highlighted in a small logic table, where we first d
 <span class="k">TRUE</span> <span class="o">!=</span> <span class="k">NULL</span> <span class="o">=</span> <span class="k">NULL</span>
 </code></pre></div></div>
 
-<p>Using the <code class="language-plaintext highlighter-rouge">IS DISTINCT FROM</code> comparator instead, we are able to treat <code class="language-plaintext highlighter-rouge">NULL</code> as a known value, which then returns the desired boolean result.</p>
+<p>Using the <code class="language-plaintext highlighter-rouge">IS DISTINCT FROM</code> comparator instead, we can treat <code class="language-plaintext highlighter-rouge">NULL</code> as a known value, which then returns the desired Boolean result.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">NULL</span> <span class="k">IS</span> <span class="k">DISTINCT</span> <span class="k">FROM</span> <span class="k">NULL</span> <span class="o">=</span> <span class="k">FALSE</span>
 <span class="k">NULL</span> <span class="k">IS</span> <span class="k">DISTINCT</span> <span class="k">FROM</span> <span class="k">TRUE</span> <span class="o">=</span> <span class="k">TRUE</span>

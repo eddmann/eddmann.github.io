@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Looking into the application of 'transpose' and 'zip' on collections in JavaScript">
+    <meta name="description" content="Learn how to implement 'transpose' and 'zip' in JavaScript to manipulate multi-dimensional arrays effectively.">
 
     <title>
         
@@ -50,13 +50,13 @@
                 <article class="post">
     <h1 class="post-title">Implementing Transpose and Zip in JavaScript</h1>
     <time datetime="2016-04-08T00:00:00+00:00" class="post-date">08 Apr 2016</time>
-    <p>In a recent <a href="http://www.fullstackradio.com/39">Full Stack Radio</a> podcast, discussion around the application of <code class="language-plaintext highlighter-rouge">transpose</code> and <code class="language-plaintext highlighter-rouge">zip</code> on collections made me wonder how I would go about implementing such a feature in JavaScript. 
-The concept behind ‘transpose’ is to turn a multi-dimensional array’s rows into columns and vice-versa.
-I typically think of a ‘zip’ as a limited form of this, handling only two collections, but having the added bonus of permitting collections of different length.
-This can be resolved by either padding out the arrays with empty values, or only including elements up-to the shortest collections length.</p>
+    <p>In a recent <a href="http://www.fullstackradio.com/39">Full Stack Radio</a> podcast, a discussion around the application of <code class="language-plaintext highlighter-rouge">transpose</code> and <code class="language-plaintext highlighter-rouge">zip</code> on collections made me wonder how I would go about implementing such a feature in JavaScript. 
+The concept behind ‘transpose’ is to turn a multi-dimensional array’s rows into columns and vice versa.
+I typically think of a ‘zip’ as a limited form of this, handling only two collections, but with the added bonus of permitting collections of different lengths.
+This can be resolved by either padding out the arrays with empty values or only including elements up to the shortest collection’s length.</p>
 
-<p>I decided that I would be a little lenient in my implementation and create a single function that could handle nth-collections of differing lengths.
-The first implementation below achieves this by only including elements up-to the shortest collections length.</p>
+<p>I decided that I would be a little lenient in my implementation and create a single function that could handle <code class="language-plaintext highlighter-rouge">n</code>-th collections of differing lengths.
+The first implementation below achieves this by only including elements up to the shortest collection’s length.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">shortest</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">length</span> <span class="p">?</span> <span class="nx">a</span> <span class="p">:</span> <span class="nx">b</span><span class="p">);</span>
 
@@ -67,7 +67,7 @@ The first implementation below achieves this by only including elements up-to th
 <span class="c1">// [['a', 1], ['b', 2], ['c', 3]]</span>
 </code></pre></div></div>
 
-<p>The implementation below instead pads out arrays which are not of the maximum length with empty values.</p>
+<p>The implementation below instead pads out arrays that are not of the maximum length with empty values.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">longest</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">length</span> <span class="p">?</span> <span class="nx">a</span> <span class="p">:</span> <span class="nx">b</span><span class="p">);</span>
 
@@ -78,8 +78,8 @@ The first implementation below achieves this by only including elements up-to th
 <span class="c1">// [['a', 1], ['b', 2], ['c', 3], ['d', undefined]]</span>
 </code></pre></div></div>
 
-<p>An interesting use-case that was discussed was being able to easily create a collection which includes the element along with their successor/predecessor.
-This can be useful in cases were (upon iteration) a decision is dependent on the elements neighboring values.</p>
+<p>An interesting use case that was discussed was the ability to easily create a collection that includes each element along with its successor or predecessor.
+This can be useful in cases where, upon iteration, a decision is dependent on the neighbouring values of elements.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">alpha</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">c</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">d</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">e</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">f</span><span class="dl">'</span><span class="p">];</span>
 

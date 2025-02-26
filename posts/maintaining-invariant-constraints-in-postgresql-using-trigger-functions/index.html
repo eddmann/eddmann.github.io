@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Taking advantage of trigger functions to maintain complex invariant constraints in PostgreSQL">
+    <meta name="description" content="Learn how to maintain complex invariant constraints in PostgreSQL using trigger functions for enhanced data integrity.">
 
     <title>
         
@@ -50,11 +50,11 @@
                 <article class="post">
     <h1 class="post-title">Maintaining Invariant Constraints in PostgreSQL using Trigger Functions</h1>
     <time datetime="2016-03-03T00:00:00+00:00" class="post-date">03 Mar 2016</time>
-    <p>Recently a feature I was working on required me to alter a unique constraint which existed upon a table column.
-The invariant had now been weakened to allow storing of duplicate <code class="language-plaintext highlighter-rouge">email</code> addresses based on if they share an equivalent <code class="language-plaintext highlighter-rouge">link_id</code> (excluding NULL).
-Sadly the ease in which I was able to add the general unique constraint had disappear.
-However, I was able to take advantage of insertion/update triggers to again provide me with these invariant reassurances. 
-I should note that I’m in favor of having business critical constraints placed within the database layer, even if this seems like a blurring of responsibility between application logic and the data-store.</p>
+    <p>Recently, a feature I was working on required me to alter a unique constraint that existed on a table column.
+The invariant had now been weakened to allow storing of duplicate <code class="language-plaintext highlighter-rouge">email</code> addresses, provided they shared an equivalent <code class="language-plaintext highlighter-rouge">link_id</code> (excluding <code class="language-plaintext highlighter-rouge">NULL</code>).
+Sadly, the ease with which I had initially added the general unique constraint had disappeared.
+However, I was able to take advantage of insertion/update triggers to regain these invariant reassurances. 
+I should note that I am in favour of placing business-critical constraints within the database layer, even if this seems like a blurring of responsibility between application logic and the data store.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">OR</span> <span class="k">REPLACE</span> <span class="k">FUNCTION</span> <span class="n">valid_record_email_address</span><span class="p">()</span>
 <span class="k">RETURNS</span> <span class="k">TRIGGER</span>
@@ -71,18 +71,17 @@ I should note that I’m in favor of having business critical constraints placed
     <span class="k">RETURN</span> <span class="k">NEW</span><span class="p">;</span>
 <span class="k">END</span>
 <span class="err">$$</span> <span class="k">LANGUAGE</span> <span class="n">plpgsql</span><span class="p">;</span>
-<span class="k">SQL</span><span class="p">;</span>
 </code></pre></div></div>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">CREATE</span> <span class="k">TRIGGER</span> <span class="n">validate_record_email_address</span>
 <span class="k">BEFORE</span> <span class="k">INSERT</span> <span class="k">OR</span> <span class="k">UPDATE</span> <span class="k">ON</span> <span class="n">records</span>
 <span class="k">FOR</span> <span class="k">EACH</span> <span class="k">ROW</span>
     <span class="k">EXECUTE</span> <span class="k">PROCEDURE</span> <span class="n">valid_record_email_address</span><span class="p">();</span>
-<span class="k">SQL</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>As you can see within PostgreSQL we are able to write extremely clear trigger functions which can be used to alter actions that occur in the database.
-We hope that the application layer will safe-guard us from an attempt to break this invariant, but as this is a critical area of our domain we can provide another level of validation just to make sure.</p>
+<p>As you can see, within PostgreSQL we can write extremely clear trigger functions that modify actions occurring in the database.
+We hope that the application layer will safeguard us from attempts to break this invariant.
+However, as this is a critical area of our domain, we provide another level of validation to ensure data integrity.</p>
 
 </article>
 

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring how to use PostgreSQL for performing operations on a Deck of Cards">
+    <meta name="description" content="Learn how to use PostgreSQL to perform operations on a deck of cards using arrays, cross-joins, and CTEs.">
 
     <title>
         
@@ -50,15 +50,17 @@
                 <article class="post">
     <h1 class="post-title">Operations on a Deck of Cards in PostgreSQL</h1>
     <time datetime="2016-04-12T00:00:00+00:00" class="post-date">12 Apr 2016</time>
-    <p>Recently I have been looking more into SQL and in-particular how RDMS’s work under-the-hood.
-I thought it would be interesting to use some of the lesser-known features that PostgreSQL has to offer, concentrating my efforts on operations performed on a deck of cards. </p>
+    <p>Recently, I have been looking more into SQL and, in particular, how RDBMSs work under the hood.
+I thought it would be interesting to use some of the lesser-known features that PostgreSQL has to offer, concentrating my efforts on operations performed on a deck of cards.</p>
+
+
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">WITH</span> <span class="n">deck</span> <span class="k">AS</span> <span class="p">(</span>
     <span class="k">SELECT</span>
         <span class="n">rank</span> <span class="o">||</span> <span class="n">suit</span> <span class="k">AS</span> <span class="n">card</span>
     <span class="k">FROM</span>
         <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(</span><span class="s1">'2 3 4 5 6 7 8 9 10 J Q K A'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">))</span> <span class="k">AS</span> <span class="n">rank</span><span class="p">,</span>
-        <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(</span><span class="s1">'♠ ♥ ♦ ♣'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">))</span> <span class="k">as</span> <span class="n">suit</span>
+        <span class="k">unnest</span><span class="p">(</span><span class="n">string_to_array</span><span class="p">(</span><span class="s1">'♠ ♥ ♦ ♣'</span><span class="p">,</span> <span class="s1">' '</span><span class="p">))</span> <span class="k">AS</span> <span class="n">suit</span>
 <span class="p">)</span>
 </code></pre></div></div>
 
@@ -69,7 +71,7 @@ Using a CTE by way of the <code class="language-plaintext highlighter-rouge">WIT
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span> <span class="n">ARRAY</span><span class="p">(</span><span class="k">SELECT</span> <span class="n">card</span> <span class="k">FROM</span> <span class="n">deck</span> <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">random</span><span class="p">()</span> <span class="k">LIMIT</span> <span class="mi">5</span><span class="p">)</span> <span class="k">AS</span> <span class="n">hand</span>
 </code></pre></div></div>
 
-<p>We can then use this deck to retrieve a randomised five card hand.</p>
+<p>We can then use this deck to retrieve a randomised five-card hand.</p>
 
 <div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SELECT</span>
     <span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">AS</span> <span class="n">hands</span>
@@ -80,9 +82,9 @@ Using a CTE by way of the <code class="language-plaintext highlighter-rouge">WIT
     <span class="k">c</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">.</span><span class="n">card</span> <span class="k">AND</span> <span class="n">d</span><span class="p">.</span><span class="n">card</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">.</span><span class="n">card</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>Alternatively we can return all the possible combinations of hands present within a deck.
-Using a similar cross-join present when creating the deck we instead condition the result to only return unique combinations.
-This uses the fact that although each card is a string value, combined they are comparable and still provide a <a href="https://en.wikipedia.org/wiki/Total_order">total order</a>.</p>
+<p>Alternatively, we can return all the possible combinations of hands present within a deck.
+Using a similar cross-join present when creating the deck, we instead condition the result to only return unique combinations.
+This uses the fact that, although each card is a string value, combined they are comparable and still provide a <a href="https://en.wikipedia.org/wiki/Total_order">total order</a>.</p>
 
 </article>
 

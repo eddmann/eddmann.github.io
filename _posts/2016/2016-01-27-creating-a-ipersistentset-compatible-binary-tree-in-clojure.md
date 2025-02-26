@@ -1,16 +1,17 @@
 ---
 layout: post
 title: 'Creating a IPersistentSet compatible Binary Tree in Clojure'
-meta: 'Implementing IPersistentSet as a Binary Tree in Clojure'
+meta: 'Learn how to implement IPersistentSet using a Binary Tree in Clojure, making it compatible with existing Clojure functions and libraries.'
+tags: clojure functional-programming data-structures
 ---
 
-Following on from my article on Binary Search Trees [last week](/posts/binary-search-trees-in-clojure/), I decided to see how I could use types and interfaces to implement the glue that is required to make the Binary Tree implementation compatible with the `clojure.lang.IPersistentSet` interface. <!--more-->
-In doing so, this would allow any library or function requiring an `IPersistentSet` to use the Binary Tree data-structure.
+Following on from my article on Binary Search Trees [last week](/posts/binary-search-trees-in-clojure/), I decided to explore how I could use types and interfaces to implement the glue required to make the Binary Tree implementation compatible with the `clojure.lang.IPersistentSet` interface. <!--more-->
+By doing so, any library or function requiring an `IPersistentSet` would be able to use the Binary Tree data structure seamlessly.
 
 ## Prerequisites
 
-At the end of the previous article we were left with a handful of useful functions which worked with the Binary Search Tree data-structure we had developed.
-For a recap, below are the definitions for each of the functions.
+At the end of the previous article, we had a handful of useful functions that worked with the Binary Search Tree data structure we had developed.
+For a recap, below are the definitions for each of these functions.
 
 ```clojure
 (defrecord Node [el left right])
@@ -22,10 +23,10 @@ For a recap, below are the definitions for each of the functions.
 (defn search [tree value] ...)
 ```
 
-## Implementing the IPersistentSet interface
+## Implementing the IPersistentSet Interface
 
-In the code laid out below we are providing a wrapper around the functions that we have already developed - for the contract that is needed to become a `IPersistentSet`.
-Creating a new type called `BinaryTree` which holds a root tree node, allows us to easily handle the use-case of an empty set, along with logical proxying to the existing functions.
+In the code below, we provide a wrapper around the functions that we have already developed, ensuring they conform to the contract required for an `IPersistentSet`.
+Creating a new type called `BinaryTree`, which holds a root tree node, allows us to easily handle the use case of an empty set while logically proxying to the existing functions.
 
 ```clojure
 (deftype BinaryTree [tree]
@@ -43,10 +44,10 @@ Creating a new type called `BinaryTree` which holds a root tree node, allows us 
   (invoke [this value] (get this value)))
 ```
 
-## Example
+## Example Usage
 
-We are now able to supply a `BinaryTree` in any place that desires a `IPersistentSet` compatible type.
-When the function is invoked Clojure polymorphically dispatches to the correct types function implementation.
+We can now use a `BinaryTree` anywhere that requires an `IPersistentSet`-compatible type.
+When a function is invoked, Clojure polymorphically dispatches to the correct type's function implementation.
 
 ```clojure
 (def xs (into (BinaryTree. nil) (range 10))) ; #{0 1 2 3 4 5 6 7 8 9}

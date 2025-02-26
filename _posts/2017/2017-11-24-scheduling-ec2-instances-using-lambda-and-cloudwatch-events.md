@@ -16,7 +16,7 @@ As the team and business needs expand, we felt this was an opportune time to emb
 I've recently discussed the reasoning behind this thought process on a [podcast](http://threedevsandamaybe.com/lets-aws-everything/) I co-host.
 Throughout this transition period, I wish to document our experiences moving solely over to the platform, sprinkling in a little Lambda along the way.
 
-### Starting and Stopping Instances
+## Starting and Stopping Instances
 
 One of the key advantages of the Infrastructure as a Service (IaaS) movement is the ability to provision resources as and when you require them.
 A good use case for this added functionality is the ability to start and stop development resources based on typical workweek patterns, providing additional cost savings.
@@ -26,7 +26,7 @@ In the video below, I highlight how you can start and stop EC2 instances in a sc
 
 The associated code used in this video can be found [here](https://gist.github.com/eddmann/a9e404eb62056f77610f752606a2e504).
 
-### Scaling Instances
+## Scaling Instances
 
 I would now like to expand upon this example by taking advantage of another IaaS benefit - scaling a given resource based on your current demands.
 In a similar manner to the first demonstration, I will now explain how you can scale an EC2 instance up and down based on a given schedule.

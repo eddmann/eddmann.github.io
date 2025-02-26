@@ -12,7 +12,7 @@ Again, there are many excellent external [resources](http://sean.voisen.org/blog
 
 <!--more-->
 
-### Implementation
+## Implementation
 
 The Maybe type encapsulates the concept of Some (contains a value) and None (no value present).
 With these two abstractions, we can safely handle cases where no value is present, avoiding NullPointerException errors and excessive null checks.
@@ -42,7 +42,7 @@ const Maybe = (function () {
 The implementation above uses two small prototypical class definitions to define Some and None.
 We then return the ability to take a value of a plain type and put it into a Maybe container, along with the capability to lift a function into the Maybe space.
 
-### Division by Zero Example
+## Division by Zero Example
 
 The first example of using the Maybe type I will demonstrate is in the case of handling division by zero errors.
 If the denominator is zero, instead of throwing an exception or returning null (as shown in the basic `div` implementation), we lift the function into the Maybe type and return a Some or None.
@@ -58,7 +58,7 @@ mdiv(100, 0); // None
 mdiv(10, 2); // Some(5)
 ```
 
-### Property Retrieval Example
+## Property Retrieval Example
 
 Another case where `undefined` values may appear in JavaScript is when retrieving properties from objects that may (or may not) be present.
 Again, we highlight how the basic `get` function returns the object property or undefined if not present, whereas lifting it into the Maybe type provides us with the Some and None abstractions.
@@ -103,7 +103,7 @@ getStreet({ address: {} }); // None
 getStreet(user); // Some(Cinder Drive)
 ```
 
-### Mimicking Do Notation in JavaScript
+## Mimicking Do Notation in JavaScript
 
 When looking at Haskell examples, you will notice how succinct the do notation is at handling the containers used.
 We can take advantage of JavaScript's ability to parse functions as strings to rewrite a language similar to this notation into one that can be executed.

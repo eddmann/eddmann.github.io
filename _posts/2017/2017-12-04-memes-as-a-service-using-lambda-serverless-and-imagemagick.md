@@ -15,7 +15,7 @@ The consumer will be able to supply top and bottom text, along with specifying t
 Fortunately, the stock Lambda Node.js environment comes equipped with support for the popular [ImageMagick](https://www.imagemagick.org/).
 In this blog post, I will present how I went about solving this problem using the Serverless Framework.
 
-### Setup and Configuration
+## Setup and Configuration
 
 I will assume that you already have the Serverless Framework and an AWS Access Key set up on your development machine.
 With these installed, we first create a new Serverless application based on the provided template.
@@ -75,7 +75,7 @@ Before continuing, we should include the Serverless plugin as a development depe
 $ npm install serverless-apigw-binary --save-dev
 ```
 
-### Implementation
+## Implementation
 
 Now, with the blueprint in place, we can create the implementation.
 Replace the sample `handler.js` contents with the following:
@@ -130,7 +130,7 @@ API Gateway supports [binary responses](https://aws.amazon.com/about-aws/whats-n
 We previously configured the media types that we want to be treated as binary within API Gateway using the added plugin.
 Since the framework configures each API Gateway route to be in proxy mode by default, this is all we need to return the generated content.
 
-### Deployment
+## Deployment
 
 Finally, we can test this service by running:
 

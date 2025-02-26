@@ -11,7 +11,7 @@ What we were instead looking for was to create a constraint-based ordering that,
 
 <!--more-->
 
-### Initial Solution
+## Initial Solution
 
 The first approach I took to achieving this end goal was to apply a low-high ordering pattern.
 To make the process easier, I decided that initially sorting the jobs based on shortlist fees would alleviate us from any intensive comparison checks later on.
@@ -33,7 +33,7 @@ function orderFeesByLowHigh(array $fees)
 }
 ```
 
-### Taking Another Approach
+## Taking Another Approach
 
 Upon reflection, however, I did not feel that the resulting list looked 'random' enough.
 Over the weekend, I thought that maybe incorporating a middle value would help achieve a better outcome.

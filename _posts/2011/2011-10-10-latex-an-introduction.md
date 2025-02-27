@@ -28,7 +28,7 @@ These markup text files can then be processed using LaTeX into various formats, 
 ## Installation
 
 There are installation packages available for all major platforms.
-If you are using OSX, an installer can be found at [MacTeX](http://www.tug.org/mactex/), which also bundles TeXShop—great for quick experiments.
+If you are using OSX, an installer can be found at [MacTeX](http://www.tug.org/mactex/), which also bundles TeXShop - great for quick experiments.
 Windows users can head to [proTeXt](http://www.tug.org/protext/), which follows a similarly simple installation process as its Mac variant.
 
 ![A screenshot of TeXShop in action](/uploads/latex-an-introduction/tex-shop.png)
@@ -47,7 +47,7 @@ Hello LaTeX!
 
 In just a few lines, we can create a document that can be easily processed using LaTeX into a variety of formats.
 The first line specifies how to format the document (heading, spacing, etc.).
-There are many different document formats available, ranging from _minimal_ to _book_ — though further explanation is beyond the scope of an introductory article.
+There are many different document formats available, ranging from _minimal_ to _book_ - though further explanation is beyond the scope of an introductory article.
 The final block of required markup is the document contents.
 
 ```bash

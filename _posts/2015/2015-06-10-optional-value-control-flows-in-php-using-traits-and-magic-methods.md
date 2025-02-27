@@ -11,7 +11,7 @@ I would instead like to focus my attention on only looking into the concept of `
 
 <!--more-->
 
-Typically, in an imperative mindset we are accustomed to evaluating a value, and based on its existence — defined as falsy in this context — we follow a different course of action.
+Typically, in an imperative mindset we are accustomed to evaluating a value, and based on its existence - defined as falsy in this context - we follow a different course of action.
 This can be clearly seen in the following two examples:
 
 ```php
@@ -65,12 +65,12 @@ $cart = $repository->findByIdOrElse(1, function () { return new ShoppingCart; })
 
 You can see from the examples above how we have been able to be more expressive within the method call, describing its intent more clearly.
 This method now reads as one that expects the possibility of a non-existent or alternative return value.
-The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation — resulting in the possibility of a new cart being created but never required.
+The second example is a rewrite of the first, taking into consideration the fact that all method parameters are interpreted during invocation - resulting in the possibility of a new cart being created but never required.
 Instead, the value is wrapped in a function which is lazily called by the trait implementation if needed.
 
 ## Using Composition
 
-If you are against the idea of altering the behaviour of the class by adding a trait — and instead wish to perform such actions ad hoc — the following example shows how the same can be achieved through composition.
+If you are against the idea of altering the behaviour of the class by adding a trait - and instead wish to perform such actions ad hoc - the following example shows how the same can be achieved through composition.
 
 ```php
 class OrElse

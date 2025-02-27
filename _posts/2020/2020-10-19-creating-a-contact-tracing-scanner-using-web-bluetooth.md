@@ -2,7 +2,7 @@
 layout: post
 title: 'Creating a Contact Tracing Scanner using Web Bluetooth'
 meta: 'Discover how to use the Web Bluetooth API to build a Contact Tracing Scanner web application.'
-tags: contact-tracing javascript
+tags: contact-tracing javascript web-bluetooth
 ---
 
 I have recently been looking at the [Contact Tracing specifications](https://covid19.apple.com/contacttracing) that Apple and Google released earlier this year in aid of the fight against COVID-19.

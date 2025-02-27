@@ -1,21 +1,21 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/
-meta: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
+meta: 'Guide to building a Serverless RESTful API and React Client using AWS services and modern development tools.'
+tags: serverless aws lambda react javascript
 ---
 
-Since moving our infrastructure over to the AWS stack I have keen to explore how we can take advantage of the large number of services at our disposal, along with the Serverless methodology.
-In this blog-series I wish to document my experience building a complete Serverless application which harnesses as many of the AWS offerings as possible.
-We will explore building both a RESTful API and a React Client, all hosted without any Servers to maintain!
+Since moving our infrastructure over to the AWS stack, I have been keen to explore how we can take advantage of the numerous services at our disposal, alongside the serverless methodology.
+In this blog series, I wish to document my experience of building a complete serverless application which harnesses as many of the AWS offerings as possible.
+We will explore building both a RESTful API and a React client, all hosted without any servers to maintain!
 
 <!--more-->
 
-### Mince Pie Challenge
+## Mince Pie Challenge
 
-The application itself will revolve around the responsibly of managing the 'extremely important' challenge of rating mince pies.
-We will provide the user with the ability to register, login, add new mince pies to the challenge (with a photo) and rate these pies.
-Although this may seem like a trivial CRUD system it will allow us to explore many different technologies and services in the process.
+The application itself will revolve around the responsibility of managing the 'extremely important' challenge of rating mince pies.
+We will provide the user with the ability to register, log in, add new mince pies to the challenge (with a photo) and rate these pies.
+Although this may seem like a trivial CRUD system, it will allow us to explore many different technologies and services in the process.
 
 <img src="/uploads/mince-pie-challenge-building-a-serverless-restful-api-and-react-client/mince-pie-challenge.png" alt="Mince Pie Challenge" />
 
@@ -43,7 +43,7 @@ Although this may seem like a trivial CRUD system it will allow us to explore ma
 - Authentication will be supplied by the [Amazon Cognito Identity SDK](https://github.com/aws/aws-amplify/tree/master/packages/amazon-cognito-identity-js).
 - Testing will be achieved using [Jest](https://facebook.github.io/jest/) and [Enzyme](http://airbnb.io/enzyme/).
 - [Semantic UI](https://react.semantic-ui.com/) for component styling.
-- [Terraform](https://www.terraform.io/) to provision the static endpoint we will publish the resulting client to.
+- [Terraform](https://www.terraform.io/) to provision the static endpoint to which we will publish the resulting client.
 
-With so much to do, we better get started!
-Join me in the next post were we will go about designing and documenting our RESTful API using RAML and HAL.
+With so much to do, we had better get started!
+Join me in the next post where we will go about designing and documenting our RESTful API using RAML and HAL.

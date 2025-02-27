@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explores creating an Enigma Machine in Haskell, using Property-based testing to assert its correctness">
+    <meta name="description" content="Explore the intricacies of creating an Enigma Machine in Haskell, utilising property-based testing to ensure correctness and robustness.">
 
     <title>
         
@@ -50,9 +50,10 @@
                 <article class="post">
     <h1 class="post-title">Building an Enigma Machine in Haskell</h1>
     <time datetime="2020-11-27T00:00:00+00:00" class="post-date">27 Nov 2020</time>
-    <p>Following on from my previous post which highlighted my experience building an <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/">Enigma Machine in ClojureScript</a>, I decided it would be interesting to model the machine within Haskell.
-I felt solving the same problem in this mannor would be a great way to compare and contrast Lisp and heavily-typed languages such as Haskell.
-Through this process I also wanted to explore using Hspec and QuickCheck for comparable Property-based testing that I achieved in the ClojureScript counterpart.</p>
+    <p>Following on from my previous post which highlighted my experience building an <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/">Enigma Machine in ClojureScript</a>.
+I decided it would be interesting to model the machine within Haskell.
+I felt solving the same problem in this manner would be a great way to compare and contrast Lisp and heavily-typed languages such as Haskell.
+Through this process I also wanted to explore using Hspec and QuickCheck for comparable property-based testing that I achieved in the ClojureScript counterpart.</p>
 
 
 
@@ -61,14 +62,14 @@ We leverage Docker to containerise the Haskell development/testing requirements 
 
 <p><a href="https://github.com/eddmann/enigma-machine-haskell"><img src="/uploads/building-an-enigma-machine-in-haskell/demo.png" alt="Command-line based Enigma Machine in Haskell" /></a></p>
 
-<h3 id="how-it-works">How it works</h3>
+<h2 id="how-it-works">How it works</h2>
 
 <p>I spent some time within the previous ClojureScript implementation discussing the purpose and inner-workings of the Enigma Machine.
-So as to not simply repeat myself here I ask that you refer to <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/#how-it-works">this section</a> for a basic understanding of the machine behaviour we will be modeling.</p>
+So as to not simply repeat myself here I ask that you refer to <a href="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/#how-it-works">this section</a> for a basic understanding of the machine behaviour we will be modelling.</p>
 
 <p><img src="/uploads/building-an-enigma-machine-in-haskell/enigma-machine.jpg" alt="Enigma Machine" /></p>
 
-<h3 id="the-machine">The Machine</h3>
+<h2 id="the-machine">The Machine</h2>
 
 <p>In a similar fashion to how we tackled the previous implementation, the first element of the machine that we will model are the Rotors.</p>
 
@@ -114,7 +115,7 @@ So as to not simply repeat myself here I ask that you refer to <a href="https://
 </code></pre></div></div>
 
 <p>Based on the code above we first create a new <em>data type</em> which will represent a given Rotor - along with an aggregate tuple which represents the collection of Rotors.
-This leads us to providing the behaviour necessary to rotate the Rotor collection based on each given Rotors position and step.
+This leads us to providing the behaviour necessary to rotate the Rotor collection based on each given rotor’s position and step.
 Finally, we provide a means of passing a given letter through (and back-through) the Rotors, performing the substitution encryption (scrambled wiring) along the way.</p>
 
 <p>From here, we will now model the Reflector, which is used to complete the circuit and send the current (letter) back through the Rotors.</p>
@@ -134,11 +135,11 @@ Finally, we provide a means of passing a given letter through (and back-through)
 <span class="n">reflect</span> <span class="n">reflector</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">maybe</span> <span class="sc">'?'</span> <span class="n">id</span> <span class="o">$</span> <span class="n">lookup</span> <span class="n">letter</span> <span class="n">reflector</span>
 </code></pre></div></div>
 
-<p>Being a static substitution system the Reflector is trival to model - however, we do cater for the possibility of a value not being present in the ‘lookup’ invocation via unwrapping the <em>Maybe</em> and returning an <code class="language-plaintext highlighter-rouge">?</code> instead.
-This should not occur in practise, but to date I have not been able to find a means of adding the sufficent type-level constraints required to ensure that only <code class="language-plaintext highlighter-rouge">Char</code> values present in the <code class="language-plaintext highlighter-rouge">alphabet</code> listing should be consumed/returned.</p>
+<p>Being a static substitution system, the Reflector is trivial to model - however, we do cater for the possibility of a value not being present in the <code class="language-plaintext highlighter-rouge">lookup</code> invocation via unwrapping the <em>Maybe</em> and returning a <code class="language-plaintext highlighter-rouge">?</code> instead.
+This should not occur in practice, but to date I have not been able to find a means of adding the sufficient type-level constraints required to ensure that only <code class="language-plaintext highlighter-rouge">Char</code> values present in the <code class="language-plaintext highlighter-rouge">alphabet</code> listing should be consumed/returned.</p>
 
-<p>This leads us on to modeling the Plugboard, which uses the <code class="language-plaintext highlighter-rouge">lookup</code> Haskell function again to see if a translation (plug) for the given letter has been provided.
-If this is not the case when unwrapping the <em>Maybe</em> monadic structure, the provided letter itself (by-way of the <code class="language-plaintext highlighter-rouge">id</code> function) is returned instead.</p>
+<p>This leads us on to modelling the Plugboard, which uses the <code class="language-plaintext highlighter-rouge">lookup</code> Haskell function again to see if a translation (plug) for the given letter has been provided.
+If this is not the case when unwrapping the <em>Maybe</em> monadic structure, the provided letter itself (by way of the <code class="language-plaintext highlighter-rouge">id</code> function) is returned instead.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">type</span> <span class="kt">Plugboard</span> <span class="o">=</span> <span class="p">[(</span><span class="kt">Char</span><span class="p">,</span> <span class="kt">Char</span><span class="p">)]</span>
 
@@ -147,7 +148,7 @@ If this is not the case when unwrapping the <em>Maybe</em> monadic structure, th
     <span class="kr">where</span> <span class="n">plugboard'</span> <span class="o">=</span> <span class="p">(</span><span class="n">plugboard</span> <span class="o">++</span> <span class="n">map</span> <span class="n">swap</span> <span class="n">plugboard</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>With all the building blocks now in-place we can begin to compose them together to handle encoding a given message through the machine.</p>
+<p>With all the building blocks now in place we can begin to compose them together to handle encoding a given message through the machine.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">encode</span> <span class="o">::</span> <span class="kt">Rotors</span> <span class="o">-&gt;</span> <span class="kt">Reflector</span> <span class="o">-&gt;</span> <span class="kt">Plugboard</span> <span class="o">-&gt;</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Char</span>
 <span class="n">encode</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">letter</span> <span class="o">=</span>
@@ -161,14 +162,14 @@ If this is not the case when unwrapping the <em>Maybe</em> monadic structure, th
 </code></pre></div></div>
 
 <p>Above we have opted to break the problem up into a recursive <code class="language-plaintext highlighter-rouge">encodeMessage</code> function which uses an internal <code class="language-plaintext highlighter-rouge">encode</code> function to provide threading the letter through the currently configured machine.
-Unlike Clojure we do not have a means to express ‘threading’ the letter through a list of functions defined left-to-right.
-Instead we have to compose the functions together reading the function right-to-left.
-It would be nice to be able to provide some syntactic sugar around this use-case - as when you have big composition chains such as this, it is a lot more understable to read left-to-right (regardless of how the call stack is going to be built internally).</p>
+Unlike Clojure, we do not have a means to express ‘threading’ the letter through a list of functions defined left-to-right.
+Instead, we have to compose the functions together reading the function right-to-left.
+It would be nice to be able to provide some syntactic sugar around this use-case - as when you have big composition chains such as this, it is a lot more understandable to read left-to-right (regardless of how the call stack is going to be built internally).</p>
 
-<h3 id="testing">Testing</h3>
+<h2 id="testing">Testing</h2>
 
-<p>With the machine behaviour now modeled in code we can move on to asserting its correctness.
-In a similar fashion to how we tested the ClojureScript implementation, I have opted to explore testing using static example-based test-cases, along with random examples which ensure desired properties of the machine hold true.</p>
+<p>With the machine behaviour now modelled in code, we can move on to asserting its correctness.
+In a similar fashion to how we tested the ClojureScript implementation, I have opted to explore testing using static example-based test cases, along with random examples which ensure desired properties of the machine hold true.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">genReflector</span> <span class="o">::</span> <span class="kt">Gen</span> <span class="kt">Reflector</span>
 <span class="n">genReflector</span> <span class="o">=</span> <span class="n">elements</span> <span class="p">[</span><span class="n">reflectorA</span><span class="p">,</span> <span class="n">reflectorB</span><span class="p">,</span> <span class="n">reflectorB</span><span class="p">]</span>
@@ -192,7 +193,7 @@ In a similar fashion to how we tested the ClojureScript implementation, I have o
 
 <p>Using <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a>, we are able to succinctly provide a means of defining how a valid machine configuration and message input should be constructed.
 One omission to this implementation that should be highlighted is that we do not provide the operator with the ability to specify the Rotor starting positions.
-This can be trivially added but I decided that in the interest of code-sample clarity I would leave this as an exercise of the reader to implement if they so wish.</p>
+This can be trivially added, but I decided that in the interest of code-sample clarity I would leave this as an exercise for the reader to implement if they so wish.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
 <span class="n">main</span> <span class="o">=</span> <span class="n">hspec</span> <span class="o">$</span> <span class="kr">do</span>
@@ -220,19 +221,19 @@ This can be trivially added but I decided that in the interest of code-sample cl
                               <span class="n">length</span> <span class="n">message</span> <span class="o">==</span> <span class="n">length</span> <span class="n">cipher</span>
 </code></pre></div></div>
 
-<p>Coupled with the help of <a href="https://hspec.github.io/">Hspec</a> we are then able to define the two static example-based tests that we created before, along with the two machine properties that we wish to hold true.
-Although the syntax is naturally different, the general philosophy of how a Property-based test is expressed and validated is very similar to the ClojureScript counterpart.</p>
+<p>Coupled with the help of <a href="https://hspec.github.io/">Hspec</a>, we are then able to define the two static example-based tests that we created before, along with the two machine properties that we wish to hold true.
+Although the syntax is naturally different, the general philosophy of how a property-based test is expressed and validated is very similar to the ClojureScript counterpart.</p>
 
 <p>As stated in the previous article this test-suite is by no means exhaustive and can be expanded upon greatly.
 The goal of this is to highlight the key differences between conventional test assertions and testing validity of <em>System under test</em> (SUT) properties.
 This test-suite can be run locally using the <code class="language-plaintext highlighter-rouge">make test</code> target, or you can see example resulting output by-way of the configured <a href="https://github.com/eddmann/enigma-machine-haskell/actions">GitHub Action</a>.</p>
 
-<h3 id="the-user-interface">The User Interface</h3>
+<h2 id="the-user-interface">The User Interface</h2>
 
-<p>To make this implementation a little different I have opted to provide a Command-line based user interface over a Web-based one.
-In doing so we are able to see a very powerful use-case for Haskell’s <a href="http://learnyouahaskell.com/syntax-in-functions">pattern matching</a> functionality.</p>
+<p>To make this implementation a little different, I have opted to provide a command-line based user interface over a web-based one.
+In doing so, we are able to see a very powerful use-case for Haskell’s <a href="http://learnyouahaskell.com/syntax-in-functions">pattern matching</a> functionality.</p>
 
-<p>To achieve this end-goal we must first provide a means for the client to translate their desired machine configuration into one that our <code class="language-plaintext highlighter-rouge">encodeMessage</code> function can understand.</p>
+<p>To achieve this end-goal, we must first provide a means for the client to translate their desired machine configuration into one that our <code class="language-plaintext highlighter-rouge">encodeMessage</code> function can understand.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">toRotor</span> <span class="o">::</span> <span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Maybe</span> <span class="kt">Rotor</span>
 <span class="n">toRotor</span> <span class="o">=</span> <span class="p">(</span><span class="n">flip</span> <span class="n">lookup</span><span class="p">)</span> <span class="p">[(</span><span class="sc">'1'</span><span class="p">,</span> <span class="n">rotorI</span><span class="p">),</span> <span class="p">(</span><span class="sc">'2'</span><span class="p">,</span> <span class="n">rotorII</span><span class="p">),</span> <span class="p">(</span><span class="sc">'3'</span><span class="p">,</span> <span class="n">rotorIII</span><span class="p">)]</span>
@@ -245,8 +246,8 @@ In doing so we are able to see a very powerful use-case for Haskell’s <a href=
 <span class="n">toPlugboard</span> <span class="kr">_</span> <span class="o">=</span> <span class="kt">[]</span>
 </code></pre></div></div>
 
-<p>With this functionality now in-place we can move on to parsing the Command-line argument input.
-Thanks to how powerful Haskell’s pattern matching is, we are able to concisely break-up the problem of parsing each of the required machine components as follows.</p>
+<p>With this functionality now in place, we can move on to parsing the command-line argument input.
+Thanks to how powerful Haskell’s pattern matching is, we are able to concisely break up the problem of parsing each of the required machine components as follows.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parseRotors</span> <span class="o">::</span> <span class="p">[</span><span class="kt">String</span><span class="p">]</span> <span class="o">-&gt;</span> <span class="kt">IO</span> <span class="kt">Rotors</span>
 <span class="n">parseRotors</span> <span class="p">(</span><span class="s">"-rotors"</span> <span class="o">:</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span> <span class="o">:</span> <span class="kr">_</span><span class="p">)</span> <span class="o">=</span> <span class="kr">case</span> <span class="p">(</span><span class="n">toRotor</span> <span class="n">a</span><span class="p">,</span> <span class="n">toRotor</span> <span class="n">b</span><span class="p">,</span> <span class="n">toRotor</span> <span class="n">c</span><span class="p">)</span> <span class="kr">of</span>
@@ -274,7 +275,7 @@ Thanks to how powerful Haskell’s pattern matching is, we are able to concisely
 </code></pre></div></div>
 
 <p>I have decided to take advantage of the <em>IO</em> Monad and return a wrapped value for each given parsed configuration option.
-This allows us to neatly use <em>do</em> notation described below to build a fully configured machine, short circuiting at any stage where we are unable to parse the given input option.</p>
+This allows us to neatly use <em>do</em> notation described below to build a fully configured machine, short-circuiting at any stage where we are unable to parse the given input option.</p>
 
 <div class="language-haskell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">main</span> <span class="o">::</span> <span class="kt">IO</span> <span class="nb">()</span>
 <span class="n">main</span> <span class="o">=</span>  <span class="kr">do</span>
@@ -286,13 +287,13 @@ This allows us to neatly use <em>do</em> notation described below to build a ful
     <span class="n">print</span> <span class="o">$</span> <span class="n">encodeMessage</span> <span class="n">rotors</span> <span class="n">reflector</span> <span class="n">plugboard</span> <span class="n">message</span>
 </code></pre></div></div>
 
-<p>With the machine configuration successfully parsed we are able to invoke the <code class="language-plaintext highlighter-rouge">encodeMessage</code> function and print the resulting cipher message to the Terminal.</p>
+<p>With the machine configuration successfully parsed, we are able to invoke the <code class="language-plaintext highlighter-rouge">encodeMessage</code> function and print the resulting cipher message to the Terminal.</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>I felt reimplementing the Enigma Machine in Haskell was a very worthwhile endeavour, allowing me to compare and contrast how the problem can be solved in the two different languages.
-I am big fan of Lisp and the Clojure dialect, but did find how useful declaring functions by means of simple type transformations was a very pleasing/powerful development process.
-Starting off by thinking in soley type transformations as opposed to concrete behaviour provided a means to build up the system in a very succinct manner.
+I am a big fan of Lisp and the Clojure dialect, but I did find how useful declaring functions by means of simple type transformations was a very pleasing and powerful development process.
+Starting off by thinking in solely type transformations as opposed to concrete behaviour provided a means to build up the system in a very succinct manner.
 From here, I hope to spend some additional time solving future problems using Haskell, taking more time to leverage further aspects of its very expressive type system.</p>
 
 </article>

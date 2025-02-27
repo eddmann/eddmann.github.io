@@ -54,12 +54,13 @@
 Along with building a <a href="https://retropie.org.uk/">RetroPie</a>, I dusted off my old Game Boy and decided to ‘catch them all’ one more time on Pokémon Red.
 Whilst playing, the developer in me started to contrive how a game like this was created, and better still could be changed.
 Enter <a href="https://github.com/pret/pokered">pokered</a>, a disassembly of Pokémon Red/Blue which has been organised so that an assembly code noice like myself can understand it.
-In this post I will go through compiling the ASM, tweaking the game to add <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de">‘Super B’ button behaviour</a>, and then running the compiled ROM on an actual handheld!
-</p>
+In this post I will go through compiling the ASM, tweaking the game to add <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de">‘Super B’ button behaviour</a>, and then running the compiled ROM on an actual handheld!</p>
+
+
 
 <p><strong>Note:</strong> I don’t condone piracy and personally own both Pokémon Red/Blue game cartridges that this project is based on.</p>
 
-<h3 id="compiling-pokered-using-docker">Compiling pokered using Docker</h3>
+<h2 id="compiling-pokered-using-docker">Compiling pokered using Docker</h2>
 
 <p>The <a href="https://github.com/pret/pokered">pokered</a> Git repository is well documented, including the steps required to compile the given assembly code for the desired platform.
 However, being an advocate of Docker I wished to take it a step further an Dockerise this process.
@@ -83,13 +84,13 @@ docker run <span class="nt">-v</span> <span class="si">$(</span><span class="nb"
 Once complete, two new build artifacts were now present in the root of the repository - <code class="language-plaintext highlighter-rouge">pokered.gbc</code> and <code class="language-plaintext highlighter-rouge">pokeblue.gbc</code>.
 Both these ROMs were now playable using a desktop/web Game Boy emulator like <a href="https://wasmboy.app/">wasmboy</a>. 🎉</p>
 
-<h3 id="adding-the-super-b-button-behaviour">Adding the ‘Super B’ button behaviour</h3>
+<h2 id="adding-the-super-b-button-behaviour">Adding the ‘Super B’ button behaviour</h2>
 
 <p>Now that I could now compile the game into a working ROM, my mind began thinking of all the small tweaks to the game I would like to experiment with.
 One aspect of the original that always felt time consuming was when trying to get to a destination in a hurry and be caught out by many wild Pokémon (without <a href="https://bulbapedia.bulbagarden.net/wiki/Repel">Repel</a> active) and trainer-battle encounters.
 I started to review the code-base to see if there was a way of taking advantage of when the B button was pressed, possibly temporarily preventing these two activities.</p>
 
-<h4 id="prevent-wild-pokémon-encounters">Prevent Wild Pokémon Encounters</h4>
+<h3 id="prevent-wild-pokémon-encounters">Prevent Wild Pokémon Encounters</h3>
 
 <p>It turns out that the game had an unused <a href="https://tcrf.net/Pok%C3%A9mon_Red_and_Blue/Debug_Functions#Debug_Mode">debug mode</a> that was left in, which provided one part of this behaviour.
 As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-126f3527215b40b1dc53ffe1ff45b479"><code class="language-plaintext highlighter-rouge">engine/battle/core.asm</code></a> to prevent wild Pokémon encounters if the B button was pressed.</p>
@@ -106,7 +107,7 @@ As such I was able to tweak <a href="https://github.com/eddmann/pokered/commit/e
 
 <p>This tweak simply removes the check for if the debug mode is enabled and short-circuits the action if the B button is pressed.</p>
 
-<h4 id="prevent-trainer-battle-encounters">Prevent Trainer Battle Encounters</h4>
+<h3 id="prevent-trainer-battle-encounters">Prevent Trainer Battle Encounters</h3>
 
 <p>Following this, I now hoped to follow a similar pattern in temporarily preventing trainer battle encounters.
 I was able to achieve this by making some minor modifications to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-33f8ea117b558305b57c03b757e4ef64"><code class="language-plaintext highlighter-rouge">home.asm</code></a>.</p>
@@ -130,7 +131,7 @@ I was able to achieve this by making some minor modifications to <a href="https:
 <p>In a similar manor to how we prevented wild Pokémon encounters, if the B button is pressed we jump to <code class="language-plaintext highlighter-rouge">.noFight</code>, skipping the <code class="language-plaintext highlighter-rouge">CheckForEngagingTrainers</code> call.
 Once compiled, I was able to experiment with these two changes and found them to be very interesting additions to game play.</p>
 
-<h4 id="walking-through-walls">Walking Through Walls</h4>
+<h3 id="walking-through-walls">Walking Through Walls</h3>
 
 <p>I then thought wouldn’t it be cool to accommodate for a similar ‘walk through walls’ glitch behaviour that you see in certain <a href="https://www.youtube.com/watch?v=5naL4X1vUbE">speed runs</a>.
 As such I delved back into the code-base and made a small modification to <a href="https://github.com/eddmann/pokered/commit/e2d6662bc13348234d58a262e9d6faef0a2507de#diff-3dcdb47cbd60e627ff3c82d83193112c"><code class="language-plaintext highlighter-rouge">home/overworld.asm</code></a> which provided me with this capability.</p>
@@ -157,7 +158,7 @@ You can see a small clip below of how game play is altered when the ‘Super B�
 <p>Due to the effort put into making the pokered project so readable, I found it very easy to work my way through the code-base and locate the areas of interest to experiment with.
 The people behind this disassembly have also worked on doing the same for <a href="https://github.com/pret">many other</a> Pokémon releases.</p>
 
-<h3 id="playing-on-a-handheld">Playing on a Handheld</h3>
+<h2 id="playing-on-a-handheld">Playing on a Handheld</h2>
 
 <p>With this modifications in place I ideally wished to now use this new behaviour on a handled console, as opposed to just through a desktop emulator.
 To achieve this I purchased an <a href="http://www.ezflash.cn/product/omega/">EZ-Flash Omega</a> cartridge for the GBA which allowed me to transfer these ROMs onto a micro-SD card.

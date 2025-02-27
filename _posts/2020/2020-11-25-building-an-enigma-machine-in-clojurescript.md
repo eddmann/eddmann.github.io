@@ -2,7 +2,7 @@
 layout: post
 title: 'Building an Enigma Machine in ClojureScript'
 meta: 'Learn how to build an Enigma Machine using ClojureScript and property-based testing. This comprehensive guide covers rotor simulation, reflector configuration, and a user interface using Reagent.'
-tags: enigma clojurescript property-testing
+tags: enigma-machine clojurescript property-testing
 ---
 
 The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2.

@@ -1,11 +1,12 @@
 ---
 layout: post
 title: "Unlocking Tsunekazu Ishihara's team in Pokémon Red (pokered)"
-meta: "Documenting how to unlock Tsunekazu Ishihara's team in Pokémon Red (pokered)"
+meta: "Discover how to unlock Tsunekazu Ishihara's team in Pokémon Red (pokered) with this comprehensive guide."
+tags: retro-gaming assembly-code
 ---
 
 Continuing on from the modifications made to [pokered](https://github.com/pret/pokered) in the [previous post](/posts/compiling-pokered-using-docker-and-adding-super-b-button-behaviour/), I noticed an interesting unused behaviour in the assembly code.
-It looked to be an unused [debug function](https://github.com/eddmann/pokered/blob/master/engine/debug1.asm) which gives the player [Tsunekazu Ishihara's](https://bulbapedia.bulbagarden.net/wiki/Tsunekazu_Ishihara) favourite Pokémon.
+It appeared to be an unused [debug function](https://github.com/eddmann/pokered/blob/master/engine/debug1.asm) which gives the player [Tsunekazu Ishihara's](https://bulbapedia.bulbagarden.net/wiki/Tsunekazu_Ishihara) favourite Pokémon.
 In this post I will document making this function accessible by [talking to Mom](https://github.com/eddmann/pokered/commit/3450a335207c79018c4c157139ad5a6ac2755081) in Pallet Town.
 
 <!--more-->
@@ -25,7 +26,7 @@ RedsHouse1FText1: ; Mom
 ```
 
 So now, instead of healing any present Pokémon, Mom will instead provide us with Ishihara's team.
-To document this change to the player I updated the text that was presented when talking to Mom within [`text/maps/RedsHouse1F.asm`](https://github.com/eddmann/pokered/commit/3450a335207c79018c4c157139ad5a6ac2755081#diff-b1750b171a232f88acb32643546f5ed3).
+To document this change to the player, I updated the text that was presented when talking to Mom within [`text/maps/RedsHouse1F.asm`](https://github.com/eddmann/pokered/commit/3450a335207c79018c4c157139ad5a6ac2755081#diff-b1750b171a232f88acb32643546f5ed3).
 
 ```diff
 _MomWakeUpText::

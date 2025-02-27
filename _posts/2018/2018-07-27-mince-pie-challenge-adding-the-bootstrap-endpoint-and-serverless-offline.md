@@ -1,19 +1,19 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/
-meta: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
+meta: 'Discover how to implement a Bootstrap API endpoint and configure Serverless Offline for efficient local development.'
+tags: serverless
 ---
 
 Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication.
 We will now move on to implementing the first **real** API endpoint, that being the Bootstrap response.
-Along the way we will configure [Serverless Offline](https://github.com/dherault/serverless-offline), allowing us to locally interact with the API, without having to provision any online resources.
+Along the way, we will configure [Serverless Offline](https://github.com/dherault/serverless-offline), allowing us to locally interact with the API without having to provision any online resources.
 
 <!--more-->
 
 If you are keen to see how the finished example looks, you can access it within the [API repository](https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/05-bootstrap-offline).
 
-### Adding the Bootstrap Endpoint
+## Adding the Bootstrap Endpoint
 
 If we [look back](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#bootstrap) at the RAML API definition, we can see that this endpoint is used to help aid the client in discovering all the different endpoints/actions that are available to them.
 We also provide the base endpoint and some Amazon Cognito User Pool specific information.
@@ -32,9 +32,9 @@ bootstrap:
         cors: true
 ```
 
-In this case we are explicitly supplying several additional environment variables to this particular handler.
-As these are only required within this endpoint, following the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) states that they should only be supplied within here.
-We are fetching these values from the stage specific configuration file (`config.dev.yml`), referencing the User Pool Client resource in a similar manor to how we reference the User Pool in the previous post.
+In this case, we are explicitly supplying several additional environment variables to this particular handler.
+As these are only required for this endpoint, the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) dictates that they should only be provided here.
+We are fetching these values from the stage-specific configuration file (`config.dev.yml`), referencing the User Pool Client resource in a similar manner to how we referenced the User Pool in the previous post.
 We also [enable CORS](https://serverless.com/framework/docs/providers/aws/events/apigateway/#enabling-cors) support within the API Gateway endpoint, as the API will be hosted on a different sub-domain to the client.
 
 ```yaml
@@ -45,7 +45,7 @@ userPoolClientId:
 ```
 
 With this endpoint now defined, we can move on to implementing the behaviour.
-We will first add a [new dependency](https://github.com/byteclubfr/js-hal) to the `package.json`, this provides a nice abstraction around managing HAL resources.
+We will first add a [new dependency](https://github.com/byteclubfr/js-hal) to the `package.json`, which provides a nice abstraction around managing HAL resources.
 
 ```json
 {
@@ -55,7 +55,7 @@ We will first add a [new dependency](https://github.com/byteclubfr/js-hal) to th
 }
 ```
 
-From here, we can implement the delivery specific handler within `src/bootstrap.js`.
+From here, we can implement the delivery-specific handler within `src/bootstrap.js`.
 
 ```js
 // @flow
@@ -118,7 +118,7 @@ const bootstrap = async ({ services: { getPoolId, getClientId, getBaseEndpointUr
 export default createHandler(bootstrap);
 ```
 
-The handler uses the newly added dependency to build up a HAL compliant resource which is returned to the client.
+The handler uses the newly added dependency to build up a HAL-compliant resource which is returned to the client.
 The supplied services are then used to correctly set the resource values based on the current setup.
 We finally return a newly created `ok` response, which needs to be added to `src/helpers/http.js`.
 
@@ -148,7 +148,7 @@ export type HALResource = {
 };
 ```
 
-Within our domain, a `HALResource` must provide a set of `_links` and a `toJSON` method, which converts the internal representation into JSON which can be consumed by the client.
+Within our domain, a `HALResource` must provide a set of `_links` and a `toJSON` method, which converts the internal representation into JSON that can be consumed by the client.
 We can now move on to covering this new handler with sufficient test coverage.
 We will create a new test within `src/__tests__/bootstrap.js`, and ensure that the handler responds with the expected output, based on the supplied service definitions.
 
@@ -171,20 +171,20 @@ it('displays the bootstrap details', async () => {
 });
 ```
 
-With this addition we can run `make test` locally to ensure the handler honours the agreement.
-Committing these changes to the GitHub repository will in-turn invoke a new Travis CI build.
+With this addition, we can run `make test` locally to ensure the handler honours the agreement.
+Committing these changes to the GitHub repository will in turn invoke a new Travis CI build.
 Finally, we can run `make deploy` to see this endpoint in action within our `dev` AWS stage.
 
 <img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap.png" alt="Online Bootstrap Endpoint" />
 
-### Adding Serverless Offline
+## Adding Serverless Offline
 
 We can now access this Bootstrap endpoint online within our `dev` AWS stage.
-This is great - but wouldn't it be even better if we could interact with this project locally!
+This is great, but wouldn't it be even better if we could interact with this project locally?
 In doing so, we would be able to quickly inspect the API's behaviour without having to deploy the resources to AWS.
-Once we are settled on the implementation, we could then deploy the changes to our online `dev` stage, and then subsequently `prod` when we wish to release it to the world.
+Once we are satisfied with the implementation, we could then deploy the changes to our online `dev` stage, and subsequently to `prod` when we wish to release it to the world.
 
-To do this we will add Serverless Offline to our project, which locally emulates AWS Lambda and API Gateway.
+To do this, we will add Serverless Offline to our project, which locally emulates AWS Lambda and API Gateway.
 Internally, it starts up a small HTTP server which handles request lifecycles like API Gateway does, invoking the desired handlers.
 To start with, we shall add a new development dependency to the `package.json` file.
 
@@ -196,8 +196,8 @@ To start with, we shall add a new development dependency to the `package.json` f
 }
 ```
 
-We can then update the `serverless.yml` configuration, amending the default stage (if one is not provided within command-line invocation) to be `offline`.
-For the sake of clarity we will also specify the default `host` and `port` the Serverless Offline HTTP server should bind itself to.
+We can then update the `serverless.yml` configuration, amending the default stage (if one is not provided via command-line invocation) to be `offline`.
+For the sake of clarity, we will also specify the default `host` and `port` to which the Serverless Offline HTTP server should bind.
 
 ```yaml
 provider:
@@ -232,17 +232,18 @@ userPoolClientId: 'OFFLINE_USER_POOL_CLIENT_ID'
 ```
 
 As we do not wish to use the online Amazon Cognito instance whilst in the `offline` stage, we will provide static dummy pool identifiers instead.
-We can then add a new target to `Makefile`, to correctly open the service ports and run the offline HTTP server.
+We can then add a new target to the `Makefile` to correctly open the service ports and run the offline HTTP server.
 
 ```make
 offline:
   docker-compose run --service-ports --rm serverless-offline sls offline --stage=offline
 ```
 
-With his in place we can run `make offline`, you should now be able to access the offline endpoint by visiting `http://0.0.0.0:3000`.
-Any changes that you now make to the handler implementation will be automatically represented within the offline instance, providing you with a much quicker development REPL cycle.
+With this in place, we can run `make offline`.
+You should now be able to access the offline endpoint by visiting `http://0.0.0.0:3000`.
+Any changes that you make to the handler implementation will be automatically reflected within the offline instance, providing you with a much quicker development REPL cycle.
 
 <img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap.png" alt="Offline Bootstrap Endpoint" />
 
-We have now created our first Mince Pie Challenge API endpoint, which not only works within the online `dev` stage, but also is equipped to handle offline access.
+We have now created our first Mince Pie Challenge API endpoint, which not only works within the online `dev` stage, but is also equipped to handle offline access.
 Join me in the next post where we will be adding the ability to add and list Mince Pies to the API, using both an online and local [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) instance.

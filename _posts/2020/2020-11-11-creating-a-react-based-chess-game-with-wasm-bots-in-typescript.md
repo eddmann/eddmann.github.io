@@ -1,25 +1,27 @@
 ---
 layout: post
 title: 'Creating a React-based Chess Game with WASM Bots in TypeScript'
-meta: 'Explores integrating JavaScript/WASM Bots in a React-based Chess Game using TypeScript'
+meta: 'Learn how to build a React-based chess game integrated with WebAssembly (WASM) bots in TypeScript, utilising React Hooks, the UCI protocol and Yarn 2 features.'
+tags: react chess typescript wasm
 ---
 
 A couple of years ago I explored using a [WebAssembly port](https://github.com/niklasf/stockfish.wasm) of [Stockfish](https://stockfishchess.org/) (the popular Chess engine) as a 'Bot' for a small React-based Chess implementation.
-I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choosen from.
+I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from.
 
 <!--more-->
 
-You can experiement with the final implementation [here](https://eddmann.com/chessbot-typescript/), and the source code is available on [GitHub](https://github.com/eddmann/chessbot-typescript) to review.
+You can experiment with the final implementation [here](https://eddmann.com/chessbot-typescript/).
+The source code is available on [GitHub](https://github.com/eddmann/chessbot-typescript) to review.
 
 [![Chessbot](/uploads/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/chessbot.png)](https://eddmann.com/chessbot-typescript/)
 
-### The Game Engine
+## The Game Engine
 
 To provide the Chess ruleset I decided to expose a simple wrapper around the popular [jhlywa/chess.js](https://github.com/jhlywa/chess.js) library.
-Abstracting away any state present (as the library being class-based) and providing referential transparent functions meant that I could simplify the client code.
+Abstracting away any state present (as the library is class-based) and providing referentially transparent functions meant that I could simplify the client code.
 All functions based their decisions on a supplied [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation) (FEN) state of the current game.
 
-I used a TypeScript type-definiton that was provided by DefinitelyTyped for the library but noticed an issue in how it was defining the constructor.
+I used a TypeScript type-definition that was provided by DefinitelyTyped for the library but noticed an issue in how it was defining the constructor.
 Thanks to [Yarn 2 patches](https://yarnpkg.com/cli/patch) I was able to include a [diff](https://github.com/eddmann/chessbot-typescript/blob/master/%40types-chessjs.diff) within my repository that resolved this issue, until it is fixed upstream.
 
 ```typescript
@@ -57,12 +59,12 @@ export const move = (fen: Fen, from: Square, to: Square): [Fen, Move] | null => 
 };
 ```
 
-Looking at the engine implementation above you can see that along with some custom made types I also leveraged and exposed several types which were provided by the `chess.js` type-definition.
+Looking at the engine implementation above you can see that, along with some custom-made types, I also leveraged and exposed several types which were provided by the `chess.js` type-definition.
 
-### The Bots
+## The Bots
 
 With the ability to now determine how a game of Chess is played I could then move on to explore how to model the concept of a Bot.
-I opted to define a couple of types up-front which expressed the the behavioral intent of a how a Bot should be initialised and used.
+I opted to define a couple of types up-front which expressed the behavioural intent of how a Bot should be initialised and used.
 
 ```typescript
 import type { Fen, ShortMove } from './engine';
@@ -72,7 +74,7 @@ export type InitialisedBot = (fen: Fen) => Promise<ShortMove>;
 export type AvailableBots = Record<string, UninitialisedBot>;
 ```
 
-Using these types I was able to implement the first example Bot - that being the trivial Random Bot.
+Using these types I was able to implement the first example Bot – that being the trivial Random Bot.
 Given a supplied FEN it determines all the available legal moves and then randomly picks one to enact.
 
 ```typescript
@@ -84,10 +86,11 @@ const randomMove: UninitialisedBot = () => fen =>
   });
 ```
 
-For client-based visual considerations I set a small delay before resolving the Promise, this gives the impression of the Bot 'doing work' to make the decision.
+For client-based visual considerations I set a small delay before resolving the Promise.
+This gives the impression of the Bot 'doing work' to make the decision.
 With this bot now available, I moved on to expressing externally provided Bots.
 Using [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) and the [Universal Chess Interface](https://en.wikipedia.org/wiki/Universal_Chess_Interface) (UCI) I found it possible to interface with several different JavaScript/WASM-based Chess Bots.
-The code executed in the Web Worker either being JavaScript-based in the case of [op12no2/lozza](https://github.com/op12no2/lozza) and WASM-based in the case of the Stockfish-port [nmrugg/stockfish.js](https://github.com/nmrugg/stockfish.js/).
+The code executed in the Web Worker was either JavaScript-based in the case of [op12no2/lozza](https://github.com/op12no2/lozza) or WASM-based in the case of the Stockfish-port [nmrugg/stockfish.js](https://github.com/nmrugg/stockfish.js/).
 
 ```typescript
 const uciWorker = (file: string, actions: Array<string>): UninitialisedBot => () => {
@@ -117,8 +120,10 @@ const uciWorker = (file: string, actions: Array<string>): UninitialisedBot => ()
 };
 ```
 
-Providing the above abstraction allowed me to define many different external Bots and configurations (Levels and Depths), it also makes way for extension to any other Bot that supports tge UCI protocol in the future.
-Converting the Web Worker message-based system into a Promise was an interesting exercise, harnessing the power of Closures I needed to keep a reference to the current present `resolve` function.
+Providing the above abstraction allowed me to define many different external Bots and configurations (levels and depths).
+It also paves the way for extension to any other Bot that supports the UCI protocol in the future.
+Converting the Web Worker message-based system into a Promise was an interesting exercise.
+Harnessing the power of closures, I needed to keep a reference to the current `resolve` function.
 Upon the `bestmove` Bot response I could then resolve the given Promise.
 
 Finally, these Bots could be exposed for use within the React Chess implementation like so.
@@ -153,14 +158,14 @@ const Bots: AvailableBots = {
 };
 ```
 
-### The React Interface
+## The React Interface
 
-The game interface itself leverages the [willb335/chessboardjsx](https://github.com/willb335/chessboardjsx) React-component to provide the Chessboard implemention.
-I also use a typed [CSS Modules Stylesheet](https://create-react-app.dev/docs/adding-a-css-modules-stylesheet/) to cleanly seperate out the desired client-side styling concerns.
-The user is able to specifiy weather each player is User-based or Bot-based, and if Bot-based which configuration they would like to use.
+The game interface itself leverages the [willb335/chessboardjsx](https://github.com/willb335/chessboardjsx) React component to provide the Chessboard implementation.
+I also use a typed [CSS Modules Stylesheet](https://create-react-app.dev/docs/adding-a-css-modules-stylesheet/) to cleanly separate out the desired client-side styling concerns.
+The user is able to specify whether each player is user-based or Bot-based, and if Bot-based which configuration they would like to use.
 
 The `BotSelector` below provides a simple component which achieves this goal.
-Upon selection an initialised Bot is passed back to the parent Component via a `setSelectedBot` function invocation.
+Upon selection an initialised Bot is passed back to the parent component via a `setSelectedBot` function invocation.
 
 ```typescript
 const BotSelector: React.FC<{
@@ -191,7 +196,7 @@ const BotSelector: React.FC<{
 };
 ```
 
-So as to recount the games previous moves, I also provided the concept of a `History` listing.
+So as to recount the game's previous moves, I also provided the concept of a `History` listing.
 This includes all the previous moves in [Portable Game Notation](https://en.wikipedia.org/wiki/Portable_Game_Notation) (PGN) form.
 
 ```typescript
@@ -214,8 +219,8 @@ const History: React.FC<{ history: Array<engine.Move> }> = ({ history }) => {
 Using an empty `div` HTML reference I was able to ensure that the listing was pinned to the bottom at all times.
 The provided effect ensured that we only attempted to interact with the DOM and scroll the HTML element when the supplied history had changed.
 
-Finally, we could incorporate these two components into the React-interface itself.
-Storing the Game state and Bot selection choices in this manor allowed me to harness a single effect to invoke any Bot-moves and if the game had completed.
+Finally, we could incorporate these two components into the React interface itself.
+Storing the game state and Bot selection choices in this manner allowed me to harness a single effect to invoke any Bot moves and to determine if the game had completed.
 
 ```typescript
 const App: React.FC<{
@@ -327,18 +332,18 @@ const App: React.FC<{
 };
 ```
 
-Wrapping the `doMove` in a Callback hook ensured that the Game effect was not needlessly invoked upon render unless the Game state or `onGameCompleted` callback had changed.
-I also provided some clean-up in the way that if the Game had changed in-between requesting a Bot move we would discard this previous move change, this ensured that the Game maintained a valid state.
+Wrapping the `doMove` in a Callback hook ensured that the game effect was not needlessly invoked upon render unless the game state or `onGameCompleted` callback had changed.
+I also provided some clean-up in the way that if the game had changed in-between requesting a Bot move, we would discard the previous move, thus ensuring that the game maintained a valid state.
 
-### Conclusion
+## Conclusion
 
 I found this small project to be a very valuable exercise in exploring what is possible using TypeScript and React Hooks.
 It also provided me with a good opportunity to explore Yarn 2 and [Zero-installs](https://yarnpkg.com/features/zero-installs).
-I enjoyed creating the abstraction around the concept of a UCI-based Bot, making way for additional Bots to be added in the future.
+I enjoyed creating the abstraction around the concept of a UCI-based Bot, paving the way for additional Bots to be added in the future.
 
 Going forward it would be interesting to explore providing more than just the current FEN chess state to the given Bot.
 At this time I am treating all Bots as stateless.
-It would be good to explore making them aware of historical moves, as this would help aid in their decision making and stop them attempting repeated moves over a certain threshold.
+It would be good to explore making them aware of historical moves, as this would help aid in their decision making and prevent them from attempting repeated moves over a certain threshold.
 
 Happy Chess Playing!
 

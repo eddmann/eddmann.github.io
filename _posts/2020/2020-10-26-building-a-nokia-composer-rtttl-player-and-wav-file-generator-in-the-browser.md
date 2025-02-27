@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Building a Nokia Composer (RTTTL) Player and WAV-file Generator in the Browser"
-meta: "Explores how to parse, play and generate WAV-files from Nokia (RTTTL) ringtones using the Web Audio API and JavaScript"
+title: 'Building a Nokia Composer (RTTTL) Player and WAV-file Generator in the Browser'
+meta: 'Explores how to parse, play and generate WAV-files from Nokia (RTTTL) ringtones using the Web Audio API and JavaScript'
 ---
 
 Who remembers punching in key-combinations found online into their Nokia 3210 to create _custom ringtones_?

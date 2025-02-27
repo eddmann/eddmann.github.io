@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Binary Addition using Half and Full Adders within TypeScript"
-meta: "Explores performing Binary Addition within TypeScript using Logic Gates and Half/Full Adders"
+title: 'Binary Addition using Half and Full Adders within TypeScript'
+meta: 'Explores performing Binary Addition within TypeScript using Logic Gates and Half/Full Adders'
 ---
 
 Recently, I watched an interesting talk about [Binary Addition in the TypeScript Type System](https://www.youtube.com/watch?v=7lyb22x9tcM) and thought it would be interesting to explore this concept in more depth.

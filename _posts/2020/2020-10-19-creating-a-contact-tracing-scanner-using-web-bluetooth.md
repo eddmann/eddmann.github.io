@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Creating a Contact Tracing Scanner using Web Bluetooth"
-meta: "Highlights how to use the Web Bluetooth API to build a Contact Tracing Scanner application"
+title: 'Creating a Contact Tracing Scanner using Web Bluetooth'
+meta: 'Highlights how to use the Web Bluetooth API to build a Contact Tracing Scanner application'
 ---
 
 I have recently been looking at the [Contact Tracing specifications](https://covid19.apple.com/contacttracing) Apple and Google released earlier this year in aid of the fight against COVID-19.

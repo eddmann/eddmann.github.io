@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "The Mystery Calculator in ClojureScript and Reagent"
-meta: "Implementing the commonly found Christmas cracker gift in ClojureScript using Reagent"
+title: 'The Mystery Calculator in ClojureScript and Reagent'
+meta: 'Implementing the commonly found Christmas cracker gift in ClojureScript using Reagent'
 ---
 
 The Mystery Calculator is a commonly found Christmas cracker gift, which uses a neat powers of two (binary) addition trick to fool the spectator.

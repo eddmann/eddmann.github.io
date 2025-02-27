@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Creating a Contact Tracing Scanner using Swift for macOS"
-meta: "Highlights how to use Swift, Interface Builder and Core Bluetooth to build a Contact Tracing Scanner application"
+title: 'Creating a Contact Tracing Scanner using Swift for macOS'
+meta: 'Highlights how to use Swift, Interface Builder and Core Bluetooth to build a Contact Tracing Scanner application'
 ---
 
 Following on from my [previous experiement](https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/) which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.

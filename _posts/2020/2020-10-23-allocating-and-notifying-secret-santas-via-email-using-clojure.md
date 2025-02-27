@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "Allocating and Notifying Secret Santas via Email using Clojure"
-meta: "Exploring how we can use Clojure and Lein to build a console application to notify Secret Santas via Email"
+title: 'Allocating and Notifying Secret Santas via Email using Clojure'
+meta: 'Exploring how we can use Clojure and Lein to build a console application to notify Secret Santas via Email'
 ---
 
 My close family have been doing Secret Santa over the past couple of years and although there are plenty of free services out there to solve the problem of allocating and notifying participants, I thought it would be a great opportunity to explore building a solution using Clojure and Lein.

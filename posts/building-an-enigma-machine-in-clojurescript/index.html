@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explores creating an Enigma Machine in ClojureScript, using Property-based testing to assert its correctness">
+    <meta name="description" content="Learn how to build an Enigma Machine using ClojureScript and property-based testing. This comprehensive guide covers rotor simulation, reflector configuration, and a user interface using Reagent.">
 
     <title>
         
@@ -52,33 +52,34 @@
     <time datetime="2020-11-25T00:00:00+00:00" class="post-date">25 Nov 2020</time>
     <p>The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2.
 It was so important to the war-time efforts that work carried out by Alan Turing at Bletchley Park to decode the resulting ciphers helped end the war.
-For years I have been fascinated by this device, and thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript.
-I also thought it would be a great opportunity to explore how I can use Property-based testing to help garner confidence from the resulting implementation.</p>
+For years I have been fascinated by this device, and I thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript.
+I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation.</p>
 
 
 
-<p>You can experiement with the final implementation <a href="https://eddmann.com/enigma-machine-clojurescript/">here</a>, and the source code is available in its entirety on <a href="https://github.com/eddmann/enigma-machine-clojurescript">GitHub</a> to review.</p>
+<p>You can experiment with the final implementation <a href="https://eddmann.com/enigma-machine-clojurescript/">here</a>.
+The source code is available in its entirety on <a href="https://github.com/eddmann/enigma-machine-clojurescript">GitHub</a> to review.</p>
 
-<p><a href="https://eddmann.com/enigma-machine-clojurescript/"><img src="/uploads/building-an-enigma-machine-in-clojurescript/demo.png" alt="Web-based Engima Machine" /></a></p>
+<p><a href="https://eddmann.com/enigma-machine-clojurescript/"><img src="/uploads/building-an-enigma-machine-in-clojurescript/demo.png" alt="Web-based Enigma Machine" /></a></p>
 
-<h3 id="how-it-works">How it works</h3>
+<h2 id="how-it-works">How it works</h2>
 
 <p>At its most basic (as many variations appeared over the years) the machine is composed of a Keyboard, Lamp Board, three Rotors, a Reflector and a Plugboard (as pictured below).
-Using a pre-shared machine configuration (Wheel order, Ring settings and Plug connections), when an operator presses a key on the Keyboard a seemingly random letter elluminates on the Lamp Board.
+Using a pre-shared machine configuration (Wheel order, Ring settings and Plug connections), when an operator presses a key on the Keyboard, a seemingly random letter illuminates on the Lamp Board.
 With these key presses forming a desired message, the resulting cipher is then sent via an agreed (often insecure) channel to interested parties.
-Using a similarly configured Enigma Machine the recipient is able to follow the same process as the sender, except upon each key press the original message letter will ellumiate on the Lamp Board.
-With the combination of the Rotors, Reflector and Plugboard there are a staggering <em>158,962,555,217,826,360,000</em> paths a letter can take to be substituted!</p>
+Using a similarly configured Enigma Machine, the recipient is able to follow the same process as the sender, except upon each key press the original message letter will illuminate on the Lamp Board.
+With the combination of the Rotors, Reflector and Plugboard, there are a staggering <em>158,962,555,217,826,360,000</em> paths a letter can take to be substituted!</p>
 
 <p><img src="/uploads/building-an-enigma-machine-in-clojurescript/enigma-machine.jpg" alt="Enigma Machine" /></p>
 
-<p>I will defer to <a href="https://hackaday.com/2017/08/22/the-enigma-enigma-how-the-enigma-machine-worked/">these</a> <a href="https://www.youtube.com/watch?v=G2_Q9FoD-oQ">great</a> <a href="https://www.youtube.com/watch?v=ASfAPOiq_eQ">resources</a> of which I found very useful in helping to elaborate on the inner workings of the Enigma Machine.
-With a basic understanding of how the machine works in place we can now move on to modelling this behaviour in code.</p>
+<p>I will defer to <a href="https://hackaday.com/2017/08/22/the-enigma-enigma-how-the-enigma-machine-worked/">these</a> <a href="https://www.youtube.com/watch?v=G2_Q9FoD-oQ">great</a> <a href="https://www.youtube.com/watch?v=ASfAPOiq_eQ">resources</a> which I found very useful in helping to elaborate on the inner workings of the Enigma Machine.
+With a basic understanding of how the machine works in place, we can now move on to modelling this behaviour in code.</p>
 
-<h3 id="the-machine">The Machine</h3>
+<h2 id="the-machine">The Machine</h2>
 
-<p>We will begin with what I feel is the heart of the Enigma Machine, the stepped Rotors.
-Comprised of three connected Rotors, the desired pressed keys wiring forms a circuit based on the current positioning of the Rotors.
-Within code we are able to represent this as <em>hash-map</em> like data-structures, where-by we rotate the given Rotor based on a specified <em>step</em> letter and position within the Rotor collection.</p>
+<p>We will begin with what I feel is the heart of the Enigma Machine: the stepped Rotors.
+Comprised of three connected Rotors, the wiring corresponding to the pressed key forms a circuit based on the current positioning of the Rotors.
+Within code, we are able to represent this as <em>hash-map</em> like data structures, where we rotate the given Rotor based on a specified <em>step</em> letter and position within the Rotor collection.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="o">^</span><span class="no">:private</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span><span class="p">))</span><span class="w">
 
@@ -119,10 +120,10 @@ Within code we are able to represent this as <em>hash-map</em> like data-structu
    </span><span class="n">rotors</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Using the above code we define three of the original Rotors (with the scrambled wiring represented as <code class="language-plaintext highlighter-rouge">in</code> and <code class="language-plaintext highlighter-rouge">out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
-With the use of <em>hash-maps</em> we are able to clearly see how the machine used substitution to form the resulting cipher.</p>
+<p>Using the above code, we define three of the original Rotors (with the scrambled wiring represented as <code class="language-plaintext highlighter-rouge">in</code> and <code class="language-plaintext highlighter-rouge">out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
+With the use of <em>hash-maps</em>, we are able to clearly see how the machine used substitution to form the resulting cipher.</p>
 
-<p>To complete the circuit and send the current back through the (inverted) Rotors we use a supplied Reflector.
+<p>To complete the circuit and send the current back through the (inverted) Rotors, we use a supplied Reflector.
 These use simple static substitutions which can be represented as <em>hash-maps</em> like so.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">reflectors</span><span class="w">
@@ -131,7 +132,7 @@ These use simple static substitutions which can be represented as <em>hash-maps<
    </span><span class="no">:C</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"FVPJIAOYEDRZXWGCTKUQSBNMHL"</span><span class="p">))})</span><span class="w">
 </span></code></pre></div></div>
 
-<p>From here, we can now succinctly declare how a chosen letter (key press) traverses through the machine and returned as a cipher to the operator.</p>
+<p>From here, we can now succinctly declare how a chosen letter (key press) traverses through the machine and is returned as a cipher to the operator.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">invert-rotor</span><span class="w"> </span><span class="p">[</span><span class="n">rotor</span><span class="p">]</span><span class="w">
   </span><span class="p">{</span><span class="no">:in</span><span class="w">   </span><span class="p">(</span><span class="no">:out</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="n">,</span><span class="w">
@@ -152,7 +153,7 @@ These use simple static substitutions which can be represented as <em>hash-maps<
 
 <p>You can see how we thread the letter through the Plugboard, passing up and down the currently configured Rotors (by way of the Reflector) and then through the Plugboard to attain the resulting cipher letter.
 We will soon be able to use this function to iteratively produce a cipher of an entire message.
-Before we do this however, as explained at the beginning of this post, we need a means of configuring the machine based on an agreed-upon setup.
+Before we do this, however, as explained at the beginning of this post, we need a means of configuring the machine based on an agreed‐upon setup.
 This is achieved using the code below.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">setup-plugboard</span><span class="w"> </span><span class="p">[</span><span class="n">plugboard</span><span class="p">]</span><span class="w">
@@ -173,8 +174,8 @@ This is achieved using the code below.</p>
       </span><span class="p">(</span><span class="nb">assoc</span><span class="w"> </span><span class="no">:cipher</span><span class="w"> </span><span class="p">[])))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>With the assumption of the client code supplying us a desired machine setup, we are able to internally configure the starting positions of the chosen Rotors and Plugboard mapping for use with encoding/decoding a message.
-Finally, based on a supplied machine configuration (which has been setup using the code above) we are able to <em>reduce</em> the message into its cipher counterpart.</p>
+<p>With the assumption of the client code supplying us a desired machine setup, we are able to internally configure the starting positions of the chosen Rotors and the Plugboard mapping for use with encoding and decoding a message.
+Finally, based on a supplied machine configuration (which has been set up using the code above), we are able to <em>reduce</em> the message into its cipher counterpart.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">encode-message</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="n">message</span><span class="p">]</span><span class="w">
   </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w">
@@ -187,9 +188,9 @@ Finally, based on a supplied machine configuration (which has been setup using t
        </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">str</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
-<h3 id="testing">Testing</h3>
+<h2 id="testing">Testing</h2>
 
-<p>Now we have modelled the behaviour of the machine we can assert its correctness by-way of testing the <em>public API</em> - the <code class="language-plaintext highlighter-rouge">encode-message</code> function.
+<p>Now that we have modelled the behaviour of the machine, we can assert its correctness by testing the <em>public API</em>, the <code class="language-plaintext highlighter-rouge">encode-message</code> function.
 We will first do this by performing a couple of basic assertions which centre around the inclusion and exclusion of a Plugboard mapping.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">deftest</span><span class="w"> </span><span class="n">encode-message-with-empty-plugboard</span><span class="w">
@@ -213,8 +214,8 @@ We will first do this by performing a couple of basic assertions which centre ar
        </span><span class="s">"HELLOWORLD"</span><span class="p">))))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>We could expand upon this test-suite greatly, but fundamentally each test being static (example based) there could be no end to the possible tests we could write.
-Based on this reasoning I thought it would be a very interesting exercise to employ <em>Property-based testing</em> to help garner ever-more increasing confidence in our implementation.
+<p>We could expand upon this test-suite greatly, but fundamentally, with each test being static (example-based), there could be no end to the possible tests we could write.
+Based on this reasoning, I thought it would be a very interesting exercise to employ <em>property-based testing</em> to help garner ever-increasing confidence in our implementation.
 This form of testing methodology can be described as:</p>
 
 <blockquote>
@@ -222,8 +223,8 @@ This form of testing methodology can be described as:</p>
 They allow for a range of inputs to be programmed and tested within a single test, rather than having to write a different test for every value that you want to test.</p>
 </blockquote>
 
-<p>With this in-mind, there are a couple of distinct properties that regardless of what machine setup or message we provide should always hold true.
-Using the <a href="https://clojure.org/guides/spec">spec</a> libary (which was inspired by <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a>) we are able to model two of these properties like so.</p>
+<p>With this in mind, there are a couple of distinct properties that, regardless of what machine setup or message we provide, should always hold true.
+Using the <a href="https://clojure.org/guides/spec">spec</a> library (which was inspired by <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a>), we are able to model two of these properties like so.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">gen-char-upper-alpha</span><span class="w">
   </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="nb">char</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/choose</span><span class="w"> </span><span class="mi">65</span><span class="w"> </span><span class="mi">90</span><span class="p">)))</span><span class="w">
@@ -252,17 +253,17 @@ Using the <a href="https://clojure.org/guides/spec">spec</a> libary (which was i
       </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="p">(</span><span class="nf">encode-message</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">cipher</span><span class="p">)))))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Providing a means of producing a valid randomly generated machine configuration - we can assert that for any given instance that the cipher message should be the same length as the plain-text message, and we should be able to encode/decode the cipher message to the original plain-text message.
-We can now leave it up to the <em>spec</em> library to produce a large random selection of valid machine configurations and ensure the correctness of our propositions - garnering ever more confidence in the code upon each test run.
-One of the true powers of this testing approach is how if a property does not seem to hold true for a given test assertion, the library is able to shrink the input down as best it can to the problem input.</p>
+<p>Providing a means of producing a valid, randomly generated machine configuration, we can assert that for any given instance, the cipher message should be the same length as the plain-text message, and we should be able to encode and decode the cipher message to the original plain-text message.
+We can now leave it up to the <em>spec</em> library to produce a large random selection of valid machine configurations and ensure the correctness of our propositions, garnering ever more confidence in the code upon each test run.
+One of the true powers of this testing approach is that if a property does not hold true for a given test assertion, the library is able to shrink the input down as best it can to the problem input.</p>
 
-<h3 id="the-user-interface">The User Interface</h3>
+<h2 id="the-user-interface">The User Interface</h2>
 
-<p>Having modeled and verified the correctness of the machine behaviour we can move on to providing the client with a user interface.
-For this we will be using <a href="https://reagent-project.github.io/">Reagent</a>, which provides ClojureScript bindings for the React library.
-So as to not overload this article with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
-Instead I ask for you to head over to the <a href="https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs"><code class="language-plaintext highlighter-rouge">app.cljs</code></a> implementation which describes how we use Reagent to interact with our machine implementation.
-Below you will see how we combine all the child input components declared in <code class="language-plaintext highlighter-rouge">app.cljs</code>, into the stateful parent component which is rendered to the DOM.</p>
+<p>Having modelled and verified the correctness of the machine behaviour, we can move on to providing the client with a user interface.
+For this, we will be using <a href="https://reagent-project.github.io/">Reagent</a>, which provides ClojureScript bindings for the React library.
+So as not to overload this article with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
+Instead, I invite you to head over to the <a href="https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs"><code class="language-plaintext highlighter-rouge">app.cljs</code></a> implementation, which describes how we use Reagent to interact with our machine implementation.
+Below, you will see how we combine all the child input components declared in <code class="language-plaintext highlighter-rouge">app.cljs</code> into the stateful parent component which is rendered to the DOM.</p>
 
 <div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="p">[]</span><span class="w">
   </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w">    </span><span class="p">[(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"III"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"II"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"I"</span><span class="p">)]</span><span class="w">
@@ -293,14 +294,14 @@ Below you will see how we combine all the child input components declared in <co
        </span><span class="p">[</span><span class="no">:pre</span><span class="w"> </span><span class="o">@</span><span class="n">cipher</span><span class="p">]])))</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Making use of <a href="http://reagent-project.github.io/docs/master/reagent.ratom.html">Reagent Atoms</a> we are able to statefully store the users intended configuration and invoke the <code class="language-plaintext highlighter-rouge">encode-message</code> function when required.</p>
+<p>Making use of <a href="http://reagent-project.github.io/docs/master/reagent.ratom.html">Reagent Atoms</a>, we are able to statefully store the user’s intended configuration and invoke the <code class="language-plaintext highlighter-rouge">encode-message</code> function when required.</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
-<p>I found modeling this solution in a Lisp using ClojureScript to be very enjoyable.
-Looking back over the code I find it amazing how a Lisp is able to so succinctly and elegantly document the behaviour of the machine.
-The more I develved into the solution to this problem space the more I felt the functional approach mapped so well.
-Being able to explore Property-based testing in this fashion was a great experience, and from it I am able to see how well it can fit into aspects of daily programming/problems we solve.</p>
+<p>I found modelling this solution in a Lisp using ClojureScript to be very enjoyable.
+Looking back over the code, I find it amazing how a Lisp is able to so succinctly and elegantly document the behaviour of the machine.
+The more I developed the solution to this problem space, the more I felt the functional approach mapped so well.
+Being able to explore property-based testing in this fashion was a great experience, and it demonstrated how well it can fit into various aspects of the everyday programming challenges we solve.</p>
 
 </article>
 

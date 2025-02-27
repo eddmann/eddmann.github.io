@@ -1,8 +1,8 @@
 ---
 layout: post
 title: 'Creating a Command Line Application to Fetch URL Titles in Go'
-canonical: https://tech.mybuilder.com/creating-a-command-line-application-to-fetch-url-titles-in-go/
-meta: 'Creating a Command Line Application to Fetch URL Titles in Go'
+meta: 'A comprehensive guide to developing a cross-platform command-line application in Go that fetches URL titles using concurrent programming techniques and Docker.'
+tags: go docker
 ---
 
 When writing show-notes for [Three Devs and a Maybe](https://threedevsandamaybe.com/) it is tedious work to extract the associated show-link titles and generate a Markdown list from them.
@@ -14,10 +14,10 @@ However, in this post I would like to discuss implementing such a command-line t
 The command-line application (entitled `urls-to-md`) will read in the latest clipboard contents, and then fetch the associated titles per URL found (using concurrent [Goroutines](https://tour.golang.org/concurrency/1)).
 It will then generate a Markdown list representation of these results and output this to the clipboard for easy inclusion into the show-notes.
 
-### Setting up the Development Toolchain with Docker
+## Setting up the Development Toolchain with Docker
 
-The first step to creating this application is to setup the required development environment dependencies.
-We will be containerising this environment using Docker, allowing others to easily setup and continue development in the future.
+The first step to creating this application is to set up the required development environment dependencies.
+We will be containerising this environment using Docker, allowing others to easily set up and continue development in the future.
 To start we will create a new `Dockerfile` with the following definition.
 
 ```docker
@@ -43,7 +43,7 @@ shell:
   docker run --rm -v "$(PWD)":/go/src/app $(IMAGE_NAME) /bin/sh
 ```
 
-### Writing the Application
+## Writing the Application
 
 With this `Makefile` present we can then execute `make image` and subsequently `make shell`.
 This will bring up a terminal session within a running container instance, allowing us to commence building our command-line application.
@@ -142,21 +142,21 @@ func main() {
 }
 ```
 
-This application takes advantage of a couple of third-party dependencies ([clipboard](https://github.com/atotto/clipboard) and [goquery](https://github.com/PuerkitoBio/goquery)), to read/write to the systems clipboard and locate the title contents from the URL response.
+This application takes advantage of a couple of third-party dependencies ([clipboard](https://github.com/atotto/clipboard) and [goquery](https://github.com/PuerkitoBio/goquery)) to read from and write to the system clipboard, and to locate the title contents from the URL response.
 
 We encapsulate every URL request into light-weight Goroutines, allowing these calls to occur concurrently.
-As the order in which these channels complete can not be relied upon, we ensure that the results are put back in the same order that we received them.
+As the order in which these channels complete cannot be relied upon, we ensure that the results are put back in the same order that we received them.
 
-With this in place we can pull-down and make the third-party dependencies available (within a `vendors` directory) by adding and executing the following target to the `Makefile`.
+With this in place we can pull down and make the third-party dependencies available (within a `vendors` directory) by adding and executing the following target to the `Makefile`.
 
 ```make
 deps:
   docker run --rm -v "$(PWD)":/go/src/app $(IMAGE_NAME) dep ensure
 ```
 
-### Distributing the Application
+## Distributing the Application
 
-Finally, we can cross-compile this command line application for all the desired systems by adding and executing the following new target within the `Makefile`.
+Finally, we can cross-compile this command-line application for all the desired systems by adding and executing the following new target within the `Makefile`.
 
 ```make
 DIST_OS=darwin linux windows
@@ -172,12 +172,12 @@ build:
     done;'
 ```
 
-This target will compile individual executable artifacts for all the specified operating system and architecture combinations.
-We should now be able to test the relevant artifact for the host system you are currently using, in my case macOS.
+This target will compile individual executable artefacts for all the specified operating system and architecture combinations.
+We should now be able to test the relevant artefact for the host system you are currently using, in my case macOS.
 
 <img src="/uploads/creating-a-command-line-application-to-fetch-url-titles-in-go/urls-to-md-darwin-amd64.gif" alt="Command Line Application Demo" />
 
 I hope you have found it interesting looking into developing and distributing a trivial command-line application using Golang.
-The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this is extremely useful.
+The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this it is extremely useful.
 
 You can find the full source-code for this application within the [GitHub repository](https://github.com/eddmann/urls-to-md).

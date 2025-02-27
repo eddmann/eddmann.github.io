@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'Allocating and Notifying Secret Santas via Email using Clojure'
-meta: 'Exploring how we can use Clojure and Lein to build a console application to notify Secret Santas via Email'
+meta: 'Discover how to build a Clojure console application with Leiningen that allocates Secret Santas and sends email notifications using Gmail SMTP.'
+tags: clojure secret-santa
 ---
 
-My close family have been doing Secret Santa over the past couple of years and although there are plenty of free services out there to solve the problem of allocating and notifying participants, I thought it would be a great opportunity to explore building a solution using Clojure and Lein.
+My close family have been doing Secret Santa over the past couple of years, and although there are plenty of free services out there to solve the problem of allocating and notifying participants, I thought it would be a great opportunity to explore building a solution using Clojure and Lein.
 
 <!--more-->
 
@@ -46,7 +47,7 @@ I opted for a recursive brute-force approach to allocating participants, which r
   (mapcat random (group participants)))
 ```
 
-With the ability to now allocate participants I could then move on parsing a given listing and subsequently handle notifying them.
+With the ability to now allocate participants, I could then move on to parsing a given listing and subsequently handle notifying them.
 
 ```clojure
 (ns secret-santa.core
@@ -84,7 +85,7 @@ With the ability to now allocate participants I could then move on parsing a giv
 
 Thanks to [data.csv](https://github.com/clojure/data.csv) I was able to elegantly translate the CSV into a suitable internal form.
 From there, I could pass this onto the allocation logic described above and then finally notify the participants via email.
-Using the [environ](https://github.com/weavejester/environ) library I was able to provide the desired Gmail SMTP credentials at runtime (via the enviornment).
+Using the [environ](https://github.com/weavejester/environ) library I was able to provide the desired Gmail SMTP credentials at runtime (via the environment).
 
 ### Testing
 
@@ -123,10 +124,10 @@ I was able to provide basic test coverage around the allocation logic using [clo
     (is (= expected (allocate participants)))))
 ```
 
-With this I created a simple CI pipeline using GitHub Actions which used the provided `Makefile` and Docker-setup to ensure that the tests passed.
+With this, I created a simple CI pipeline using GitHub Actions, which used the provided `Makefile` and Docker setup to ensure that the tests passed.
 Upon success, the application was built (using `uberjar`) and then uploaded as an artifact to GitHub.
 
-```yml
+```yaml
 name: TestAndBuild
 
 on: push
@@ -149,4 +150,4 @@ jobs:
           path: target/uberjar/secret-santa-1.0.0-standalone.jar
 ```
 
-In the future I hope to explore [property-based testing](https://clojure.org/guides/test_check_beginner), which I feel will improve upon the confidence garnered from the static test-suite present at this time.
+In the future, I hope to explore [property-based testing](https://clojure.org/guides/test_check_beginner), which I feel will improve upon the confidence garnered from the static test suite present at this time.

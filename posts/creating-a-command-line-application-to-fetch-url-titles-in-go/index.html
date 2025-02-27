@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Creating a Command Line Application to Fetch URL Titles in Go">
+    <meta name="description" content="A comprehensive guide to developing a cross-platform command-line application in Go that fetches URL titles using concurrent programming techniques and Docker.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/creating-a-command-line-application-to-fetch-url-titles-in-go/" />
     
 
     <script>
@@ -61,10 +59,10 @@ However, in this post I would like to discuss implementing such a command-line t
 <p>The command-line application (entitled <code class="language-plaintext highlighter-rouge">urls-to-md</code>) will read in the latest clipboard contents, and then fetch the associated titles per URL found (using concurrent <a href="https://tour.golang.org/concurrency/1">Goroutines</a>).
 It will then generate a Markdown list representation of these results and output this to the clipboard for easy inclusion into the show-notes.</p>
 
-<h3 id="setting-up-the-development-toolchain-with-docker">Setting up the Development Toolchain with Docker</h3>
+<h2 id="setting-up-the-development-toolchain-with-docker">Setting up the Development Toolchain with Docker</h2>
 
-<p>The first step to creating this application is to setup the required development environment dependencies.
-We will be containerising this environment using Docker, allowing others to easily setup and continue development in the future.
+<p>The first step to creating this application is to set up the required development environment dependencies.
+We will be containerising this environment using Docker, allowing others to easily set up and continue development in the future.
 To start we will create a new <code class="language-plaintext highlighter-rouge">Dockerfile</code> with the following definition.</p>
 
 <div class="language-docker highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> golang:1.10-alpine3.8</span>
@@ -88,7 +86,7 @@ From here we can add our first targets to a <code class="language-plaintext high
   <span class="nl">docker run --rm -v "$(PWD)"</span><span class="o">:</span><span class="nf">/go/src/app $(IMAGE_NAME) /bin/sh</span>
 </code></pre></div></div>
 
-<h3 id="writing-the-application">Writing the Application</h3>
+<h2 id="writing-the-application">Writing the Application</h2>
 
 <p>With this <code class="language-plaintext highlighter-rouge">Makefile</code> present we can then execute <code class="language-plaintext highlighter-rouge">make image</code> and subsequently <code class="language-plaintext highlighter-rouge">make shell</code>.
 This will bring up a terminal session within a running container instance, allowing us to commence building our command-line application.
@@ -186,20 +184,20 @@ Within this session we will execute <code class="language-plaintext highlighter-
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This application takes advantage of a couple of third-party dependencies (<a href="https://github.com/atotto/clipboard">clipboard</a> and <a href="https://github.com/PuerkitoBio/goquery">goquery</a>), to read/write to the systems clipboard and locate the title contents from the URL response.</p>
+<p>This application takes advantage of a couple of third-party dependencies (<a href="https://github.com/atotto/clipboard">clipboard</a> and <a href="https://github.com/PuerkitoBio/goquery">goquery</a>) to read from and write to the system clipboard, and to locate the title contents from the URL response.</p>
 
 <p>We encapsulate every URL request into light-weight Goroutines, allowing these calls to occur concurrently.
-As the order in which these channels complete can not be relied upon, we ensure that the results are put back in the same order that we received them.</p>
+As the order in which these channels complete cannot be relied upon, we ensure that the results are put back in the same order that we received them.</p>
 
-<p>With this in place we can pull-down and make the third-party dependencies available (within a <code class="language-plaintext highlighter-rouge">vendors</code> directory) by adding and executing the following target to the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
+<p>With this in place we can pull down and make the third-party dependencies available (within a <code class="language-plaintext highlighter-rouge">vendors</code> directory) by adding and executing the following target to the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
 
 <div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">deps</span><span class="o">:</span>
   <span class="nl">docker run --rm -v "$(PWD)"</span><span class="o">:</span><span class="nf">/go/src/app $(IMAGE_NAME) dep ensure</span>
 </code></pre></div></div>
 
-<h3 id="distributing-the-application">Distributing the Application</h3>
+<h2 id="distributing-the-application">Distributing the Application</h2>
 
-<p>Finally, we can cross-compile this command line application for all the desired systems by adding and executing the following new target within the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
+<p>Finally, we can cross-compile this command-line application for all the desired systems by adding and executing the following new target within the <code class="language-plaintext highlighter-rouge">Makefile</code>.</p>
 
 <div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">DIST_OS</span><span class="o">=</span>darwin linux windows
 <span class="nv">DIST_ARCH</span><span class="o">=</span>amd64
@@ -214,13 +212,13 @@ As the order in which these channels complete can not be relied upon, we ensure 
 <span class="nf">    done;'</span>
 </code></pre></div></div>
 
-<p>This target will compile individual executable artifacts for all the specified operating system and architecture combinations.
-We should now be able to test the relevant artifact for the host system you are currently using, in my case macOS.</p>
+<p>This target will compile individual executable artefacts for all the specified operating system and architecture combinations.
+We should now be able to test the relevant artefact for the host system you are currently using, in my case macOS.</p>
 
 <p><img src="/uploads/creating-a-command-line-application-to-fetch-url-titles-in-go/urls-to-md-darwin-amd64.gif" alt="Command Line Application Demo" /></p>
 
 <p>I hope you have found it interesting looking into developing and distributing a trivial command-line application using Golang.
-The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this is extremely useful.</p>
+The ability to compile native system binaries that can be shared is a powerful concept, and for small applications like this it is extremely useful.</p>
 
 <p>You can find the full source-code for this application within the <a href="https://github.com/eddmann/urls-to-md">GitHub repository</a>.</p>
 

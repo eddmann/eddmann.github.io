@@ -1,8 +1,8 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/
-meta: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
+meta: 'A comprehensive guide to viewing and removing mince pies using Amazon DynamoDB as part of the Mince Pie Challenge API.'
+tags: serverless aws lambda dynamodb javascript
 ---
 
 In this post we will progress in implementing the proposed endpoint behaviour documented in our [RAML design](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#viewing-the-pies).
@@ -67,7 +67,7 @@ export const getPie =
       .then(r => r.Item);
 ```
 
-You will notice that we use the `UUID` type which was before internal to the `src/types/index.js` definition.
+You will notice that we use the `UUID` type which was previously internal to the `src/types/index.js` definition.
 This will need to be exposed for external consumption like so, `export type UUID = string;`.
 
 The next step is to implement the internal handler (`src/handlers/view.js`) which will be called to fetch the pie and generate the API response.
@@ -245,7 +245,7 @@ With the ability to access a specified pie now available, we will follow this wi
 
 ### Removing a Pie
 
-In a similar manor to how we constructed the viewing capabilities, we will start off by defining a new handler within `functions.yml` which is called upon a `DELETE` request.
+In a similar manner to how we constructed the viewing capabilities, we will start off by defining a new handler within `functions.yml` which is called upon a `DELETE` request.
 
 ```yaml
 remove-pie:

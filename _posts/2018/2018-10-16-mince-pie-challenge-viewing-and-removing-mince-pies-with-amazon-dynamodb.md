@@ -12,7 +12,7 @@ Using the online/offline DynamoDB abstractions that we constructed in the [previ
 
 If you are keen to see how the finished example looks, you can access it within the [API repository](https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/07-view-remove-pies).
 
-### Viewing a Pie
+## Viewing a Pie
 
 We will begin by adding the ability to view a specified mince pie's full details, along with any associated actions available based on the client's request.
 To start we will add the following new handler definition to `functions.yml`.
@@ -243,7 +243,7 @@ This function provides us with the ability to supply custom attributes that we w
 
 With the ability to access a specified pie now available, we will follow this with work on one of the supplied owner actions - removing a pie from the challenge.
 
-### Removing a Pie
+## Removing a Pie
 
 In a similar manner to how we constructed the viewing capabilities, we will start off by defining a new handler within `functions.yml` which is called upon a `DELETE` request.
 

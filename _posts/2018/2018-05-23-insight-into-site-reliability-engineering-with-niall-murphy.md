@@ -1,7 +1,6 @@
 ---
 layout: post
 title: 'Insight into Site Reliability Engineering with Niall Murphy'
-canonical: https://tech.mybuilder.com/insight-into-site-reliability-engineering-with-niall-murphy/
 meta: 'Explore expert insights into Site Reliability Engineering with Niall Murphy, featuring discussions on error budgets, uptime challenges and the evolving DevOps landscape.'
 tags: sre
 ---

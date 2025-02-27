@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'Building a Flag Guessing Game using React Hooks'
-meta: 'Showcases how you can use Create React App, Styled Components and React Hooks to build a Flag Guessing Game'
+meta: 'Learn how to build an interactive flag guessing game using React Hooks, Create React App, and Styled Components. Exploring game logic, state management, and deployment with GitHub Pages.'
+tags: react javascript
 ---
 
-Since [React Hooks](https://reactjs.org/docs/hooks-intro.html) were announced last autumn I've been looking at ways to experiment with them in a couple of small side-projects.
+Since [React Hooks](https://reactjs.org/docs/hooks-intro.html) were announced last autumn, I've been looking at ways to experiment with them in a couple of small side-projects.
 In this post we will create a simple flag guessing game (called [Fun with Flags](https://eddmann.com/fun-with-flags/)) leveraging [Create React App](https://facebook.github.io/create-react-app/), [Styled Components](https://www.styled-components.com/) and React Hooks.
 Along the way we will highlight use-cases for several different hooks such as State, Effect and Memoization.
 Finally, we will automate the process of publishing the compiled game to [GitHub Pages](https://pages.github.com/).
@@ -116,14 +117,14 @@ export default ({ answer, onCorrect, onIncorrect, ...props }) => {
 };
 ```
 
-Looking at the implementation above you can see that we manage the user's answer with a State hook.
+Looking at the implementation above, you can see that we manage the user's answer with a State hook.
 This value is reset if the desired answer changes (i.e. a new flag is displayed) using an Effect hook.
 From here, both calculating the actual answer's length and generating the placeholder for the current state are [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency) operations, and as such can be cached using the Memoization hook.
-Finally, when the user submits the form (i.e. hits enter), we check the value and based on its correctness invoke the provided `onCorrect`/`onIncorrect` callbacks.
+Finally, when the user submits the form (i.e. hits enter), we check the value and, based on its correctness, invoke the provided `onCorrect`/`onIncorrect` callbacks.
 
 ## Managing the Game
 
-With the `AnswerBox` now implemented we can move on to developing the encompassing `Game` management component within [`src/Game.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js).
+With the `AnswerBox` now implemented, we can move on to developing the encompassing `Game` management component within [`src/Game.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js).
 In a similar manner to before, we define several styled building blocks that will be used to present the overall game to the user.
 
 ```js
@@ -207,10 +208,10 @@ export default props => {
 };
 ```
 
-When the game is started (or all flags exhausted) we reset the `flags` state to a shuffled ordering of the provided listing.
+When the game is started (or all flags are exhausted) we reset the `flags` state to a shuffled ordering of the provided listing.
 In the case of the `flags` initial state, we only wish to shuffle the provided flags once at the beginning (not wastefully on each render).
-To do this we wrap the behaviour in a function which ensures that the operation is only called when required during the components lifecycle.
-From here, based on the decision made within the `AnswerBox` component, we update the user's attempts/score accordingly.
+To do this, we wrap the behaviour in a function which ensures that the operation is only called when required during the component's lifecycle.
+From here, based on the decision made within the `AnswerBox` component, we update the user's attempts and score accordingly.
 
 Finally, we are able to compose all these pieces together into a [`src/index.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/index.js) entry point.
 
@@ -223,7 +224,7 @@ import flags from './flags';
 ReactDOM.render(<Game flags={flags} attempts={3} />, document.getElementById('root'));
 ```
 
-We can then `yarn start` to experiment with the game locally 🎉.
+We can then run `yarn start` to experiment with the game locally 🎉.
 
 ## Publishing to GitHub Pages
 
@@ -246,12 +247,12 @@ With this dependency added, include the following `scripts` actions into the `pa
 }
 ```
 
-Now, whenever you wish to publish a new version of the game simply run the following command and `gh-pages` will build and commit a new version to the `gh-pages` branch.
+Now, whenever you wish to publish a new version of the game, simply run the following command and `gh-pages` will build and commit a new version to the `gh-pages` branch.
 
 ```bash
 $ yarn deploy
 ```
 
-This in-turn will publish a new static version of the game to GitHub Pages, accessible in my case via [`https://eddmann.github.io/fun-with-flags`](https://eddmann.github.io/fun-with-flags) and as I have my apex DNS record pointing to GitHub at [`https://eddmann.com/fun-with-flags`](https://eddmann.com/fun-with-flags/).
+This in turn will publish a new static version of the game to GitHub Pages, accessible in my case via [`https://eddmann.github.io/fun-with-flags`](https://eddmann.github.io/fun-with-flags) and, as I have my apex DNS record pointing to GitHub, at [`https://eddmann.com/fun-with-flags`](https://eddmann.com/fun-with-flags/).
 
 ![Fun with Flags](/uploads/building-a-flag-guessing-game-using-react-hooks/fun-with-flags.png)

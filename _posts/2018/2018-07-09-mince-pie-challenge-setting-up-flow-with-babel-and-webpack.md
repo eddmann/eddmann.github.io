@@ -1,23 +1,23 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/
-meta: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
+meta: 'Learn how to set up Flow with Babel and Webpack to enhance code confidence and ensure type safety in your JavaScript project.'
+tags: javascript flow webpack
 ---
 
 We have now settled on how our application will perform [user authentication](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/).
-I now wish to take a step back and help improve upon our code confidence, by-way of adding the static type checker [Flow](https://flow.org/).
-In this article I will document the process of configuring Flow with Babel and Webpack, expanding upon our previous example by adding sufficient typing.
+I now wish to take a step back and help improve our code confidence by adding the static type checker [Flow](https://flow.org/).
+In this article, I will document the process of configuring Flow with Babel and Webpack, expanding upon our previous example by adding sufficient typing.
 
 <!--more-->
 
 If you are keen to see how the finished example looks, you can access it within the [API repository](https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/03-flow).
 
 Developed by Facebook, Flow adds the ability to provide an incremental [type system](https://en.wikipedia.org/wiki/Type_system) to your JavaScript application.
-In doing so we garner the benefits of using a type system - helping catch errors early, improving code readability and enabling better tooling.
-Facebook provides a well written [article](https://flow.org/en/docs/lang/) on the rationale for developing such a tool, which I highly recommend you read.
+In doing so, we garner the benefits of a type system – it helps catch errors early, improves code readability, and enables better tooling.
+Facebook provides a well-written [article](https://flow.org/en/docs/lang/) on the rationale for developing such a tool, which I highly recommend you read.
 
-### Setting up Flow with Babel and Webpack
+## Setting up Flow with Babel and Webpack
 
 The first step to configuring Flow within the project is to add the following development dependencies to the `package.json`.
 You should also add the new `scripts` definition, which will allow us to validate types within the project by simply running `npm run flow`.
@@ -56,7 +56,7 @@ module.exports = {
 };
 ```
 
-Adding this Webpack plugin allows Flow to be ran before a build is started.
+Adding this Webpack plugin allows Flow to be run before a build is started.
 If any issues are highlighted by Flow, you will be alerted and the build will not succeed.
 
 Finally, we need to ensure that we have initialised our Flow configuration (an empty `.flowconfig` will be generated) and define a new `Makefile` target which will run Flow for us.
@@ -72,10 +72,10 @@ flow:
 
 With this setup now complete, we can go about slowly incorporating types into our project.
 
-### Adding Types to the Project
+## Adding Types to the Project
 
 In the [last article](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/#constructing-handlers-with-user-authentication) we documented a handler abstraction that provided assurances on user authentication and authorisation.
-We will now go about adding suitable typing to this abstraction, to help improve code clarity and aid in preventing any future bugs.
+We will now go about adding suitable typing to this abstraction to help improve code clarity and aid in preventing any future bugs.
 
 The first step is to add the following development dependency to the `package.json`.
 This [package](https://www.npmjs.com/package/flow-aws-lambda) will allow us to type against the Lambda environment abstractions that are present.
@@ -88,7 +88,7 @@ This [package](https://www.npmjs.com/package/flow-aws-lambda) will allow us to t
 }
 ```
 
-With this now installed we will start off by creating a single file within `src/types/index.js`, were we will define all our custom types.
+With this now installed we will start off by creating a single file within `src/types/index.js`, where we will define all our custom types.
 Here we will make Flow aware that we wish to process this file using the `// @flow` annotation, and import some of the types that the dependency provides to us.
 
 ```js
@@ -123,7 +123,7 @@ type UserId = string;
 export type UserTokenAuthenticator = Token => Promise<?UserId>;
 ```
 
-Again, we are using type aliases to help document the code's intent - along with defining how the authenticator service function should work (returning an optional `UserId` encapsulated in a `Promise`).
+Again, we are using type aliases to help document the code's intent – along with defining how the authenticator service function should work (returning an optional `UserId` encapsulated in a `Promise`).
 We can then employ this type definition within `src/services/userTokenAuthenticator.js`.
 
 ```js
@@ -175,8 +175,8 @@ export type AuthenticatedUserHandlerMiddlware = UserHandlerMiddleware<Authentica
 ```
 
 There are several interesting aspects to this above example.
-The first of which is that we lay out the expected structure of the `Services` [object as a map](https://flow.org/en/docs/types/objects/#toc-objects-as-maps), with `string` keys and `Function` values.
-Secondly, we define two different `Parameters` types; ensuring by-way of a [union](https://flow.org/en/docs/types/unions/) that the supplied value matches one of these structures.
+The first is that we lay out the expected structure of the `Services` [object as a map](https://flow.org/en/docs/types/objects/#toc-objects-as-maps), with `string` keys and `Function` values.
+Secondly, we define two different `Parameters` types; ensuring by means of a [union](https://flow.org/en/docs/types/unions/) that the supplied value matches one of these structures.
 From here, we define how a typical handler is constructed using the `createHandler` paradigm we have devised.
 
 We then go one step further and define how user middleware should work using a [Generic](https://flow.org/en/docs/types/generics/) `UserHandlerMiddleware` type.
@@ -232,12 +232,12 @@ const getUserIdFromToken = createUserTokenAuthenticator(USER_POOL_ID);
 
 Now if we invoke `make flow` or attempt a `make deploy`, we will see that our types get validated by Flow and successfully pass! 🎉
 
-### Better Feedback from Flow
+## Better Feedback from Flow
 
 Although we are able to run Flow when desired using `make flow`, I have found it beneficial to gain instant feedback within my editor using a project such as [Flow-IDE](https://atom.io/packages/flow-ide) for Atom.
-In doing so we are able to get real-time Flow analysis, which makes it easier to manage the project and introduce typing to the code-base.
+In doing so, we are able to get real-time Flow analysis, which makes it easier to manage the project and introduce typing to the code-base.
 
 <img src="/uploads/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/flow-ide.png" alt="Flow IDE" />
 
-With Flow now configured, I wish to increase our code confidence even more so by adding the unit testing framework [Jest](https://jestjs.io/) into the project.
-Join me in the next post were we will look into testing the application using Jest, and add continuous integration via [Travis CI](https://travis-ci.org/).
+With Flow now configured, I wish to increase our code confidence even more by adding the unit testing framework [Jest](https://jestjs.io/) into the project.
+Join me in the next post where we will look into testing the application using Jest, and add continuous integration via [Travis CI](https://travis-ci.org/).

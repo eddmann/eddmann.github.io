@@ -1,10 +1,11 @@
 ---
 layout: post
 title: 'Creating a Contact Tracing Scanner using Swift for macOS'
-meta: 'Highlights how to use Swift, Interface Builder and Core Bluetooth to build a Contact Tracing Scanner application'
+meta: 'Learn how to build a contact tracing scanner for macOS using Swift, Interface Builder, and Core Bluetooth with detailed instructions and code examples.'
+tags: swift macos contact-tracing
 ---
 
-Following on from my [previous experiement](https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/) which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.
+Following on from my [previous experiment](https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/) which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.
 
 <!--more-->
 
@@ -12,8 +13,8 @@ The latest [application release](https://github.com/eddmann/contact-tracing-scan
 
 [![Contact Tracing Scanner using Swift for macOS](/uploads/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner.png)](https://github.com/eddmann/contact-tracing-scanner-macos)
 
-Using [Core Bluetooth](https://developer.apple.com/documentation/corebluetooth) I was able to scan for devices which were advertising the registered service UUID `0xfd6f` - and in-turn parse the service data.
-The process overall, was very similair to the one used when building the Web Bluetooth solution.
+Using [Core Bluetooth](https://developer.apple.com/documentation/corebluetooth) I was able to scan for devices which were advertising the registered service UUID `0xfd6f` and in-turn parse the service data.
+The process overall was very similar to the one used when building the Web Bluetooth solution.
 
 ```swift
 // ...
@@ -43,7 +44,7 @@ public func centralManager(_ central: CBCentralManager, didDiscover peripheral: 
 // ...
 ```
 
-To clean-up the listing and ensure that only active devices where present, I used a scheduled timer which would remove any old devices every 5 seconds.
+To clean up the listing and ensure that only active devices were present, I used a scheduled timer which would remove any old devices every 5 seconds.
 
 ```swift
 Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in

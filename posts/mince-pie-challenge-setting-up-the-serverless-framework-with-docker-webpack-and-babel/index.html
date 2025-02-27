@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel">
+    <meta name="description" content="Learn how to set up the Serverless Framework with Docker, Webpack and Babel for building robust AWS Lambda functions as part of the Mince Pie Challenge.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/" />
     
 
     <script>
@@ -53,17 +51,17 @@
     <h1 class="post-title">Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel</h1>
     <time datetime="2018-06-15T00:00:00+00:00" class="post-date">15 Jun 2018</time>
     <p>Now that we have spent some time working out how the API is going to look, we can move on to building it!
-We will start off by configuring the initial API project, setting up a Dockerized <a href="https://serverless.com/">Serverless Framework</a> with <a href="https://webpack.js.org/">Webpack</a> and <a href="https://babeljs.io/">Babel</a> support.</p>
+We will start off by configuring the initial API project, setting up a Dockerised <a href="https://serverless.com/">Serverless Framework</a> with <a href="https://webpack.js.org/">Webpack</a> and <a href="https://babeljs.io/">Babel</a> support.</p>
 
 
 
 <p>If you are keen to see how the finished configuration looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/01-base">API repository</a>.</p>
 
-<h3 id="serverless-framework-via-docker">Serverless Framework via Docker</h3>
+<h2 id="serverless-framework-via-docker">Serverless Framework via Docker</h2>
 
-<p>So as to make the project easy-to-setup on many different development environments, we will employ Docker to manage the Serverless Framework and Node dependencies.
+<p>So as to make the project easy to set-up on many different development environments, we will employ Docker to manage the Serverless Framework and Node dependencies.
 We will take advantage of a pre-built Node 8 image and add the ability to run the Serverless Framework within it.
-For allowing us to support future Node dependencies that require <code class="language-plaintext highlighter-rouge">glibc</code> and container exploration via a Bash shell, we will also include these into our image definition.</p>
+To allow us to support future Node dependencies that require <code class="language-plaintext highlighter-rouge">glibc</code> and container exploration via a Bash shell, we will also include these in our image definition.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FROM node:8-alpine
 RUN apk --no-cache add bash ca-certificates wget
@@ -75,7 +73,7 @@ RUN yarn global add serverless@1.28.0
 WORKDIR /opt/app
 </code></pre></div></div>
 
-<p>When the container is initiated we wish to supply the AWS credentials (<code class="language-plaintext highlighter-rouge">AWS_ACCESS_KEY_ID</code>, <code class="language-plaintext highlighter-rouge">AWS_SECRET_ACCESS_KEY</code>) required by Serverless using a given <code class="language-plaintext highlighter-rouge">.env</code> file.
+<p>When the container is initiated, we wish to supply the AWS credentials (<code class="language-plaintext highlighter-rouge">AWS_ACCESS_KEY_ID</code>, <code class="language-plaintext highlighter-rouge">AWS_SECRET_ACCESS_KEY</code>) required by Serverless using a given <code class="language-plaintext highlighter-rouge">.env</code> file.
 This allows us to easily control what <a href="https://serverless.com/framework/docs/providers/aws/guide/credentials/">credentials</a> are being used to deploy and maintain the application.
 We will also allow the container to access the code-base and provide a separate volume for Node dependencies to be persisted.
 Doing this allows us to isolate working dependencies targeted at the container architecture and dependencies installed for the host machine.</p>
@@ -109,10 +107,10 @@ Doing this allows us to isolate working dependencies targeted at the container a
   <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--rm</span> <span class="err">serverless</span> <span class="err">bash</span>
 </code></pre></div></div>
 
-<h3 id="serverless-with-babel-and-webpack">Serverless with Babel and Webpack</h3>
+<h2 id="serverless-with-babel-and-webpack">Serverless with Babel and Webpack</h2>
 
 <p>It should be noted that it is not strictly necessary to require Babel and Webpack when working with Lambda and the Serverless Framework.
-However, the ability to use all the latest JavaScript features, along with Webpack’s module bundling (inc. <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a>) are invaluable additions.
+However, the ability to use all the latest JavaScript features, along with Webpack’s module bundling (inc. <a href="https://webpack.js.org/guides/tree-shaking/">tree-shaking</a>), is an invaluable addition.
 We will start off by defining and installing the explicit development dependencies that we will need.
 Within Lambda, the <code class="language-plaintext highlighter-rouge">aws-sdk</code> dependency comes pre-baked into the runtime, so we only care about including this during development.</p>
 
@@ -136,10 +134,10 @@ Within Lambda, the <code class="language-plaintext highlighter-rouge">aws-sdk</c
 
 <p>From here we can <code class="language-plaintext highlighter-rouge">make install</code> and see the Docker module volume in action.
 You will notice that a <code class="language-plaintext highlighter-rouge">node_modules</code> directory has been created within the code-base but it is empty on your host machine?!
-However, if you <code class="language-plaintext highlighter-rouge">make shell</code> into the container you will notice that the container specific dependencies are present.
-This allows you to optionally install the dependencies on your host machine, without conflicting with the container.</p>
+However, if you <code class="language-plaintext highlighter-rouge">make shell</code> into the container, you will notice that the container-specific dependencies are present.
+This allows you to optionally install the dependencies on your host machine without conflicting with the container.</p>
 
-<p>Now lets setup the initial <code class="language-plaintext highlighter-rouge">serverless.yml</code>, <code class="language-plaintext highlighter-rouge">webpack.config.js</code> and <code class="language-plaintext highlighter-rouge">.babelrc</code> configurations.</p>
+<p>Now let’s set up the initial <code class="language-plaintext highlighter-rouge">serverless.yml</code>, <code class="language-plaintext highlighter-rouge">webpack.config.js</code> and <code class="language-plaintext highlighter-rouge">.babelrc</code> configurations.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">mince-pie-challenge-api</span>
 
@@ -171,9 +169,9 @@ This allows you to optionally install the dependencies on your host machine, wit
 </code></pre></div></div>
 
 <p>You can see that we have decided to break up the roles, resources and functions into separate YAML files.
-This allows us to manage these definitions in an easier manor, preventing us from creating one huge file.
+This allows us to manage these definitions in an easier manner, preventing us from creating one huge file.
 We have specified that we wish to use the latest Lambda <a href="https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/">node runtime</a> (at the time of writing), with a single global environment variable set (this will be used in a following demo).
-So as to take full advantage of Webpack we have specified that we wish each function to be packaged individually when deployed.
+So as to take full advantage of Webpack, we have specified that we wish each function to be packaged individually when deployed.
 This allows us to prune any unused dependencies on a per-function basis.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">path</span><span class="dl">'</span><span class="p">);</span>
@@ -206,7 +204,7 @@ This allows us to prune any unused dependencies on a per-function basis.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We supply Webpack with a simple configuration, specifying that we are targeting Node (allowing us to <a href="https://www.npmjs.com/package/webpack-node-externals">ignore packaging</a> built-in modules) and that wish to use Babel to process our JavaScript files.
+<p>We supply Webpack with a simple configuration, specifying that we are targeting Node (allowing us to <a href="https://www.npmjs.com/package/webpack-node-externals">ignore packaging</a> built-in modules) and that we wish to use Babel to process our JavaScript files.
 We also define how we wish each function to be output (with their associated source mapping), and which mode to run in based on a <a href="https://github.com/dherault/serverless-offline">serverless-offline</a> flag.</p>
 
 <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
@@ -217,14 +215,14 @@ We also define how we wish each function to be output (with their associated sou
 </span></code></pre></div></div>
 
 <p>We let Babel know that we wish to target the specific version of Node that is present within the Lambda runtime.
-This allows Babel to only include <a href="https://remysharp.com/2010/10/08/what-is-a-polyfill">pollyfilled</a> support for features that are used and do not natively exist in this version.
+This allows Babel to only include <a href="https://remysharp.com/2010/10/08/what-is-a-polyfill">polyfilled</a> support for features that are used and do not natively exist in this version.
 One such feature that is not present within the <code class="language-plaintext highlighter-rouge">env</code> preset at this time is <a href="https://babeljs.io/docs/plugins/transform-object-rest-spread/">Object rest spread</a>, so we explicitly include this plugin.</p>
 
 <p>This is all that is required to begin developing Lambda functions using the Serverless Framework, with access to the latest JavaScript features. 🎉</p>
 
-<h3 id="the-hello-world-example">The ‘Hello World’ Example</h3>
+<h2 id="the-hello-world-example">The ‘Hello World’ Example</h2>
 
-<p>Before we delve into developing the API, lets get ourselves accustom to building and deploying a trivial HTTP-based Lambda function.
+<p>Before we delve into developing the API, let’s get ourselves accustomed to building and deploying a trivial HTTP-based Lambda function.
 We will create a function which is invoked by an <a href="https://aws.amazon.com/api-gateway/">API Gateway</a> endpoint and returns a greeting based on the supplied name.
 The environment variable that we specified in the <code class="language-plaintext highlighter-rouge">serverless.yml</code> file will make sense now.</p>
 
@@ -242,7 +240,7 @@ The environment variable that we specified in the <code class="language-plaintex
               <span class="na">name</span><span class="pi">:</span> <span class="no">true</span>
 </code></pre></div></div>
 
-<p>With this simple definition Serverless is able to create all the AWS-specific infrastructure required for us to get the endpoint up and running.
+<p>With this simple definition, Serverless is able to create all the AWS-specific infrastructure required for us to get the endpoint up and running.
 We define a single handler which is invoked via HTTP and requires a specified name to be included with the request.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="p">{</span> <span class="nx">GREETING</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
@@ -256,18 +254,18 @@ We define a single handler which is invoked via HTTP and requires a specified na
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Once API Gateway has passed the request to our Lambda function we will use the supplied name to return a <code class="language-plaintext highlighter-rouge">200 OK</code> response with the associated greeting.</p>
+<p>Once API Gateway has passed the request to our Lambda function, we will use the supplied name to return a <code class="language-plaintext highlighter-rouge">200 OK</code> response with the associated greeting.</p>
 
 <p>Now that we have some actual functionality we can interact with, we can go about deploying this application to AWS.
-Simply executing <code class="language-plaintext highlighter-rouge">make deploy</code> will instruct our Dockerized Serverless Framework to package up and deploy the function, along with the required resources.
-If you are interested in a more in-depth look into this process I have created <a href="https://www.youtube.com/watch?v=ke3eQv-PUC8">several</a> <a href="https://www.youtube.com/watch?v=B0r3QdcCy8g">different</a> videos on the topic.
+Simply executing <code class="language-plaintext highlighter-rouge">make deploy</code> will instruct our Dockerised Serverless Framework to package up and deploy the function, along with the required resources.
+If you are interested in a more in-depth look into this process, I have created <a href="https://www.youtube.com/watch?v=ke3eQv-PUC8">several</a> <a href="https://www.youtube.com/watch?v=B0r3QdcCy8g">different</a> videos on the topic.
 Once this has completed, an API Gateway endpoint will be presented that you can then visit to test out the service.
-You can see this module installation and deployment process in-action within the following screencast.</p>
+You can see this module installation and deployment process in action within the following screencast.</p>
 
 <p><script src="https://asciinema.org/a/6BAfJE1YFYLoSw0StVA9jWUaN.js" id="asciicast-6BAfJE1YFYLoSw0StVA9jWUaN" async=""></script></p>
 
 <p>With the Serverless Framework configured and a sample function now deployed, we can begin the process of implementing our API.
-Join me in the next post were I will discuss the process of configuring <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>, the authentication service that will be used within our API.</p>
+Join me in the next post where I will discuss the process of configuring <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>, the authentication service that will be used within our API.</p>
 
 </article>
 

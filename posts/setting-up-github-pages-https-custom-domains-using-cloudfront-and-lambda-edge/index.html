@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge">
+    <meta name="description" content="Learn how to set up HTTPS custom domains for GitHub Pages using CloudFront and Lambda@Edge in this comprehensive guide.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/" />
     
 
     <script>
@@ -52,41 +50,40 @@
                 <article class="post">
     <h1 class="post-title">Setting up GitHub Pages HTTPS Custom Domains using CloudFront and Lambda@Edge</h1>
     <time datetime="2018-01-24T00:00:00+00:00" class="post-date">24 Jan 2018</time>
-    <p>We recently wished to switch over our sites hosted on <a href="https://pages.github.com/">GitHub Pages</a> to be soley HTTPS.
-However, although you are able to supply a <a href="https://help.github.com/articles/using-a-custom-domain-with-github-pages/">custom domain</a> or support <a href="https://github.com/blog/2186-https-for-github-pages">HTTPS traffic</a> you are not able to do both.
-In this article I would like to guide you through the process of how we went about achieving this using <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>, <a href="https://aws.amazon.com/route53/">Route 53</a> and <a href="https://aws.amazon.com/lambda/edge/">Lambda@Edge</a>.</p>
+    <p>We recently wished to switch over our sites hosted on <a href="https://pages.github.com/">GitHub Pages</a> to be solely HTTPS.
+However, although you are able to supply a <a href="https://help.github.com/articles/using-a-custom-domain-with-github-pages/">custom domain</a> or support <a href="https://github.com/blog/2186-https-for-github-pages">HTTPS traffic</a>, you are not able to do both.
+In this article, I would like to guide you through the process of how we went about achieving this using <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>, <a href="https://aws.amazon.com/route53/">Route 53</a> and <a href="https://aws.amazon.com/lambda/edge/">Lambda@Edge</a>.</p>
 
 
 
-<h3 id="setting-up-the-cloudfront-distribution">Setting up the CloudFront Distribution</h3>
+<h2 id="setting-up-the-cloudfront-distribution">Setting up the CloudFront Distribution</h2>
 
-<p>To get around the fact that we can only route plain HTTP traffic using custom domains within GitHub Pages, we decided to add a CloudFront distribution in-between the client and origin.
-Doing so allowed us to supply our own SSL certificate and custom domain secure connection.
+<p>To get around the fact that we can only route plain HTTP traffic using custom domains within GitHub Pages, we decided to add a CloudFront distribution in between the client and the origin.
+Doing so allowed us to supply our own SSL certificate and a secure connection for our custom domain.
 Below is a high-level diagram depicting the approach we took.</p>
 
 <p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/architecture.png" alt="Architecture" /></p>
 
-<p>We first setup a new distribution which was associated with a certificate supplied by <a href="https://aws.amazon.com/certificate-manager/">AWS Certificate Manager</a>.</p>
+<p>We first set up a new distribution which was associated with a certificate supplied by <a href="https://aws.amazon.com/certificate-manager/">AWS Certificate Manager</a>.</p>
 
 <p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/distribution.png" alt="Distribution Settings" /></p>
 
-<p>Following this we created a new origin which routed traffic to the specified <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
+<p>Following this, we created a new origin which routed traffic to the specified <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
 We ensured that only HTTPS via TLS 1.2 was used for requests to the origin server for security concerns.</p>
 
 <p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/origin.png" alt="Distribution Origin" /></p>
 
-<p>With this origin in-place we then created a default cache behaviour which enforced HTTPS traffic (redirecting HTTP traffic if found).</p>
+<p>With this origin in place, we then created a default cache behaviour which enforced HTTPS traffic (redirecting HTTP traffic if found).</p>
 
-<p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/cache.png" alt="Default Cache Dehaviour" /></p>
+<p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/cache.png" alt="Default Cache Behaviour" /></p>
 
-<h3 id="handling-github-page-redirects">Handling Github Page Redirects</h3>
+<h2 id="handling-github-page-redirects">Handling GitHub Page Redirects</h2>
 
-<p>One issue we faced with routing traffic through CloudFront was if GitHub attempted to return a redirect response to the client (i.e for missing trailing slashes).
-As GitHub is unaware of the custom domain, it attempts to route traffic to the <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
-To get around this we took advantage of a <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-updating-http-responses.html">Origin Response Lambda</a> which simply replaced any such responses <code class="language-plaintext highlighter-rouge">Location</code> header with the desired custom domain.</p>
+<p>One issue we faced with routing traffic through CloudFront was that if GitHub attempted to return a redirect response to the client (for example, for missing trailing slashes), GitHub, being unaware of the custom domain, would attempt to route traffic to the <code class="language-plaintext highlighter-rouge">*.github.io</code> domain.
+To get around this, we took advantage of an <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-updating-http-responses.html">Origin Response Lambda</a> which simply replaced any such responses’ <code class="language-plaintext highlighter-rouge">Location</code> header with the desired custom domain.</p>
 
-<p>To ensure that CloudFront had access to this Lambda we had to define it within the <code class="language-plaintext highlighter-rouge">us-east-1</code> region.
-Using the simple handler below we published a new version of the Lambda and copied the ARN into the CloudFront Distribution settings.</p>
+<p>To ensure that CloudFront had access to this Lambda, we had to define it within the <code class="language-plaintext highlighter-rouge">us-east-1</code> region.
+Using the simple handler below, we published a new version of the Lambda and copied the ARN into the CloudFront Distribution settings.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
 
@@ -111,7 +108,8 @@ Using the simple handler below we published a new version of the Lambda and copi
 
 <p><img src="/uploads/setting-up-github-pages-https-custom-domains-using-cloudfront-and-lambda-edge/lambda.png" alt="Origin Response Lambda" /></p>
 
-<p>Once this was complete we setup an <code class="language-plaintext highlighter-rouge">ALIAS</code> record for the custom domain within Route 53 and all GitHub Pages traffic could now be accessed from the custom domain over HTTPS.</p>
+<p>Once this was complete, we set up an <code class="language-plaintext highlighter-rouge">ALIAS</code> record for the custom domain within Route 53.
+All GitHub Pages traffic could now be accessed from the custom domain over HTTPS.</p>
 
 </article>
 

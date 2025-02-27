@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Unlocking the AWS WAF Logs using Serverless, Lambda and AWS SDK">
+    <meta name="description" content="Unlock AWS WAF logs easily using Serverless, Lambda and AWS SDK to gain deep insights into your web application firewall and enhance security.">
 
     <title>
         
@@ -19,8 +19,6 @@
 
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
-    
-        <link rel="canonical" href="https://tech.mybuilder.com/unlocking-the-aws-waf-logs/" />
     
 
     <script>
@@ -52,54 +50,56 @@
                 <article class="post">
     <h1 class="post-title">Unlocking the AWS WAF Logs</h1>
     <time datetime="2018-01-12T00:00:00+00:00" class="post-date">12 Jan 2018</time>
-    <p>In this article we discuss our recent move to route all requests through <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>, allowing us to parse all traffic through the <a href="https://aws.amazon.com/waf/">AWS Web Application Firewall</a> (WAF).
-We highlight the reasoning behind this change, and some issues/remedies ecountered when trying to garner concrete logs from the WAF instance.</p>
+    <p>In this article we discuss our recent move to route all requests through <a href="https://aws.amazon.com/cloudfront/">CloudFront</a>.
+This allows us to parse all traffic through the <a href="https://aws.amazon.com/waf/">AWS Web Application Firewall</a> (WAF).
+We highlight the reasoning behind this change, and some issues and remedies encountered when trying to garner concrete logs from the WAF instance.</p>
 
 
 
-<h3 id="dynamic-content-delivery">Dynamic Content Delivery</h3>
+<h2 id="dynamic-content-delivery">Dynamic Content Delivery</h2>
 
-<p>Since moving our infrastructure fully over to AWS, one of the first benefits we wished to take advantage of was <a href="https://aws.amazon.com/cloudfront/dynamic-content/">Dynamic Content Delivery</a> by way of CloudFront.
-It may seem odd to wish to route all requests through a CDN, but in doing so we have been able to unlock the following possibilities:</p>
+<p>Since moving our infrastructure fully to AWS, one of the first benefits we wished to take advantage of was <a href="https://aws.amazon.com/cloudfront/dynamic-content/">Dynamic Content Delivery</a> via CloudFront.
+It may seem odd to route all requests through a CDN, but in doing so we have been able to unlock the following possibilities:</p>
 
 <ul>
   <li>Allow CloudFront to handle SSL/TLS termination.</li>
   <li>HTTP/2 support out of the box.</li>
-  <li>Due to HTTP/2 being <a href="http://qnimate.com/what-is-multiplexing-in-http2/">fully multiplexed</a>, fine-grained path/query-string cache behaviors present in CloudFront are hugely beneficial.</li>
-  <li>Take advantage of CloudFront’s many Edge locations - connecting the client to the nearest geographical point, and then using Amazon’s own infrastructure to route the requests to the EC2 hosted origin server(s).</li>
-  <li>Along with standard static assets that can be trivially cached, we are able to begin to experiment with caching whole pages - pushing simple dynamic content to the client (i.e. logged-in navigation states).</li>
+  <li>Due to HTTP/2 being <a href="http://qnimate.com/what-is-multiplexing-in-http2/">fully multiplexed</a>, fine-grained path/query-string cache behaviours present in CloudFront are hugely beneficial.</li>
+  <li>Take advantage of CloudFront’s many Edge locations, connecting the client to the nearest geographical point and then using Amazon’s own infrastructure to route the requests to the EC2-hosted origin server(s).</li>
+  <li>Along with standard static assets that can be trivially cached, we are able to begin to experiment with caching whole pages, pushing simple dynamic content to the client (i.e. logged-in navigation states).</li>
   <li>Instead of pushing the entire cached page to the client, we can also harness <a href="https://aws.amazon.com/lambda/edge/">Lambda@Edge</a> for small dynamic content changes at Edge locations.</li>
   <li>Employ the <a href="https://aws.amazon.com/waf/">AWS WAF</a> on all client requests, providing another layer of security.</li>
 </ul>
 
-<h3 id="aws-web-application-firewall">AWS Web Application Firewall</h3>
+<h2 id="aws-web-application-firewall">AWS Web Application Firewall</h2>
 
-<p>As you can see there are many possibilities this opens the door to, in this post however, I would like to focus on the last one.
+<p>As you can see, there are many possibilities that this opens the door to.
+In this post, however, I would like to focus on the last one.
 Soon after shifting all our traffic to go through CloudFront, we wished to take advantage of the AWS WAF.
-The benefits of deploying a WAF in-front of your stack are succinctly put in a <a href="https://www.youtube.com/watch?v=4liTK5MrTNo">short talk</a> from last years re:Invent.</p>
+The benefits of deploying a WAF in front of your stack are succinctly presented in a <a href="https://www.youtube.com/watch?v=4liTK5MrTNo">short talk</a> from last year’s re:Invent.</p>
 
-<p>However, during development of this approach we realised that getting meaningful logs out of the product was harder than expected.
-As of writing AWS does not provide any easily accessible log stream to inspect how the WAF instance is reacting to requests.
-The only noticeable indicator of a WAF rule blocking a request came from the 403 HTTP response code that was generated and returned to the client.
-This was a less than desirable metric to lean on, as we could get many false-positives from genuine backend 403 reponses, and still did not know which rule triggered it.</p>
+<p>However, during development of this approach, we realised that obtaining meaningful logs from the product was harder than expected.
+As of writing, AWS does not provide any easily accessible log stream to inspect how the WAF instance is reacting to requests.
+The only noticeable indicator of a WAF rule blocking a request was the 403 HTTP response code that was generated and returned to the client.
+This was a less-than-desirable metric to rely on, as we could get many false positives from genuine backend 403 responses, and we still did not know which rule triggered it.</p>
 
-<p>We did not feel confident in using such a feature without having more insight into how it was working.
-We wished to be able to analyse the traffic patterns and which rules were being matched.</p>
+<p>We did not feel confident using such a feature without having more insight into how it was working.
+We wished to be able to analyse the traffic patterns and determine which rules were being matched.</p>
 
-<h3 id="unlocking-the-logs">Unlocking the Logs</h3>
+<h2 id="unlocking-the-logs">Unlocking the Logs</h2>
 
-<p>To remedy this we decided to explore the AWS SDK and noticed that with a little work we could query the <a href="http://docs.aws.amazon.com/waf/latest/APIReference/API_GetSampledRequests.html"><code class="language-plaintext highlighter-rouge">GetSampledRequests</code></a> action at a scheduled interval and fetch any matches found - storing them for future use.
+<p>To remedy this, we decided to explore the AWS SDK and noticed that with a little work we could query the <a href="http://docs.aws.amazon.com/waf/latest/APIReference/API_GetSampledRequests.html"><code class="language-plaintext highlighter-rouge">GetSampledRequests</code></a> action at a scheduled interval and fetch any matches found, storing them for future use.
 This would allow us to look at current and historical data about the WAF’s actions.
-A small caveat to how <code class="language-plaintext highlighter-rouge">GetSampledRequests</code> works however, is in that it only returns a sample (maximum of 500) from among the first 5,000 request that your resource receives during the specified time-range.
-So to ensure that we receive as many hits as have actually occurred, we must configure the scheduled invocation time according to our throughput.</p>
+A small caveat to how <code class="language-plaintext highlighter-rouge">GetSampledRequests</code> works, however, is that it only returns a sample (a maximum of 500) from among the first 5,000 requests that your resource receives during the specified time range.
+Therefore, to ensure that we receive as many hits as have actually occurred, we must configure the scheduled invocation time according to our throughput.</p>
 
-<p>I felt this was a great opportunity to work with the <a href="https://serverless.com/">Serverless Framework</a> again, and in doing so created the <a href="https://github.com/mybuilder/aws-waf-logger">aws-waf-logger</a> project.
-Using the provided <code class="language-plaintext highlighter-rouge">env.yml.sample</code> as a template, it is very easy to configure the desired Web ACL’s to monitor, the tracking frequency and which S3 bucket to store the results into.</p>
+<p>I felt this was a great opportunity to work with the <a href="https://serverless.com/">Serverless Framework</a> again, and in doing so, created the <a href="https://github.com/mybuilder/aws-waf-logger">aws-waf-logger</a> project.
+Using the provided <code class="language-plaintext highlighter-rouge">env.yml.sample</code> as a template, it is very easy to configure the desired Web ACLs to monitor, the tracking frequency, and the S3 bucket in which to store the results.</p>
 
-<p>The most interesting part of this project is within the transformation from what <code class="language-plaintext highlighter-rouge">GetSampledRequests</code> returns us, to clear insight about the individual ACL’s and rules we wish to track.
-Using a composition of several Promises, the below piece of code takes in the desired Web ACL identifier, along with a time-frame which is based on the last time the Lambda has been executed.
-We then query for all the present rules which are applied to this Web ACL, and then fetch these individual rule hits.
-Once we have this data, we flattern the results into a single dimensional array, which we then subsequently clean-up the client supplied headers.</p>
+<p>The most interesting part of this project is the transformation of what <code class="language-plaintext highlighter-rouge">GetSampledRequests</code> returns into clear insight about the individual ACLs and rules we wish to track.
+Using a composition of several Promises, the code below takes in the desired Web ACL identifier, along with a time frame based on the last time the Lambda was executed.
+We then query for all the current rules that are applied to this Web ACL, and subsequently fetch these individual rule hits.
+Once we have this data, we flatten the results into a single-dimensional array, which we then clean up by removing client-supplied headers.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
 
@@ -155,16 +155,16 @@ Once we have this data, we flattern the results into a single dimensional array,
     <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">hits</span> <span class="o">=&gt;</span> <span class="nx">hits</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">normaliseHeaders</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>We are then able to use this functionality to write the resulting listing to a file, or logging service of our choice.
-Within the project we have provided the ability to write the results to S3 and/or directly send the hits off to <a href="https://www.loggly.com/">Loggly</a>.
-Upon review, we could have possibly extracted out the Loggly logic (making the project logger agnostic), employing a decoupled S3 <code class="language-plaintext highlighter-rouge">ObjectCreated</code> event approach to send the hits off instead.</p>
+<p>We are then able to use this functionality to write the resulting listing to a file or a logging service of our choice.
+Within the project, we have provided the ability to write the results to S3 and/or directly send the hits to <a href="https://www.loggly.com/">Loggly</a>.
+Upon review, we could have possibly extracted the Loggly logic to make the project logger-agnostic, employing a decoupled S3 <code class="language-plaintext highlighter-rouge">ObjectCreated</code> event approach to send the hits instead.</p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
-<p>Since adding these logging capabilities we have been able to clearly see what rules are being hit and in which context.
+<p>Since adding these logging capabilities, we have been able to clearly see which rules are being hit and in which context.
 This allows us to feel more confident in the WAF product, removing the ‘black-box’ fears that we previously had towards it.</p>
 
-<p>If you have ran into this problem, maybe the <a href="https://github.com/mybuilder/aws-waf-logger">aws-waf-logger</a> we have created could help you!</p>
+<p>If you have encountered this problem, perhaps the <a href="https://github.com/mybuilder/aws-waf-logger">aws-waf-logger</a> we have created could help you!</p>
 
 </article>
 

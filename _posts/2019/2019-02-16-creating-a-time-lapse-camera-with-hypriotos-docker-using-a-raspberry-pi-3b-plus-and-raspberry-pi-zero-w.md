@@ -1,17 +1,18 @@
 ---
 layout: post
-title: "Creating a Time-lapse Camera with HypriotOS/Docker using a Raspberry Pi 3B+ and Raspberry Pi Zero W"
+title: 'Creating a Time-lapse Camera with HypriotOS/Docker using a Raspberry Pi 3B+ and Raspberry Pi Zero W'
 meta: "Documenting my experience with building Raspberry Pi time-lapse camera's using HypriotOS and Docker"
 ---
 
 I have recently started a project that requires the ability to create a time-lapse video over a set duration.
 Looking at all the possible ways of achieving this I felt that a Raspberry Pi would be well suited for the job.
 In this post I will discuss how I went about setting up both a [Raspberry Pi 3 Model B+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/) and [Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/) with [HypriotOS](https://blog.hypriot.com/) to run a Docker-based time-lapse camera Node application.
+
 <!--more-->
 
 The decision to run the Node application within Docker provides me with the best flexibility for updating and adding further functionality to the devices at a later date.
 
-### The Setup
+## The Setup
 
 I decided on using both a Raspberry Pi 3 Model B+ and Raspberry Pi Zero W so as to experiment with the two different form factors and see how well both would perform with the given workload.
 Both Pi's allow you to connect the Raspberry Pi Camera Module v2 to them so as to control how/when a photo is taken.
@@ -35,7 +36,7 @@ Both Pi's allow you to connect the Raspberry Pi Camera Module v2 to them so as t
   <div style="clear:both"></div>
 </div>
 
-### Building the Node Application
+## Building the Node Application
 
 Now that I had decided on the equipment I was going to use, the next task was to create the [`timelapse.js`](https://github.com/eddmann/pi-timelapse/blob/master/timelapse.js) Node application.
 The application is a simple script which uses `setInterval` to block and call the give `shoot` function with the desired delay.
@@ -43,14 +44,14 @@ Photos are organised into a deterministic `/year/month/day/hour/` directory stru
 The actual act of taking the photo (with desired options) is delegated to the [`raspistill`](https://www.raspberrypi.org/documentation/usage/camera/raspicam/raspistill.md) command-line tool which is provided by the Raspberry Pi organisation.
 
 ```js
-const { mkdirSync } = require("fs");
-const { execSync } = require("child_process");
+const { mkdirSync } = require('fs');
+const { execSync } = require('child_process');
 
 const toMilliseconds = seconds => seconds * 1000;
 
 const getCurrentDate = () => {
   const now = new Date();
-  const pad = number => number.toString().padStart(2, "0");
+  const pad = number => number.toString().padStart(2, '0');
 
   return {
     year: now.getFullYear(),
@@ -58,7 +59,7 @@ const getCurrentDate = () => {
     day: pad(now.getDate()),
     hours: pad(now.getHours()),
     minutes: pad(now.getMinutes()),
-    seconds: pad(now.getSeconds())
+    seconds: pad(now.getSeconds()),
   };
 };
 
@@ -87,8 +88,8 @@ const shoot = (basePath, options) => {
 };
 
 const delay = process.env.TIME_DELAY || 30;
-const basePath = process.env.BASE_PATH || "/var/photos";
-const options = process.env.OPTIONS || "";
+const basePath = process.env.BASE_PATH || '/var/photos';
+const options = process.env.OPTIONS || '';
 
 console.log(`Delay: ${delay}s, Path: '${basePath}', Options: '${options}'`);
 
@@ -109,7 +110,7 @@ The image ensures that the [user-land](https://github.com/raspberrypi/userland) 
 
 With these two files in place I was now able to build and push the image to [Docker Hub](https://hub.docker.com/r/eddmann/pi-timelapse) for later use on the Raspberry Pi's.
 
-### Building the HypriotOS Image
+## Building the HypriotOS Image
 
 The [Hypriot](https://github.com/hypriot) project takes a lot of the pain out of getting setup with using Docker on the Raspberry Pi and it's ARM architecture.
 It also includes the [cloud-init](https://cloudinit.readthedocs.io/en/latest/) library which allows you to clearly define how you wish the instance to be provisioned on first boot.
@@ -124,7 +125,7 @@ manage_etc_hosts: true
 
 users:
   - name: pi
-    gecos: "Raspberry Pi"
+    gecos: 'Raspberry Pi'
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
     groups: users,docker,video
@@ -133,8 +134,8 @@ users:
     ssh_pwauth: true
     chpasswd: { expire: false }
 
-locale: "en_US.UTF-8"
-timezone: "Europe/London"
+locale: 'en_US.UTF-8'
+timezone: 'Europe/London'
 
 write_files:
   - content: |
@@ -202,7 +203,7 @@ flash \
 
 With both the Docker and Raspberry Pi HypriotOS images now written I was able to move on to actually experimenting with the devices. 📸
 
-### Booting the Raspberry Pi Time-lapse Camera
+## Booting the Raspberry Pi Time-lapse Camera
 
 After inserting MicroSD cards into each Raspberry Pi I was able to access both devices via SSH using the chosen hostnames (i.e `timelapse.local`).
 The Docker container had been successfully configured to start at boot time and would restart automatically given any error that occurs.

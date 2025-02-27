@@ -1,18 +1,19 @@
 ---
 layout: post
-title: "Building a Flag Guessing Game using React Hooks"
-meta: "Showcases how you can use Create React App, Styled Components and React Hooks to build a Flag Guessing Game"
+title: 'Building a Flag Guessing Game using React Hooks'
+meta: 'Showcases how you can use Create React App, Styled Components and React Hooks to build a Flag Guessing Game'
 ---
 
 Since [React Hooks](https://reactjs.org/docs/hooks-intro.html) were announced last autumn I've been looking at ways to experiment with them in a couple of small side-projects.
 In this post we will create a simple flag guessing game (called [Fun with Flags](https://eddmann.com/fun-with-flags/)) leveraging [Create React App](https://facebook.github.io/create-react-app/), [Styled Components](https://www.styled-components.com/) and React Hooks.
 Along the way we will highlight use-cases for several different hooks such as State, Effect and Memoization.
 Finally, we will automate the process of publishing the compiled game to [GitHub Pages](https://pages.github.com/).
+
 <!--more-->
 
 ![Sheldon Cooper Presents: Fun with Flags](/uploads/building-a-flag-guessing-game-using-react-hooks/sheldon.jpg)
 
-### Setup
+## Setup
 
 The first step we need to take is to initialise the project, including the required `styled-components` dependency.
 
@@ -27,14 +28,14 @@ If you are following along with this post, you can find the completed listing wi
 ```js
 export default [
   {
-    emoji: "🇬🇧",
-    name: "United Kingdom"
+    emoji: '🇬🇧',
+    name: 'United Kingdom',
   },
   // ...
 ];
 ```
 
-### The Answer Box
+## The Answer Box
 
 It is good practise to decompose an application into smaller, high cohesion units - of which we can then compose together to provide the desired behaviour.
 With this in mind, we will begin by focusing our attention on the special input field (located within [`src/AnswerBox.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/AnswerBox.js)) that will be used to manage the user's entered answer.
@@ -42,8 +43,8 @@ With this in mind, we will begin by focusing our attention on the special input 
 We start off by defining some key styled building blocks used to create the overall `AnswerBox`.
 
 ```js
-import React, { useState, useEffect, useMemo } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect, useMemo } from 'react';
+import styled from 'styled-components';
 
 const Form = styled.form`
   margin-bottom: 1em;
@@ -80,15 +81,15 @@ Thank you to [Sebastian Sim](https://github.com/sebastianplsim) for this idea!
 ```js
 const toPlaceholder = (value, answer) =>
   [...value].reduce((placeholder, char) => {
-    return placeholder.replace("_", char);
-  }, answer.replace(/[^\s]/g, "_"));
+    return placeholder.replace('_', char);
+  }, answer.replace(/[^\s]/g, '_'));
 
-const normalise = value => value.toUpperCase().replace(/[^A-Z]/g, "");
+const normalise = value => value.toUpperCase().replace(/[^A-Z]/g, '');
 
 export default ({ answer, onCorrect, onIncorrect, ...props }) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
 
-  useEffect(() => setValue(""), [answer]);
+  useEffect(() => setValue(''), [answer]);
 
   const handleChange = event => {
     setValue(normalise(event.target.value));
@@ -98,25 +99,17 @@ export default ({ answer, onCorrect, onIncorrect, ...props }) => {
     event.preventDefault();
 
     value === normalise(answer) ? onCorrect() : onIncorrect();
-    setValue("");
+    setValue('');
     return;
   };
 
-  const placeholder = useMemo(() => toPlaceholder(value, answer), [
-    value,
-    answer
-  ]);
+  const placeholder = useMemo(() => toPlaceholder(value, answer), [value, answer]);
 
   const maxLength = useMemo(() => normalise(answer).length, [answer]);
 
   return (
     <Form onSubmit={handleSubmit}>
-      <HiddenInput
-        onChange={handleChange}
-        value={value}
-        maxLength={maxLength}
-        autoFocus
-      />
+      <HiddenInput onChange={handleChange} value={value} maxLength={maxLength} autoFocus />
       <Placeholder>{placeholder}</Placeholder>
     </Form>
   );
@@ -128,15 +121,15 @@ This value is reset if the desired answer changes (i.e. a new flag is displayed)
 From here, both calculating the actual answer's length and generating the placeholder for the current state are [referentially transparent](https://en.wikipedia.org/wiki/Referential_transparency) operations, and as such can be cached using the Memoization hook.
 Finally, when the user submits the form (i.e. hits enter), we check the value and based on its correctness invoke the provided `onCorrect`/`onIncorrect` callbacks.
 
-### Managing the Game
+## Managing the Game
 
 With the `AnswerBox` now implemented we can move on to developing the encompassing `Game` management component within [`src/Game.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js).
 In a similar manner to before, we define several styled building blocks that will be used to present the overall game to the user.
 
 ```js
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import AnswerBox from "./AnswerBox";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import AnswerBox from './AnswerBox';
 
 const CentreWrapper = styled.div`
   margin: 0;
@@ -207,11 +200,7 @@ export default props => {
   return (
     <CentreWrapper>
       <Flag flag={emoji} />
-      <AnswerBox
-        answer={name}
-        onCorrect={onCorrect}
-        onIncorrect={onIncorrect}
-      />
+      <AnswerBox answer={name} onCorrect={onCorrect} onIncorrect={onIncorrect} />
       <Results score={score} attempts={attempts} />
     </CentreWrapper>
   );
@@ -226,20 +215,17 @@ From here, based on the decision made within the `AnswerBox` component, we updat
 Finally, we are able to compose all these pieces together into a [`src/index.js`](https://github.com/eddmann/fun-with-flags/blob/master/src/index.js) entry point.
 
 ```js
-import React from "react";
-import ReactDOM from "react-dom";
-import Game from "./Game";
-import flags from "./flags";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Game from './Game';
+import flags from './flags';
 
-ReactDOM.render(
-  <Game flags={flags} attempts={3} />,
-  document.getElementById("root")
-);
+ReactDOM.render(<Game flags={flags} attempts={3} />, document.getElementById('root'));
 ```
 
 We can then `yarn start` to experiment with the game locally 🎉.
 
-### Publishing to GitHub Pages
+## Publishing to GitHub Pages
 
 Now that we are happy with the game locally, the next step is to share it with the masses 😎.
 This can be easily achieved via compiling a production build locally and publishing it to GitHub Pages.

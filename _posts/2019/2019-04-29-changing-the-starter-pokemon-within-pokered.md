@@ -1,11 +1,12 @@
 ---
 layout: post
-title: "Changing the Starter Pokémon within Pokémon Red (pokered)"
-meta: "Documents how to change the Starter Pokémon available in Pokémon Red (pokered)"
+title: 'Changing the Starter Pokémon within Pokémon Red (pokered)'
+meta: 'Documents how to change the Starter Pokémon available in Pokémon Red (pokered)'
 ---
 
 Taking a closer look through the [pokered](https://github.com/pret/pokered) source, I stumbled upon the [Starter Pokémon](https://bulbapedia.bulbagarden.net/wiki/Starter_Pok%C3%A9mon) choices and thought how it would be possible to change these.
 In this post I will document how I went about customising the Starter Pokémon choices available in Pokémon Red, and the modifications required to the 'pokered' source.
+
 <!--more-->
 
 I started off by updating the Starter Pokémon constants that are present in [`constants/starter_mons.asm`](https://github.com/eddmann/pokered/blob/change-starter-pokemon/constants/starter_mons.asm).
@@ -56,7 +57,7 @@ If you wish to do this however, it is within this file that you can decide how t
 
 The final change that I made was to the Rival's Starter Pokémon move-set in the final battle, found in [`engine/battle/read_trainer_party.asm`](https://github.com/eddmann/pokered/blob/change-starter-pokemon/engine/battle/read_trainer_party.asm#L132).
 In this battle each Starter Pokémon has a specific move made available to them.
-Again, for the sake of simplicity I normalised this to only include [Hyper Beam](https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)) regardless of choice.
+Again, for the sake of simplicity I normalised this to only include [Hyper Beam](<https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)>) regardless of choice.
 
 ```diff
 ; starter

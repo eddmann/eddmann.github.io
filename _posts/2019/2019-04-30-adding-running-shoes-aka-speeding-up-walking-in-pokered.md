@@ -1,13 +1,14 @@
 ---
 layout: post
-title: "Adding Running Shoes (aka Speeding up walking) in Pokémon Red (pokered)"
-meta: "Documenting how to add Running Shoes to the Pokémon Red (pokered) game"
+title: 'Adding Running Shoes (aka Speeding up walking) in Pokémon Red (pokered)'
+meta: 'Documenting how to add Running Shoes to the Pokémon Red (pokered) game'
 ---
 
 One item I feel that is missing from the Pokémon Generation 1 games are the [Running Shoes](https://bulbapedia.bulbagarden.net/wiki/Running_Shoes).
 When 'on' they increase the speed at which you move around the game.
 You are able to achieve this with the [Bicycle](https://bulbapedia.bulbagarden.net/wiki/Bicycle), but this is only present later in the game.
 In this post I will document how I simply added this running ability globally whilst the 'B button' is pressed.
+
 <!--more-->
 
 Looking through the [pokered](https://github.com/pret/pokered) source, I identified the logic surrounding moving the player around the game within [`home/overworld.asm`](https://github.com/eddmann/pokered/blob/running-shoes/home/overworld.asm#L276).

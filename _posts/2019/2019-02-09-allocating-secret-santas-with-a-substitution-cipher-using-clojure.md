@@ -1,15 +1,16 @@
 ---
 layout: post
-title: "Allocating Secret Santas with a Substitution Cipher using Clojure"
-meta: "Documenting how I went about allocating Secret Santas with a substitution cipher using Clojure"
+title: 'Allocating Secret Santas with a Substitution Cipher using Clojure'
+meta: 'Documenting how I went about allocating Secret Santas with a substitution cipher using Clojure'
 ---
 
 Over Christmas I found myself delving back into a bit of Clojure, one such problem I stumbled upon solving was allocating [Secret Santas](https://en.wikipedia.org/wiki/Secret_Santa).
 In this post I will discuss how I went about grouping a given list of names based on certain criteria, and then correctly pairing up each person.
 From here, I will then highlight how I expanded upon the solution to allow these allocations to be distributed, hidden from prying eyes with a simple [ROT13](https://en.wikipedia.org/wiki/ROT13) substitution cipher.
+
 <!--more-->
 
-### Allocating Secret Santas
+## Allocating Secret Santas
 
 The first problem that I had to tackle was loading in a given text file which contained all the given participants and their gender, in CSV form.
 
@@ -62,7 +63,7 @@ In the event that a buyer had been paired with themselves, the action would be r
 Once complete I was able to compose these building blocks together.
 As participants were allocated within groups I used [`mapcat`](https://clojuredocs.org/clojure.core/mapcat) to ensure that the result was a flat listing of all the pairings.
 
-### Hiding the Pairings using a Substitution Cipher
+## Hiding the Pairings using a Substitution Cipher
 
 Now that I could pair up a given list of grouped participants, I then thought about how this could be easily distributed via a print-out without anyone else knowing each others picks.
 I decided that a simple [substitution cipher](https://en.wikipedia.org/wiki/Substitution_cipher) such as ROT13 would do the trick.

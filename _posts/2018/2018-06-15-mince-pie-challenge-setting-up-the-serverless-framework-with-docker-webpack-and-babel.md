@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel'
 meta: 'Learn how to set up the Serverless Framework with Docker, Webpack and Babel for building robust AWS Lambda functions as part of the Mince Pie Challenge.'
-tags: serverless docker webpack babel lambda
+tags: serverless docker webpack babel lambda mince-pie-challenge
 ---
 
 Now that we have spent some time working out how the API is going to look, we can move on to building it!

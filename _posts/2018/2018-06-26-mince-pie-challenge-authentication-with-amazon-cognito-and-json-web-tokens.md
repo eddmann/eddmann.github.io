@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'
 meta: 'This technical post explains how to implement authentication with Amazon Cognito and JSON Web Tokens in a Serverless environment.'
-tags: cognito serverless security
+tags: cognito serverless security mince-pie-challenge
 ---
 
 Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.

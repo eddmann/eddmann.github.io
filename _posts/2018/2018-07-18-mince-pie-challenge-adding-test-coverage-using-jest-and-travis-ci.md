@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
 meta: 'A comprehensive guide to enhancing your API project with test coverage using Jest and Travis CI, ensuring robust code quality and continuous integration.'
-tags: jest testing javascript
+tags: jest testing javascript mince-pie-challenge
 ---
 
 Following on from [adding Flow](https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/) to the API project, I now wish to garner further confidence in the code by adding tests.

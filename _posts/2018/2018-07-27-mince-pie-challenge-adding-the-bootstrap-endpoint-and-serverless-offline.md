@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
 meta: 'Discover how to implement a Bootstrap API endpoint and configure Serverless Offline for efficient local development.'
-tags: serverless
+tags: serverless mince-pie-challenge
 ---
 
 Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication.

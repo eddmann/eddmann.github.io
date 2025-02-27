@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
 meta: 'Explore the process of adding and listing mince pies with Amazon DynamoDB using Lambda and offline development with DynamoDB Local.'
-tags: serverless aws lambda dynamodb javascript
+tags: serverless aws lambda dynamodb javascript mince-pie-challenge
 ---
 
 In the [previous post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) we began to implement the API endpoints, starting off with creating the bootstrap response.

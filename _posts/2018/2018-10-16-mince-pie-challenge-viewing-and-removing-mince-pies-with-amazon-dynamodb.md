@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Viewing and Removing Mince Pies with Amazon DynamoDB'
 meta: 'A comprehensive guide to viewing and removing mince pies using Amazon DynamoDB as part of the Mince Pie Challenge API.'
-tags: serverless aws lambda dynamodb javascript
+tags: serverless aws lambda dynamodb javascript mince-pie-challenge
 ---
 
 In this post we will progress in implementing the proposed endpoint behaviour documented in our [RAML design](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#viewing-the-pies).

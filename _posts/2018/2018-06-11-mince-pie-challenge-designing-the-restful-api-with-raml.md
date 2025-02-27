@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Designing the RESTful API with RAML'
 meta: 'Learn how to design a RESTful API using RAML for the Mince Pie Challenge with detailed guidelines, best practices and authentication strategies.'
-tags: rest raml
+tags: rest raml mince-pie-challenge
 ---
 
 Now that we are aware of what needs to be done, we can go about designing the RESTful API that will be used to process and persist those vital mince pies.

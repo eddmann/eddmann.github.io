@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Setting up Flow with Babel and Webpack'
 meta: 'Learn how to set up Flow with Babel and Webpack to enhance code confidence and ensure type safety in your JavaScript project.'
-tags: javascript flow webpack
+tags: javascript flow webpack mince-pie-challenge
 ---
 
 We have now settled on how our application will perform [user authentication](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/).

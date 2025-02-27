@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
 meta: 'Guide to building a Serverless RESTful API and React Client using AWS services and modern development tools.'
-tags: serverless aws lambda react javascript
+tags: serverless aws lambda react javascript mince-pie-challenge
 ---
 
 Since moving our infrastructure over to the AWS stack, I have been keen to explore how we can take advantage of the numerous services at our disposal, alongside the serverless methodology.

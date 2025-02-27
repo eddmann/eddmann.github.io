@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Showcases how you can use Create React App, Styled Components and React Hooks to build a Flag Guessing Game">
+    <meta name="description" content="Learn how to build an interactive flag guessing game using React Hooks, Create React App, and Styled Components. Exploring game logic, state management, and deployment with GitHub Pages.">
 
     <title>
         
@@ -50,7 +50,7 @@
                 <article class="post">
     <h1 class="post-title">Building a Flag Guessing Game using React Hooks</h1>
     <time datetime="2019-05-03T00:00:00+00:00" class="post-date">03 May 2019</time>
-    <p>Since <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks</a> were announced last autumn I’ve been looking at ways to experiment with them in a couple of small side-projects.
+    <p>Since <a href="https://reactjs.org/docs/hooks-intro.html">React Hooks</a> were announced last autumn, I’ve been looking at ways to experiment with them in a couple of small side-projects.
 In this post we will create a simple flag guessing game (called <a href="https://eddmann.com/fun-with-flags/">Fun with Flags</a>) leveraging <a href="https://facebook.github.io/create-react-app/">Create React App</a>, <a href="https://www.styled-components.com/">Styled Components</a> and React Hooks.
 Along the way we will highlight use-cases for several different hooks such as State, Effect and Memoization.
 Finally, we will automate the process of publishing the compiled game to <a href="https://pages.github.com/">GitHub Pages</a>.</p>
@@ -158,14 +158,14 @@ In doing this we can still take advantage of the form lifecycle events (i.e. <co
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Looking at the implementation above you can see that we manage the user’s answer with a State hook.
+<p>Looking at the implementation above, you can see that we manage the user’s answer with a State hook.
 This value is reset if the desired answer changes (i.e. a new flag is displayed) using an Effect hook.
 From here, both calculating the actual answer’s length and generating the placeholder for the current state are <a href="https://en.wikipedia.org/wiki/Referential_transparency">referentially transparent</a> operations, and as such can be cached using the Memoization hook.
-Finally, when the user submits the form (i.e. hits enter), we check the value and based on its correctness invoke the provided <code class="language-plaintext highlighter-rouge">onCorrect</code>/<code class="language-plaintext highlighter-rouge">onIncorrect</code> callbacks.</p>
+Finally, when the user submits the form (i.e. hits enter), we check the value and, based on its correctness, invoke the provided <code class="language-plaintext highlighter-rouge">onCorrect</code>/<code class="language-plaintext highlighter-rouge">onIncorrect</code> callbacks.</p>
 
 <h2 id="managing-the-game">Managing the Game</h2>
 
-<p>With the <code class="language-plaintext highlighter-rouge">AnswerBox</code> now implemented we can move on to developing the encompassing <code class="language-plaintext highlighter-rouge">Game</code> management component within <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js"><code class="language-plaintext highlighter-rouge">src/Game.js</code></a>.
+<p>With the <code class="language-plaintext highlighter-rouge">AnswerBox</code> now implemented, we can move on to developing the encompassing <code class="language-plaintext highlighter-rouge">Game</code> management component within <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/Game.js"><code class="language-plaintext highlighter-rouge">src/Game.js</code></a>.
 In a similar manner to before, we define several styled building blocks that will be used to present the overall game to the user.</p>
 
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">React</span><span class="p">,</span> <span class="p">{</span> <span class="nx">useState</span><span class="p">,</span> <span class="nx">useEffect</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">react</span><span class="dl">'</span><span class="p">;</span>
@@ -247,10 +247,10 @@ const Results = styled(({ score, attempts, ...props }) =&gt; (
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>When the game is started (or all flags exhausted) we reset the <code class="language-plaintext highlighter-rouge">flags</code> state to a shuffled ordering of the provided listing.
+<p>When the game is started (or all flags are exhausted) we reset the <code class="language-plaintext highlighter-rouge">flags</code> state to a shuffled ordering of the provided listing.
 In the case of the <code class="language-plaintext highlighter-rouge">flags</code> initial state, we only wish to shuffle the provided flags once at the beginning (not wastefully on each render).
-To do this we wrap the behaviour in a function which ensures that the operation is only called when required during the components lifecycle.
-From here, based on the decision made within the <code class="language-plaintext highlighter-rouge">AnswerBox</code> component, we update the user’s attempts/score accordingly.</p>
+To do this, we wrap the behaviour in a function which ensures that the operation is only called when required during the component’s lifecycle.
+From here, based on the decision made within the <code class="language-plaintext highlighter-rouge">AnswerBox</code> component, we update the user’s attempts and score accordingly.</p>
 
 <p>Finally, we are able to compose all these pieces together into a <a href="https://github.com/eddmann/fun-with-flags/blob/master/src/index.js"><code class="language-plaintext highlighter-rouge">src/index.js</code></a> entry point.</p>
 
@@ -262,7 +262,7 @@ From here, based on the decision made within the <code class="language-plaintext
 <span class="nx">ReactDOM</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Game</span> <span class="nx">flags</span><span class="o">=</span><span class="p">{</span><span class="nx">flags</span><span class="p">}</span> <span class="nx">attempts</span><span class="o">=</span><span class="p">{</span><span class="mi">3</span><span class="p">}</span> <span class="sr">/&gt;, document.getElementById</span><span class="se">(</span><span class="sr">'root'</span><span class="se">))</span><span class="err">;
 </span></code></pre></div></div>
 
-<p>We can then <code class="language-plaintext highlighter-rouge">yarn start</code> to experiment with the game locally 🎉.</p>
+<p>We can then run <code class="language-plaintext highlighter-rouge">yarn start</code> to experiment with the game locally 🎉.</p>
 
 <h2 id="publishing-to-github-pages">Publishing to GitHub Pages</h2>
 
@@ -283,12 +283,12 @@ We can even automate this process by adding the following <a href="https://githu
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Now, whenever you wish to publish a new version of the game simply run the following command and <code class="language-plaintext highlighter-rouge">gh-pages</code> will build and commit a new version to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch.</p>
+<p>Now, whenever you wish to publish a new version of the game, simply run the following command and <code class="language-plaintext highlighter-rouge">gh-pages</code> will build and commit a new version to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yarn deploy
 </code></pre></div></div>
 
-<p>This in-turn will publish a new static version of the game to GitHub Pages, accessible in my case via <a href="https://eddmann.github.io/fun-with-flags"><code class="language-plaintext highlighter-rouge">https://eddmann.github.io/fun-with-flags</code></a> and as I have my apex DNS record pointing to GitHub at <a href="https://eddmann.com/fun-with-flags/"><code class="language-plaintext highlighter-rouge">https://eddmann.com/fun-with-flags</code></a>.</p>
+<p>This in turn will publish a new static version of the game to GitHub Pages, accessible in my case via <a href="https://eddmann.github.io/fun-with-flags"><code class="language-plaintext highlighter-rouge">https://eddmann.github.io/fun-with-flags</code></a> and, as I have my apex DNS record pointing to GitHub, at <a href="https://eddmann.com/fun-with-flags/"><code class="language-plaintext highlighter-rouge">https://eddmann.com/fun-with-flags</code></a>.</p>
 
 <p><img src="/uploads/building-a-flag-guessing-game-using-react-hooks/fun-with-flags.png" alt="Fun with Flags" /></p>
 

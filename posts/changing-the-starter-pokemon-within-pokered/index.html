@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documents how to change the Starter Pokémon available in Pokémon Red (pokered)">
+    <meta name="description" content="Learn how to customise the Starter Pokémon in Pokémon Red (pokered) by modifying the pokered source code for an enhanced gaming experience.">
 
     <title>
         
@@ -67,7 +67,7 @@ In this post I will document how I went about customising the Starter Pokémon c
 
 <p>From here, I then generalised the wording Professor Oak uses when you are selecting the Starter Pokémon.
 Instead of the specific ‘So! You want the {type} Pokémon, {name}’, I reworded it to ‘So! You want this Pokémon?’.
-As this required multiple disparate changes you can see the modifications in their entirety within <a href="https://github.com/eddmann/pokered/commit/5d86068da8ef0a8967caa7c2fd654b54518e7f31">this</a> commit.</p>
+As this required multiple disparate changes, you can see the modifications in their entirety within <a href="https://github.com/eddmann/pokered/commit/5d86068da8ef0a8967caa7c2fd654b54518e7f31">this</a> commit.</p>
 
 <p>Next up was to update the Rival’s Pokémon party, based on each location we encounter them.
 This is defined within <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/data/trainer_parties.asm#L461"><code class="language-plaintext highlighter-rouge">data/trainer_parties.asm</code></a> under the sections <code class="language-plaintext highlighter-rouge">Green1Data</code>, <code class="language-plaintext highlighter-rouge">Green2Data</code> and <code class="language-plaintext highlighter-rouge">Green3Data</code> (an homage to <a href="https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Red_and_Green_Versions">Pokémon Green</a>).</p>
@@ -97,11 +97,11 @@ This is defined within <a href="https://github.com/eddmann/pokered/blob/change-s
 
 <p>Above you can see the changes I made to the <code class="language-plaintext highlighter-rouge">Green1Data</code> section.
 I decided to keep the change-set simple and not evolve any of the Rival’s Starter Pokémon (i.e. Pikachu) throughout game-play.
-If you wish to do this however, it is within this file that you can decide how they evolve (or maybe even change!?).</p>
+If you wish to do this, however, it is within this file that you can decide how they evolve (or maybe even change!?).</p>
 
 <p>The final change that I made was to the Rival’s Starter Pokémon move-set in the final battle, found in <a href="https://github.com/eddmann/pokered/blob/change-starter-pokemon/engine/battle/read_trainer_party.asm#L132"><code class="language-plaintext highlighter-rouge">engine/battle/read_trainer_party.asm</code></a>.
-In this battle each Starter Pokémon has a specific move made available to them.
-Again, for the sake of simplicity I normalised this to only include <a href="https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)">Hyper Beam</a> regardless of choice.</p>
+In this battle, each Starter Pokémon has a specific move made available to them.
+Again, for the sake of simplicity, I normalised this to only include <a href="https://bulbapedia.bulbagarden.net/wiki/Hyper_Beam_(move)">Hyper Beam</a> regardless of choice.</p>
 
 <div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">;</span> starter
 <span class="gd">- ld a, [wRivalStarter]

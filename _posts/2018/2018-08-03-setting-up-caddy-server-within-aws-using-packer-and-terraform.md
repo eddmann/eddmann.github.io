@@ -1,39 +1,41 @@
 ---
 layout: post
 title: 'Setting up Caddy Server within AWS using Packer and Terraform'
-canonical: https://tech.mybuilder.com/setting-up-caddy-server-within-aws-using-packer-and-terraform/
-meta: 'Setting up Caddy Server within AWS using Packer and Terraform'
+meta: 'A detailed guide on setting up a secure Caddy Server within AWS using Packer and Terraform, with step-by-step instructions for HTTPS configuration and Infrastructure-as-Code implementation.'
+tags: aws packer terraform caddy
 ---
 
-With the [recent update](https://security.googleblog.com/2018/02/a-secure-web-is-here-to-stay.html) to Google Chrome helping shape a more secure Web by marking all HTTP sites as "not secure", I thought it was time that I make the necessary changes to how we host audio files for the [Three Devs and a Maybe](https://threedevsandamaybe.com/) podcast.
-In this post I would like to discuss setting up [Caddy Server](https://caddyserver.com/) (which provides HTTPS out of the box!) as a static-hosting platform on AWS - provisioning the instance with Packer and the surrounding infrastructure using Terraform.
+With the [recent update](https://security.googleblog.com/2018/02/a-secure-web-is-here-to-stay.html) to Google Chrome helping shape a more secure Web by marking all HTTP sites as "not secure".
+I thought it was time that I make the necessary changes to how we host audio files for the [Three Devs and a Maybe](https://threedevsandamaybe.com/) podcast.
+In this post I would like to discuss setting up [Caddy Server](https://caddyserver.com/) (which provides HTTPS out of the box!) as a static-hosting platform on AWS.
+I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform.
 
 <!--more-->
 
 The goal of this guide is to document a process in which we can deploy the resulting service using an Infrastructure-as-Code philosophy.
 
-### Architecting the Service
+## Architecting the Service
 
 We will be storing all statically hosted files and Let's Encrypt generated SSL certificates within a dedicated EBS volume which has already been created.
 This will allow us to bring up and tear down the service as desired whilst keeping the required persistent state.
-It is good practise to keep hold of the certificates that are generated within Caddy Server, as Let's Encrypt has particular [rate-limits](https://letsencrypt.org/docs/rate-limits/) that could cause issues.
+It is good practise to retain the certificates that are generated within Caddy Server, as Let's Encrypt has particular [rate-limits](https://letsencrypt.org/docs/rate-limits/) that could cause issues.
 Following this, we will be using an Elastic IP which has also already been allocated.
-As the `threedevsandamaybe.com` domain is not currently managed by Amazon Route 53 it is easier to use an expected IP address that we can manually update the DNS records to before hand.
+As the `threedevsandamaybe.com` domain is not currently managed by Amazon Route 53, it is easier to use an expected IP address that we can manually update the DNS records to beforehand.
 
 With these two prerequisite resources in place, we can look at how the service will be constructed, as shown in the following diagram.
 
 <img src="/uploads/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure.png" alt="Caddy Server" />
 
-### Provisioning the Machine with Packer
+## Provisioning the Machine with Packer
 
 Built by HashiCorp, [Packer](https://www.packer.io/) provides a clean abstraction around creating identical machine images for multiple platforms, using a single source configuration.
 Packer clearly defines the meaning of a 'machine image' within their documentation.
 
 > A machine image is a single static unit that contains a pre-configured operating system and installed software which is used to quickly create new running machines.
 
-The allows us to define how we wish the image to look within code (using Provisioners) and then build the associated artifacts (AMI's, VirtualBox OVF exports) based on our environment needs.
+This allows us to define how we wish the image to look within code (using Provisioners) and then build the associated artifacts (AMIs, VirtualBox OVF exports) based on our environment needs.
 
-Now we are familiar with what Packer provides us with, we must first [download](https://www.packer.io/downloads.html) the relevant package based on your host system.
+Now that we are familiar with what Packer provides us with, we must first [download](https://www.packer.io/downloads.html) the relevant package based on your host system.
 Alternatively, you can do away with installing packages on your host system and containerise the dependency using Docker 💪.
 This can be simply achieved by adding the following alias into your terminal session.
 
@@ -48,9 +50,9 @@ With this set up we can define our Caddy Server image within a file called `cadd
   "builders": [
     {
       "type": "amazon-ebs",
-      "access_key": "{{ "{{user `aws_access_key`"}}}}",
-      "secret_key": "{{ "{{user `aws_secret_key`"}}}}",
-      "region": "{{ "{{user `aws_region`"}}}}",
+      "access_key": "{{ \"{{user `aws_access_key`}}\" }}",
+      "secret_key": "{{ \"{{user `aws_secret_key`}}\" }}",
+      "region": "{{ \"{{user `aws_region`}}\" }}",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
@@ -62,7 +64,7 @@ With this set up we can define our Caddy Server image within a file called `cadd
       },
       "instance_type": "m3.medium",
       "ssh_username": "ubuntu",
-      "ami_name": "Caddy-Server-{{ "{{timestamp"}}}}"
+      "ami_name": "Caddy-Server-{{ \"{{timestamp}}\" }}"
     }
   ],
   "provisioners": [
@@ -100,7 +102,7 @@ With this set up we can define our Caddy Server image within a file called `cadd
 
 You can see that we first define the builder that we wish to use for this machine image.
 We have opted for a single [`amazon-ebs`](https://www.packer.io/docs/builders/amazon-ebs.html), which will boot up a temporary `m3.medium` EC2 instance with a base AMI (the latest Ubuntu 16.04), and create a new AMI using the supplied name template once the instance has been provisioned.
-We require that the user externally supply the relevant AWS credentials and desired region they wish the AMI to be created in.
+We require that the user externally supply the relevant AWS credentials and desired region in which the AMI is to be created.
 These variables will be stored in an accompanying file called `variables.json`.
 
 ```json
@@ -115,23 +117,24 @@ These variables will be stored in an accompanying file called `variables.json`.
 
 With the base AWS EC2 instance running we will provision the machine using simple shell commands.
 Packer has support for many different provisioners (such as Puppet and Chef), but the easiest and best suited for our use-case is [`shell`](https://www.packer.io/docs/provisioners/shell.html).
-At this stage we ensure that the instance is fully up-to-date (with a reboot to ensure any required changes take affect), and then download and configure the latest Caddy Server package.
+At this stage we ensure that the instance is fully up-to-date (with a reboot to ensure any required changes take effect), and then download and configure the latest Caddy Server package.
 
-With this configuration now defined, we can run `packer build -var-file=variables.json caddy.json`, and once the AMI has been successfully created you will be shown its' unique identifier.
-Keep ahold of this identifier as it will be required in the next step!
+With this configuration now defined, we can run `packer build -var-file=variables.json caddy.json`.
+Once the AMI has been successfully created, you will be shown its unique identifier.
+Keep hold of this identifier as it will be required in the next step!
 
-### Provisioning the Infrastructure with Terraform
+## Provisioning the Infrastructure with Terraform
 
 Now that we have the bespoke Caddy Server AMI in place, we can move on to creating the associated AWS infrastructure that is required to get this EC2-backed service running.
 Like Packer, [Terraform](https://www.terraform.io/) is built by HashiCorp, providing you with the ability to define your desired infrastructure through code.
-Once you have specified your intended goal state, Terraform will go about computing a plan of imperative steps to get the desired provider to this.
-Terraform is able to interact with many different third-party providers, and states as such in their documentation.
+Once you have specified your intended goal state, Terraform will compute a plan of imperative steps to reach the desired state.
+Terraform is able to interact with many different third-party providers, as stated in their documentation.
 
 > Terraform is used to create, manage, and update infrastructure resources such as physical machines, VMs, network switches, containers, and more.
 > Almost any infrastructure type can be represented as a resource in Terraform.
 
 We must first [download](https://www.terraform.io/downloads.html) the relevant package based on your host system.
-Similar to how we can containerise Packer using Docker, we can also alternatively access this dependency like so using a terminal alias.
+Similar to how we can containerise Packer using Docker, we can also alternatively access this dependency by using a terminal alias.
 
 ```bash
 alias terraform='docker run -it --rm -v ${HOME}:/root -v $(pwd):/app/ -w /app/ eddmann/terraform-cli'
@@ -245,7 +248,7 @@ resource "aws_route" "caddy" {
 ```
 
 This file defines the desired AWS VPC, Subnet and Internet Gateway.
-It also creates the Security Group which allows HTTP(S) access to/from the instance from anywhere, along with restricted SSH access to the IP address found when accessing `http://icanhazip.com`.
+It also creates the Security Group which allows HTTP(S) access to and from the instance, along with restricted SSH access to the IP address found when accessing `http://icanhazip.com`.
 The subnet specifies which Availability Zone we wish to place our service in, and as such is defined using another variable which needs to be added to `variables.tf` and `terraform.tfvars`.
 
 ```
@@ -302,8 +305,9 @@ resource "aws_volume_attachment" "caddy" {
 ```
 
 We define the instance running the supplied AMI (created with Packer) using the newly created Subnet and Security Group.
-So as to access the instance via SSH (and upload web assets) we supply a public key, we then associate the instance with the supplied Elastic IP and attach the externally persistent EBS volume.
-Like before these values are provided externally by the user, and as such need to be declared within `variables.tf` and `terraform.tfvars`.
+To access the instance via SSH (and upload web assets) we supply a public key.
+We then associate the instance with the supplied Elastic IP and attach the externally persistent EBS volume.
+As before, these values are provided externally by the user, and as such need to be declared within `variables.tf` and `terraform.tfvars`.
 
 ```
 variable "caddy_ami_id" {}
@@ -323,9 +327,9 @@ caddy_domain = ""
 caddy_email = ""
 ```
 
-When the instance is first booted up we ensure that the external volume is mounted and required Caddyfile (based on the supplied domain) is defined, before finally starting up Caddy Server.
+When the instance is first booted up we ensure that the external volume is mounted and the required Caddyfile (based on the supplied domain) is defined before finally starting up Caddy Server.
 This is achieved within EC2 using supplied [User Data](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html).
-This script is generated using a template (stored in `provision.tpl`), which allows us to supply dynamic content which is written out before invocation.
+This script is generated using a template (stored in `provision.tpl`), which allows us to supply dynamic content that is written out before invocation.
 
 ```bash
 #!/bin/bash
@@ -367,7 +371,7 @@ sudo systemctl start caddy.service
 
 Supplying the desired domain and associated email address for automatic Let's Encrypt certificate generation allows us to be sure that the service is self-reliant upon boot.
 
-Finally, we can run `terraform apply` and create the underlying infrastructure and Caddy Server instance which is accessible from the supplied Elastic IP.
-If for any reason we wish to make changes to this service, we can do so safe in the knowledge that the statically hosted content (and SSL certificates) are persisted and the service will remain running as stated within the code.
+Finally, we can run `terraform apply` to create the underlying infrastructure and Caddy Server instance which is accessible from the supplied Elastic IP.
+If for any reason we wish to make changes to this service, we can do so safe in the knowledge that the statically hosted content (and SSL certificates) are persisted, and the service will remain running as stated within the code.
 
 If you are interested in experimenting with this service, you can find all the source code within the [associated GitHub repository](https://github.com/eddmann/aws-caddy-server).

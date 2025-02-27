@@ -2,7 +2,7 @@
 layout: post
 title: "Unlocking Tsunekazu Ishihara's team in Pokémon Red (pokered)"
 meta: "Discover how to unlock Tsunekazu Ishihara's team in Pokémon Red (pokered) with this comprehensive guide."
-tags: retro-gaming assembly-code
+tags: retro-gaming assembly-code pokemon
 ---
 
 Continuing on from the modifications made to [pokered](https://github.com/pret/pokered) in the [previous post](/posts/compiling-pokered-using-docker-and-adding-super-b-button-behaviour/), I noticed an interesting unused behaviour in the assembly code.

@@ -2,7 +2,7 @@
 layout: post
 title: "Compiling Pokémon Red (pokered) using Docker and adding 'Super B' button behaviour"
 meta: "Learn how to compile Pokémon Red with Docker, add custom 'Super B' button behaviour, and enhance your retro gaming experience. A step-by-step guide for enthusiasts."
-tags: docker retro-gaming assembly-code
+tags: docker retro-gaming assembly-code pokemon
 ---
 
 Over the Christmas break I found myself on a bit of a nostalgic gaming journey.

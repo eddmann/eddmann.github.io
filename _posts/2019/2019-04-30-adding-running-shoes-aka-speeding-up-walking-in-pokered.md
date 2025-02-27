@@ -2,7 +2,7 @@
 layout: post
 title: 'Adding Running Shoes (aka Speeding up walking) in Pokémon Red (pokered)'
 meta: 'Learn how to add Running Shoes to Pokémon Red (pokered) for a faster walking experience without waiting for the Bicycle.'
-tags: retro-gaming assembly-code
+tags: retro-gaming assembly-code pokemon
 ---
 
 One item I feel is missing from the Pokémon Generation 1 games is the [Running Shoes](https://bulbapedia.bulbagarden.net/wiki/Running_Shoes).

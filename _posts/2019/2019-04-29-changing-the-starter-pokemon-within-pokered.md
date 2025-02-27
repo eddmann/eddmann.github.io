@@ -2,7 +2,7 @@
 layout: post
 title: 'Changing the Starter Pokémon within Pokémon Red (pokered)'
 meta: 'Learn how to customise the Starter Pokémon in Pokémon Red (pokered) by modifying the pokered source code for an enhanced gaming experience.'
-tags: retro-gaming assembly-code
+tags: retro-gaming assembly-code pokemon
 ---
 
 Taking a closer look through the [pokered](https://github.com/pret/pokered) source, I stumbled upon the [Starter Pokémon](https://bulbapedia.bulbagarden.net/wiki/Starter_Pok%C3%A9mon) choices and thought how it would be possible to change these.

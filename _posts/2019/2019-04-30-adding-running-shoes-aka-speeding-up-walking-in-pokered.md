@@ -1,13 +1,14 @@
 ---
 layout: post
 title: 'Adding Running Shoes (aka Speeding up walking) in Pokémon Red (pokered)'
-meta: 'Documenting how to add Running Shoes to the Pokémon Red (pokered) game'
+meta: 'Learn how to add Running Shoes to Pokémon Red (pokered) for a faster walking experience without waiting for the Bicycle.'
+tags: retro-gaming assembly-code
 ---
 
-One item I feel that is missing from the Pokémon Generation 1 games are the [Running Shoes](https://bulbapedia.bulbagarden.net/wiki/Running_Shoes).
-When 'on' they increase the speed at which you move around the game.
-You are able to achieve this with the [Bicycle](https://bulbapedia.bulbagarden.net/wiki/Bicycle), but this is only present later in the game.
-In this post I will document how I simply added this running ability globally whilst the 'B button' is pressed.
+One item I feel is missing from the Pokémon Generation 1 games is the [Running Shoes](https://bulbapedia.bulbagarden.net/wiki/Running_Shoes).
+When activated, they increase the speed at which you move around the game.
+You can achieve this with the [Bicycle](https://bulbapedia.bulbagarden.net/wiki/Bicycle), but it is only available later in the game.
+In this post, I will document how I simply added this running ability globally whilst the 'B button' is pressed.
 
 <!--more-->
 
@@ -32,5 +33,5 @@ Looking through the [pokered](https://github.com/pret/pokered) source, I identif
   call AdvancePlayerSprite
 ```
 
-With this small modification, if the 'B button' is pressed we jump directly to the new `speedUp` label which instructs the engine to perform the bike speedup.
-This in-turn provides us with the ability to 'run' throughout the game, at the same speed as if you were on a bike.
+With this small modification, if the 'B button' is pressed, we jump directly to the new `speedUp` label, which instructs the engine to perform the bike speedup.
+This in turn provides us with the ability to 'run' throughout the game at the same speed as if you were on a bike.

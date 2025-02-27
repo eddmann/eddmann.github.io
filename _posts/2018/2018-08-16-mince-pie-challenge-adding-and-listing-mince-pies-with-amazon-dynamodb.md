@@ -1,26 +1,26 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/
-meta: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
+meta: 'Explore the process of adding and listing mince pies with Amazon DynamoDB using Lambda and offline development with DynamoDB Local.'
+tags: serverless aws lambda dynamodb javascript
 ---
 
 In the [previous post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) we began to implement the API endpoints, starting off with creating the bootstrap response.
-We did this in a manor that catered for both online and offline development access.
+We did this in a manner that catered for both online and offline development access.
 In this post we will incorporate the ability to add and list mince pies, persisting the state within [Amazon DynamoDB](https://aws.amazon.com/dynamodb/).
-Following this, we will enrich our offline development process by setting up a [Amazon DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) instance using Docker.
+Following this, we will enrich our offline development process by setting up an [Amazon DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) instance using Docker.
 
 <!--more-->
 
 If you are keen to see how the finished example looks, you can access it within the [API repository](https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/06-add-list-pies).
 
-### Adding Pies with Amazon DynamoDB
+## Adding Pies with Amazon DynamoDB
 
-If we again look back at the API [RAML definition](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#managing-the-pies), we can see that we wish to provide the client with the ability to add a new mince pie to the challenge by making a `POST` request with the specific pie name.
+If we again look back at the API [RAML definition](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#managing-the-pies) we can see that we wish to provide the client with the ability to add a new mince pie to the challenge by making a `POST` request with the specific pie name.
 If successful, the new pie resource will be returned back to the client.
 
-To persist the pie resources and associated ratings we shall be using the fully-managed NoSQL Amazon DynamoDB solution.
-A deep-dive into the specifics of DynamoDB is outside the scope of this series, but I would urge you to checkout [these](https://acloud.guru/learn/aws-dynamodb) [great](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.html) [resources](https://www.youtube.com/watch?v=bCW3lhsJKfw) on the subject.
+To persist the pie resources and associated ratings we shall be using the fully managed NoSQL Amazon DynamoDB solution.
+A deep dive into the specifics of DynamoDB is outside the scope of this series, but I would urge you to checkout [these](https://acloud.guru/learn/aws-dynamodb) [great](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.html) [resources](https://www.youtube.com/watch?v=bCW3lhsJKfw) on the subject.
 We shall start off by defining the desired table within `resources.yml`, and grant access to the table for each of the present Lambda functions within `roles.yml`.
 
 ```yaml
@@ -53,16 +53,16 @@ Outputs:
 ```
 
 This table includes a unique `Id` attribute which will be used as the record key.
-At this time we have statically specified some rather low [throughput units](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ProvisionedThroughput.html), when we enter production these should be tuned accordingly.
-We assign each Lambda function a role that grants access to perform all available actions on this table, this could be restricted in the future for security concerns.
-In a similar manor to how we have defined stage specific parameters in the past, we shall specify the desired table name per `config.{stage}.yml` file like so.
+At this time we have statically specified some rather low [throughput units](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ProvisionedThroughput.html); when we enter production these should be tuned accordingly.
+We assign each Lambda function a role that grants access to perform all available actions on this table, although this could be restricted in the future for security concerns.
+In a similar manner to how we have defined stage-specific parameters in the past, we shall specify the desired table name per `config.{stage}.yml` file like so.
 
 ```yaml
 tableName: 'dev-mince-pie-challenge'
 ```
 
 With the table now present we can move on to providing the ability to add new mince pies to the challenge.
-Each pie is uniquely distinguishable based on an associated UUID, to generate these identifiers we must include a new runtime dependency within `package.json`.
+Each pie is uniquely distinguishable based on an associated UUID; to generate these identifiers we must include a new runtime dependency within `package.json`.
 
 ```json
 {
@@ -103,7 +103,7 @@ export const addPie =
   };
 ```
 
-At this time we simply expose an `addPie` function which allows us to partially apply it with the desired stages table name.
+At this time we simply expose an `addPie` function which allows us to partially apply it with the desired stage's table name.
 Once invoked, we build up the initial pie structure, persist it to the DynamoDB table and finally return it to the caller.
 This pie structure is typed by Flow, and as such needs to be added to `src/types/index.js`.
 
@@ -164,8 +164,8 @@ const add = async ({ event, userId, services: { addPie } }) => {
 export default createHandler(withStrictHttpAuthentication(add));
 ```
 
-This handler simply ensures that a name has been supplied within the requests JSON body, and then proceeds to add it to the challenge.
-We ensure that only authenticated clients have access to this behaviour (by-way of `withStrictHttpAuthentication`) and return a newly specified `created` response.
+This handler simply ensures that a name has been supplied within the request's JSON body, and then proceeds to add it to the challenge.
+We ensure that only authenticated clients have access to this behaviour (by way of `withStrictHttpAuthentication`) and return a newly specified `created` response.
 As we are expanding our HTTP language we need to add these functions to `src/helpers/http.js`.
 
 ```js
@@ -227,7 +227,7 @@ export const handler = add({
 });
 ```
 
-With the implementation in-place, we can then wire up the handler within `functions.yml`.
+With the implementation in place, we can then wire up the handler within `functions.yml`.
 
 ```yaml
 add-pie:
@@ -292,7 +292,7 @@ it('adds a new mince pie', async () => {
 ```
 
 As discussed in a previous post, we have intentionally split the domain logic out from the external dependencies.
-This allows us to easily incorporate test doubles within our tests, allowing us to inspect that the `addPie` service function is being invoked as expected.
+This allows us to easily incorporate test doubles within our tests, enabling us to inspect that the `addPie` service function is being invoked as expected.
 
 If we now `make deploy` we shall see a new endpoint appear within the deployment summary.
 We can now `POST` to this endpoint as described within the RAML documentation, and see that the expected responses are returned.
@@ -301,7 +301,7 @@ We will address this in the next section.
 
 <img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/aws-console-dynamodb.png" alt="DynamoDB AWS Console" />
 
-### Listing Pies with Amazon DynamoDB
+## Listing Pies with Amazon DynamoDB
 
 Now we have the ability to add new pies, we will move on to granting the client access to list all pies present within the challenge.
 We will start off by adding a new function to `src/services/dynamoDBPieStore.js`, which will return all the pies present.
@@ -347,7 +347,7 @@ const list = async ({ services: { allPies } }) => {
 export default createHandler(list);
 ```
 
-As described within the [RAML definition](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#viewing-the-pies), important details about each pie are embedded within the listing collection resource.
+As described within the [RAML definition](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#viewing-the-pies) important details about each pie are embedded within the listing collection resource.
 This stops us from having to make many individual HTTP requests per pie.
 We can then encapsulate this in the concrete handler within `src/list.js`, which configures the external database service dependency.
 
@@ -425,7 +425,7 @@ If we now visit this new endpoint we should see the pie we added from the last r
 We have now added the ability to add and list mince pies within the challenge using online AWS resources.
 In similar fashion to how we were able to develop the bootstrap endpoint offline, we will now expand upon this and add the ability to interact with these endpoints using Amazon DynamoDB Local.
 
-### Using Amazon DynamoDB Local for Offline Development
+## Using Amazon DynamoDB Local for Offline Development
 
 We shall be using a dedicated [Docker container](https://hub.docker.com/r/ccabreraruiz/dynamodb-local/) which will expose the DynamoDB Local instance to our API.
 To begin, we need to add the new service to the `docker-compose.yml` file, ensuring that the `serverless-offline` service is linked and made aware of it.
@@ -444,10 +444,10 @@ services:
 The Serverless Framework is able to interact with this DynamoDB Local instance by adding an [additional plugin](https://www.npmjs.com/package/serverless-dynamodb-local).
 We shall add this development dependency to the `package.json` file.
 
-```js
+```json
 {
-  devDependencies: {
-     "serverless-dynamodb-local": "^0.2.30",
+  "devDependencies": {
+    "serverless-dynamodb-local": "^0.2.30"
   }
 }
 ```
@@ -501,7 +501,7 @@ module.exports = {
 };
 ```
 
-By adding this layer of indirection we provide the ability to swap out the desired `db` and `userTokenAuthenticator` service, based on if we are in online or offline mode.
+By adding this layer of indirection we provide the ability to swap out the desired `db` and `userTokenAuthenticator` service, based on whether we are in online or offline mode.
 To maintain the current online functionality all we need to do is replace the paths defined within `src/list.js` and `src/add.js` with these new aliases.
 
 ```js
@@ -579,10 +579,10 @@ module.name_mapper='^userTokenAuthenticator$' -> '<PROJECT_ROOT>/src/services/co
 ```
 
 Finally, we can `make offline` and experiment with the new API endpoints offline.
-We can supply authenticated user tokens (i.e `TOKEN1`) in the event that we wish to add a new pie to the challenge.
+We can supply authenticated user tokens (i.e. `TOKEN1`) in the event that we wish to add a new pie to the challenge.
 In the case of the local DynamoDB instance, we are able to inspect the current state and run custom queries by visiting `http://0.0.0.0:8000/shell/`.
 
 <img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" />
 
-I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manor.
+I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manner.
 In the next post we shall be expanding the API further, by adding the capability to view and remove specified mince pies.

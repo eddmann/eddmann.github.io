@@ -47,7 +47,7 @@ Reducing the invocation times gave us short-term relief, but eventually, we need
 We even found that, in some cases, a single instance would not suffice, and having multiple workers running would be a requirement too.
 To address this need, we created the concept of a `RunManager`, which allowed us to provide commands with a looping process construct.
 
-Looking at the problem of sending queued emails again as a concrete example, let’s say that to manage the load at which we now enqueue emails to be sent, we require an always-running instance of the sender command.
+Looking at the problem of sending queued emails again as a concrete example, let's say that to manage the load at which we now enqueue emails to be sent, we require an always-running instance of the sender command.
 Below, we have made some amendments that will now iteratively keep processing queued emails that are present.
 
 ```php

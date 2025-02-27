@@ -67,7 +67,7 @@ They both follow similar asynchronous execution models (`async`, `await`) which 
 Within part two there was an _intelligent_ way to solve the problem and a brute force means; splitting up the required work lead to great use-case for solving the problem in parallel.
 
 Swift has come on leaps and bounds from the time I remember having to use [Grand Central Dispatch](https://en.wikipedia.org/wiki/Grand_Central_Dispatch).
-Having explored Kotlin’s concurrency model first and finding Java's `parallelStream`, I decided to implement a similar abstraction within Swift (`parallelMap`) using a generic _Sequence_ extension method.
+Having explored Kotlin's concurrency model first and finding Java's `parallelStream`, I decided to implement a similar abstraction within Swift (`parallelMap`) using a generic _Sequence_ extension method.
 It was very cool to see all my machines cores being utilised with very little code.
 
 #### Day 6

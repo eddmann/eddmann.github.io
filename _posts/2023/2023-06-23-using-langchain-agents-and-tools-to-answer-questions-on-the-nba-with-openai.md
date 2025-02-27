@@ -52,7 +52,7 @@ llm("Who won the 1998 NBA season MVP, what team where they on?, what team won th
 
 ## Adding a source
 
-> "You Don’t Have to Know Everything. You Just Have to Know Where to Find It."
+> "You Don't Have to Know Everything. You Just Have to Know Where to Find It."
 > -- <cite>Albert Einstein</cite>
 
 We can improve the models answer by providing tools for it to use to lookup recent events within a given domain.

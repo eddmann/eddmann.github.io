@@ -23,7 +23,7 @@ Sally,sally@email.com,Jane,f
 $ GMAIL_USERNAME=x GMAIL_PASSWORD=x java -jar secret-santa-1.0.0-standalone.jar participants.txt
 ```
 
-### The Solution
+## The Solution
 
 I opted for a recursive brute-force approach to allocating participants, which randomly shuffled the mapping until deemed valid.
 
@@ -87,7 +87,7 @@ Thanks to [data.csv](https://github.com/clojure/data.csv) I was able to elegantl
 From there, I could pass this onto the allocation logic described above and then finally notify the participants via email.
 Using the [environ](https://github.com/weavejester/environ) library I was able to provide the desired Gmail SMTP credentials at runtime (via the environment).
 
-### Testing
+## Testing
 
 I was able to provide basic test coverage around the allocation logic using [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html).
 

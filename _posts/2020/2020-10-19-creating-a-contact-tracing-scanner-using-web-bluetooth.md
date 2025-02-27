@@ -15,7 +15,7 @@ I decided to make a Web Bluetooth-based [scanning application](https://eddmann.c
 
 [![Contact Tracing Scanner using Web Bluetooth](/uploads/creating-a-contact-tracing-scanner-using-web-bluetooth/contact-tracing-scanner.png)](https://eddmann.com/contact-tracing-scanner-web/)
 
-### How it works
+## How it works
 
 The [Exposure Notification system](https://en.wikipedia.org/wiki/Exposure_Notification) designed by Apple and Google uses the GATT Bluetooth LE protocol to emit advertisements using the registered service UUID `0xfd6f`.
 These advertisements are sent using the format outlined in the [Exposure Notification Bluetooth Specification](https://covid19-static.cdn-apple.com/applications/covid19/current/static/contact-tracing/pdf/ExposureNotification-BluetoothSpecificationv1.2.pdf).

@@ -1,12 +1,12 @@
 ---
 layout: post
 title: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'
-canonical: https://tech.mybuilder.com/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/
-meta: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'
+meta: 'This technical post explains how to implement authentication with Amazon Cognito and JSON Web Tokens in a Serverless environment.'
+tags: cognito serverless security
 ---
 
-Now that we have setup the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.
-For this we will be using [Amazon Cognito](https://aws.amazon.com/cognito/), a fully-managed web service which handles the user sign-up, sign-in and management processes.
+Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.
+For this, we will be using [Amazon Cognito](https://aws.amazon.com/cognito/), a fully managed web service which handles the user sign-up, sign-in and management processes.
 
 <!--more-->
 
@@ -14,22 +14,22 @@ If you are keen to see how the finished example looks, you can access it within 
 
 Cognito provides us with the ability to register users to a specified [User Pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html) directory, or enable social sign-in services (such as Google).
 It also includes the ability to verify supplied email addresses and include additional layers of security using [MFA](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html).
-This allows us to focus our attention on the key domain-specific functionality of the application, as opposed to re-inventing the wheel.
+This allows us to focus our attention on the key domain-specific functionality of the application, as opposed to reinventing the wheel.
 
 Along with managed User Pools, Cognito also provides the concept of [Identity Pools](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-started-with-identity-pools.html).
-We will not be using this feature, but it is good to understand how this could be of use to you in future development.
+We will not be using this feature, but it is good to understand how this could be of use in future development.
 
 > The two main components of Amazon Cognito are user pools and identity pools.
 > User pools are user directories that provide sign-up and sign-in options for your app users.
 > Identity pools enable you to grant your users access to other AWS services.
 
-Cognito User Pools use [JSON Web Tokens](https://jwt.io/) to transmit and validate payloads between the Client and Server.
-Using the Client AWS SDK we are able to authenticate with the Pool, returning a token that we can later send to the API to handle authenticated requests.
+Cognito User Pools use [JSON Web Tokens](https://jwt.io/) to transmit and validate payloads between the client and server.
+Using the Client AWS SDK, we are able to authenticate with the pool, returning a token that we can later send to the API to handle authenticated requests.
 
-### Creating the User Pool
+## Creating the User Pool
 
-The first step in setting up Cognito is to define the AWS specific resources that are required.
-To do this we will provision a User Pool and Client using [CloudFormation](https://serverless.com/framework/docs/providers/aws/guide/resources/) within `resources.yml`.
+The first step in setting up Cognito is to define the AWS-specific resources that are required.
+To do this, we will provision a User Pool and Client using [CloudFormation](https://serverless.com/framework/docs/providers/aws/guide/resources/) within `resources.yml`.
 
 ```yaml
 Resources:
@@ -79,17 +79,17 @@ userPoolName: 'dev-mince-pie-challenge-pool'
 userPoolClientName: 'dev-mince-pie-challenge-client'
 ```
 
-In regard to the Pool itself, along with the default username and password required by the User Pool, we also specify that we would like a verified email address be included per user.
-To provide client-side access to the Pool sign-up and sign-in functionality, we must also associate a [User Pool Client](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html) that has access to the unauthorised endpoints.
+In regard to the pool itself, along with the default username and password required by the User Pool, we also specify that we would like a verified email address to be included per user.
+To provide client-side access to the pool sign-up and sign-in functionality, we must also associate a [User Pool Client](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html) that has access to the unauthorised endpoints.
 
-So as to test the newly created User Pool within the AWS CLI, we must include an explicit authentication flow entitled `ADMIN_NO_SRP_AUTH`, which permits exclusion of the [Secure Remote Protocol (SRP)](https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol).
+So as to test the newly created User Pool within the AWS CLI, we must include an explicit authentication flow entitled `ADMIN_NO_SRP_AUTH`, which permits the exclusion of the [Secure Remote Password Protocol (SRP)](https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol).
 Finally, we specify that we wish to output the two created resource identifiers, which will be presented to us within the terminal after a successful deployment.
 
-### Authenticating a User
+## Authenticating a User
 
-With the User Pool now defined we can move our attention onto how we will authenticate an incoming request within the API.
-There is an option within Amazon API Gateway to provide a [Lambda Authoriser](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html) (formally known as a Custom Authoriser), which are invoked before the intended function and provide it with the generated IAM policy.
-Although this approach is desirable, some of the API resource endpoints require the ability to differ based on if the user is authenticated or not.
+With the User Pool now defined, we can move our attention onto how we will authenticate an incoming request within the API.
+There is an option within Amazon API Gateway to provide a [Lambda Authoriser](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html) (formerly known as a Custom Authoriser), which are invoked before the intended function and provide it with the generated IAM policy.
+Although this approach is desirable, some of the API resource endpoints require the ability to differ based on whether the user is authenticated or not.
 As such, we will instead bring this authentication logic into our application domain, and validate the claims for each intended request ourselves.
 
 As discussed before, Cognito uses standard JSON Web Tokens, which allows us to include a pre-existing library [node-jose](https://github.com/cisco/node-jose), that abstracts away this problem space.
@@ -162,11 +162,11 @@ export default poolId => async token => {
 ```
 
 This small service fetches the associated [JSON Web Key Set](https://auth0.com/docs/jwks), locates the matching key, and then verifies that the provided request token is valid.
-Providing that the token has been verified to come from the intended party and has not expired, we parse the the provided claims and return the user identifier.
+Providing that the token has been verified to come from the intended party and has not expired, we parse the provided claims and return the user identifier.
 
-### Constructing Handlers with User Authentication
+## Constructing Handlers with User Authentication
 
-Now that we have a means to authenticate a request and be provided with the user identifier - we can now create a framework in which to easily construct handlers with varying permission requirements.
+Now that we have a means to authenticate a request and be provided with the user identifier, we can now create a framework in which to easily construct handlers with varying permission requirements.
 We will now create a couple of small helper functions within `src/helpers/handlers.js`, which will be used to aid us in this pursuit.
 
 ```js
@@ -190,15 +190,16 @@ export const withStrictHttpAuthentication = handler => async params => {
 };
 ```
 
-The first function is a rather important one, instead of simply returning a standard Lambda handler, we add the concept of supplying `services` to the handler.
-This allows us to explicitly supply services (such as the user token authenticator) to a given handler in a controlled manor, which can be easily tested.
+The first function is rather important.
+Instead of simply returning a standard Lambda handler, we add the concept of supplying `services` to the handler.
+This allows us to explicitly supply services (such as the user token authenticator) to a given handler in a controlled manner, which can be easily tested.
 
-Following this, the next two functions show how a handler can now be composed - supplying the ability to specify if the handler requires optional (`withOptionalHttpAuthentication`) or strict (`withStrictHttpAuthentication`) authentication requirements.
-In both cases the `userId` is provided to the decorated handler.
+Following this, the next two functions show how a handler can now be composed – supplying the ability to specify if the handler requires optional (`withOptionalHttpAuthentication`) or strict (`withStrictHttpAuthentication`) authentication requirements.
+In both cases, the `userId` is provided to the decorated handler.
 
 As we are now managing how a handler is constructed within our domain, we are able to craft how the internal handler signature looks.
-This leads us to opt for a single object parameter, which can be specifically destructed.
-You will also notice that we have decided to delegate creation of the Unauthorised HTTP response to a specific function, which is defined within `src/helpers/http.js`.
+This leads us to opt for a single object parameter, which can be specifically destructured.
+You will also notice that we have decided to delegate creation of the unauthorised HTTP response to a specific function, which is defined within `src/helpers/http.js`.
 
 ```js
 export const unauthorised = detail => ({
@@ -214,10 +215,10 @@ export const unauthorised = detail => ({
 
 This response follows the [Problem Details for HTTP APIs](https://tools.ietf.org/html/rfc7807) specification that we highlighted when defining the API within RAML in a [previous post](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/).
 
-### Testing the Authenticated Handler Use-Cases
+## Testing the Authenticated Handler Use-Cases
 
 Now that we have all the pieces in place, we can experiment with how this abstraction will work in practise for the different handler use-cases we have laid out.
-To do this we will replace the Hello, World example we created in the [previous post](https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/#the-hello-world-example) with the following configuration (`serverless.yml`, `config.dev.yml`) and endpoints (`functions.yml`).
+To do this, we will replace the Hello, World example we created in the [previous post](https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/#the-hello-world-example) with the following configuration (`serverless.yml`, `config.dev.yml`) and endpoints (`functions.yml`).
 
 ```yaml
 provider:
@@ -233,7 +234,7 @@ userPoolId:
   Ref: PieUserPool
 ```
 
-As shown before, we define the value using the one present within the current stages YAML configuration file.
+As shown before, we define the value using the one present within the current stage's YAML configuration file.
 In a similar fashion to how we reference the User Pool identifier within the resource output, we can also include them as environment variables within Lambda functions.
 
 ```yaml
@@ -285,16 +286,16 @@ export const strict = createHandler(withStrictHttpAuthentication(handler))({ get
 ```
 
 Thanks to how the handler is now constructed, we are able to re-use the underlying handler in all three use-cases.
-This handler returns the requests user identifier (if present), and highlights how explicit object destructing allows us to clearly see what parameters are being used.
-Finally, we simply have to supply each handler with the concrete user token authenticator service, before exporting them for consumption.
+This handler returns the request's user identifier (if present), and highlights how explicit object destructuring allows us to clearly see which parameters are being used.
+Finally, we simply have to supply each handler with the concrete user token authenticator service before exporting them for consumption.
 
-#### Testing the Endpoints
+## Testing the Endpoints
 
-Now that the three endpoints have been configured we can move on to deploying and subsequently testing them.
-First deploy the updated application, provisioning all the associated resources and keeping a note of the User Pool and User Pool Client identifiers in the process.
+Now that the three endpoints have been configured, we can move on to deploying and subsequently testing them.
+First, deploy the updated application, provisioning all the associated resources and keeping a note of the User Pool and User Pool Client identifiers in the process.
 
-For testing, we will use the ability within the [aws-cli](https://aws.amazon.com/cli/) to sign-up and authenticate with a given User Pool.
-In a similar fashion to how we setup the Serverless Framework with Docker, we will include a pre-existing [aws-cli image](https://github.com/mesosphere/aws-cli) within `docker-compose.yml`, referencing the same `.env` variable file that is used within Serverless.
+For testing, we will use the ability within the [aws-cli](https://aws.amazon.com/cli/) to sign up and authenticate with a given User Pool.
+In a similar fashion to how we set up the Serverless Framework with Docker, we will include a pre-existing [aws-cli image](https://github.com/mesosphere/aws-cli) within `docker-compose.yml`, referencing the same `.env` variable file that is used within Serverless.
 
 ```yaml
 services:
@@ -304,7 +305,7 @@ services:
     env_file: .env
 ```
 
-With this in place, we can now create a new user within the User Pool, signing-up with a unique username and email address.
+With this in place, we can now create a new user within the User Pool, signing up with a unique username and email address.
 We must supply the User Pool Client identifier that was created during the deployment phase, along with the region in which the User Pool was deployed.
 
 ```bash
@@ -327,7 +328,7 @@ docker-compose run --rm aws-cli cognito-idp admin-confirm-sign-up \
 ```
 
 We can now generate a new authentication token for the newly created user, which can be used to make subsequent authenticated requests to the API.
-This token will be outputted to the terminal.
+This token will be output to the terminal.
 
 ```bash
 docker-compose run --rm aws-cli cognito-idp admin-initiate-auth \
@@ -341,7 +342,7 @@ docker-compose run --rm aws-cli cognito-idp admin-initiate-auth \
 ```
 
 Finally, we can experiment with this token and make requests to each of the three different endpoints.
-Notice how the behaviour of all three differ, based on if you provide a valid token or not.
+Notice how the behaviour of all three differs based on whether you provide a valid token or not.
 
 ```bash
 http https://nw6ok0dk3k.execute-api.eu-west-1.amazonaws.com/dev/strict 'Authorization:$JSON_WEB_TOKEN'
@@ -351,5 +352,5 @@ If you are interested in seeing the entire deployment and testing process for al
 
 <p><script src="https://asciinema.org/a/w6hj8mSNhjbttO56KTKBolwyK.js" id="asciicast-w6hj8mSNhjbttO56KTKBolwyK" async></script></p>
 
-We have now successfully exercised the ability to sign-up and authenticate users with the application.
-Join me in the next post were we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.
+We have now successfully exercised the ability to sign up and authenticate users with the application.
+Join me in the next post where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.

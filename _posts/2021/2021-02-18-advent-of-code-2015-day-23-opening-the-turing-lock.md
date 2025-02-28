@@ -1,18 +1,18 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 23 - Opening the Turing Lock'
-meta: 'Solving the Advent of Code 2015 Day 23 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 23 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twenty third day of Advent of Code 2015 we are asked to help 'Little Jane Marie' run a program on a computer she got for Christmas.
+On the twenty-third day of Advent of Code 2015, we are asked to help 'Little Jane Marie' run a program on a computer she got for Christmas.
 
 <!--more-->
 
 ## Part 1
 
 The computer has two registers (_a_ and _b_), along with six different instructions.
-For part one we are asked to execute the provided program and determine what the value of the _b_ register will be after the termination.
+For part one, we are asked to execute the provided program and determine what the value of the _b_ register will be after termination.
 To begin, we will parse the provided input instruction listing into a form we can process going forward.
 
 ```typescript
@@ -26,7 +26,7 @@ type Instruction =
   | { op: 'jmp'; offset: number };
 ```
 
-We start by modeling the `Instruction` and `Registers` as types within TypeScript.
+We start by modelling the `Instruction` and `Registers` as types within TypeScript.
 This provides an additional level of safety around building the solution.
 From here, we can validate and parse the provided input like so.
 
@@ -56,8 +56,8 @@ const parseInstructions = (input: string): Instruction[] =>
   });
 ```
 
-In doing this we have guaranteed at a runtime and type-level that the parsed input is of the given types.
-With the instruction now available we can go about implementing the _computer_ itself.
+In doing this, we have guaranteed at a runtime and type level that the parsed input is of the given types.
+With the instruction now available, we can go about implementing the _computer_ itself.
 
 ```typescript
 const execute = (
@@ -101,9 +101,9 @@ const execute = (
 };
 ```
 
-I opted for a stateful loop approach which maps each of the given operations to an associated action.
-Thanks to [exhaustive type-checking](https://dev.to/babak/exhaustive-type-checking-with-typescript-4l3f) within the `switch` construct, we are able to be sure that all possible operations have been catered for.
-With the ability to now parse and execute the given program we can go about answering part one 🌟.
+I opted for a stateful loop approach that maps each of the given operations to an associated action.
+Thanks to [exhaustive type-checking](https://dev.to/babak/exhaustive-type-checking-with-typescript-4l3f) within the `switch` construct, we can be sure that all possible operations have been catered for.
+With the ability to now parse and execute the given program, we can go about answering part one 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -112,8 +112,8 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-For part two we are required to revise the initial _a_ register value to 1, and then return the _b_ value again.
-This can be done with a single modification, and upon execution we have the desired answer we are looking for 🌟.
+For part two, we are required to revise the initial _a_ register value to 1 and then return the _b_ value again.
+This can be done with a single modification, and upon execution, we have the desired answer we are looking for 🌟.
 
 ```typescript
 const part2 = (input: string): number =>

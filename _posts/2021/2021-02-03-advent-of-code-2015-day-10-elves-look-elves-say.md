@@ -21,7 +21,7 @@ const lookAndSay = (input: string): string =>
     .reduce((next, digit) => next + digit.length + digit[0], '');
 ```
 
-For this implementation, I have decided to take advantage of Regular Expression back-references again to capture all the grouped adjacent digits - treating integers as strings in the process.
+For this implementation, I have decided to take advantage of regular expression back-references again to capture all the grouped adjacent digits - treating integers as strings in the process.
 From here, we can reduce over these groups, forming the next value in the sequence.
 
 Now that we have the ability to produce the next term in the sequence, we need a means to iterate over this process for a given number of times.

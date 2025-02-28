@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 10 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 10 puzzle using TypeScript.">
 
     <title>
         
@@ -49,13 +49,13 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 10 - Elves Look, Elves Say</h1>
     <time datetime="2021-02-03T00:00:00+00:00" class="post-date">03 Feb 2021</time>
-    <p>On the tenth day of Advent of Code 2015 the Elves are playing a game of <a href="https://en.wikipedia.org/wiki/Look-and-say_sequence">look-and-say</a>, of which we are asked to find several terms in the sequence.</p>
+    <p>On the tenth day of Advent of Code 2015, the Elves are playing a game of <a href="https://en.wikipedia.org/wiki/Look-and-say_sequence">look-and-say</a>, in which we are asked to find several terms in the sequence.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>For part one we are asked to determine the length of the result of the 40th term in the sequence (starting with the provided input).
+<p>For part one, we are asked to determine the length of the result of the 40th term in the sequence (starting with the provided input).
 Based on a famous integer sequence, we begin by implementing how the next term can be produced from a supplied value.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">lookAndSay</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">string</span> <span class="o">=&gt;</span>
@@ -64,11 +64,11 @@ Based on a famous integer sequence, we begin by implementing how the next term c
     <span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">next</span><span class="p">,</span> <span class="nx">digit</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">next</span> <span class="o">+</span> <span class="nx">digit</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="nx">digit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="dl">''</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>For this implementation I have decided to take advantage of Regular Expression back-reference’s again to capture all the grouped adjacent digits - treating integers as strings in the process.
-From here we can reduce over these groups forming the next value in the sequence.</p>
+<p>For this implementation, I have decided to take advantage of Regular Expression back-references again to capture all the grouped adjacent digits - treating integers as strings in the process.
+From here, we can reduce over these groups, forming the next value in the sequence.</p>
 
-<p>Now we have the ability to produce the next term in the sequence, we need a means to iterate over this process for a given amount of times.
-For this I decided to create a small generic utility function, which is influenced by the <a href="https://clojuredocs.org/clojure.core/iterate"><code class="language-plaintext highlighter-rouge">iterate</code></a> function provided in Clojure (expect this one is not lazy).</p>
+<p>Now that we have the ability to produce the next term in the sequence, we need a means to iterate over this process for a given number of times.
+For this, I decided to create a small generic utility function, which is influenced by the <a href="https://clojuredocs.org/clojure.core/iterate"><code class="language-plaintext highlighter-rouge">iterate</code></a> function provided in Clojure (except this one is not lazy).</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">repeat</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span>
   <span class="nx">times</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span>
@@ -81,8 +81,8 @@ For this I decided to create a small generic utility function, which is influenc
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Providing an optional initial value, this function abstracts away the mutational looping required to apply this process in a performant manor.
-With these two functions now present we can compose them together and find the 40th term which is requird to answer this parts question 🌟.</p>
+<p>Providing an optional initial value, this function abstracts away the mutational looping required to apply this process in a performant manner.
+With these two functions now present, we can compose them together and find the 40th term, which is required to answer this part’s question 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">repeat</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="nx">lookAndSay</span><span class="p">,</span> <span class="nx">input</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
@@ -90,8 +90,8 @@ With these two functions now present we can compose them together and find the 4
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are required to instead find the 50th terms length in the sequence.
-Again we can compose the two above functions together to find the desired answer 🌟.</p>
+<p>For part two, we are required to instead find the length of the 50th term in the sequence.
+Again, we can compose the two above functions together to find the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">repeat</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="nx">lookAndSay</span><span class="p">,</span> <span class="nx">input</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>

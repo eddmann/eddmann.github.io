@@ -1,11 +1,11 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 20 - Infinite Elves and Infinite Houses'
-meta: 'Solving the Advent of Code 2015 Day 20 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 20 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twentieth day of Advent of Code 2015 we are asked to help work out how many presents the Elves will deliver to specific houses.
+On the twentieth day of Advent of Code 2015, we are asked to help work out how many presents the Elves will deliver to specific houses.
 
 <!--more-->
 
@@ -17,9 +17,9 @@ Each Elf is assigned a number, too, and delivers presents to houses based on tha
 There are infinitely many Elves, numbered starting with 1.
 Each Elf delivers presents equal to ten times his or her number at each house.
 
-For part one we are asked to determine what is the lowest house number which will receive at least _29000000 presents_.
-To tackle this problem we could opt for a brute-force approach storing each house in-memory and iterating through each Elves deliveries.
-However, upon closer inspection you will see that each house is visited by the Elves which share their factors.
+For part one, we are asked to determine what is the lowest house number that will receive at least _29,000,000 presents_.
+To tackle this problem, we could opt for a brute-force approach, storing each house in memory and iterating through each Elf's deliveries.
+However, upon closer inspection, we see that each house is visited by the Elves that share its factors.
 As such, we can devise a [Factors function](https://rosettacode.org/wiki/Factors_of_an_integer) which optimally determines which Elves visited a given house number.
 
 ```typescript
@@ -37,7 +37,7 @@ const elvesWhoVisited = (houseNo: number): number[] => {
 };
 ```
 
-With the ability to determine which Elves visited a given house we can increment through each house number (starting at 1) until we reach a house where-by the presents the Elves delivered (10 times their own number) is greater than the supplied input.
+With the ability to determine which Elves visited a given house, we can increment through each house number (starting at 1) until we reach a house where the presents the Elves delivered (10 times their own number) is greater than the supplied input.
 We can then return this house number to answer part one 🌟.
 
 ```typescript
@@ -58,12 +58,12 @@ const part1 = (input: string): number => {
 
 ## Part 2
 
-For part two, there is an imposed limit on the amount of houses a given Elf can deliver presents to (which is now 50).
-Along with this restriction, the total presents per house an Elf delvers is now 11.
-We are asked to now determine what is the new lowest house number which will receive at least _29000000 presents_.
+For part two, there is an imposed limit on the number of houses a given Elf can deliver presents to, which is now 50.
+Along with this restriction, the total presents per house an Elf delivers is now 11.
+We are now asked to determine what the new lowest house number is that will receive at least _29,000,000 presents_.
 
-To achieve this we can borrow a lot of the logic implemented for part one; except now we must filter out only the Elves which have not exceeded the 50 house quota.
-In doing this we can return the desired answer 🌟.
+To achieve this, we can borrow a lot of the logic implemented for part one, except now we must filter out only the Elves that have not exceeded the 50-house quota.
+In doing this, we can return the desired answer 🌟.
 
 ```typescript
 const part2 = (input: string): number => {

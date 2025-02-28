@@ -1,21 +1,21 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 16 - Aunt Sue'
-meta: 'Solving the Advent of Code 2015 Day 16 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 16 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the sixteenth day of Advent of Code 2015 we are tasked with working out which Aunt Sue (there are 500!?) sent us a gift, so we can send them a thank you card.
+On the sixteenth day of Advent of Code 2015, we are tasked with working out which Aunt Sue (there are 500!?) sent us a gift, so we can send them a thank you card.
 
 <!--more-->
 
 ## Part 1
 
-For part one we are provided with a list of all the Aunt Sues (identified 1-500) and _things_ that we remember about each one.
-We have been gifted a _My First Crime Scene Analysis Machine_ so we are able to get readings from the provided wrapping paper.
-To determine which Aunt Sue sent the gift we must compare these readings with all the properties we know about them.
+For part one, we are provided with a list of all the Aunt Sues (identified 1-500) and _things_ that we remember about each one.
+We have been gifted a _My First Crime Scene Analysis Machine_, so we are able to get readings from the provided wrapping paper.
+To determine which Aunt Sue sent the gift, we must compare these readings with all the properties we know about them.
 
-To begin, we parse the input into a form with can subsequently work with.
+To begin, we parse the input into a form we can subsequently work with.
 
 ```typescript
 type Aunt = { id: number; properties: { [name: string]: number } };
@@ -32,7 +32,7 @@ const parseAunts = (input: string): Aunt[] =>
   }));
 ```
 
-With each Aunts properties now parsed, we move on to creating several number-based comparator [curried](https://en.wikipedia.org/wiki/Currying) functions which will come in handy going forward.
+With each Aunt's properties now parsed, we move on to creating several number-based comparator [curried](https://en.wikipedia.org/wiki/Currying) functions, which will come in handy going forward.
 
 ```typescript
 type Comparator = (value: number) => boolean;
@@ -42,7 +42,7 @@ const lessThan = (x: number): Comparator => (y: number) => y < x;
 const greaterThan = (x: number): Comparator => (y: number) => y > x;
 ```
 
-In doing this, we are then able to provide the supplied reading and comparator logic to a function which will find the given Aunt which matches all these conditions.
+In doing this, we are then able to provide the supplied reading and comparator logic to a function that will find the given Aunt who matches all these conditions.
 
 ```typescript
 const findAuntWithReadings = (
@@ -54,8 +54,8 @@ const findAuntWithReadings = (
   );
 ```
 
-The function above iterates over all the supplied Aunts' properties and returns the first one that meets all the readings critiera.
-For part one we are asked to find the Aunt which matches the _exact_ reading values - supplying these readings to the function above returns the desired Aunts identifier 🌟.
+The function above iterates over all the supplied Aunts' properties and returns the first one that meets all the readings criteria.
+For part one, we are asked to find the Aunt who matches the _exact_ reading values - supplying these readings to the function above returns the desired Aunt's identifier 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -75,7 +75,7 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-For part two we are required to tweak the readings criteria and supply several greater/less-than comparators in place of the equality checks as so:
+For part two, we are required to tweak the readings criteria and supply several greater/less-than comparators in place of the equality checks, as follows:
 
 ```typescript
 const part2 = (input: string): number =>
@@ -93,4 +93,4 @@ const part2 = (input: string): number =>
   }).id;
 ```
 
-With these amendments made we can use the same functions as implemented in part one to return the revised found Aunts identifier 🌟.
+With these amendments made, we can use the same functions as implemented in part one to return the revised found Aunt's identifier 🌟.

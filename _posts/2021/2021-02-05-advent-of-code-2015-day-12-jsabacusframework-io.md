@@ -1,11 +1,11 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 12 - JSAbacusFramework.io'
-meta: 'Solving the Advent of Code 2015 Day 12 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 12 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twelfth day of Advent of Code 2015 Santa's Accounting-Elves need help balancing the books after a recent order.
+On the twelfth day of Advent of Code 2015, Santa's Accounting-Elves need help balancing the books after a recent order.
 
 <!--more-->
 
@@ -37,9 +37,9 @@ const sumJsonNumbers = (
 };
 ```
 
-With some pre-warning that part two will require us to inspect the provided document in some form, I have opted to provide the ability to optional include a predicate function which will skip the provided sub-section.
-As stated in the problem we can expect all number values to be typed as such and none are present in string form.
-Using this above function we can now invoke the function with the supplied deserialised JSON document to return the desired answer 🌟.
+With some pre-warning that part two will require us to inspect the provided document in some form, I have opted to provide the ability to optionally include a predicate function which will skip the provided sub-section.
+As stated in the problem, we can expect all number values to be typed as such, and none are present in string form.
+Using this function, we can now invoke it with the supplied deserialised JSON document to return the desired answer 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -48,8 +48,8 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-As eluded to in part one, we are now required to instead of simply summing up _all_ numbers present, we must apply some predicate logic.
-We are now asked ignore any object (and all of its children) which has any property with the value "red".
+As alluded to in part one, we are now required to, instead of simply summing up _all_ numbers present, apply some predicate logic.
+We are now asked to ignore any object (and all of its children) that has any property with the value "red".
 
 ```typescript
 const part2 = (input: string): number =>
@@ -62,12 +62,12 @@ const part2 = (input: string): number =>
   );
 ```
 
-The predicate function itself checks to ensure that the current document value is not an Array (as Arrays are represented as Objects in JavaScript) and then attempts to see if any of the Objects values include the value "red".
+The predicate function itself checks to ensure that the current document value is not an Array (as Arrays are represented as Objects in JavaScript) and then attempts to see if any of the Object's values include the value "red".
 We can then invoke the `sumJsonNumbers` function again, returning the required answer for part two 🌟.
 
 ## Alternative Solution
 
-Alternatively, we could tackle this problem in a more simplified mannor.
+Alternatively, we could tackle this problem in a more simplified manner.
 Instead of deserialising the JSON document and recursing over its contents, we could just employ a Regular Expression to extract all numbers present.
 
 ```typescript
@@ -78,7 +78,7 @@ const part1 = (input: string): number =>
   );
 ```
 
-For solving part two, we could then harness a lesser-known second argument to [`JSON.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) and ensure that when attempting to deserialise the input we _revive_ its contents only if it matches a the given predicate.
+For solving part two, we could then harness a lesser-known second argument to [`JSON.parse`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse) and ensure that when attempting to deserialise the input, we _revive_ its contents only if it matches the given predicate.
 
 ```typescript
 const part2 = (input: string): number =>

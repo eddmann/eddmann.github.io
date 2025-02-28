@@ -1,19 +1,19 @@
 ---
 layout: post
 title: 'Advent of Code 2016 - Day 2 - Bathroom Security'
-meta: 'Solving the Advent of Code 2016 Day 2 puzzle using Python'
+meta: 'Solving the Advent of Code 2016 Day 2 puzzle using Python.'
 tags: advent-of-code advent-of-code-2016 python
 ---
 
-On the second day of Advent of Code 2016 we are asked to work out what a bathroom code is based on the supplied instructions.
+On the second day of Advent of Code 2016, we are asked to work out what a bathroom code is based on the supplied instructions.
 
 <!--more-->
 
 ## Part 1
 
-For part one we are required to follow our input (instructions _UDLR_ per keycode) based on a _3x3 1-9_ keypad.
-We begin by generating a dictionary lookup of the supplied keypad based on _x, y_ cordinates to their related key.
-In a similiar mannor to how we used Complex numbers to represent x, y coordinates in the previous solution, we will be doing the same here.
+For part one, we are required to follow our input (instructions _UDLR_ per keycode) based on a _3x3 1-9_ keypad.
+We begin by generating a dictionary lookup of the supplied keypad based on _x, y_ coordinates to their related key.
+In a similar manner to how we used complex numbers to represent _x, y_ coordinates in the previous solution, we will be doing the same here.
 
 ```python
 def generate_keypad(input):
@@ -23,12 +23,11 @@ def generate_keypad(input):
             if key != '.'}
 ```
 
-So as to correctly handle any intentional whitespace going forward we will represent this intent using a `.`.
-From here, we can then create a function which will take in the keypad, along with the initial key position and instructions and return the resulting keycode.
+To correctly handle any intentional whitespace going forward, we will represent this intent using a `.`.
+From here, we can then create a function that will take in the keypad, along with the initial key position and instructions, and return the resulting keycode.
 
 ```python
 DIRECTIONS = {'U': 0+-1j, 'D': 0+1j, 'L': -1+0j, 'R': 1+0j}
-
 
 def calc_keycode(keypad, initial_key, instructions):
     pos = next(pos for pos, key in keypad.items() if key == initial_key)
@@ -43,11 +42,11 @@ def calc_keycode(keypad, initial_key, instructions):
     return code
 ```
 
-Using an [assignment expression](https://www.python.org/dev/peps/pep-0572/) we are able to succinctly express that we only wish to apply positional moves that are within the supplied keypad bounds.
-Once we have exhausted the given code instructions directions we append this to the resulting code.
-Finally, we return the complete code to the callee.
+Using an [assignment expression](https://www.python.org/dev/peps/pep-0572/), we can succinctly express that we only wish to apply positional moves that are within the supplied keypad bounds.
+Once we have exhausted the given code instruction directions, we append this to the resulting code.
+Finally, we return the complete code to the caller.
 
-With these building block in-place we can compose them together to produce the desired answer 🌟.
+With these building blocks in place, we can compose them together to produce the desired answer 🌟.
 
 ```python
 def part1(input):
@@ -60,9 +59,9 @@ def part1(input):
 
 ## Part 2
 
-For part two we are required to instead discern what the keycode will be based on a revised keypad.
-Fortunatly, based on the building blocks we already have in-place we can simply update the `generate_keypad` argument.
-In doing so we produce the answer we desire to complete part two 🌟.
+For part two, we are required to instead discern what the keycode will be based on a revised keypad.
+Fortunately, based on the building blocks we already have in place, we can simply update the `generate_keypad` argument.
+In doing so, we produce the answer we desire to complete part two 🌟.
 
 ```python
 def part2(input):
@@ -77,8 +76,8 @@ def part2(input):
 
 ## Alternative Solution
 
-Instead of representing the coordinate as a Complex number, I additionally explored creating a more aptly modelled value object which managed this state in an immutable manor.
-Using [Data Classes](https://docs.python.org/3/library/dataclasses.html) and the `__add__` dunder method I was able to design the following:
+Instead of representing the coordinate as a complex number, I additionally explored creating a more aptly modelled value object that managed this state in an immutable manner.
+Using [Data Classes](https://docs.python.org/3/library/dataclasses.html) and the `__add__` dunder method, I was able to design the following:
 
 ```python
 @dataclass(frozen=True)
@@ -98,7 +97,6 @@ The only other aspects of the original solution that required modification were 
 DIRECTIONS = {'U': Point2D(0, -1), 'D': Point2D(0, 1),
               'L': Point2D(-1, 0), 'R': Point2D(1, 0)}
 
-
 def generate_keypad(input):
     return {Point2D(x, y): key
             for y, line in enumerate(input.splitlines())
@@ -106,4 +104,4 @@ def generate_keypad(input):
             if key != '.'}
 ```
 
-Providing such a model is preferred over _piggy-backing_ on Complex numbers, as this clearly expresses its purpose and intent.
+Providing such a model is preferred over _piggybacking_ on complex numbers, as this clearly expresses its purpose and intent.

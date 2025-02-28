@@ -1,19 +1,19 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 13 - Knights of the Dinner Table'
-meta: 'Solving the Advent of Code 2015 Day 13 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 13 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the thirteenth day of Advent of Code 2015 we are tasked with finding the optimal seating arrangement for our family _holiday feast_.
+On the thirteenth day of Advent of Code 2015, we are tasked with finding the optimal seating arrangement for our family _holiday feast_.
 
 <!--more-->
 
 ## Part 1
 
-We are provided with a listings of all our family members and their relationships with each other.
-These relationships come in the form of a happiness score which can be either positive or negative.
-We are tasked with determining the happiness total of the optimial seating arrangment.
+We are provided with a listing of all our family members and their relationships with each other.
+These relationships come in the form of a happiness score, which can be either positive or negative.
+We are tasked with determining the happiness total of the optimal seating arrangement.
 
 My initial reaction to this problem is that it shows a great similarity to [Day 9](https://eddmann.com/posts/advent-of-code-2015-day-9-all-in-a-single-night/).
 Like before, we initially begin by parsing the provided input into a form we can use.
@@ -48,14 +48,14 @@ const parseFamilyRelationships = (input: string): Relationships =>
   );
 ```
 
-Like in Day 9, we reduce over the listing building up both a _set_ of all the family members and a _map_ of the relationship happiness scores.
-Unlike the previous day, I have decided to opt for a single-level map which provides the associations in the form of `Neighbours` strings.
-As an aside, I've really enjoyed being able to map the problem domain into types of which I can construct the behaviour from.
-I find great value in being able to type-aliase primitives such as numbers and strings to the domain language.
+Like in Day 9, we reduce over the listing, building up both a _set_ of all the family members and a _map_ of the relationship happiness scores.
+Unlike the previous day, I have decided to opt for a single-level map, which provides the associations in the form of `Neighbours` strings.
+As an aside, I've really enjoyed being able to map the problem domain into types from which I can construct the behaviour.
+I find great value in being able to type-alias primitives such as numbers and strings to the domain language.
 
-With the input now parsed we can move on to calculating the seating happiness scores.
-The input listing is not that large so again we can use the `permutations` function we implemented in Day 9 to iterate over every possible seating arrangement.
-For each given arrangement we then calculate its total happiness score.
+With the input now parsed, we can move on to calculating the seating happiness scores.
+The input listing is not that large, so again, we can use the `permutations` function we implemented in Day 9 to iterate over every possible seating arrangement.
+For each given arrangement, we then calculate its total happiness score.
 
 ```typescript
 const calcSeatingHappiness = ({
@@ -73,7 +73,7 @@ const calcSeatingHappiness = ({
   );
 ```
 
-Instead of _piggy-backing_ on the reduction to include the previous family member (like we did in Day 9) I decided to implement a `zip` function which returned a tuple of each seat neighbours (gracefully handling the circular nature of the table).
+Instead of _piggy-backing_ on the reduction to include the previous family member (like we did in Day 9), I decided to implement a `zip` function that returns a tuple of each seat's neighbours (gracefully handling the circular nature of the table).
 These neighbouring tuples are then reduced over to produce the total happiness score for that given arrangement.
 
 ```typescript
@@ -81,16 +81,16 @@ const zip = <A, B>(a: A[], b: B[]): [A, B][] =>
   a.map((x, idx) => [x, b[idx]]);
 ```
 
-Whilst solving this problem I encoutered an issue when using JavaScripts `Math.max` and the size of the possible arrangement happiness scores.
-Due to the nature in which `Math.max` (and `Math.min`) uses a multi-arity argument approach to supplying input, their is a finite amount of arguments that it can take till it exceeds the call-stack limit.
-For this problem I encounted this issue and as such was required to implement an alternative approach.
+Whilst solving this problem, I encountered an issue when using JavaScript's `Math.max` and the size of the possible arrangement happiness scores.
+Due to the nature in which `Math.max` (and `Math.min`) uses a multi-arity argument approach to supplying input, there is a finite amount of arguments that it can take before exceeding the call-stack limit.
+For this problem, I encountered this issue and was required to implement an alternative approach.
 
 ```typescript
 const max = (xs: number[]) =>
   xs.reduce((m, x) => (x > m ? x : m), -Infinity);
 ```
 
-With this custom `max` implementation we can now compose all the building blocks together and return the desired answer 🌟.
+With this custom `max` implementation, we can now compose all the building blocks together and return the desired answer 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -99,9 +99,9 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-To solve part two we are required to add ourselves to the seating arrangement; with neutral (`0`) happiness scores for all family members.
-Once added we are required to then determine what the new optimial seating arrangement happiness score will be.
-We can sovle this in a similiar mannor to how we did for part one 🌟.
+To solve part two, we are required to add ourselves to the seating arrangement, with neutral (`0`) happiness scores for all family members.
+Once added, we are required to determine what the new optimal seating arrangement happiness score will be.
+We can solve this in a similar manner to how we did for part one 🌟.
 
 ```typescript
 const part2 = (input: string): number => {

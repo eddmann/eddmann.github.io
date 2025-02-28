@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 25 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 25 puzzle using TypeScript.">
 
     <title>
         
@@ -49,17 +49,17 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 25 - Let It Snow</h1>
     <time datetime="2021-02-20T00:00:00+00:00" class="post-date">20 Feb 2021</time>
-    <p>On the twenty fifth day of Advent of Code 2015 we are asked to help Santa boot up his weather machine.</p>
+    <p>On the twenty-fifth day of Advent of Code 2015, we are asked to help Santa boot up his weather machine.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
 <p>The weather machine requires a <em>code</em> to be entered for copy protection purposes.
-As the manual has been misplaced we are required to determine what this code will be based on the rules laid out in the <a href="https://adventofcode.com/2015/day/25">problem definition</a>.</p>
+As the manual has been misplaced, we are required to determine what this code will be based on the rules laid out in the <a href="https://adventofcode.com/2015/day/25">problem definition</a>.</p>
 
-<p>The problem outlined first centres around calculating a <a href="https://en.wikipedia.org/wiki/Triangular_number">Triangle number</a>, and then with this value using <a href="https://en.wikipedia.org/wiki/Modular_exponentiation">Modular exponentiation</a> to return the desired code.
-We will begin by building the functionality to determine what the given rows/columns triangle number will be in the table.</p>
+<p>The problem outlined first centres around calculating a <a href="https://en.wikipedia.org/wiki/Triangular_number">Triangle number</a> and then, with this value, using <a href="https://en.wikipedia.org/wiki/Modular_exponentiation">Modular exponentiation</a> to return the desired code.
+We will begin by building the functionality to determine what the given row/column triangle number will be in the table.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">calcTriangleNumberAt</span> <span class="o">=</span> <span class="p">(</span><span class="nx">row</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">col</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">side</span> <span class="o">=</span> <span class="nx">row</span> <span class="o">+</span> <span class="nx">col</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
@@ -67,14 +67,14 @@ We will begin by building the functionality to determine what the given rows/col
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>The value we are looking for is on the hypotenuse of an isosceles right-angle triangle.
+<p>The value we are looking for is on the hypotenuse of an isosceles right-angled triangle.
 We begin by working out what the length of the side is.
-From here we then calculate how many numbers are in that triangle.
-Based on this value we can then return the resulting number.</p>
+From here, we then calculate how many numbers are in that triangle.
+Based on this value, we can then return the resulting number.</p>
 
-<p>Now we have the <em>exponent</em> value required, we can move on to building the functionality to calculate the code itself.
+<p>Now that we have the <em>exponent</em> value required, we can move on to building the functionality to calculate the code itself.
 We use <em>Modular exponentiation</em> to solve this, which is used regularly within public-key cryptography.
-As JavaScript does not have this functionality built-in we are required to write our own implementation.</p>
+As JavaScript does not have this functionality built-in, we are required to write our own implementation.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">expMod</span> <span class="o">=</span> <span class="p">(</span><span class="nx">base</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">exp</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">mod</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">exp</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -84,7 +84,7 @@ As JavaScript does not have this functionality built-in we are required to write
 </code></pre></div></div>
 
 <p>With these two functions available to us, we can parse the provided row and column input and calculate the desired answer 🌟.
-Note that based on our resulting modular exponentiation we must multiply this by the first code supplied before returning it.</p>
+Note that based on our resulting modular exponentiation, we must multiply this by the first code supplied before returning it.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="p">[</span><span class="nx">row</span><span class="p">,</span> <span class="nx">col</span><span class="p">]</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/g</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>

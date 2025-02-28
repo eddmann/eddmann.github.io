@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 20 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 20 puzzle using TypeScript.">
 
     <title>
         
@@ -49,7 +49,7 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 20 - Infinite Elves and Infinite Houses</h1>
     <time datetime="2021-02-13T00:00:00+00:00" class="post-date">13 Feb 2021</time>
-    <p>On the twentieth day of Advent of Code 2015 we are asked to help work out how many presents the Elves will deliver to specific houses.</p>
+    <p>On the twentieth day of Advent of Code 2015, we are asked to help work out how many presents the Elves will deliver to specific houses.</p>
 
 
 
@@ -61,9 +61,9 @@ Each Elf is assigned a number, too, and delivers presents to houses based on tha
 There are infinitely many Elves, numbered starting with 1.
 Each Elf delivers presents equal to ten times his or her number at each house.</p>
 
-<p>For part one we are asked to determine what is the lowest house number which will receive at least <em>29000000 presents</em>.
-To tackle this problem we could opt for a brute-force approach storing each house in-memory and iterating through each Elves deliveries.
-However, upon closer inspection you will see that each house is visited by the Elves which share their factors.
+<p>For part one, we are asked to determine what is the lowest house number that will receive at least <em>29,000,000 presents</em>.
+To tackle this problem, we could opt for a brute-force approach, storing each house in memory and iterating through each Elf’s deliveries.
+However, upon closer inspection, we see that each house is visited by the Elves that share its factors.
 As such, we can devise a <a href="https://rosettacode.org/wiki/Factors_of_an_integer">Factors function</a> which optimally determines which Elves visited a given house number.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">elvesWhoVisited</span> <span class="o">=</span> <span class="p">(</span><span class="nx">houseNo</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -80,7 +80,7 @@ As such, we can devise a <a href="https://rosettacode.org/wiki/Factors_of_an_int
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With the ability to determine which Elves visited a given house we can increment through each house number (starting at 1) until we reach a house where-by the presents the Elves delivered (10 times their own number) is greater than the supplied input.
+<p>With the ability to determine which Elves visited a given house, we can increment through each house number (starting at 1) until we reach a house where the presents the Elves delivered (10 times their own number) is greater than the supplied input.
 We can then return this house number to answer part one 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -100,12 +100,12 @@ We can then return this house number to answer part one 🌟.</p>
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two, there is an imposed limit on the amount of houses a given Elf can deliver presents to (which is now 50).
-Along with this restriction, the total presents per house an Elf delvers is now 11.
-We are asked to now determine what is the new lowest house number which will receive at least <em>29000000 presents</em>.</p>
+<p>For part two, there is an imposed limit on the number of houses a given Elf can deliver presents to, which is now 50.
+Along with this restriction, the total presents per house an Elf delivers is now 11.
+We are now asked to determine what the new lowest house number is that will receive at least <em>29,000,000 presents</em>.</p>
 
-<p>To achieve this we can borrow a lot of the logic implemented for part one; except now we must filter out only the Elves which have not exceeded the 50 house quota.
-In doing this we can return the desired answer 🌟.</p>
+<p>To achieve this, we can borrow a lot of the logic implemented for part one, except now we must filter out only the Elves that have not exceeded the 50-house quota.
+In doing this, we can return the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">numOfPresents</span> <span class="o">=</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>

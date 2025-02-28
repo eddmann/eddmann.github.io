@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 23 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 23 puzzle using TypeScript.">
 
     <title>
         
@@ -49,14 +49,14 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 23 - Opening the Turing Lock</h1>
     <time datetime="2021-02-18T00:00:00+00:00" class="post-date">18 Feb 2021</time>
-    <p>On the twenty third day of Advent of Code 2015 we are asked to help ‘Little Jane Marie’ run a program on a computer she got for Christmas.</p>
+    <p>On the twenty-third day of Advent of Code 2015, we are asked to help ‘Little Jane Marie’ run a program on a computer she got for Christmas.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
 <p>The computer has two registers (<em>a</em> and <em>b</em>), along with six different instructions.
-For part one we are asked to execute the provided program and determine what the value of the <em>b</em> register will be after the termination.
+For part one, we are asked to execute the provided program and determine what the value of the <em>b</em> register will be after termination.
 To begin, we will parse the provided input instruction listing into a form we can process going forward.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">registers</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">a</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">]</span> <span class="k">as</span> <span class="kd">const</span><span class="p">;</span>
@@ -69,7 +69,7 @@ To begin, we will parse the provided input instruction listing into a form we ca
   <span class="o">|</span> <span class="p">{</span> <span class="na">op</span><span class="p">:</span> <span class="dl">'</span><span class="s1">jmp</span><span class="dl">'</span><span class="p">;</span> <span class="nl">offset</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We start by modeling the <code class="language-plaintext highlighter-rouge">Instruction</code> and <code class="language-plaintext highlighter-rouge">Registers</code> as types within TypeScript.
+<p>We start by modelling the <code class="language-plaintext highlighter-rouge">Instruction</code> and <code class="language-plaintext highlighter-rouge">Registers</code> as types within TypeScript.
 This provides an additional level of safety around building the solution.
 From here, we can validate and parse the provided input like so.</p>
 
@@ -98,8 +98,8 @@ From here, we can validate and parse the provided input like so.</p>
   <span class="p">});</span>
 </code></pre></div></div>
 
-<p>In doing this we have guaranteed at a runtime and type-level that the parsed input is of the given types.
-With the instruction now available we can go about implementing the <em>computer</em> itself.</p>
+<p>In doing this, we have guaranteed at a runtime and type level that the parsed input is of the given types.
+With the instruction now available, we can go about implementing the <em>computer</em> itself.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">execute</span> <span class="o">=</span> <span class="p">(</span>
   <span class="nx">instructions</span><span class="p">:</span> <span class="nx">Instruction</span><span class="p">[],</span>
@@ -142,9 +142,9 @@ With the instruction now available we can go about implementing the <em>computer
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>I opted for a stateful loop approach which maps each of the given operations to an associated action.
-Thanks to <a href="https://dev.to/babak/exhaustive-type-checking-with-typescript-4l3f">exhaustive type-checking</a> within the <code class="language-plaintext highlighter-rouge">switch</code> construct, we are able to be sure that all possible operations have been catered for.
-With the ability to now parse and execute the given program we can go about answering part one 🌟.</p>
+<p>I opted for a stateful loop approach that maps each of the given operations to an associated action.
+Thanks to <a href="https://dev.to/babak/exhaustive-type-checking-with-typescript-4l3f">exhaustive type-checking</a> within the <code class="language-plaintext highlighter-rouge">switch</code> construct, we can be sure that all possible operations have been catered for.
+With the ability to now parse and execute the given program, we can go about answering part one 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">execute</span><span class="p">(</span><span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">0</span> <span class="p">}).</span><span class="nx">b</span><span class="p">;</span>
@@ -152,8 +152,8 @@ With the ability to now parse and execute the given program we can go about answ
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are required to revise the initial <em>a</em> register value to 1, and then return the <em>b</em> value again.
-This can be done with a single modification, and upon execution we have the desired answer we are looking for 🌟.</p>
+<p>For part two, we are required to revise the initial <em>a</em> register value to 1 and then return the <em>b</em> value again.
+This can be done with a single modification, and upon execution, we have the desired answer we are looking for 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">execute</span><span class="p">(</span><span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="p">{</span> <span class="na">a</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">b</span><span class="p">:</span> <span class="mi">0</span> <span class="p">}).</span><span class="nx">b</span><span class="p">;</span>

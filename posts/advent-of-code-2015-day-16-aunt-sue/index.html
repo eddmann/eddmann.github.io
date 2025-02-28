@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 16 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 16 puzzle using TypeScript.">
 
     <title>
         
@@ -49,17 +49,17 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 16 - Aunt Sue</h1>
     <time datetime="2021-02-09T00:00:00+00:00" class="post-date">09 Feb 2021</time>
-    <p>On the sixteenth day of Advent of Code 2015 we are tasked with working out which Aunt Sue (there are 500!?) sent us a gift, so we can send them a thank you card.</p>
+    <p>On the sixteenth day of Advent of Code 2015, we are tasked with working out which Aunt Sue (there are 500!?) sent us a gift, so we can send them a thank you card.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>For part one we are provided with a list of all the Aunt Sues (identified 1-500) and <em>things</em> that we remember about each one.
-We have been gifted a <em>My First Crime Scene Analysis Machine</em> so we are able to get readings from the provided wrapping paper.
-To determine which Aunt Sue sent the gift we must compare these readings with all the properties we know about them.</p>
+<p>For part one, we are provided with a list of all the Aunt Sues (identified 1-500) and <em>things</em> that we remember about each one.
+We have been gifted a <em>My First Crime Scene Analysis Machine</em>, so we are able to get readings from the provided wrapping paper.
+To determine which Aunt Sue sent the gift, we must compare these readings with all the properties we know about them.</p>
 
-<p>To begin, we parse the input into a form with can subsequently work with.</p>
+<p>To begin, we parse the input into a form we can subsequently work with.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Aunt</span> <span class="o">=</span> <span class="p">{</span> <span class="na">id</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">properties</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="na">name</span><span class="p">:</span> <span class="kr">string</span><span class="p">]:</span> <span class="kr">number</span> <span class="p">}</span> <span class="p">};</span>
 
@@ -75,7 +75,7 @@ To determine which Aunt Sue sent the gift we must compare these readings with al
   <span class="p">}));</span>
 </code></pre></div></div>
 
-<p>With each Aunts properties now parsed, we move on to creating several number-based comparator <a href="https://en.wikipedia.org/wiki/Currying">curried</a> functions which will come in handy going forward.</p>
+<p>With each Aunt’s properties now parsed, we move on to creating several number-based comparator <a href="https://en.wikipedia.org/wiki/Currying">curried</a> functions, which will come in handy going forward.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Comparator</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">boolean</span><span class="p">;</span>
 
@@ -84,7 +84,7 @@ To determine which Aunt Sue sent the gift we must compare these readings with al
 <span class="kd">const</span> <span class="nx">greaterThan</span> <span class="o">=</span> <span class="p">(</span><span class="nx">x</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="nx">Comparator</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">y</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">y</span> <span class="o">&gt;</span> <span class="nx">x</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>In doing this, we are then able to provide the supplied reading and comparator logic to a function which will find the given Aunt which matches all these conditions.</p>
+<p>In doing this, we are then able to provide the supplied reading and comparator logic to a function that will find the given Aunt who matches all these conditions.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">findAuntWithReadings</span> <span class="o">=</span> <span class="p">(</span>
   <span class="nx">aunts</span><span class="p">:</span> <span class="nx">Aunt</span><span class="p">[],</span>
@@ -95,8 +95,8 @@ To determine which Aunt Sue sent the gift we must compare these readings with al
   <span class="p">);</span>
 </code></pre></div></div>
 
-<p>The function above iterates over all the supplied Aunts’ properties and returns the first one that meets all the readings critiera.
-For part one we are asked to find the Aunt which matches the <em>exact</em> reading values - supplying these readings to the function above returns the desired Aunts identifier 🌟.</p>
+<p>The function above iterates over all the supplied Aunts’ properties and returns the first one that meets all the readings criteria.
+For part one, we are asked to find the Aunt who matches the <em>exact</em> reading values - supplying these readings to the function above returns the desired Aunt’s identifier 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">findAuntWithReadings</span><span class="p">(</span><span class="nx">parseAunts</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="p">{</span>
@@ -115,7 +115,7 @@ For part one we are asked to find the Aunt which matches the <em>exact</em> read
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are required to tweak the readings criteria and supply several greater/less-than comparators in place of the equality checks as so:</p>
+<p>For part two, we are required to tweak the readings criteria and supply several greater/less-than comparators in place of the equality checks, as follows:</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">findAuntWithReadings</span><span class="p">(</span><span class="nx">parseAunts</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="p">{</span>
@@ -132,7 +132,7 @@ For part one we are asked to find the Aunt which matches the <em>exact</em> read
   <span class="p">}).</span><span class="nx">id</span><span class="p">;</span>
 </code></pre></div></div>
 
-<p>With these amendments made we can use the same functions as implemented in part one to return the revised found Aunts identifier 🌟.</p>
+<p>With these amendments made, we can use the same functions as implemented in part one to return the revised found Aunt’s identifier 🌟.</p>
 
 </article>
 

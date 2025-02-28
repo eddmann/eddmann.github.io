@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 21 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 21 puzzle using TypeScript.">
 
     <title>
         
@@ -49,15 +49,15 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 21 - RPG Simulator 20XX</h1>
     <time datetime="2021-02-15T00:00:00+00:00" class="post-date">15 Feb 2021</time>
-    <p>On the twenty first day of Advent of Code 2015 we are asked to help ‘Little Henry Case’ beat the boss in a new video game he got for Christmas.</p>
+    <p>On the twenty-first day of Advent of Code 2015, we are asked to help ‘Little Henry Case’ beat the boss in a new video game he got for Christmas.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>The game is a turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
+<p>The game is turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
 The rules can be read by visiting the <a href="https://adventofcode.com/2015/day/21">problem specification</a>.
-For part one, we are asked to work out what is the least amount of gold we can spend and still win the fight.
+For part one, we are asked to work out the least amount of gold we can spend and still win the fight.
 We will begin by getting a copy of the shop items that are available for purchase.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">ITEMS</span> <span class="o">=</span> <span class="s2">`
@@ -115,7 +115,7 @@ Defense +3   80     0       3
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With the shop items now parsed, we can move onto parsing the Boss configuration that has been provided as input.</p>
+<p>With the shop items now parsed, we can move on to parsing the Boss configuration that has been provided as input.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Participant</span> <span class="o">=</span> <span class="p">{</span> <span class="na">hp</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">damage</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">armor</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
 
@@ -129,21 +129,21 @@ Defense +3   80     0       3
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Reading through the shop item purchase criteria, I have decided that an elegant way in which to produce all possible valid configurations is via an <a href="https://en.wikipedia.org/wiki/Cartesian_product">cartesian product</a>.
-For this I will be using the below generalised implementation.</p>
+<p>Reading through the shop item purchase criteria, I have decided that an elegant way to produce all possible valid configurations is via a <a href="https://en.wikipedia.org/wiki/Cartesian_product">Cartesian product</a>.
+For this, I will be using the below generalised implementation.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cartesianProduct</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(...</span><span class="nx">a</span><span class="p">:</span> <span class="nx">T</span><span class="p">[][]):</span> <span class="nx">T</span><span class="p">[][]</span> <span class="o">=&gt;</span>
   <span class="nx">a</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">.</span><span class="nx">flatMap</span><span class="p">(</span><span class="nx">d</span> <span class="o">=&gt;</span> <span class="nx">b</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="nx">d</span><span class="p">,</span> <span class="nx">e</span><span class="p">].</span><span class="nx">flat</span><span class="p">())),</span> <span class="p">[[]]);</span>
 </code></pre></div></div>
 
-<p>We will also need a means to sum up a given array of objects property.
-This can be achieved in a type-safe manor using the code below.</p>
+<p>We will also need a means to sum up a given array of object properties.
+This can be achieved in a type-safe manner using the code below.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">sumProp</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">els</span><span class="p">:</span> <span class="nx">T</span><span class="p">[],</span> <span class="nx">prop</span><span class="p">:</span> <span class="kr">keyof</span> <span class="nx">T</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">els</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">sum</span><span class="p">,</span> <span class="nx">el</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">sum</span> <span class="o">+</span> <span class="o">+</span><span class="nx">el</span><span class="p">[</span><span class="nx">prop</span><span class="p">],</span> <span class="mi">0</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>With these two utility helper functions in-hand we can go about creating a function to return all the possible valid player configurations.</p>
+<p>With these two utility helper functions in hand, we can go about creating a function to return all the possible valid player configurations.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">PlayerConfiguration</span> <span class="o">=</span> <span class="nx">Participant</span> <span class="o">&amp;</span> <span class="p">{</span> <span class="na">cost</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
 
@@ -176,13 +176,13 @@ This can be achieved in a type-safe manor using the code below.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>As the armour and both rings are optional, we add a dummy <code class="language-plaintext highlighter-rouge">NO_ITEM</code> item option which provides us with the <em>non-existent</em> purchase.
-Unfortuantly, the rules surrounding how rings may be purchased makes this not a <em>true</em> cartesian product.
-Instead, we must additional ensure that we do not purchase the same ring twice, and cater for the option of no ring being purchased at all.
-With these configurations not excluded we can return an array of <code class="language-plaintext highlighter-rouge">PlayerConfiguration</code> which along with the total damage, armor and hit points (we always start with 100), also includes the total cost of the configuration.</p>
+<p>As the armour and both rings are optional, we add a dummy <code class="language-plaintext highlighter-rouge">NO_ITEM</code> option, which provides us with the <em>non-existent</em> purchase.
+Unfortunately, the rules surrounding how rings may be purchased make this not a <em>true</em> Cartesian product.
+Instead, we must additionally ensure that we do not purchase the same ring twice and cater for the option of no ring being purchased at all.
+With these configurations now excluded, we can return an array of <code class="language-plaintext highlighter-rouge">PlayerConfiguration</code>, which, along with the total damage, armour, and hit points (we always start with 100), also includes the total cost of the configuration.</p>
 
-<p>Leading on from this, we now need a means in which to simulate a given battle scenario.
-Looking at how a battle is conducted we can determine using a single formula how many turns it would take for a given participant to beat the other.</p>
+<p>Leading on from this, we now need a means to simulate a given battle scenario.
+Looking at how a battle is conducted, we can determine using a single formula how many turns it would take for a given participant to beat the other.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">isPlayerWinner</span> <span class="o">=</span> <span class="p">(</span>
   <span class="nx">player</span><span class="p">:</span> <span class="nx">Participant</span><span class="p">,</span>
@@ -199,9 +199,10 @@ Looking at how a battle is conducted we can determine using a single formula how
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We can calculate the total turns it would take for both the player and boss to win; and then providing the players turn total is less than or equal to the bosses (as the player goes first) we can be sure the player has won.
+<p>We can calculate the total turns it would take for both the player and the boss to win.
+Then, provided the player’s turn total is less than or equal to the boss’s (as the player goes first), we can be sure the player has won.
 With the ability to now simulate a battle in place, we can go about solving the question laid out in part one.
-Generating all the possible valid player configurations we can filter down to only the ones that the player wins.
+Generating all the possible valid player configurations, we can filter down to only the ones where the player wins.
 From here, we return the minimal cost of those player configurations, leading us to our answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -218,9 +219,9 @@ From here, we return the minimal cost of those player configurations, leading us
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two, we are asked to determine what is the most amount of gold we could spend and still lose the fight.
-We can re-use all the functionality we built up for part one, except this time we wish to only include games the player loses.
-From these lost games we can determine the highest costing player configuration 🌟.</p>
+<p>For part two, we are asked to determine the most amount of gold we could spend and still lose the fight.
+We can reuse all the functionality we built up for part one, except this time we wish to only include games where the player loses.
+From these lost games, we can determine the highest costing player configuration 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">items</span> <span class="o">=</span> <span class="nx">parseShopItems</span><span class="p">(</span><span class="nx">ITEMS</span><span class="p">);</span>

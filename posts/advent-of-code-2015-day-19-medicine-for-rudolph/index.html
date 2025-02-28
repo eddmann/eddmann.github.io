@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 19 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 19 puzzle using TypeScript.">
 
     <title>
         
@@ -49,16 +49,16 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 19 - Medicine for Rudolph</h1>
     <time datetime="2021-02-12T00:00:00+00:00" class="post-date">12 Feb 2021</time>
-    <p>On the nineteenth day of Advent of Code 2015 Rudolph is sick and we have been tasked to help develop the <em>custom-made</em> medicine required.</p>
+    <p>On the nineteenth day of Advent of Code 2015, Rudolph is sick, and we have been tasked with helping develop the <em>custom-made</em> medicine required.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
 <p>We are tasked with helping calibrate the machine that is capable of constructing any Red-Nosed Reindeer molecule required to make the medicine.
-As input we are provided an initial medicine molecule and list of replacements of which we need to apply.
-For part one, we need to work out how many distinct molecules can be created using the replacements provided.
-We begin as always by parsing this input into a form we can work with.</p>
+As input, we are provided with an initial medicine molecule and a list of replacements that we need to apply.
+For part one, we need to determine how many distinct molecules can be created using the replacements provided.
+We begin, as always, by parsing this input into a form we can work with.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Replacement</span> <span class="o">=</span> <span class="p">[</span><span class="k">from</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">to</span><span class="p">:</span> <span class="kr">string</span><span class="p">];</span>
 <span class="kd">type</span> <span class="nx">Molecule</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
@@ -77,7 +77,7 @@ We begin as always by parsing this input into a form we can work with.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>With a listing of all the replacements and the initial molecule now available we can use these values in determining all the possible molecule variants.</p>
+<p>With a listing of all the replacements and the initial molecule now available, we can use these values to determine all the possible molecule variants.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getMoleculeVariants</span> <span class="o">=</span> <span class="kd">function</span><span class="o">*</span> <span class="p">(</span>
   <span class="nx">m</span><span class="p">:</span> <span class="nx">Molecule</span><span class="p">,</span>
@@ -92,10 +92,10 @@ We begin as always by parsing this input into a form we can work with.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Given the molecule and desired replacement we return a Generator which provides the callee with all the possible variants (based on individual occurrences) within the string.
-This allows us to maintain the current position within the Generator and not muddle this logic into the callees responsibility.</p>
+<p>Given the molecule and the desired replacement, we return a Generator that provides the caller with all the possible variants (based on individual occurrences) within the string.
+This allows us to maintain the current position within the Generator and not muddle this logic into the caller’s responsibility.</p>
 
-<p>We can then combine these two function and determine how many distinct molecule variants there are 🌟.</p>
+<p>We can then combine these two functions and determine how many distinct molecule variants there are 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="p">{</span> <span class="nx">replacements</span><span class="p">,</span> <span class="nx">molecule</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">parseReplacementsAndMolecule</span><span class="p">(</span>
@@ -114,19 +114,19 @@ This allows us to maintain the current position within the Generator and not mud
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>I initially used a Set within the reduction, but due to the ease of combining arrays within JavaScript I felt it more readable to first get all possible variants and then return the Set (the deduplication process) at the end.</p>
+<p>I initially used a <code class="language-plaintext highlighter-rouge">Set</code> within the reduction, but due to the ease of combining arrays within JavaScript, I found it more readable to first get all possible variants and then return the <code class="language-plaintext highlighter-rouge">Set</code> (the deduplication process) at the end.</p>
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two, with the machine now calibrated we are required to help with the fabrication process.
-Molecule fabrication always begins with just a single electron, <em>e</em>, and applying replacements one at a time, just like the ones during calibration.
-We are required to work out how many steps it will take to go from <em>e</em> to the provided molecule.</p>
+<p>For part two, with the machine now calibrated, we are required to help with the fabrication process.
+Molecule fabrication always begins with just a single electron, <em>e</em>, and involves applying replacements one at a time, just like during calibration.
+We are required to determine how many steps it will take to go from <em>e</em> to the provided molecule.</p>
 
-<p>My initial thought for this was to begin at <em>e</em> and apply all the possible variants until we landed on the desired molecule (like the problem states).
-However, the distinct amount of possabilities grows too fast and as such this is not a viable solution.
-After alittle thought, I decided to instead flip this problem around and based on the molecule provideed decern how many replacements would be required to get back to <em>e</em>.
-I opted for a <em>greedy approach</em>, sorting the replacements by descending length order.
-In doing so we can then count the steps required and return the desired total to answer part two 🌟.</p>
+<p>My initial thought was to begin at <em>e</em> and apply all possible variants until we landed on the desired molecule (as the problem states).
+However, the distinct number of possibilities grows too fast, making this an unviable solution.
+After a little thought, I decided to flip this problem around and, based on the molecule provided, determine how many replacements would be required to get back to <em>e</em>.
+I opted for a <em>greedy approach</em>, sorting the replacements in descending length order.
+By doing so, we can then count the steps required and return the desired total to answer part two 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="p">{</span> <span class="nx">replacements</span><span class="p">,</span> <span class="nx">molecule</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">parseReplacementsAndMolecule</span><span class="p">(</span>
@@ -154,12 +154,13 @@ In doing so we can then count the steps required and return the desired total to
 </code></pre></div></div>
 
 <p>The input has been constructed in such a way that there is no possibility for ambiguity, with only one path back to <em>e</em>.
-An interesting optimisation I made was that in a previous solution I broke out of both the variant and replacement loops upon finding a match.
-This would ensure that we were performing the largest replacement possible every step.
-However, I experimented with what we now have above and instead allow it to continue on to the next possible replacement.
-This looks to have speeded up the solution and returns the same answer.</p>
+An interesting optimisation I made was that in a previous solution, I broke out of both the variant and replacement loops upon finding a match.
+This ensured that we performed the largest replacement possible at every step.
+However, I experimented with what we now have above and instead allowed it to continue to the next possible replacement.
+This appears to have sped up the solution while still returning the correct answer.</p>
 
-<p>I really enjoyed todays challenge and would highly recommend you check out the discussion on the <a href="https://www.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/">/r/adventofcode</a> subreddit which details some interesting ways in which people and solved the problem by-hand!</p>
+<p>I really enjoyed today’s challenge and would highly recommend checking out the discussion on the <a href="https://www.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/">/r/adventofcode</a> subreddit.
+It details some interesting ways in which people have solved the problem by hand!</p>
 
 </article>
 

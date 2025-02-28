@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 17 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 17 puzzle using TypeScript.">
 
     <title>
         
@@ -49,23 +49,23 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 17 - No Such Thing as Too Much</h1>
     <time datetime="2021-02-10T00:00:00+00:00" class="post-date">10 Feb 2021</time>
-    <p>On the seventeenth day of Advent of Code 2015 the elves bought 150 litres of eggnog that we are asked to fit in the supplied containers for refrigeration.</p>
+    <p>On the seventeenth day of Advent of Code 2015, the elves bought 150 litres of eggnog that we are asked to fit in the supplied containers for refrigeration.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>We are supplied a list of all the different sized containers we have available to us as input; and for part one asked how many combinations of these will fit the 150 litre requirement.
-At its core today centres around the <a href="https://en.wikipedia.org/wiki/Subset_sum_problem">Subset sum problem</a>, where-by given a <a href="https://en.wikipedia.org/wiki/Multiset">Multiset</a> we are required to find all the possible subsets that sum to a given number (in this case 150).
+<p>We are supplied with a list of all the different-sized containers available to us as input, and for part one, we are asked how many combinations of these will fit the 150-litre requirement.
+At its core, today centres around the <a href="https://en.wikipedia.org/wiki/Subset_sum_problem">Subset Sum problem</a>, whereby given a <a href="https://en.wikipedia.org/wiki/Multiset">Multiset</a>, we are required to find all the possible subsets that sum to a given number (in this case, 150).
 We begin by parsing the supplied containers into a form we can then process.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">parseContainers</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="o">=&gt;</span>
   <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>There are several popular ways to solve the Subset sum problem, all with their own complexity characteristics.
-Due to the input being so small I have opted for the native combinations approach, with a small optimisation to prune subsets that have already exceeded the desired total.
-In the future I hope to spend some time investigating how you can employ Dynamic Programming to help improve performance.</p>
+<p>There are several popular ways to solve the Subset Sum problem, each with its own complexity characteristics.
+Due to the input being relatively small, I have opted for the native combinations approach, with a small optimisation to prune subsets that have already exceeded the desired total.
+In the future, I hope to spend some time investigating how Dynamic Programming can help improve performance.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">subsetSum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">numbers</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span> <span class="nx">target</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="kr">number</span><span class="p">[][]</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">recur</span> <span class="o">=</span> <span class="p">(</span><span class="na">remaining</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span> <span class="na">subset</span><span class="p">:</span> <span class="kr">number</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="p">{</span>
@@ -83,11 +83,11 @@ In the future I hope to spend some time investigating how you can employ Dynamic
 </code></pre></div></div>
 
 <p>The above implementation uses a recursive closure to iterate through all the possible subsets.
-An optimisation I omitted would be to check upon each iteration that the sum of the current total and remaining numbers is not less than the target.
-If this is the case we can prune these branches, as we know that no following subset will meet the desired criteria.</p>
+An optimisation I omitted would be to check upon each iteration whether the sum of the current total and remaining numbers is less than the target.
+If this is the case, we can prune these branches, as we know that no following subset will meet the desired criteria.</p>
 
-<p>Following on from this, I also spent a little time implementing the same recursive implementation using Generators.
-I find that recursive problems such as this can be succinctly defined in this manor.</p>
+<p>Following on from this, I also spent some time implementing the same recursive approach using Generators.
+I find that recursive problems such as this can be succinctly defined in this manner.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">subsetSum</span><span class="p">(</span>
   <span class="nx">numbers</span><span class="p">:</span> <span class="kr">number</span><span class="p">[],</span>
@@ -107,7 +107,7 @@ I find that recursive problems such as this can be succinctly defined in this ma
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>With the ability to now determine all the possible subsets which sum to the given number we can answer the first part of today’s problem 🌟.</p>
+<p>With the ability to now determine all the possible subsets that sum to the given number, we can answer the first part of today’s problem 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">subsetSum</span><span class="p">(</span><span class="nx">parseContainers</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">150</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
@@ -115,9 +115,9 @@ I find that recursive problems such as this can be succinctly defined in this ma
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are asked to investigate the possible subsets further, determining how many combinations of the least amount of containers can we use.
-Again, due to the search-space being so small we can harness the same functionality implemented in part one and construct an occurrences map per subset length.
-With this occurrence mapping we can then workout the smallest subset length present and then return this count to answer part two 🌟.</p>
+<p>For part two, we are asked to investigate the possible subsets further, determining how many combinations of the least number of containers we can use.
+Again, due to the search space being so small, we can harness the same functionality implemented in part one and construct an occurrences map per subset length.
+With this occurrence mapping, we can then work out the smallest subset length present and return this count to answer part two 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">sizes</span> <span class="o">=</span> <span class="nx">subsetSum</span><span class="p">(</span><span class="nx">parseContainers</span><span class="p">(</span><span class="nx">input</span><span class="p">),</span> <span class="mi">150</span><span class="p">).</span><span class="nx">reduce</span><span class="p">(</span>
@@ -130,8 +130,8 @@ With this occurrence mapping we can then workout the smallest subset length pres
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>Like in the part one there are more performant solutions to achieving this end result.
-In the future I hope to explore the Subset sum problem in more detail and explore these options.</p>
+<p>As in part one, there are more performant solutions to achieving this end result.
+In the future, I hope to explore the Subset Sum problem in more detail and investigate these options.</p>
 
 </article>
 

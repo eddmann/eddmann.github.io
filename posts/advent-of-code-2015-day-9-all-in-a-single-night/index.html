@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 9 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 9 puzzle using TypeScript.">
 
     <title>
         
@@ -49,14 +49,14 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 9 - All in a Single Night</h1>
     <time datetime="2021-02-02T00:00:00+00:00" class="post-date">02 Feb 2021</time>
-    <p>On the ninth day of Advent of Code 2015 Santa wants us to examine some new locations (and distances) he is required to visit.</p>
+    <p>On the ninth day of Advent of Code 2015, Santa wants us to examine some new locations (and distances) he is required to visit.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>We are provided a list of distances between locations that Santa wishes to visit exactly once, starting and finishing at any location.
-For part one we are asked to determine what the shortest distance is for the shortest route that meets this criteria.
+<p>We are provided with a list of distances between locations that Santa wishes to visit exactly once, starting and finishing at any location.
+For part one, we are asked to determine the shortest distance for the shortest route that meets this criterion.
 Like before, we start off by parsing the provided input into a structure that we can use going forward.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Location</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
@@ -90,13 +90,13 @@ Like before, we start off by parsing the provided input into a structure that we
   <span class="p">);</span>
 </code></pre></div></div>
 
-<p>From this function we are returned a Set of all the unique locations that Santa wishes to visit - along with a Map of all the distances (weights) between each of these locations.
-My initial thought was this was possibly a form of <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling salesman problem</a> and that we would need to employ such an algorithm to achieve the end result.
-However, upon inspection of the input we can see that all locations are directly accessable from each other, and that the listing is small.
-With this in-mind we can instead opt to calculate the distances of all possible <em>permutations</em> of the location listing with minimal computational overhead.</p>
+<p>From this function, we are returned a <code class="language-plaintext highlighter-rouge">Set</code> of all the unique locations that Santa wishes to visit, along with a <code class="language-plaintext highlighter-rouge">Map</code> of all the distances (weights) between each of these locations.
+My initial thought was that this was possibly a form of the <a href="https://en.wikipedia.org/wiki/Travelling_salesman_problem">Travelling Salesman Problem</a> and that we would need to employ such an algorithm to achieve the end result.
+However, upon inspection of the input, we can see that all locations are directly accessible from each other and that the listing is small.
+With this in mind, we can instead opt to calculate the distances of all possible <em>permutations</em> of the location listing with minimal computational overhead.</p>
 
 <p>JavaScript does not provide permutation functionality <em>out of the box</em> like languages such as Python do.
-As such, we are required to roll our own; I opted to leverage Generators in the below implementation.</p>
+As such, we are required to roll our own; I opted to leverage generators in the implementation below.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">permutations</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">col</span><span class="p">:</span> <span class="nx">T</span><span class="p">[]):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">[]</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
@@ -116,7 +116,7 @@ As such, we are required to roll our own; I opted to leverage Generators in the 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>Using this function we are then able to create a higher-order function which aggregates all the possible trip distances into a final reduced value, using a supplied <code class="language-plaintext highlighter-rouge">reducer</code> function.</p>
+<p>Using this function, we can then create a higher-order function that aggregates all the possible trip distances into a final reduced value using a supplied <code class="language-plaintext highlighter-rouge">reducer</code> function.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">aggregateTripDistances</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span>
   <span class="p">{</span> <span class="nx">locations</span><span class="p">,</span> <span class="nx">distances</span> <span class="p">}:</span> <span class="nx">Distances</span><span class="p">,</span>
@@ -152,7 +152,7 @@ As such, we are required to roll our own; I opted to leverage Generators in the 
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are instead asked to determine what the longest distance for the longest route is based on the same location listing.
+<p>For part two, we are instead asked to determine the longest distance for the longest route based on the same location listing.
 Using the same building blocks provided for part one’s solution, we can instead supply the <code class="language-plaintext highlighter-rouge">Math.max</code> aggregate function to return the desired answer 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
@@ -165,8 +165,8 @@ Using the same building blocks provided for part one’s solution, we can instea
 
 <h2 id="alternative-solution">Alternative Solution</h2>
 
-<p>Instead of designing an aggregate function which applies a given reduction function, we could instead take the approach below.
-First we generate a list of all the possible trip distance totals, based on permutations of the location set.</p>
+<p>Instead of designing an aggregate function that applies a given reduction function, we could instead take the approach below.
+First, we generate a list of all the possible trip distance totals based on permutations of the location set.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">calcTripDistances</span> <span class="o">=</span> <span class="p">({</span>
   <span class="nx">locations</span><span class="p">,</span>
@@ -184,8 +184,9 @@ First we generate a list of all the possible trip distance totals, based on perm
   <span class="p">});</span>
 </code></pre></div></div>
 
-<p>Then we can supply this list as arguments to both the <code class="language-plaintext highlighter-rouge">Math.min</code> and <code class="language-plaintext highlighter-rouge">Math.max</code> functions.
-Using this approach works well for this input, however, we should be considerate that as all arguments are required to be put on the call stack within the chosen JavaScript VM, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#using_apply_and_built-in_functions">there is a limit</a> to how many list items this will cater for.</p>
+<p>Then, we can supply this list as arguments to both the <code class="language-plaintext highlighter-rouge">Math.min</code> and <code class="language-plaintext highlighter-rouge">Math.max</code> functions.
+Using this approach works well for this input.
+However, we should be considerate that as all arguments are required to be put on the call stack within the chosen JavaScript VM, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply#using_apply_and_built-in_functions">there is a limit</a> to how many list items this will cater for.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(...</span><span class="nx">calcTripDistances</span><span class="p">(</span><span class="nx">parseLocationsAndDistances</span><span class="p">(</span><span class="nx">input</span><span class="p">)));</span>

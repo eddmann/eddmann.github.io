@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 3 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 3 puzzle using Python.">
 
     <title>
         
@@ -49,7 +49,7 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 3 - Squares With Three Sides</h1>
     <time datetime="2021-03-25T00:00:00+00:00" class="post-date">25 Mar 2021</time>
-    <p>On the third day of Advent of Code 2016 we are asked to work out how many valid triangles are present in a given listing.</p>
+    <p>On the third day of Advent of Code 2016, we are asked to work out how many valid triangles are present in a given listing.</p>
 
 
 
@@ -71,7 +71,7 @@ We can simplify any conditional logic required by sorting the triplet values fir
     <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">&gt;</span> <span class="n">c</span>
 </code></pre></div></div>
 
-<p>To answer part one we can combine these two functions using list comprehension, and sum up the <code class="language-plaintext highlighter-rouge">True</code> values 🌟.</p>
+<p>To answer part one, we can combine these two functions using list comprehension and sum up the <code class="language-plaintext highlighter-rouge">True</code> values 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">is_triangle</span><span class="p">(</span><span class="n">triplet</span><span class="p">)</span> <span class="k">for</span> <span class="n">triplet</span> <span class="ow">in</span> <span class="n">parse_triplets</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
@@ -80,19 +80,19 @@ We can simplify any conditional logic required by sorting the triplet values fir
 <h2 id="part-2">Part 2</h2>
 
 <p>For part two, we are now instead required to interpret the input in a different form.
-Triplets are now grouped based on transposing (flipping the rows and columns) the listing.</p>
+Triplets are now grouped based on transposing (flipping the rows and columns) of the listing.</p>
 
-<p>So as to complete this task we will need a means to split up a flat listing into triplets.
-Combining <code class="language-plaintext highlighter-rouge">range</code>, list slicing and subsequently yielding each <em>chunk</em> is a very succinct means to achieve this result.</p>
+<p>To complete this task, we will need a means to split up a flat listing into triplets.
+Combining <code class="language-plaintext highlighter-rouge">range</code>, list slicing, and subsequently yielding each <em>chunk</em> is a very succinct means to achieve this result.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">chunks</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="n">n</span><span class="p">):</span>
         <span class="k">yield</span> <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">]</span>
 </code></pre></div></div>
 
-<p>With this new function available we can transpose the parsed triplets (using <code class="language-plaintext highlighter-rouge">zip</code>) and <em>flatten</em> each available column triplet chunks.
-This leaves us with a single-level listing (the same form as our input) of which we can validate if the triplets are indeed triangles.
-In a similiar mannor to part one we can sum up the <code class="language-plaintext highlighter-rouge">True</code> values and return the desired answer 🌟.</p>
+<p>With this new function available, we can transpose the parsed triplets (using <code class="language-plaintext highlighter-rouge">zip</code>) and <em>flatten</em> each available column triplet chunk.
+This leaves us with a single-level listing (the same form as our input), from which we can validate if the triplets are indeed triangles.
+In a similar manner to part one, we can sum up the <code class="language-plaintext highlighter-rouge">True</code> values and return the desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">is_triangle</span><span class="p">(</span><span class="n">triplet</span><span class="p">)</span>

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 4 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 4 puzzle using Python.">
 
     <title>
         
@@ -49,17 +49,17 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 4 - Security Through Obscurity</h1>
     <time datetime="2021-03-26T00:00:00+00:00" class="post-date">26 Mar 2021</time>
-    <p>On the fourth day of Advent of Code 2016 we are asked to validate and decrypt a listing of room names.</p>
+    <p>On the fourth day of Advent of Code 2016, we are asked to validate and decrypt a listing of room names.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>The input consists of a listing of encrypted room names, each with a sector id and accompanying checksum.
-For part one we are required to filter down to only the valid rooms (based on their checkum) and return the sum of these sector ids.
-A room is <em>real</em> (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetization.</p>
+<p>The input consists of a listing of encrypted room names, each with a sector ID and accompanying checksum.
+For part one, we are required to filter down to only the valid rooms (based on their checksum) and return the sum of these sector IDs.
+A room is <em>real</em> (not a decoy) if the checksum is the five most common letters in the encrypted name, in order, with ties broken by alphabetisation.</p>
 
-<p>We will begin by parsing each room entry into a tuple, consisting of the room name (without any <code class="language-plaintext highlighter-rouge">-</code>), sector id (as an integer) and checksum.</p>
+<p>We will begin by parsing each room entry into a tuple, consisting of the room name (without any <code class="language-plaintext highlighter-rouge">-</code>), sector ID (as an integer), and checksum.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[(</span><span class="n">name</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'-'</span><span class="p">,</span> <span class="s">''</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">id</span><span class="p">),</span> <span class="n">checksum</span><span class="p">)</span>
@@ -75,11 +75,11 @@ A room is <em>real</em> (not a decoy) if the checksum is the five most common le
 </code></pre></div></div>
 
 <p>The function above uses the <a href="https://docs.python.org/3/library/collections.html#collections.Counter">Counter collection</a> provided within Python to tally up the letter occurrences present in the room name.
-From here we then sort the listing, initially based on occurrence <code class="language-plaintext highlighter-rouge">-o[1]</code>, and then ties based on alphabetization <code class="language-plaintext highlighter-rouge">o[0]</code>.
-As we have generated the checksum for the entire room name we only wish to assert that this value starts with the provided checksum.</p>
+From here, we then sort the listing, initially based on occurrence <code class="language-plaintext highlighter-rouge">-o[1]</code>, and then ties based on alphabetisation <code class="language-plaintext highlighter-rouge">o[0]</code>.
+As we have generated the checksum for the entire room name, we only wish to assert that this value starts with the provided checksum.</p>
 
-<p>Finally, we can combine these two functions together to <em>filter-map</em> the listing down to the valid room sector ids.
-The sum of these sector ids can then be returned to result in the desired answer 🌟.</p>
+<p>Finally, we can combine these two functions together to <em>filter-map</em> the listing down to the valid room sector IDs.
+The sum of these sector IDs can then be returned to result in the desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">id</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">checksum</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
@@ -88,8 +88,8 @@ The sum of these sector ids can then be returned to result in the desired answer
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two, we are required to now deduce the sector id for the decoded room name which contains <em>northpole</em>.
-The encrypted room names have been constructed using a <a href="https://en.wikipedia.org/wiki/Caesar_cipher">Caesar cipher</a> - based on cycling each letter forward through the alphabet a number of times equal to the room’s sector id.
+<p>For part two, we are required to now deduce the sector ID for the decoded room name that contains <em>northpole</em>.
+The encrypted room names have been constructed using a <a href="https://en.wikipedia.org/wiki/Caesar_cipher">Caesar cipher</a>, based on cycling each letter forward through the alphabet a number of times equal to the room’s sector ID.
 This can be achieved using Python’s string character translation support like so.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -104,8 +104,8 @@ This can be achieved using Python’s string character translation support like 
     <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="nb">chr</span><span class="p">(((</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="nb">ord</span><span class="p">(</span><span class="s">'a'</span><span class="p">))</span> <span class="o">+</span> <span class="nb">id</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span> <span class="o">+</span> <span class="nb">ord</span><span class="p">(</span><span class="s">'a'</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Using this new function we can now iterate through the rooms, decoding each name as we go, until we finally land on the one that includes <em>northpole</em>.
-From here, we can return this rooms sector id and answer the second part of today’s problem 🌟.</p>
+<p>Using this new function, we can now iterate through the rooms, decoding each name as we go, until we finally land on the one that includes <em>northpole</em>.
+From here, we can return this room’s sector ID and answer the second part of today’s problem 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">id</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">parse_rooms</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>

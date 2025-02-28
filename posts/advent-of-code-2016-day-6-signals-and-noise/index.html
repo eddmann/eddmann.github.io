@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 6 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 6 puzzle using Python.">
 
     <title>
         
@@ -49,33 +49,33 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 6 - Signals and Noise</h1>
     <time datetime="2021-03-28T00:00:00+00:00" class="post-date">28 Mar 2021</time>
-    <p>On the sixth day of Advent of Code 2016 we are required to work what the error-corrected message is attempted to be sent to Santa.</p>
+    <p>On the sixth day of Advent of Code 2016, we are required to determine the error-corrected message that is being sent to Santa.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>Based on the message signal provided (our input), we can work out the error-corrected message being sent by finding the most frequent character for each position.
-In a <em>one-liner</em> we are able to decode the correct message and return this as our desired answer 🌟.</p>
+<p>Based on the message signal provided (our input), we can determine the error-corrected message by identifying the most frequent character for each position.
+Using a <em>one-liner</em>, we can decode the correct message and return this as our desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">col</span><span class="p">).</span><span class="n">most_common</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()))</span>
 </code></pre></div></div>
 
-<p>This solution highlights how powerful Python’s list comprehension and standard library is, transposing the message characters and using the Counter collection again to tally up their frequencies.</p>
+<p>This solution highlights the power of Python’s list comprehension and standard library, transposing the message characters and using the <code class="language-plaintext highlighter-rouge">Counter</code> collection to tally their frequencies.</p>
 
 <h2 id="part-2">Part 2</h2>
 
 <p>For part two, we are instead required to use a <em>modified repetition code</em>, taking the least common occurrence per character position.
-Thanks to the Counter collection again, we can trivially modify the occurrence being plucked out (now the least common) and return in a similar fashion 🌟.</p>
+Thanks to the <code class="language-plaintext highlighter-rouge">Counter</code> collection again, we can trivially modify the occurrence being extracted (now the least common) and return it in a similar fashion 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">col</span><span class="p">).</span><span class="n">most_common</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()))</span>
 </code></pre></div></div>
 
-<p>I really do not feel you could be more expressive and consise in a solution than how we have been able to model today’s problem in Python.</p>
+<p>I really do not feel you could be more expressive and concise in a solution than how we have been able to model today’s problem in Python.</p>
 
 </article>
 

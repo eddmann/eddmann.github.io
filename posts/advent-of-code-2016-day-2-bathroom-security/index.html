@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 2 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 2 puzzle using Python.">
 
     <title>
         
@@ -49,15 +49,15 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 2 - Bathroom Security</h1>
     <time datetime="2021-03-24T00:00:00+00:00" class="post-date">24 Mar 2021</time>
-    <p>On the second day of Advent of Code 2016 we are asked to work out what a bathroom code is based on the supplied instructions.</p>
+    <p>On the second day of Advent of Code 2016, we are asked to work out what a bathroom code is based on the supplied instructions.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>For part one we are required to follow our input (instructions <em>UDLR</em> per keycode) based on a <em>3x3 1-9</em> keypad.
-We begin by generating a dictionary lookup of the supplied keypad based on <em>x, y</em> cordinates to their related key.
-In a similiar mannor to how we used Complex numbers to represent x, y coordinates in the previous solution, we will be doing the same here.</p>
+<p>For part one, we are required to follow our input (instructions <em>UDLR</em> per keycode) based on a <em>3x3 1-9</em> keypad.
+We begin by generating a dictionary lookup of the supplied keypad based on <em>x, y</em> coordinates to their related key.
+In a similar manner to how we used complex numbers to represent <em>x, y</em> coordinates in the previous solution, we will be doing the same here.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">generate_keypad</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">{</span><span class="nb">complex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="n">key</span>
@@ -66,11 +66,10 @@ In a similiar mannor to how we used Complex numbers to represent x, y coordinate
             <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s">'.'</span><span class="p">}</span>
 </code></pre></div></div>
 
-<p>So as to correctly handle any intentional whitespace going forward we will represent this intent using a <code class="language-plaintext highlighter-rouge">.</code>.
-From here, we can then create a function which will take in the keypad, along with the initial key position and instructions and return the resulting keycode.</p>
+<p>To correctly handle any intentional whitespace going forward, we will represent this intent using a <code class="language-plaintext highlighter-rouge">.</code>.
+From here, we can then create a function that will take in the keypad, along with the initial key position and instructions, and return the resulting keycode.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'U'</span><span class="p">:</span> <span class="mi">0</span><span class="o">+-</span><span class="mf">1j</span><span class="p">,</span> <span class="s">'D'</span><span class="p">:</span> <span class="mi">0</span><span class="o">+</span><span class="mf">1j</span><span class="p">,</span> <span class="s">'L'</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="mf">0j</span><span class="p">,</span> <span class="s">'R'</span><span class="p">:</span> <span class="mi">1</span><span class="o">+</span><span class="mf">0j</span><span class="p">}</span>
-
 
 <span class="k">def</span> <span class="nf">calc_keycode</span><span class="p">(</span><span class="n">keypad</span><span class="p">,</span> <span class="n">initial_key</span><span class="p">,</span> <span class="n">instructions</span><span class="p">):</span>
     <span class="n">pos</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keypad</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">initial_key</span><span class="p">)</span>
@@ -85,11 +84,11 @@ From here, we can then create a function which will take in the keypad, along wi
     <span class="k">return</span> <span class="n">code</span>
 </code></pre></div></div>
 
-<p>Using an <a href="https://www.python.org/dev/peps/pep-0572/">assignment expression</a> we are able to succinctly express that we only wish to apply positional moves that are within the supplied keypad bounds.
-Once we have exhausted the given code instructions directions we append this to the resulting code.
-Finally, we return the complete code to the callee.</p>
+<p>Using an <a href="https://www.python.org/dev/peps/pep-0572/">assignment expression</a>, we can succinctly express that we only wish to apply positional moves that are within the supplied keypad bounds.
+Once we have exhausted the given code instruction directions, we append this to the resulting code.
+Finally, we return the complete code to the caller.</p>
 
-<p>With these building block in-place we can compose them together to produce the desired answer 🌟.</p>
+<p>With these building blocks in place, we can compose them together to produce the desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">keypad</span> <span class="o">=</span> <span class="n">generate_keypad</span><span class="p">(</span><span class="s">"""1 2 3
@@ -101,9 +100,9 @@ Finally, we return the complete code to the callee.</p>
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two we are required to instead discern what the keycode will be based on a revised keypad.
-Fortunatly, based on the building blocks we already have in-place we can simply update the <code class="language-plaintext highlighter-rouge">generate_keypad</code> argument.
-In doing so we produce the answer we desire to complete part two 🌟.</p>
+<p>For part two, we are required to instead discern what the keycode will be based on a revised keypad.
+Fortunately, based on the building blocks we already have in place, we can simply update the <code class="language-plaintext highlighter-rouge">generate_keypad</code> argument.
+In doing so, we produce the answer we desire to complete part two 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">keypad</span> <span class="o">=</span> <span class="n">generate_keypad</span><span class="p">(</span><span class="s">""". . 1 . .
@@ -117,8 +116,8 @@ In doing so we produce the answer we desire to complete part two 🌟.</p>
 
 <h2 id="alternative-solution">Alternative Solution</h2>
 
-<p>Instead of representing the coordinate as a Complex number, I additionally explored creating a more aptly modelled value object which managed this state in an immutable manor.
-Using <a href="https://docs.python.org/3/library/dataclasses.html">Data Classes</a> and the <code class="language-plaintext highlighter-rouge">__add__</code> dunder method I was able to design the following:</p>
+<p>Instead of representing the coordinate as a complex number, I additionally explored creating a more aptly modelled value object that managed this state in an immutable manner.
+Using <a href="https://docs.python.org/3/library/dataclasses.html">Data Classes</a> and the <code class="language-plaintext highlighter-rouge">__add__</code> dunder method, I was able to design the following:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">@</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">Point2D</span><span class="p">:</span>
@@ -136,7 +135,6 @@ Using <a href="https://docs.python.org/3/library/dataclasses.html">Data Classes<
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s">'U'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="s">'D'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
               <span class="s">'L'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s">'R'</span><span class="p">:</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}</span>
 
-
 <span class="k">def</span> <span class="nf">generate_keypad</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">{</span><span class="n">Point2D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span> <span class="n">key</span>
             <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">())</span>
@@ -144,7 +142,7 @@ Using <a href="https://docs.python.org/3/library/dataclasses.html">Data Classes<
             <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s">'.'</span><span class="p">}</span>
 </code></pre></div></div>
 
-<p>Providing such a model is preferred over <em>piggy-backing</em> on Complex numbers, as this clearly expresses its purpose and intent.</p>
+<p>Providing such a model is preferred over <em>piggybacking</em> on complex numbers, as this clearly expresses its purpose and intent.</p>
 
 </article>
 

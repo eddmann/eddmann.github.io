@@ -1,22 +1,22 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 24 - It Hangs in the Balance'
-meta: 'Solving the Advent of Code 2015 Day 24 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 24 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twenty fourth day of Advent of Code 2015 we are asked to help Santa balance his sleigh based on all the presents he has to carry.
+On the twenty-fourth day of Advent of Code 2015, we are asked to help Santa balance his sleigh based on all the presents he has to carry.
 
 <!--more-->
 
 ## Part 1
 
 We are told that the presents need to be evenly divided into three groups based on their weight (which is provided as input).
-Along with this, we are required to ensure that the first grouping (which goes in the passenger compartment of the sleigh) needs to include the minimal amount of packages possible.
-So as to resolve conflict upon multiple package combinations meeting the first groupings critieria, we are to consider the grouping which has the smallest _quantum entanglement_ (aka product of their weights) to be the winner.
-For part one we are required to determine what the _quantum entanglement_ of the first group will be based on this criteria.
+Along with this, we are required to ensure that the first grouping (which goes in the passenger compartment of the sleigh) includes the minimal number of packages possible.
+To resolve conflicts when multiple package combinations meet the first grouping's criteria, we consider the grouping with the smallest _quantum entanglement_ (i.e. the product of their weights) to be the winner.
+For part one, we need to determine what the _quantum entanglement_ of the first group will be based on these criteria.
 
-To begin we will parse the provide package weights into a form we can process hence forth.
+To begin, we will parse the provided package weights into a form we can process henceforth.
 
 ```typescript
 type Weight = number;
@@ -25,8 +25,9 @@ const parsePackageWeights = (input: string): Weight[] =>
   input.split('\n').map(toInt);
 ```
 
-From here, we will create a function which based on a given total weight and available packages yields all the possible matching groups.
-This function will return groupings in size order, for example, all groupings of two will be yielded before any groups of three are considered (this is important for the final solution).
+From here, we will create a function that, based on a given total weight and available packages, yields all the possible matching groups.
+This function will return groupings in size order.
+For example, all groupings of two will be yielded before any groups of three are considered (this is important for the final solution).
 
 ```typescript
 type Group = Weight[];
@@ -45,8 +46,8 @@ const groupsOfWeight = function* (
 };
 ```
 
-With the ability to now determine valid package groupings, we will create a function which recursively validates that based on a supplied total group weight and available packages that the number of groups can be met.
-This will be required to ensure that once we have determined a candidate compartment package grouping, that the remaining packages can be split evenly within the remaining groupings.
+With the ability to determine valid package groupings, we will create a function that recursively validates whether, based on a supplied total group weight and available packages, the required number of groups can be met.
+This will ensure that once we have determined a candidate compartment package grouping, the remaining packages can be evenly distributed within the other groupings.
 
 ```typescript
 const sub = <T>(xs: T[], ys: T[]) => xs.filter(x => !ys.includes(x));
@@ -68,7 +69,7 @@ const canGroup = (
 };
 ```
 
-This now leads us to being able to determine what the _ideal_ first grouping will be.
+This now allows us to determine what the _ideal_ first grouping will be.
 
 ```typescript
 const idealFirstGroupQE = (
@@ -98,12 +99,12 @@ const idealFirstGroupQE = (
 };
 ```
 
-Using the characteristics discussed above surrounding the yielded package grouping sizes, we first determine what the _weight per group_ will have to be.
-From here we iterate through possible groupings, checking that the remaining available packages can be evenly distributed into the other groups.
-So as to not have to needlessly perform this check, we only do so if the groupings _quantum entanglement_ is less than the one we have already recorded.
-Once we have found a minimum _quantum entanglement_ and the yielded group size increases, we can decern that this is the smallest possible value.
+Using the characteristics discussed above regarding the yielded package grouping sizes, we first determine what the _weight per group_ needs to be.
+From here, we iterate through possible groupings, checking whether the remaining available packages can be evenly distributed into the other groups.
+To avoid needless checks, we only perform this validation if the grouping’s _quantum entanglement_ is less than the one we have already recorded.
+Once we find a minimum _quantum entanglement_ and the yielded group size increases, we can determine that this is the smallest possible value.
 
-Finally, we can put all these building blocks together and return the desired answer we are looking for 🌟.
+Finally, we put all these building blocks together to return the desired answer we are looking for 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -112,8 +113,8 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-For part two we are required to cater for an additional package grouping (four groupings as opposed to the original three).
-Based on how our solution has been modeled we can simply supply an updated `numOfGroups` and return this revised value 🌟.
+For part two, we need to cater for an additional package grouping (four groupings instead of the original three).
+Based on how our solution has been modelled, we can simply supply an updated `numOfGroups` and return this revised value 🌟.
 
 ```typescript
 const part2 = (input: string): number =>
@@ -122,12 +123,13 @@ const part2 = (input: string): number =>
 
 ## Alternative Solution
 
-The solution above provides a _belt n' braces_ approach to handling the provided package weight input.
-It considers all possible combinations based on a given group sizing, and that the remaining packages can be grouped up correctly.
-However, experimenting with the input brought me to an additional solution that returns the correct answers, but without the need for this additional validation.
+The solution above provides a _belt and braces_ approach to handling the provided package weight input.
+It considers all possible combinations based on a given group size while ensuring that the remaining packages can also be grouped correctly.
+However, through experimentation with the input, I discovered an additional solution that returns the correct answers without needing this additional validation.
 
-Based on the input supplied we do not need to consider the above concerns and can instead simply return the first grouping that we see.
-This returns the correct answer for both parts; but as this takes advantage of the provided input (as opposed to handling any arbitrary input) I do not feel this is a desired solution.
+Based on the provided input, we do not need to consider the above concerns and can instead return the first grouping we encounter.
+This approach yields the correct answer for both parts.
+However, since it takes advantage of the specific input (rather than handling any arbitrary input), I do not believe it is a desirable solution.
 
 ```typescript
 const idealFirstGroupQE = (

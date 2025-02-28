@@ -9,7 +9,7 @@ On the sixth day of Advent of Code 2016 we are required to work what the error-c
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Based on the message signal provided (our input), we can work out the error-corrected message being sent by finding the most frequent character for each position.
 In a _one-liner_ we are able to decode the correct message and return this as our desired answer 🌟.
@@ -22,7 +22,7 @@ def part1(input):
 
 This solution highlights how powerful Python's list comprehension and standard library is, transposing the message characters and using the Counter collection again to tally up their frequencies.
 
-### Part 2
+## Part 2
 
 For part two, we are instead required to use a _modified repetition code_, taking the least common occurrence per character position.
 Thanks to the Counter collection again, we can trivially modify the occurrence being plucked out (now the least common) and return in a similar fashion 🌟.

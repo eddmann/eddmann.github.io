@@ -9,7 +9,7 @@ On the twelfth day of Advent of Code 2015 Santa's Accounting-Elves need help bal
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The supplied input comes in the form of a serialised JSON document, of which we are initially asked to sum up all the numbers present.
 For this, we are required to traverse through the deserialised document structure and sum up all the numbers.
@@ -46,7 +46,7 @@ const part1 = (input: string): number =>
   sumJsonNumbers(JSON.parse(input));
 ```
 
-### Part 2
+## Part 2
 
 As eluded to in part one, we are now required to instead of simply summing up _all_ numbers present, we must apply some predicate logic.
 We are now asked ignore any object (and all of its children) which has any property with the value "red".
@@ -65,7 +65,7 @@ const part2 = (input: string): number =>
 The predicate function itself checks to ensure that the current document value is not an Array (as Arrays are represented as Objects in JavaScript) and then attempts to see if any of the Objects values include the value "red".
 We can then invoke the `sumJsonNumbers` function again, returning the required answer for part two 🌟.
 
-### Alternative Solution
+## Alternative Solution
 
 Alternatively, we could tackle this problem in a more simplified mannor.
 Instead of deserialising the JSON document and recursing over its contents, we could just employ a Regular Expression to extract all numbers present.

@@ -9,7 +9,7 @@ On the twenty fourth day of Advent of Code 2015 we are asked to help Santa balan
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are told that the presents need to be evenly divided into three groups based on their weight (which is provided as input).
 Along with this, we are required to ensure that the first grouping (which goes in the passenger compartment of the sleigh) needs to include the minimal amount of packages possible.
@@ -110,7 +110,7 @@ const part1 = (input: string): number =>
   idealFirstGroupQE(parsePackageWeights(input), 3);
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to cater for an additional package grouping (four groupings as opposed to the original three).
 Based on how our solution has been modeled we can simply supply an updated `numOfGroups` and return this revised value 🌟.
@@ -120,7 +120,7 @@ const part2 = (input: string): number =>
   idealFirstGroupQE(parsePackageWeights(input), 4);
 ```
 
-### Alternative Solution
+## Alternative Solution
 
 The solution above provides a _belt n' braces_ approach to handling the provided package weight input.
 It considers all possible combinations based on a given group sizing, and that the remaining packages can be grouped up correctly.

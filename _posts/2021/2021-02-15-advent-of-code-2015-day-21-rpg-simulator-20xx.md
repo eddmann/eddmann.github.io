@@ -9,7 +9,7 @@ On the twenty first day of Advent of Code 2015 we are asked to help 'Little Henr
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The game is a turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
 The rules can be read by visiting the [problem specification](https://adventofcode.com/2015/day/21).
@@ -180,7 +180,7 @@ const part1 = (input: string): number => {
 };
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are asked to determine what is the most amount of gold we could spend and still lose the fight.
 We can re-use all the functionality we built up for part one, except this time we wish to only include games the player loses.

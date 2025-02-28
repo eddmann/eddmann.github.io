@@ -9,7 +9,7 @@ On the seventh day of Advent of Code 2016 we are required to work out which IPv7
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are supplied a list of IPv7 addresses which consist of supernets (sequences outside square brackets) and hypernets (sequences within square brackets).
 For part one we are required to tally up how many IPv7 addresses support TLS.
@@ -48,7 +48,7 @@ def part1(input):
     return sum(has_tls_support(ip) for ip in parse_ips(input))
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are instead asked to tally up how many of these parsed IPv7 addresses support SSL.
 

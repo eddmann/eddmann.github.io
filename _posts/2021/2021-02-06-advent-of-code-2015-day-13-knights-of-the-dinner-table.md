@@ -9,7 +9,7 @@ On the thirteenth day of Advent of Code 2015 we are tasked with finding the opti
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are provided with a listings of all our family members and their relationships with each other.
 These relationships come in the form of a happiness score which can be either positive or negative.
@@ -97,7 +97,7 @@ const part1 = (input: string): number =>
   max(calcSeatingHappiness(parseFamilyRelationships(input)));
 ```
 
-### Part 2
+## Part 2
 
 To solve part two we are required to add ourselves to the seating arrangement; with neutral (`0`) happiness scores for all family members.
 Once added we are required to then determine what the new optimial seating arrangement happiness score will be.

@@ -9,7 +9,7 @@ On the third day of Advent of Code 2015 we are asked to help determine (based on
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Based on a directional system that caters for _north (^), south (v), east (>), or west (<)_ we are asked to navigate our way between houses (on a two-dimensional grid) recording how many receive presents along the way.
 The first step is to parse the input data into a type-safe form.
@@ -62,7 +62,7 @@ const part1 = (input: string): number =>
   deliverPresents(parseDirections(input)).size;
 ```
 
-### Part 2
+## Part 2
 
 In part two we are now asked to tally the total number of houses Santa and Robo-Santa would deliver presents too based on the supplied directions.
 In this instance the input directions are split (odd/even) between Santa and Robo-Santa.

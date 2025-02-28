@@ -9,7 +9,7 @@ On the eleventh day of Advent of Code 2015 we are asked to help Santa pick a new
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 For part one we are asked to work out what Santas next password should be, based on his previous expired one.
 
@@ -80,7 +80,7 @@ Finally, we can call this function with the supplied expired password to return 
 const part1 = (input: string): string => generateNextPassword(input);
 ```
 
-### Part 2
+## Part 2
 
 For part two we are asked to apply this process an additonal time and generate Santas next following password.
 All the work for carrying out this task has been done in part one 🎉, meaning all that is required it to supply the password generated in part one into an additional generation call 🌟.

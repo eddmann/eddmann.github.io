@@ -12,7 +12,7 @@ Having spent a couple of months recently interested in microcontrollers, I decid
 
 <img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/begin.jpg" />
 
-### The build
+## The build
 
 The system I designed comprised of a display (that I had used in a [previous project](https://eddmann.com/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/)), the Raspberry Pi Pico and a [SIM800L GSM module](https://lastminuteengineers.com/sim800l-gsm-module-arduino-tutorial/).
 Upon boot the system reads in the supplied [`participants.json`](https://github.com/eddmann/pico-secret-santa/blob/main/participants.json.example) file which contains the participants names and phone numbers.
@@ -20,7 +20,7 @@ Once allocation commences all participants are assigned a Secret Santa, with the
 The display is used to report the current status throughout both the allocation and notification phases.
 The final solution can be found on [GitHub](https://github.com/eddmann/pico-secret-santa), with additional usage instructions included.
 
-### The allocation process
+## The allocation process
 
 I decided to use the same technique I had employed in a previous years solution to allocate the Secret Santas.
 This method applied a brute-force approach which uniformly shuffled the given participants into pairs, returning the allocations if all pairs met the desired criteria (i.e. not oneself or within an exclusion listing).
@@ -30,7 +30,7 @@ MicroPython does however provide some of the high-level Python constructs I have
 
 <img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/allocation.jpg" />
 
-### Sending the SMS
+## Sending the SMS
 
 The most interesting part of the entire project was exploring how you could send SMS using the Pico.
 The SIM800L module is a GSM cellular chip which communicates with the microcontroller via [UART](https://docs.micropython.org/en/latest/library/machine.UART.html).
@@ -40,7 +40,7 @@ Further more, it encapsulated the behaviour required to send an SMS to a given p
 
 <img src="/uploads/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/breadboard.jpg" style="margin:0 auto;width:350px;" />
 
-### Conclusion
+## Conclusion
 
 This was by-far my most enjoyable Secret Santa allocation system to design and build to date.
 Having the ability to begin the allocation process using a physical button, and subsequently see progress reported on the display was very pleasing.

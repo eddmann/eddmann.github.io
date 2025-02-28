@@ -9,7 +9,7 @@ On the fourteen day of Advent of Code 2015 Santa wants to find out who is the fa
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are provided with a listing of all the nine reindeer; stating how fast they can travel per second, how many seconds they can fly for at the given speed and how many seconds they require subsequently to rest.
 We are tasked with first determining the distance of the reindeer who would travel the furthest in _2503 seconds_.
@@ -74,7 +74,7 @@ const part1 = (input: string): number =>
   Math.max(...parseReindeer(input).map(r => nth(simulate(r), 2503)));
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are again asked to simulate the distance travelled for _2503 seconds_, however, a point is now awarded each second to the reindeer that has travelled the furthest distance at that time.
 Once all reindeer points have been awarded we are asked to return the winning reindeers total points.
@@ -101,7 +101,7 @@ For this solution I was able to harness the `repeat` function we created for [Da
 This abstracts away the need to implement a stateful loop and focuses on the problem at hand.
 I have also decided to omit the reindeers name and identify each reindeer based on theirposition within the listing.
 
-### Alternative Solution
+## Alternative Solution
 
 Since implementing the above solution I have been exploring how we could skip the iterative simulation step all together and apply a little math to produce the answer.
 As such, we are able to replace the `simulate` Generator with a function that takes in the reindeer details and seconds elapsed like so:

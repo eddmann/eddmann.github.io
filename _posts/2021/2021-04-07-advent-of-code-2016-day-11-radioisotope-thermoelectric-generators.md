@@ -16,7 +16,7 @@ To achieve this we are provided a single elevator which can go up or down one-le
 There are a couple of rules surrounding how a floor can be left upon each transition (which the problem defintion lays out).
 This initially reminded me of the [Chicken Crossing](https://www.mathsisfun.com/chicken_crossing_solution.html) puzzle.
 
-### Part 1
+## Part 1
 
 For part one we are required to work out what the minimum number of steps required is to bring all of the objects to the fourth floor.
 We will begin (like we always do) by parsing the supplied input (the initial object floor states) into a representation we can process going forward.
@@ -118,7 +118,7 @@ def part1(input):
     return min_moves_to_top_level(parse_floors(input))
 ```
 
-### Part 2
+## Part 2
 
 Fortunalty, part two is only a small _spin_ on what is asked in part one.
 We are now asked to calculate the minimum number of moves required based on the input state, along with two additional object-pairs found on the first floor.

@@ -9,7 +9,7 @@ On the fifteen day of Advent of Code 2015 we are tasked with finding the right b
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are provided with a listing of the four available ingredients, along with five properties for each.
 These properties are capacity, durability, flavor, texture and calories.
@@ -126,7 +126,7 @@ const part1 = (input: string): number => {
 
 Note: due to the size of the scores array that is produced we are again required to use the [`max`](https://eddmann.com/posts/advent-of-code-2015-day-13-knights-of-the-dinner-table/) function produced in a previous days solution over `Math.max`.
 
-### Part 2
+## Part 2
 
 For part two we are asked to determine what mixture produces the highest cookie score again, expect this time the mixtures calories should equal to 500.
 In a similar manor to part one we can calculate all the possible cookie scores, however, now we only return this score if the calories are equal to 500.

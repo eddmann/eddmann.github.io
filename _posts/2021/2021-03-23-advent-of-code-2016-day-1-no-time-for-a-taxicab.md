@@ -12,7 +12,7 @@ However, for this year I wish to instead explore Python.
 
 I have decided on Python as I've been very impressed with how consise and expressive some of the solutions for the 2015 calendar I have seen on the AoC subreddit have been.
 
-### Part 1
+## Part 1
 
 The initial problem for the 2016 calendar requires us to navigate our way from our 'airdropped' location to Easter Bunny HQ.
 In doing so we are required to work out how many blocks away the location is (using [Manhattan distance](https://en.wikipedia.org/wiki/Taxicab_geometry)).
@@ -44,7 +44,7 @@ def part1(input):
 We are able to calculate what the revised directional cordinates which need to be applied to the current position upon each instruction using the provided `COMPASS` lookup table.
 Once we have applied all the moves we return the _Manhattan distance_ of the final position to return the desired answer 🌟.
 
-### Part 2
+## Part 2
 
 For part two we are required to instead now work out what the first position that we see twice is.
 This can be achieved storing the _seen_ positions within a Set and short-circuiting the instruction application upon seeing a position again 🌟.
@@ -66,7 +66,7 @@ def part2(input):
     raise Exception('No repeated position')
 ```
 
-### Alternative Solutions
+## Alternative Solutions
 
 Like the 2015 calendar, I found that for the first couple of days solutions I had the time to devise several different ways in which to solve the problem.
 

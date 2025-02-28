@@ -9,7 +9,7 @@ On the fourth day of Advent of Code 2015 Santa needs help mining some AdventCoin
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Mining AdventCoin is very similiar in principle to how Bitcoin is mined.
 Difficulty of mining _a block_ is based on how many leading-zeros must appear when hashing the desired block contents with a generated nonce value.
@@ -40,7 +40,7 @@ To answer part one we are required to find the first valid nonce value which has
 const part1 = (input: string): number => calcLowestNonce(input, 5);
 ```
 
-### Part 2
+## Part 2
 
 The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading-zeros.
 

@@ -2,7 +2,7 @@
 layout: post
 title: 'Advent of Code 2015 - Day 1 - Not Quite Lisp'
 meta: 'Solving the Advent of Code 2015 Day 1 puzzle using TypeScript'
-tags: advent-of-code advent-of-code-2015
+tags: advent-of-code advent-of-code-2015 typescript
 ---
 
 This past Decemeber a [fellow colleague](https://github.com/tomcant) introduced us to [Advent of Code](https://adventofcode.com/).
@@ -13,7 +13,7 @@ Over the coming months I hope to record each of my solutions, with the goal of c
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 And so the journey begins...
 
@@ -56,7 +56,7 @@ const part1 = (input: string): number =>
   input.split('(').length - input.split(')').length;
 ```
 
-### Part 2
+## Part 2
 
 In the second part of todays puzzle we are asked to answer a different question based on same supplied input.
 We are now required to work out at which directions position (one-indexed) that Santa first enters the Basement (`-1`).

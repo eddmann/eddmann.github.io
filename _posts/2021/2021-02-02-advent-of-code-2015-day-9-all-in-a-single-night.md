@@ -9,7 +9,7 @@ On the ninth day of Advent of Code 2015 Santa wants us to examine some new locat
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are provided a list of distances between locations that Santa wishes to visit exactly once, starting and finishing at any location.
 For part one we are asked to determine what the shortest distance is for the shortest route that meets this criteria.
@@ -110,7 +110,7 @@ const part1 = (input: string): number =>
   );
 ```
 
-### Part 2
+## Part 2
 
 For part two we are instead asked to determine what the longest distance for the longest route is based on the same location listing.
 Using the same building blocks provided for part one's solution, we can instead supply the `Math.max` aggregate function to return the desired answer 🌟.
@@ -124,7 +124,7 @@ const part2 = (input: string): number =>
   );
 ```
 
-### Alternative Solution
+## Alternative Solution
 
 Instead of designing an aggregate function which applies a given reduction function, we could instead take the approach below.
 First we generate a list of all the possible trip distance totals, based on permutations of the location set.

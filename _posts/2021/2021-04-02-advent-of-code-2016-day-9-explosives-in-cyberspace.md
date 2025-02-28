@@ -9,7 +9,7 @@ On the ninth day of Advent of Code 2016 we are asked to calculate the decompress
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are supplied with a compressed file format as our input, of which we are required to calculate what the decompressed length is.
 The format is structured as such:
@@ -48,7 +48,7 @@ def part1(input):
     return decompressed_length(input, len)
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are required to expand upon part one's decompression implementation and cater for an _improved_ compression format.
 In version two, the only difference is that markers within decompressed data are decompressed.

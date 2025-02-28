@@ -9,7 +9,7 @@ On the sixteenth day of Advent of Code 2015 we are tasked with working out which
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 For part one we are provided with a list of all the Aunt Sues (identified 1-500) and _things_ that we remember about each one.
 We have been gifted a _My First Crime Scene Analysis Machine_ so we are able to get readings from the provided wrapping paper.
@@ -73,7 +73,7 @@ const part1 = (input: string): number =>
   }).id;
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to tweak the readings criteria and supply several greater/less-than comparators in place of the equality checks as so:
 

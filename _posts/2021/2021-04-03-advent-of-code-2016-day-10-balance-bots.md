@@ -12,7 +12,7 @@ On the tenth day of Advent of Code 2016 we come across a factory in which many r
 Upon entry into the factory we notice that each bot only proceeds when it has two microchips, and once it does, it gives each one to a different bot or puts it in a marked _output_ bin.
 Sometimes, bots take microchips from _input_ bins, too.
 
-### Part 1
+## Part 1
 
 We are supplied the bot instructions as our input, and are required to work out what numbered bot is responsible for comparing value-61 microchips with value-17 microchips?
 To begin we will provide the functionality to parse the input (value) and bot/output allocation instructions.
@@ -79,7 +79,7 @@ def part1(input):
     return next(bot for bot, allocated in bins.items() if allocated == (17, 61))
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are are required to instead multiply together the values of one chip in each of outputs 0, 1, and 2?
 This can be achieved using the same initial process as in part one, expect now we inspect the bins for the resulting `output N` values.

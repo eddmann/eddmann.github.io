@@ -11,7 +11,7 @@ However, before solving a 3x3x3 Rubik Cube, I thought it would be beneficial to 
 
 <!--more-->
 
-### Characteristics of a Pocket Cube
+## Characteristics of a Pocket Cube
 
 There is plenty of prior art in this space, and thanks to some key characteristics of a 2x2x2 Pocket Cube, optimally solving a given cube state is not too computationally intensive.
 The Pocket Cube consists of 8 _cubies_, each with three colour stickers on them.
@@ -24,7 +24,7 @@ In fixing a single _cubie_ we have managed to reduce the number of valid states,
 
 I was able to model [this representation](https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs) of a Pocket Cube in Rust taking advantage of the ability to inline tests within the same file to provide additional confidence.
 
-### Using a Bidirectional search
+## Using a Bidirectional search
 
 As we know the desired goal state and the initial cube state we can employ two simultaneous Breath First Searches - one going forward from the initial state and one backward from the goal state, stopping when they meet.
 In doing this we provide a means to restrict the branching which occurs when the search is being performed, into seperate two sub-graphs - dramatically reducing the amount of exploration required.
@@ -35,7 +35,7 @@ In doing this we provide a means to restrict the branching which occurs when the
 On top of this we are able to prune out move sequences which exceed [God's Number](https://en.wikipedia.org/wiki/God%27s_algorithm) - which is eleven moves for a Pocket Cube.
 I had a lot of fun implementing [this algorithm](https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/solve.rs) in Rust, and in-turn exposing the solver to the Browser/JavaScript using [WASM](https://rustwasm.github.io/docs/book/).
 
-### Visualising the Solution
+## Visualising the Solution
 
 Now that I was able to optimally solve a given cube state in the Browser via WASM, next was to provide a pleasing visualisation which could be followed along using a real Pocket Cube.
 For this I decided to build the client in React using [Three.js](https://threejs.org/), [react-three-fiber](https://github.com/pmndrs/react-three-fiber) and TypeScript.
@@ -46,7 +46,7 @@ The cube component itself took adavanteg of React Hooks to manage the state tran
 
 [![Visualising the Solution](/uploads/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/solution.gif)](https://eddmann.com/pocket-cube-solver/)
 
-### Conclusion
+## Conclusion
 
 To conclude I learned a great deal about the Pocket/Rubik Cube solution space, coupled with Rust and Three.js while completing this project.
 The actual solver algorithm itself being relativity simple simple allowed me to concentrate my efforts on learning Rust and its interoperability with WebAssembly.

@@ -9,7 +9,7 @@ On the twenty fifth day of Advent of Code 2015 we are asked to help Santa boot u
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The weather machine requires a _code_ to be entered for copy protection purposes.
 As the manual has been misplaced we are required to determine what this code will be based on the rules laid out in the [problem definition](https://adventofcode.com/2015/day/25).
@@ -57,7 +57,7 @@ const part1 = (input: string): number => {
 };
 ```
 
-### Part 2
+## Part 2
 
 For part two... there is nothing more to do.
 We can give ourselves a pat on the back as we have helped save Christmas! 🎉

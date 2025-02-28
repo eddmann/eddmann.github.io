@@ -9,7 +9,7 @@ On the tenth day of Advent of Code 2015 the Elves are playing a game of [look-an
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 For part one we are asked to determine the length of the result of the 40th term in the sequence (starting with the provided input).
 Based on a famous integer sequence, we begin by implementing how the next term can be produced from a supplied value.
@@ -47,7 +47,7 @@ const part1 = (input: string): number =>
   repeat(40, lookAndSay, input).length;
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to instead find the 50th terms length in the sequence.
 Again we can compose the two above functions together to find the desired answer 🌟.

@@ -9,7 +9,7 @@ On the fifth day of Advent of Code 2016 we are asked to calculate the password f
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The eight-character password for the security door is generated one character at a time by finding the MD5 hash of the door id (our input) and an increasing integer index (starting with 0).
 A hash indicates the next character in the password if its hexadecimal representation starts with five zeroes, with the sixth character being the next password character.
@@ -41,7 +41,7 @@ def part1(input):
     return ''.join(h[5] for h in itertools.islice(generate_hashes(input), PASSWORD_LENGTH))
 ```
 
-### Part 2
+## Part 2
 
 For part two instead of filling in the password from left to right, the hash now also indicates the position within the password to fill.
 Based on the same process for generating hashes as in part one - the sixth character now represents the position (0-7), and the seventh character is the character to put in that position.

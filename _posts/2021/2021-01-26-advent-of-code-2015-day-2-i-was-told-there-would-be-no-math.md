@@ -10,7 +10,7 @@ With the Present dimensions (perfect right rectangular prisms) provided we are a
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Based on the supplied Present dimensions we are required to calculate how much square-feet of wrapping paper should be ordered to wrap these presents.
 We are also asked to include _alittle extra_ (the area of the smallest side) per present included.
@@ -45,7 +45,7 @@ Mapping over each of the dimensions we are able to calculate how much wrapping p
 With this mapped result we can then sum these together (using another helper method I have included to help aid clarity in the solutions) to produce the desired answer 🌟.
 We could have alternatively achieved this with a single _reduce_ but I opted for the initial _map_ for readability.
 
-### Part 2
+## Part 2
 
 With the same input we are now instead asked to determine the total feet of ribben the Elves should order to tie and bow a ribben around all the provided presents.
 The total feet required per present is equal to the cubic feet of volume of the given dimensions.

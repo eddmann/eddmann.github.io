@@ -9,7 +9,7 @@ On the sixth day of Advent of Code 2015 we are tasked with trying to win the hol
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are first told that the lights are configured in a _1000x1000 grid_ and that based on instructions that Santa has provided we should operate each light in different ways.
 Like before, we start off by parsing the provided instructions (actions and grid position ranges) into a form we can enact on going forward.
@@ -109,7 +109,7 @@ Accessing the desired row and column is now achieved using a small formula `1000
 To toggle the light state we use the `1 - n` trick to flip the state between `1` and `0`.
 Finally, we can sum up all the lights that are on with a single reduction, thanks to the values we are now storing (integers) and being a one-dimensional array.
 
-### Part 2
+## Part 2
 
 In the case of part two we are required to again iterate through the provided instructions, but instead of just turning the light on or off we now control their brightness.
 As such, we now wish to store integer values in our two-dimensional array - thanks to the help of [Generics](https://www.typescriptlang.org/docs/handbook/generics.html) and the supplied default value this is made type-safe.

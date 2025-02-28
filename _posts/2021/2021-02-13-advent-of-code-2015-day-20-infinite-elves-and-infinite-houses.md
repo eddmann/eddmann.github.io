@@ -9,7 +9,7 @@ On the twentieth day of Advent of Code 2015 we are asked to help work out how ma
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 To keep the Elves busy, Santa has them deliver some presents by hand, door-to-door.
 He sends them down a street with infinite houses numbered sequentially: 1, 2, 3, 4, 5, and so on.
@@ -56,7 +56,7 @@ const part1 = (input: string): number => {
 };
 ```
 
-### Part 2
+## Part 2
 
 For part two, there is an imposed limit on the amount of houses a given Elf can deliver presents to (which is now 50).
 Along with this restriction, the total presents per house an Elf delvers is now 11.

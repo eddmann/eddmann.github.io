@@ -9,7 +9,7 @@ On the seventh day of Advent of Code 2015 we are tasked with helping little Bobb
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Our input is an instruction booklet which describes how to connect these parts together.
 Based on following the instructions laid out in the booklet we are asked to provide what signal is ultimately provided to wire `a`.
@@ -79,7 +79,7 @@ const part1 = (input: string): number =>
 
 With the logic in-place we can combine the two functions together and determine what the resulting signal is from wire `a` 🌟.
 
-### Part 2
+## Part 2
 
 For part two we are required to replace the original inputs wire `b` value with the resulting signal that we emulated in part one for wire `a`.
 From this, we are the asked to determine what the resulting signal is now from wire `a`.
@@ -94,7 +94,7 @@ const part2 = (input: string): number => {
 
 Splitting out and modifying the parsed circuit mapping before getting the newly emulated signal provides us with the desired answer 🌟.
 
-### Alternative Solution
+## Alternative Solution
 
 Since solving this problem, I re-evaluated the provided input and noticed that it did not include any [circular dependencies](https://en.wikipedia.org/wiki/Circular_dependency)!
 As such, it could be treated as a [Directed acyclic graph](https://en.wikipedia.org/wiki/Directed_acyclic_graph) (DAG) of which we then would be able to perform a [Topological Sort](https://en.wikipedia.org/wiki/Topological_sorting) on to return the correctly ordered instruction listing.

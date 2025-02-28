@@ -9,7 +9,7 @@ On the twenty second day of Advent of Code 2015 we are asked to help 'Little Hen
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Like the [previous day](https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/) the game is turn-based, however, this time we are able to spend _mana_ in-exchnage for spells we can cast per-round.
 Certain spells have the ability to cause effects which can last between rounds.
@@ -204,7 +204,7 @@ const part1 = (input: string): number => {
 };
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to expand upon the game we created in part one.
 We are to now create a _Hard Mode_, in-which at the start of each round the players health is now reduced by one HP.

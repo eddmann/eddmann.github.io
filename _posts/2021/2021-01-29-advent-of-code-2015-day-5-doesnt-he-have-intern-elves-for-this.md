@@ -9,7 +9,7 @@ On the fifth day of Advent of Code 2015 Santa needs help figuring out which stri
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 For part one we are supplied several rules which when combined constitute the supplied string being _nice_.
 String validation rules such as this lend themselves well to Regular Expression pattern matching.
@@ -58,7 +58,7 @@ Combined with three [lookahead](https://javascript.info/regexp-lookahead-lookbeh
 Using lookaheads in this manor provides us with a form of `AND` logic, giving us the ability to evaluate the entire line multiple times.
 Although this shows how powerful Regular Expressions can be, I still prefer the first solution due to its readability.
 
-### Part 2
+## Part 2
 
 For the next part we are asked to revise the rules which dictate how we determine a nice string, and evalulate the list again.
 

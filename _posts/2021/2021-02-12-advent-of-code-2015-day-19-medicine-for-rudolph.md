@@ -9,7 +9,7 @@ On the nineteenth day of Advent of Code 2015 Rudolph is sick and we have been ta
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are tasked with helping calibrate the machine that is capable of constructing any Red-Nosed Reindeer molecule required to make the medicine.
 As input we are provided an initial medicine molecule and list of replacements of which we need to apply.
@@ -75,7 +75,7 @@ const part1 = (input: string): number => {
 
 I initially used a Set within the reduction, but due to the ease of combining arrays within JavaScript I felt it more readable to first get all possible variants and then return the Set (the deduplication process) at the end.
 
-### Part 2
+## Part 2
 
 For part two, with the machine now calibrated we are required to help with the fabrication process.
 Molecule fabrication always begins with just a single electron, _e_, and applying replacements one at a time, just like the ones during calibration.

@@ -9,7 +9,7 @@ On the twenty third day of Advent of Code 2015 we are asked to help 'Little Jane
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The computer has two registers (_a_ and _b_), along with six different instructions.
 For part one we are asked to execute the provided program and determine what the value of the _b_ register will be after the termination.
@@ -110,7 +110,7 @@ const part1 = (input: string): number =>
   execute(parseInstructions(input), { a: 0, b: 0 }).b;
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to revise the initial _a_ register value to 1, and then return the _b_ value again.
 This can be done with a single modification, and upon execution we have the desired answer we are looking for 🌟.

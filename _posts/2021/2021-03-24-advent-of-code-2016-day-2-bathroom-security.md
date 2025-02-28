@@ -9,7 +9,7 @@ On the second day of Advent of Code 2016 we are asked to work out what a bathroo
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 For part one we are required to follow our input (instructions _UDLR_ per keycode) based on a _3x3 1-9_ keypad.
 We begin by generating a dictionary lookup of the supplied keypad based on _x, y_ cordinates to their related key.
@@ -58,7 +58,7 @@ def part1(input):
     return calc_keycode(keypad, initial_key="5", instructions=input.splitlines())
 ```
 
-### Part 2
+## Part 2
 
 For part two we are required to instead discern what the keycode will be based on a revised keypad.
 Fortunatly, based on the building blocks we already have in-place we can simply update the `generate_keypad` argument.
@@ -75,7 +75,7 @@ def part2(input):
     return calc_keycode(keypad, initial_key="5", instructions=input.splitlines())
 ```
 
-### Alternative Solution
+## Alternative Solution
 
 Instead of representing the coordinate as a Complex number, I additionally explored creating a more aptly modelled value object which managed this state in an immutable manor.
 Using [Data Classes](https://docs.python.org/3/library/dataclasses.html) and the `__add__` dunder method I was able to design the following:

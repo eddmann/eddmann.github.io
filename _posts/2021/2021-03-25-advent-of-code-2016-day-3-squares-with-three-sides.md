@@ -9,7 +9,7 @@ On the third day of Advent of Code 2016 we are asked to work out how many valid 
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Our input consists of a listing of triplets, of which we are initially asked to tally how many triplets are valid triangles.
 We begin by parsing the input, ensuring that all triplets have been parsed into integer form.
@@ -36,7 +36,7 @@ def part1(input):
     return sum(is_triangle(triplet) for triplet in parse_triplets(input))
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are now instead required to interpret the input in a different form.
 Triplets are now grouped based on transposing (flipping the rows and columns) the listing.

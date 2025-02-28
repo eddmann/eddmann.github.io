@@ -9,7 +9,7 @@ On the fourth day of Advent of Code 2016 we are asked to validate and decrypt a 
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The input consists of a listing of encrypted room names, each with a sector id and accompanying checksum.
 For part one we are required to filter down to only the valid rooms (based on their checkum) and return the sum of these sector ids.
@@ -45,7 +45,7 @@ def part1(input):
                if is_real_room(name, checksum))
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are required to now deduce the sector id for the decoded room name which contains _northpole_.
 The encrypted room names have been constructed using a [Caesar cipher](https://en.wikipedia.org/wiki/Caesar_cipher) - based on cycling each letter forward through the alphabet a number of times equal to the room's sector id.

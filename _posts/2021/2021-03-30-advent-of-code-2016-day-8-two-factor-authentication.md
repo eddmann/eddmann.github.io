@@ -9,7 +9,7 @@ On the eighth day of Advent of Code 2016 we are required to work out what a _sma
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 The magnetic strip on the card we have _swiped_ encodes a series of instructions for the screen; these instructions are our puzzle input.
 We are told that the screen is 50 pixels wide and 6 pixels tall, all of which begin in the off state.
@@ -79,7 +79,7 @@ def part1(input):
     return sum(c for r in screen for c in r)
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are required to display and interpret the code that is present within the final screen output we produced in part one.
 Thanks again to Python's list comprehensions this is a trivial exercise allowing us to represent _lit_ pixels as `#` and _off_ as `.`.

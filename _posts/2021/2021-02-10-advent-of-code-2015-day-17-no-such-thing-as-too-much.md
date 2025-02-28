@@ -9,7 +9,7 @@ On the seventeenth day of Advent of Code 2015 the elves bought 150 litres of egg
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are supplied a list of all the different sized containers we have available to us as input; and for part one asked how many combinations of these will fit the 150 litre requirement.
 At its core today centres around the [Subset sum problem](https://en.wikipedia.org/wiki/Subset_sum_problem), where-by given a [Multiset](https://en.wikipedia.org/wiki/Multiset) we are required to find all the possible subsets that sum to a given number (in this case 150).
@@ -73,7 +73,7 @@ const part1 = (input: string): number =>
   subsetSum(parseContainers(input), 150).length;
 ```
 
-### Part 2
+## Part 2
 
 For part two we are asked to investigate the possible subsets further, determining how many combinations of the least amount of containers can we use.
 Again, due to the search-space being so small we can harness the same functionality implemented in part one and construct an occurrences map per subset length.

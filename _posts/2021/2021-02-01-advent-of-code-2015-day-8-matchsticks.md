@@ -9,7 +9,7 @@ On the eighth day of Advent of Code 2015 Santa wants to know how much space his 
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 Based on the supplied input list of string literals; part one asks us to tally up the additional space this literal interpretation takes us as opposed to their in-memory representations.
 When parsing each string literal we need to take into consideration any escape sequences and hexadecimal notation.
@@ -29,7 +29,7 @@ Using the _dreaded_ [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaSc
 Although I would refrain from using this approach with untrusted input, in a small puzzle like this it provides a very succinct solution.
 Reducing over the input listing tallying up the length differences along the way, we are able to produce the desired answer 🌟.
 
-### Part 2
+## Part 2
 
 In part two we are asked to apply an additional encoding on the provided string literals, returning the total difference between the encoded and original input.
 

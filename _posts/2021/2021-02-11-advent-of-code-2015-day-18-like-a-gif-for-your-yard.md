@@ -9,7 +9,7 @@ On the eighteenth day of Advent of Code 2015 we are asked to re-arrange the ligh
 
 <!--more-->
 
-### Part 1
+## Part 1
 
 We are supplied with an initial 100x100 grid of light states (on or off) and told that Santa has provided us with rules to follow to produce this new light show.
 These rules follow the [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway's_Game_of_Life), like so:
@@ -105,7 +105,7 @@ const part1 = (input: string): number => {
 };
 ```
 
-### Part 2
+## Part 2
 
 For part two, we are told that it appears that the lights we bought have _stuck corners_ where-by these lights are always left on.
 We are told to apply this new characteristic and repeat the 100 iterations from the initial grid state again.

@@ -17,7 +17,7 @@ Thanks to some [great](https://datatracker.ietf.org/doc/html/rfc2104) [resources
 
 <a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.gif" /></a>
 
-### Features
+## Features
 
 Below is a list of the feature-set that the built device provides:
 
@@ -27,7 +27,7 @@ Below is a list of the feature-set that the built device provides:
 - Flashing alert LED when the TOTP is about to expire.
 - Initial configuration screen to set the current UTC time - to correct the Raspberry Pi Pico's RTC.
 
-### Usage
+## Usage
 
 Once you have downloaded the project from [GitHub](https://github.com/eddmann/pico-2fa-totp), you can the follow the instructions below to get the device setup.
 
@@ -40,7 +40,7 @@ Once you have downloaded the project from [GitHub](https://github.com/eddmann/pi
 
 <a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.jpg" /></a>
 
-### Conclusion
+## Conclusion
 
 I have been amazed at how easy it is for someone like myself (coming from a high-level programming background), to pick up MicroPython and build non-trivial systems using microcontrollers.
 I found researching and implementing the functionality that performed HMAC-SHA1 to be alot of fun, allowing me to demystify what can seem to be a very _magical_ process.

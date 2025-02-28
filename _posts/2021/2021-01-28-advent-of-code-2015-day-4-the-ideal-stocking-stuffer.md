@@ -1,19 +1,19 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 4 - The Ideal Stocking Stuffer'
-meta: 'Solving the Advent of Code 2015 Day 4 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 4 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the fourth day of Advent of Code 2015 Santa needs help mining some AdventCoins 💵.
+On the fourth day of Advent of Code 2015, Santa needs help mining some AdventCoins 💵.
 
 <!--more-->
 
 ## Part 1
 
-Mining AdventCoin is very similiar in principle to how Bitcoin is mined.
-Difficulty of mining _a block_ is based on how many leading-zeros must appear when hashing the desired block contents with a generated nonce value.
-In the case of AdventCoin the hashing algorithm used is MD5.
+Mining AdventCoin is very similar in principle to how Bitcoin is mined.
+The difficulty of mining _a block_ is based on how many leading zeros must appear when hashing the desired block contents with a generated nonce value.
+In the case of AdventCoin, the hashing algorithm used is MD5.
 
 ```typescript
 import { createHash } from 'crypto';
@@ -31,10 +31,11 @@ const calcLowestNonce = (input: string, totalLeadingZeros: number): number => {
 };
 ```
 
-We begin by creating a small function `calcLowestNonce` which uses brute-force to determine the lowest matching nonce value based on the supplied input.
-Once found we then return this nonce value to the callee.
+We begin by creating a small function, `calcLowestNonce`, which uses brute force to determine the lowest matching nonce value based on the supplied input.
+Once found, we then return this nonce value to the caller.
 
-To answer part one we are required to find the first valid nonce value which has five leading-zeros, using the above function we are able to return this answer like so 🌟.
+To answer part one, we are required to find the first valid nonce value which has five leading zeros.
+Using the above function, we are able to return this answer like so 🌟.
 
 ```typescript
 const part1 = (input: string): number => calcLowestNonce(input, 5);
@@ -42,13 +43,13 @@ const part1 = (input: string): number => calcLowestNonce(input, 5);
 
 ## Part 2
 
-The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading-zeros.
+The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading zeros.
 
 ```typescript
 const part2 = (input: string): number => calcLowestNonce(input, 6);
 ```
 
-Tweaking the `totalLeadingZero` argument to our `calcLowestNonce` function provides us with this answer 🌟.
+Tweaking the `totalLeadingZeros` argument to our `calcLowestNonce` function provides us with this answer 🌟.
 
-By-design this problem is computational-hard to produce and requires forms of brute-force to be solved.
-As such, there are no real optimisations that can be made - other than possibly designing a [Hardware ASIC miner](https://en.bitcoin.it/wiki/ASIC) for AdventCoin!
+By design, this problem is computationally hard to produce and requires forms of brute force to be solved.
+As such, there are no real optimisations that can be made - other than possibly designing a [hardware ASIC miner](https://en.bitcoin.it/wiki/ASIC) for AdventCoin!

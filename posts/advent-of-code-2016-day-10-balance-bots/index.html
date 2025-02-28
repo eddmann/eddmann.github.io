@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 10 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 10 puzzle using Python.">
 
     <title>
         
@@ -49,17 +49,18 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 10 - Balance Bots</h1>
     <time datetime="2021-04-03T00:00:00+00:00" class="post-date">03 Apr 2021</time>
-    <p>On the tenth day of Advent of Code 2016 we come across a factory in which many robots are zooming around handing small microchips to each other.</p>
+    <p>On the tenth day of Advent of Code 2016, we come across a factory in which many robots are zooming around, handing small microchips to each other.</p>
 
 
 
-<p>Upon entry into the factory we notice that each bot only proceeds when it has two microchips, and once it does, it gives each one to a different bot or puts it in a marked <em>output</em> bin.
+<p>Upon entry into the factory, we notice that each bot only proceeds when it has two microchips.
+Once it does, it gives each one to a different bot or puts it in a marked <em>output</em> bin.
 Sometimes, bots take microchips from <em>input</em> bins, too.</p>
 
 <h2 id="part-1">Part 1</h2>
 
-<p>We are supplied the bot instructions as our input, and are required to work out what numbered bot is responsible for comparing value-61 microchips with value-17 microchips?
-To begin we will provide the functionality to parse the input (value) and bot/output allocation instructions.</p>
+<p>We are supplied with the bot instructions as our input and are required to determine which numbered bot is responsible for comparing value-61 microchips with value-17 microchips.
+To begin, we will provide the functionality to parse the input (value) and bot/output allocation instructions.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_values</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="n">val</span><span class="p">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
@@ -67,7 +68,7 @@ To begin we will provide the functionality to parse the input (value) and bot/ou
             <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="p">:</span><span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">'value (\d+) goes to (bot \d+)'</span><span class="p">,</span> <span class="n">line</span><span class="p">))]</span>
 </code></pre></div></div>
 
-<p>This allows us to return input (value) instructions as a tuple, containing the value and bot number to supply this to.</p>
+<p>This allows us to return input (value) instructions as a tuple, containing the value and bot number to which it should be supplied.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_allocations</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">alloc</span><span class="p">.</span><span class="n">groups</span><span class="p">()</span>
@@ -75,11 +76,12 @@ To begin we will provide the functionality to parse the input (value) and bot/ou
             <span class="k">if</span> <span class="p">(</span><span class="n">alloc</span> <span class="p">:</span><span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">'(bot \d+) gives low to (\w+ \d+) and high to (\w+ \d+)'</span><span class="p">,</span> <span class="n">line</span><span class="p">))]</span>
 </code></pre></div></div>
 
-<p>This allows us to return high/low value allocations as a tuple, containing the sender bot and output/bot high and low microchip recipients.</p>
+<p>This allows us to return high/low value allocations as a tuple, containing the sender bot and the high and low microchip recipients (either another bot or an output bin).</p>
 
-<p>With the ability to now parse the instruction set into a form we can process, we can begin to model how we wish to process each bot allocation.
-I initially modelled this as a queue in which we processed each valid instruction and subsequent allocations, until there where no more actions to take place.
-This worked well, however, since the initial solution I thought it would be interesting to explore taking advantage of partial function application instead.</p>
+<p>With the ability to now parse the instruction set into a form we can process, we can begin to model how we wish to handle each bot allocation.
+I initially modelled this as a queue, in which we processed each valid instruction and subsequent allocations until there were no more actions to take.
+This worked well.
+However, since the initial solution, I thought it would be interesting to explore taking advantage of partial function application instead.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setup_bins</span><span class="p">(</span><span class="n">allocations</span><span class="p">):</span>
     <span class="n">bins</span> <span class="o">=</span> <span class="n">collections</span><span class="p">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>
@@ -100,14 +102,14 @@ This worked well, however, since the initial solution I thought it would be inte
     <span class="k">return</span> <span class="n">bins</span>
 </code></pre></div></div>
 
-<p>So as to simplify the design we store both outputs and bots in the same Dictionary called <em>bins</em>.
-Each entry consists of a single-arity function which returns either a value (the bot has performed their allocation) or a subsequent single-arity function which needs to be applied in a later action.
-We use Python’s default Dictionary capabilities to return an identity function on non-exist keys, to uniformly <em>apply</em> the output bin allocations.
-All bot allocation instructions are translated into <em>configured bots</em> within the Dictionary, and this is then returned to the callee.</p>
+<p>To simplify the design, we store both outputs and bots in the same dictionary called <em>bins</em>.
+Each entry consists of a single-arity function, which either returns a value (when the bot has performed its allocation) or a subsequent single-arity function that needs to be applied in a later action.
+We use Python’s default dictionary capabilities to return an identity function for non-existent keys, ensuring uniform application of output bin allocations.
+All bot allocation instructions are translated into <em>configured bots</em> within the dictionary, which is then returned to the caller.</p>
 
-<p>From here, we are then able to setup the bins and provide all the initial value instructions to the bots.
-Subsequently, all the bot allocation functions will be applied as stated, and we will be returned with a final bin representation.
-This final bin representation can then be inspected to see which bot compares bot-17 and bot-61’s microchips 🌟.</p>
+<p>From here, we are then able to set up the bins and provide all the initial value instructions to the bots.
+Subsequently, all the bot allocation functions will be applied as specified, resulting in a final bin representation.
+This final bin representation can then be inspected to determine which bot compares bot-17 and bot-61’s microchips 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">instructions</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>
@@ -121,9 +123,9 @@ This final bin representation can then be inspected to see which bot compares bo
 
 <h2 id="part-2">Part 2</h2>
 
-<p>For part two, we are are required to instead multiply together the values of one chip in each of outputs 0, 1, and 2?
-This can be achieved using the same initial process as in part one, expect now we inspect the bins for the resulting <code class="language-plaintext highlighter-rouge">output N</code> values.
-These values are then multiplied and this value leads to our answer 🌟.</p>
+<p>For part two, we are required to multiply together the values of one chip in each of outputs 0, 1, and 2.
+This can be achieved using the same initial process as in part one, except now we inspect the bins for the resulting <code class="language-plaintext highlighter-rouge">output N</code> values.
+These values are then multiplied, leading to our answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">instructions</span> <span class="o">=</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()</span>

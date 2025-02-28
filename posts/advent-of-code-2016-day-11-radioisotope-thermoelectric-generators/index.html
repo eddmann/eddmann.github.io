@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 11 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 11 puzzle using Python.">
 
     <title>
         
@@ -49,29 +49,29 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 11 - Radioisotope Thermoelectric Generators</h1>
     <time datetime="2021-04-07T00:00:00+00:00" class="post-date">07 Apr 2021</time>
-    <p>On the eleventh day of Advent of Code 2016 we are tasked with moving all the supplied Generators and Microchips to a top-floor using a single elevator.</p>
+    <p>On the eleventh day of Advent of Code 2016, we are tasked with moving all the supplied Generators and Microchips to the top floor using a single elevator.</p>
 
 
 
-<p>Having since read through some of the AoC subreddit I can see that this is an <em>infamous</em> AoC day puzzle.
-The puzzle description itself is <a href="https://adventofcode.com/2016/day/11">rather detailed</a> so I would delegate to this to get an understanding of the problem at hand.
-In summary, we are required to move all the Generators and Microchips to a top-floor, of a four floor building.
-To achieve this we are provided a single elevator which can go up or down one-level at a time, moving one or two objects in the process.
-There are a couple of rules surrounding how a floor can be left upon each transition (which the problem defintion lays out).
+<p>Having since read through some of the AoC subreddit, I can see that this is an <em>infamous</em> AoC day puzzle.
+The puzzle description itself is <a href="https://adventofcode.com/2016/day/11">rather detailed</a>, so I would delegate to this to get an understanding of the problem at hand.
+In summary, we are required to move all the Generators and Microchips to the top floor of a four-floor building.
+To achieve this, we are provided with a single elevator, which can go up or down one level at a time, moving one or two objects in the process.
+There are a couple of rules surrounding how a floor can be left upon each transition (which the problem definition lays out).
 This initially reminded me of the <a href="https://www.mathsisfun.com/chicken_crossing_solution.html">Chicken Crossing</a> puzzle.</p>
 
 <h2 id="part-1">Part 1</h2>
 
-<p>For part one we are required to work out what the minimum number of steps required is to bring all of the objects to the fourth floor.
-We will begin (like we always do) by parsing the supplied input (the initial object floor states) into a representation we can process going forward.</p>
+<p>For part one, we are required to determine the minimum number of steps required to bring all of the objects to the fourth floor.
+We will begin (as we always do) by parsing the supplied input (the initial object floor states) into a representation we can process going forward.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">parse_floors</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s">'(\w+)(?:-compatible)? (microchip|generator)'</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">input</span><span class="p">.</span><span class="n">splitlines</span><span class="p">()]</span>
 </code></pre></div></div>
 
-<p>This will return a list of all the floors initial states (zero-indexed) as sets in the form <code class="language-plaintext highlighter-rouge">NAME microchip</code> and <code class="language-plaintext highlighter-rouge">NAME generator</code>.
-From here we can begin to model the rules surrounding a valid floor transition.</p>
+<p>This will return a list of all the floors’ initial states (zero-indexed) as sets in the form <code class="language-plaintext highlighter-rouge">NAME microchip</code> and <code class="language-plaintext highlighter-rouge">NAME generator</code>.
+From here, we can begin to model the rules surrounding a valid floor transition.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">is_valid_transition</span><span class="p">(</span><span class="n">floor</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">type</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">floor</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> \
@@ -80,8 +80,8 @@ From here we can begin to model the rules surrounding a valid floor transition.<
                <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s">'microchip'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>At a high level, a floor is deemed valid if it is empty, only contains a single type (generators/microchips) of object, or if there are multiple types that every microchip has their associated generator on that floor.
-With the ability to now verify if a supplied floor is valid or not, we can continue on to modeling a means to generate all the possible transitions based on a supplied state.</p>
+<p>At a high level, a floor is deemed valid if it is empty, only contains a single type (generators/microchips) of object, or, if there are multiple types, every microchip has its associated generator on that floor.
+With the ability to now verify if a supplied floor is valid or not, we can continue modelling a means to generate all the possible transitions based on a supplied state.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">next_states</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
     <span class="n">moves</span><span class="p">,</span> <span class="n">elevator</span><span class="p">,</span> <span class="n">floors</span> <span class="o">=</span> <span class="n">state</span>
@@ -102,9 +102,9 @@ With the ability to now verify if a supplied floor is valid or not, we can conti
                 <span class="k">yield</span> <span class="p">(</span><span class="n">moves</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">next_elevator</span><span class="p">,</span> <span class="n">next_floors</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>The function above takes in a state (total moves performed, position of elevator and floor objects) as a tuple and yields all the possible valid state transitions we could perform from this position.
-Thanks to Python’s out-of-the-box combinatorics support we can leverage this to simplify our solution.
-With the ability to generate the next possible states from a given initial state, we now need a means or verifying if we have met our end goal state.</p>
+<p>The function above takes in a state (total moves performed, position of the elevator, and floor objects) as a tuple and yields all the possible valid state transitions we could perform from this position.
+Thanks to Python’s out-of-the-box combinatorics support, we can leverage this to simplify our solution.
+With the ability to generate the next possible states from a given initial state, we now need a means of verifying if we have met our end goal state.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">is_all_top_level</span><span class="p">(</span><span class="n">floors</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="n">floor</span>
@@ -112,8 +112,8 @@ With the ability to generate the next possible states from a given initial state
                <span class="k">if</span> <span class="n">number</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">floors</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>From here, we can now create a <a href="https://en.wikipedia.org/wiki/Breadth-first_search">BFS</a> implementation which traverses all the possible state transitions until it finally meets our end goal state.
-Using BFS we can be sure that this results in the shortest possible move total.</p>
+<p>From here, we can now create a <a href="https://en.wikipedia.org/wiki/Breadth-first_search">BFS</a> implementation that traverses all the possible state transitions until it finally meets our end goal state.
+Using BFS, we can be sure that this results in the shortest possible move total.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">min_moves_to_top_level</span><span class="p">(</span><span class="n">floors</span><span class="p">):</span>
     <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -133,23 +133,23 @@ Using BFS we can be sure that this results in the shortest possible move total.<
 </code></pre></div></div>
 
 <p>But wait, what is this <code class="language-plaintext highlighter-rouge">count_floor_objects</code> function?!
-So… to cut a long story short, I initially went about running this above solution <em>pruning</em> any exact floor states that we had already encountered to help performance.
-This sadly did not provide a solution reaching the end goal in a adequate amount of time 😢.
-After pondering on other techniques to help effectively prune the search space, I resorted to finding some clues online.
-The clue I found asked the question <em>‘what classifies a unique floor state?’</em>.
-After even more pondering and experimentation I finally landed on what this clue meant.</p>
+So… to cut a long story short, I initially went about running this solution <em>pruning</em> any exact floor states that we had already encountered to help performance.
+This, sadly, did not provide a solution reaching the end goal in an adequate amount of time 😢.
+After pondering other techniques to help effectively prune the search space, I resorted to finding some clues online.
+The clue I found asked the question, <em>‘what classifies a unique floor state?’</em>.
+After even more pondering and experimentation, I finally landed on what this clue meant.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">count_floor_objects</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">elevator</span><span class="p">,</span> <span class="n">floors</span> <span class="o">=</span> <span class="n">state</span>
     <span class="k">return</span> <span class="n">elevator</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="nb">type</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="nb">type</span> <span class="ow">in</span> <span class="n">floor</span><span class="p">).</span><span class="n">most_common</span><span class="p">())</span> <span class="k">for</span> <span class="n">floor</span> <span class="ow">in</span> <span class="n">floors</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>Providing that the floor state is valid (which all are when returned from <code class="language-plaintext highlighter-rouge">next_states</code>) we do not care about the <em>name</em> of the actual objects.
-What this means is that a floor can simply be represented as a unique state based on the total number of generators and microchips that are on that floor (each pair are replaceable).
-In doing this we cut the search-space down dramatically 🎉.</p>
+<p>Providing that the floor state is valid (which all are when returned from <code class="language-plaintext highlighter-rouge">next_states</code>), we do not care about the <em>name</em> of the actual objects.
+What this means is that a floor can simply be represented as a unique state based on the total number of generators and microchips that are on that floor (each pair is replaceable).
+In doing this, we cut the search space down dramatically 🎉.</p>
 
-<p>With all the building blocks now in-place we can parse the input and call <code class="language-plaintext highlighter-rouge">min_moves_to_top_level</code>.
-In doing so we are returned the desired answer to this super-tough problem 🌟!</p>
+<p>With all the building blocks now in place, we can parse the input and call <code class="language-plaintext highlighter-rouge">min_moves_to_top_level</code>.
+In doing so, we are returned the desired answer to this super-tough problem 🌟!</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">min_moves_to_top_level</span><span class="p">(</span><span class="n">parse_floors</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
@@ -157,9 +157,9 @@ In doing so we are returned the desired answer to this super-tough problem 🌟!
 
 <h2 id="part-2">Part 2</h2>
 
-<p>Fortunalty, part two is only a small <em>spin</em> on what is asked in part one.
-We are now asked to calculate the minimum number of moves required based on the input state, along with two additional object-pairs found on the first floor.
-With a small addition we can answer this question using the same <code class="language-plaintext highlighter-rouge">min_moves_to_top_level</code> function 🌟.</p>
+<p>Fortunately, part two is only a small <em>spin</em> on what is asked in part one.
+We are now asked to calculate the minimum number of moves required based on the input state, along with two additional object pairs found on the first floor.
+With a small addition, we can answer this question using the same <code class="language-plaintext highlighter-rouge">min_moves_to_top_level</code> function 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="n">floors</span> <span class="o">=</span> <span class="n">parse_floors</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>

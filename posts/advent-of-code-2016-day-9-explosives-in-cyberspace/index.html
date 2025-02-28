@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 9 puzzle using Python">
+    <meta name="description" content="Solving the Advent of Code 2016 Day 9 puzzle using Python.">
 
     <title>
         
@@ -49,14 +49,14 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2016 - Day 9 - Explosives in Cyberspace</h1>
     <time datetime="2021-04-02T00:00:00+00:00" class="post-date">02 Apr 2021</time>
-    <p>On the ninth day of Advent of Code 2016 we are asked to calculate the decompressed length of a file.</p>
+    <p>On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>We are supplied with a compressed file format as our input, of which we are required to calculate what the decompressed length is.
-The format is structured as such:</p>
+<p>We are supplied with a compressed file format as our input, of which we are required to calculate the decompressed length.
+The format is structured as follows:</p>
 
 <blockquote>
   <p>The format compresses a sequence of characters.
@@ -67,7 +67,7 @@ Then, continue reading the file after the repeated data.
 The marker itself is not included in the decompressed output.</p>
 </blockquote>
 
-<p>Based on these rules we can now create a function that goes about calculating the length based on a supplied file.</p>
+<p>Based on these rules, we can now create a function that calculates the length based on a supplied file.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">acc</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">file</span><span class="p">:</span>
@@ -82,11 +82,11 @@ The marker itself is not included in the decompressed output.</p>
     <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">acc</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>The function above recursively decompresses the file, applying the provided accumulator function based on any markers that it encounters.
-Once the file has been exhausted the function call-stack will bubble up, and we will return the total decompressed file length.</p>
+<p>The function above recursively decompresses the file, applying the provided accumulator function based on any markers it encounters.
+Once the file has been exhausted, the function call stack will bubble up, and we will return the total decompressed file length.</p>
 
-<p>Using the above implementation we can supply the in-built <code class="language-plaintext highlighter-rouge">len</code> function as our acculator to be applied upon the occurance of markers.
-In doing so we will be returned with the desired answer 🌟.</p>
+<p>Using the above implementation, we can supply the built-in <code class="language-plaintext highlighter-rouge">len</code> function as our accumulator to be applied upon the occurrence of markers.
+In doing so, we will be returned with the desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="nb">len</span><span class="p">)</span>
@@ -95,11 +95,11 @@ In doing so we will be returned with the desired answer 🌟.</p>
 <h2 id="part-2">Part 2</h2>
 
 <p>For part two, we are required to expand upon part one’s decompression implementation and cater for an <em>improved</em> compression format.
-In version two, the only difference is that markers within decompressed data are decompressed.
-So instead of simply computing the length of a marker sub-section we are required to decompress this string as well.</p>
+In version two, the only difference is that markers within decompressed data are also decompressed.
+So instead of simply computing the length of a marker sub-section, we are required to decompress this string as well.</p>
 
-<p>Fortunaly, as we supply how we wish to acculate markers within the <code class="language-plaintext highlighter-rouge">decompressed_length</code> function, we can instead supply a means of recursively decompressing the file until we reach the final length.
-With this new <code class="language-plaintext highlighter-rouge">recursive_len</code> function we can now calculate the decompressed length again, returning the desired answer 🌟.</p>
+<p>Fortunately, as we supply how we wish to accumulate markers within the <code class="language-plaintext highlighter-rouge">decompressed_length</code> function, we can instead supply a means of recursively decompressing the file until we reach the final length.
+With this new <code class="language-plaintext highlighter-rouge">recursive_len</code> function, we can now calculate the decompressed length again, returning the desired answer 🌟.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">recursive_len</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>

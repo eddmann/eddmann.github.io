@@ -1,19 +1,19 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 21 - RPG Simulator 20XX'
-meta: 'Solving the Advent of Code 2015 Day 21 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 21 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twenty first day of Advent of Code 2015 we are asked to help 'Little Henry Case' beat the boss in a new video game he got for Christmas.
+On the twenty-first day of Advent of Code 2015, we are asked to help 'Little Henry Case' beat the boss in a new video game he got for Christmas.
 
 <!--more-->
 
 ## Part 1
 
-The game is a turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
+The game is turn-based, in which we buy available shop items before fighting a given boss (with a configuration that is provided as input).
 The rules can be read by visiting the [problem specification](https://adventofcode.com/2015/day/21).
-For part one, we are asked to work out what is the least amount of gold we can spend and still win the fight.
+For part one, we are asked to work out the least amount of gold we can spend and still win the fight.
 We will begin by getting a copy of the shop items that are available for purchase.
 
 ```typescript
@@ -73,7 +73,7 @@ const parseShopItems = (items: string): ShopItems => {
 };
 ```
 
-With the shop items now parsed, we can move onto parsing the Boss configuration that has been provided as input.
+With the shop items now parsed, we can move on to parsing the Boss configuration that has been provided as input.
 
 ```typescript
 type Participant = { hp: number; damage: number; armor: number };
@@ -88,23 +88,23 @@ const parseBossConfiguration = (input: string): Participant => {
 };
 ```
 
-Reading through the shop item purchase criteria, I have decided that an elegant way in which to produce all possible valid configurations is via an [cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
-For this I will be using the below generalised implementation.
+Reading through the shop item purchase criteria, I have decided that an elegant way to produce all possible valid configurations is via a [Cartesian product](https://en.wikipedia.org/wiki/Cartesian_product).
+For this, I will be using the below generalised implementation.
 
 ```typescript
 const cartesianProduct = <T>(...a: T[][]): T[][] =>
   a.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())), [[]]);
 ```
 
-We will also need a means to sum up a given array of objects property.
-This can be achieved in a type-safe manor using the code below.
+We will also need a means to sum up a given array of object properties.
+This can be achieved in a type-safe manner using the code below.
 
 ```typescript
 const sumProp = <T>(els: T[], prop: keyof T) =>
   els.reduce((sum, el) => sum + +el[prop], 0);
 ```
 
-With these two utility helper functions in-hand we can go about creating a function to return all the possible valid player configurations.
+With these two utility helper functions in hand, we can go about creating a function to return all the possible valid player configurations.
 
 ```typescript
 type PlayerConfiguration = Participant & { cost: number };
@@ -138,13 +138,13 @@ const generatePlayerConfigurations = ({
 };
 ```
 
-As the armour and both rings are optional, we add a dummy `NO_ITEM` item option which provides us with the _non-existent_ purchase.
-Unfortuantly, the rules surrounding how rings may be purchased makes this not a _true_ cartesian product.
-Instead, we must additional ensure that we do not purchase the same ring twice, and cater for the option of no ring being purchased at all.
-With these configurations not excluded we can return an array of `PlayerConfiguration` which along with the total damage, armor and hit points (we always start with 100), also includes the total cost of the configuration.
+As the armour and both rings are optional, we add a dummy `NO_ITEM` option, which provides us with the _non-existent_ purchase.
+Unfortunately, the rules surrounding how rings may be purchased make this not a _true_ Cartesian product.
+Instead, we must additionally ensure that we do not purchase the same ring twice and cater for the option of no ring being purchased at all.
+With these configurations now excluded, we can return an array of `PlayerConfiguration`, which, along with the total damage, armour, and hit points (we always start with 100), also includes the total cost of the configuration.
 
-Leading on from this, we now need a means in which to simulate a given battle scenario.
-Looking at how a battle is conducted we can determine using a single formula how many turns it would take for a given participant to beat the other.
+Leading on from this, we now need a means to simulate a given battle scenario.
+Looking at how a battle is conducted, we can determine using a single formula how many turns it would take for a given participant to beat the other.
 
 ```typescript
 const isPlayerWinner = (
@@ -162,9 +162,10 @@ const isPlayerWinner = (
 };
 ```
 
-We can calculate the total turns it would take for both the player and boss to win; and then providing the players turn total is less than or equal to the bosses (as the player goes first) we can be sure the player has won.
+We can calculate the total turns it would take for both the player and the boss to win.
+Then, provided the player's turn total is less than or equal to the boss's (as the player goes first), we can be sure the player has won.
 With the ability to now simulate a battle in place, we can go about solving the question laid out in part one.
-Generating all the possible valid player configurations we can filter down to only the ones that the player wins.
+Generating all the possible valid player configurations, we can filter down to only the ones where the player wins.
 From here, we return the minimal cost of those player configurations, leading us to our answer 🌟.
 
 ```typescript
@@ -182,9 +183,9 @@ const part1 = (input: string): number => {
 
 ## Part 2
 
-For part two, we are asked to determine what is the most amount of gold we could spend and still lose the fight.
-We can re-use all the functionality we built up for part one, except this time we wish to only include games the player loses.
-From these lost games we can determine the highest costing player configuration 🌟.
+For part two, we are asked to determine the most amount of gold we could spend and still lose the fight.
+We can reuse all the functionality we built up for part one, except this time we wish to only include games where the player loses.
+From these lost games, we can determine the highest costing player configuration 🌟.
 
 ```typescript
 const part2 = (input: string): number => {

@@ -1,17 +1,17 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 14 - Reindeer Olympics'
-meta: 'Solving the Advent of Code 2015 Day 14 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 14 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the fourteen day of Advent of Code 2015 Santa wants to find out who is the fastest reindeer.
+On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer.
 
 <!--more-->
 
 ## Part 1
 
-We are provided with a listing of all the nine reindeer; stating how fast they can travel per second, how many seconds they can fly for at the given speed and how many seconds they require subsequently to rest.
+We are provided with a listing of all the nine reindeer, stating how fast they can travel per second, how many seconds they can fly for at the given speed, and how many seconds they require subsequently to rest.
 We are tasked with first determining the distance of the reindeer who would travel the furthest in _2503 seconds_.
 To begin, we parse the reindeer input we have been supplied.
 
@@ -30,7 +30,7 @@ const parseReindeer = (input: string): Reindeer[] =>
 ```
 
 As we are not required to provide the name of the reindeer, we can omit this from the parsed representation.
-For our initial solution we are going to create a [Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator) which will yield the current distance travelled every second that is elasped.
+For our initial solution, we are going to create a [Generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator) which will yield the current distance travelled every second that has elapsed.
 
 ```typescript
 function* simulate({
@@ -56,7 +56,7 @@ function* simulate({
 }
 ```
 
-With this iterative approach we simulate the logic around alternating between flying and resting states.
+With this iterative approach, we simulate the logic around alternating between flying and resting states.
 
 ```typescript
 const nth = <T>(g: Generator<T>, n: number): T => {
@@ -66,8 +66,8 @@ const nth = <T>(g: Generator<T>, n: number): T => {
 };
 ```
 
-To produce a more succinct solution I have decided to include a small utility function which iterates through the generator returning the `nth` value.
-With the building blocks now in place we can now proceed to answer the question to part one 🌟.
+To produce a more succinct solution, I have decided to include a small utility function that iterates through the generator, returning the `nth` value.
+With the building blocks now in place, we can proceed to answer the question for part one 🌟.
 
 ```typescript
 const part1 = (input: string): number =>
@@ -76,11 +76,12 @@ const part1 = (input: string): number =>
 
 ## Part 2
 
-For part two, we are again asked to simulate the distance travelled for _2503 seconds_, however, a point is now awarded each second to the reindeer that has travelled the furthest distance at that time.
-Once all reindeer points have been awarded we are asked to return the winning reindeers total points.
+For part two, we are again asked to simulate the distance travelled for _2503 seconds_.
+However, a point is now awarded each second to the reindeer that has travelled the furthest distance at that time.
+Once all reindeer points have been awarded, we are asked to return the winning reindeer's total points.
 
-Like in part one, we can re-use the `simulate` Generator function, expect now per iteration we record all the total distances travelled and award the winning reindeer with a point.
-From here, we return the highest recorded reindeers points to answer the qestion 🌟.
+Like in part one, we can reuse the `simulate` Generator function, except now per iteration, we record all the total distances travelled and award the winning reindeer with a point.
+From here, we return the highest recorded reindeer's points to answer the question 🌟.
 
 ```typescript
 const part2 = (input: string): number => {
@@ -97,14 +98,14 @@ const part2 = (input: string): number => {
 };
 ```
 
-For this solution I was able to harness the `repeat` function we created for [Day 10](https://eddmann.com/posts/advent-of-code-2015-day-10-elves-look-elves-say/).
+For this solution, I was able to harness the `repeat` function we created for [Day 10](https://eddmann.com/posts/advent-of-code-2015-day-10-elves-look-elves-say/).
 This abstracts away the need to implement a stateful loop and focuses on the problem at hand.
-I have also decided to omit the reindeers name and identify each reindeer based on theirposition within the listing.
+I have also decided to omit the reindeers' names and identify each reindeer based on their position within the listing.
 
 ## Alternative Solution
 
-Since implementing the above solution I have been exploring how we could skip the iterative simulation step all together and apply a little math to produce the answer.
-As such, we are able to replace the `simulate` Generator with a function that takes in the reindeer details and seconds elapsed like so:
+Since implementing the above solution, I have been exploring how we could skip the iterative simulation step altogether and apply a little maths to produce the answer.
+As such, we can replace the `simulate` Generator with a function that takes in the reindeer details and seconds elapsed like so:
 
 ```typescript
 const simulate = (
@@ -119,15 +120,15 @@ const simulate = (
 };
 ```
 
-Within the function above we deduce the total seconds flown (taking into consideration required rest) and multiply that by the speed per second to return the total distance covered.
-We can then answer part one in a similiar fashion to how we did the original solution - expect this time we can omit the need to compute each iteration.
+Within the function above, we deduce the total seconds flown (taking into consideration required rest) and multiply that by the speed per second to return the total distance covered.
+We can then answer part one in a similar fashion to how we did in the original solution, except this time, we can omit the need to compute each iteration.
 
 ```typescript
 const part1 = (input: string): number =>
   Math.max(...parseReindeer(input).map(r => simulate(r, 2503)));
 ```
 
-To answer part two we can reduce over each second elapsed and upon each step update the points mapping according to the winner.
+To answer part two, we can reduce over each second elapsed and, upon each step, update the points mapping according to the winner.
 
 ```typescript
 const part2 = (input: string): number => {

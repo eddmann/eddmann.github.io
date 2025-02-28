@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 3 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 3 puzzle using TypeScript.">
 
     <title>
         
@@ -49,13 +49,13 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 3 - Perfectly Spherical Houses in a Vacuum</h1>
     <time datetime="2021-01-27T00:00:00+00:00" class="post-date">27 Jan 2021</time>
-    <p>On the third day of Advent of Code 2015 we are asked to help determine (based on supplied directions) how many houses Santa (and Robo-Santa) will deliver presents to.</p>
+    <p>On the third day of Advent of Code 2015, we are asked to help determine (based on supplied directions) how many houses Santa (and Robo-Santa) will deliver presents to.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>Based on a directional system that caters for <em>north (^), south (v), east (&gt;), or west (&lt;)</em> we are asked to navigate our way between houses (on a two-dimensional grid) recording how many receive presents along the way.
+<p>Based on a directional system that caters for <em>north (^), south (v), east (&gt;), or west (&lt;)</em>, we are asked to navigate our way between houses (on a two-dimensional grid), recording how many receive presents along the way.
 The first step is to parse the input data into a type-safe form.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">directions</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">^</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">v</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">&lt;</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">&gt;</span><span class="dl">'</span><span class="p">]</span> <span class="k">as</span> <span class="kd">const</span><span class="p">;</span>
@@ -65,10 +65,10 @@ The first step is to parse the input data into a type-safe form.</p>
   <span class="p">[...</span><span class="nx">input</span><span class="p">].</span><span class="nx">filter</span><span class="p">((</span><span class="nx">d</span><span class="p">:</span> <span class="nx">Direction</span><span class="p">):</span> <span class="nx">d</span> <span class="k">is</span> <span class="nx">Direction</span> <span class="o">=&gt;</span> <span class="nx">directions</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">d</span><span class="p">));</span>
 </code></pre></div></div>
 
-<p>This filters out any invalid direction ensuring that the resulting values are within the defined <code class="language-plaintext highlighter-rouge">Direction</code> union-type.
-Like before, we could have alternatively provided more stricter parsing rules and thrown an exception upon an invalid direction occurrence - but for this input the provided behaviour will suffice.</p>
+<p>This filters out any invalid directions, ensuring that the resulting values are within the defined <code class="language-plaintext highlighter-rouge">Direction</code> union type.
+As before, we could have alternatively provided stricter parsing rules and thrown an exception upon an invalid direction occurrence, but for this input, the provided behaviour will suffice.</p>
 
-<p>From here, we create a small function which iterates through the provided directions, storing each house <code class="language-plaintext highlighter-rouge">Position</code> (represented as X-Y coordinate tuples) encountered along the way.</p>
+<p>From here, we create a small function that iterates through the provided directions, storing each house <code class="language-plaintext highlighter-rouge">Position</code> (represented as X-Y coordinate tuples) encountered along the way.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Position</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">y</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
 <span class="kd">const</span> <span class="nx">coordinates</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">K</span> <span class="k">in</span> <span class="nx">Direction</span><span class="p">]:</span> <span class="nx">Position</span> <span class="p">}</span> <span class="o">=</span> <span class="p">{</span>
@@ -92,12 +92,12 @@ Like before, we could have alternatively provided more stricter parsing rules an
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We are only interested in the presence of a house being visited as opposed to how many times we encounter said house, which lends itself well to the Set data-structure.
-JavaScript does support storing compound data-types (such as <code class="language-plaintext highlighter-rouge">Position</code>) in a native Set, however, equality is based on reference as opposed to value semantics.
-In many circumstances (such as this one) this is not the behaviour we desire, instead favouring equality based on value.
-There is a propsal in JavaScript to add <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> to the language, but until this is made available I decided to create a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">small <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation</a> which catered for this need.</p>
+<p>We are only interested in the presence of a house being visited as opposed to how many times we encounter said house, which lends itself well to the <code class="language-plaintext highlighter-rouge">Set</code> data structure.
+JavaScript does support storing compound data types (such as <code class="language-plaintext highlighter-rouge">Position</code>) in a native <code class="language-plaintext highlighter-rouge">Set</code>; however, equality is based on reference as opposed to value semantics.
+In many circumstances (such as this one), this is not the behaviour we desire, instead favouring equality based on value.
+There is a proposal in JavaScript to add <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> to the language, but until this is made available, I decided to create a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">small <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation</a> that catered to this need.</p>
 
-<p>To answer part one we can now invoke this function, returning the resulting Sets’ size 🌟.</p>
+<p>To answer part one, we can now invoke this function, returning the resulting <code class="language-plaintext highlighter-rouge">Set</code>’s size 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">deliverPresents</span><span class="p">(</span><span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">)).</span><span class="nx">size</span><span class="p">;</span>
@@ -105,8 +105,8 @@ There is a propsal in JavaScript to add <a href="https://github.com/tc39/proposa
 
 <h2 id="part-2">Part 2</h2>
 
-<p>In part two we are now asked to tally the total number of houses Santa and Robo-Santa would deliver presents too based on the supplied directions.
-In this instance the input directions are split (odd/even) between Santa and Robo-Santa.</p>
+<p>In part two, we are now asked to tally the total number of houses Santa and Robo-Santa would deliver presents to based on the supplied directions.
+In this instance, the input directions are split (odd/even) between Santa and Robo-Santa.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="kd">const</span> <span class="nx">directions</span> <span class="o">=</span> <span class="nx">parseDirections</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
@@ -119,10 +119,10 @@ In this instance the input directions are split (odd/even) between Santa and Rob
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>To answer part two I opted to initially split the directions into the two seperate sub-direction listings.
+<p>To answer part two, I opted to initially split the directions into the two separate sub-direction listings.
 This was easy to do with a filter as we are provided the current index position as the second argument within JavaScript.
 The sub-problems have now taken the same shape as part one, and as such, we can use the above function again to determine which houses are delivered presents.
-Finally, we merge the sub-problems back together producing the union set to determine the total size 🌟.</p>
+Finally, we merge the sub-problems back together, producing the union <code class="language-plaintext highlighter-rouge">Set</code> to determine the total size 🌟.</p>
 
 </article>
 

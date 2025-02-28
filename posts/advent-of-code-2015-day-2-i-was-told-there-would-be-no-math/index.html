@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 2 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 2 puzzle using TypeScript.">
 
     <title>
         
@@ -49,17 +49,17 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 2 - I Was Told There Would Be No Math</h1>
     <time datetime="2021-01-26T00:00:00+00:00" class="post-date">26 Jan 2021</time>
-    <p>The second day of Advent of Code 2015 brings us a small Math problem by-way of Elves <em>running-low</em> on wrapping paper.
-With the Present dimensions (perfect right rectangular prisms) provided we are answer several related questions.</p>
+    <p>The second day of Advent of Code 2015 brings us a small maths problem by way of Elves <em>running low</em> on wrapping paper.
+With the present dimensions (perfect right rectangular prisms) provided, we are to answer several related questions.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>Based on the supplied Present dimensions we are required to calculate how much square-feet of wrapping paper should be ordered to wrap these presents.
-We are also asked to include <em>alittle extra</em> (the area of the smallest side) per present included.</p>
+<p>Based on the supplied present dimensions, we are required to calculate how many square feet of wrapping paper should be ordered to wrap these presents.
+We are also asked to include <em>a little extra</em> (the area of the smallest side) per present.</p>
 
-<p>Similiar to Day 1 we will start of by parsing the provided input, this time into tuples.</p>
+<p>Similar to Day 1, we will start off by parsing the provided input, this time into tuples.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">PresentDimensions</span> <span class="o">=</span> <span class="p">[</span><span class="nx">length</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">width</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">height</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
 
@@ -69,10 +69,10 @@ We are also asked to include <em>alittle extra</em> (the area of the smallest si
     <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="nx">line</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">)</span> <span class="k">as</span> <span class="nx">PresentDimensions</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>I have decided to be alittle more relaxed with my parsing validation this time around, instead opting to assume that each input line will be of the correct form.
+<p>I have decided to be a little more relaxed with my parsing validation this time around, instead opting to assume that each input line will be of the correct form.
 This allows me to just map over the resulting split, converting each dimension into an integer using a small helper method.</p>
 
-<p>With the input now parsed we can go about calculating how much wrapping paper we will require.</p>
+<p>With the input now parsed, we can go about calculating how much wrapping paper we will require.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">parsePresentDimensions</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
@@ -83,13 +83,13 @@ This allows me to just map over the resulting split, converting each dimension i
     <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Mapping over each of the dimensions we are able to calculate how much wrapping paper is required (the surface area) per present, including the desired additional extra paper.
-With this mapped result we can then sum these together (using another helper method I have included to help aid clarity in the solutions) to produce the desired answer 🌟.
-We could have alternatively achieved this with a single <em>reduce</em> but I opted for the initial <em>map</em> for readability.</p>
+<p>Mapping over each of the dimensions, we are able to calculate how much wrapping paper is required (the surface area) per present, including the desired additional extra paper.
+With this mapped result, we can then sum these together (using another helper method I have included to help aid clarity in the solutions) to produce the desired answer 🌟.
+We could have alternatively achieved this with a single <em>reduce</em>, but I opted for the initial <em>map</em> for readability.</p>
 
 <h2 id="part-2">Part 2</h2>
 
-<p>With the same input we are now instead asked to determine the total feet of ribben the Elves should order to tie and bow a ribben around all the provided presents.
+<p>With the same input, we are now instead asked to determine the total feet of ribbon the Elves should order to tie and bow a ribbon around all the provided presents.
 The total feet required per present is equal to the cubic feet of volume of the given dimensions.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
@@ -101,9 +101,9 @@ The total feet required per present is equal to the cubic feet of volume of the 
     <span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Using a similar <em>map</em> we are able to calculate the required ribben per present and then <em>reduce</em> this into the total sum required 🌟.</p>
+<p>Using a similar <em>map</em>, we are able to calculate the required ribbon per present and then <em>reduce</em> this into the total sum required 🌟.</p>
 
-<p>Alternatively, as there are three dimensions and we wish to find the sum of the smallest two - we can add all the dimensions together and subtract the maximum dimension value.</p>
+<p>Alternatively, as there are three dimensions and we wish to find the sum of the smallest two, we can add all the dimensions together and subtract the maximum dimension value.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
   <span class="nx">parsePresentDimensions</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>

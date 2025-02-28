@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring how we can use a Map to implement a Set data-structure which handles Compound data-types in TypeScript">
+    <meta name="description" content="Learn how to implement a Compound Set data structure in TypeScript using a Map to handle complex data types effectively.">
 
     <title>
         
@@ -49,17 +49,18 @@
                 <article class="post">
     <h1 class="post-title">Implementing a Compound Set in TypeScript</h1>
     <time datetime="2021-01-27T00:00:00+00:00" class="post-date">27 Jan 2021</time>
-    <p>Since being introduced to Advent of Code, one feature missing from JavaScript that I have seen available in other languages (such as Python and Clojure) are Sets which hande <a href="https://www.oreilly.com/library/view/javascript-design/0735711674/0735711674_ch03lev1sec3.html">Compound data-types</a>.
-So as to focus each puzzle solution on the problem at hand and not <em>re-invent the wheel</em> I decided to implement a <code class="language-plaintext highlighter-rouge">CompoundSet</code> data-structure which would fill this void.</p>
+    <p>Since being introduced to Advent of Code, one feature missing from JavaScript that I have seen available in other languages (such as Python and Clojure) is Sets that handle <a href="https://www.oreilly.com/library/view/javascript-design/0735711674/0735711674_ch03lev1sec3.html">Compound data-types</a>.
+To focus each puzzle solution on the problem at hand and not <em>re-invent the wheel</em>, I decided to implement a <code class="language-plaintext highlighter-rouge">CompoundSet</code> data structure to fill this void.</p>
 
 
 
-<p>JavaScript does include the ability to create Sets with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">primitive data-types</a>.
-However, in certain use-cases (such as storing X-Y coordinates) it is useful to be able to store more complex data-types (such as Tuples).
-Although this is techincally possible, the <em>gotcha</em> is that equality is based on reference as opposed to value semantics.
-So storing the Compound data-type within the Set will be valid, except checking for existence will require the exact same value reference to be supplied.</p>
+<p>JavaScript does include the ability to create Sets with <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set">primitive data types</a>.
+However, in certain use cases (such as storing X-Y coordinates), it is useful to be able to store more complex data types (such as Tuples).
+Although this is technically possible, the <em>gotcha</em> is that equality is based on reference as opposed to value semantics.
+So storing the Compound data type within the Set will be valid, except checking for existence will require the exact same value reference to be supplied.</p>
 
-<p>There is a proposal to introduce <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> in a future version of JavaScript which will alleviate this problem - but until that is introduced I decided to create a <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation backed by a native <code class="language-plaintext highlighter-rouge">Map</code> like so:</p>
+<p>There is a proposal to introduce <a href="https://github.com/tc39/proposal-record-tuple">Records and Tuples</a> in a future version of JavaScript, which will alleviate this problem.
+But until that is introduced, I decided to create a <code class="language-plaintext highlighter-rouge">CompoundSet</code> implementation backed by a native <code class="language-plaintext highlighter-rouge">Map</code> like so:</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span> <span class="p">{</span>
   <span class="k">private</span> <span class="na">set</span><span class="p">:</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="kr">string</span><span class="p">,</span> <span class="nx">T</span><span class="o">&gt;</span><span class="p">;</span>
@@ -96,13 +97,13 @@ So storing the Compound data-type within the Set will be valid, except checking 
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This implementation is not exhaustive and does not provide all the functionality that a native Set provides.
-It does however include enough of the behaviour to be a <em>drop-in replacement</em> for solving daily puzzles I have been working through.
-Encoding the value as a JSON string provides us with the primitive-type required for the Map key - which we can subsequently use to check for existence (by value).
-Using an internal Map we are able to ensure that we persist the original value, which can be used when iterating over the Set.</p>
+<p>This implementation is not exhaustive and does not provide all the functionality that a native Set offers.
+It does, however, include enough behaviour to be a <em>drop-in replacement</em> for solving the daily puzzles I have been working through.
+Encoding the value as a JSON string provides us with the primitive type required for the Map key, which we can subsequently use to check for existence (by value).
+Using an internal Map, we can ensure that we persist the original value, which can be used when iterating over the Set.</p>
 
-<p>I have found this data-structure to be very useful whilst completing my first Advent of Code calendar in 2020.
-In the future I hope to explore how we could use a similiar means to provide a <code class="language-plaintext highlighter-rouge">CompoundMap</code> implementation.</p>
+<p>I have found this data structure to be very useful whilst completing my first Advent of Code calendar in 2020.
+In the future, I hope to explore how we could use a similar approach to provide a <code class="language-plaintext highlighter-rouge">CompoundMap</code> implementation.</p>
 
 </article>
 

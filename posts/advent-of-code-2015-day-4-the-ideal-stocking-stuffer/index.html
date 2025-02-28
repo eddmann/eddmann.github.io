@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 4 puzzle using TypeScript">
+    <meta name="description" content="Solving the Advent of Code 2015 Day 4 puzzle using TypeScript.">
 
     <title>
         
@@ -49,15 +49,15 @@
                 <article class="post">
     <h1 class="post-title">Advent of Code 2015 - Day 4 - The Ideal Stocking Stuffer</h1>
     <time datetime="2021-01-28T00:00:00+00:00" class="post-date">28 Jan 2021</time>
-    <p>On the fourth day of Advent of Code 2015 Santa needs help mining some AdventCoins 💵.</p>
+    <p>On the fourth day of Advent of Code 2015, Santa needs help mining some AdventCoins 💵.</p>
 
 
 
 <h2 id="part-1">Part 1</h2>
 
-<p>Mining AdventCoin is very similiar in principle to how Bitcoin is mined.
-Difficulty of mining <em>a block</em> is based on how many leading-zeros must appear when hashing the desired block contents with a generated nonce value.
-In the case of AdventCoin the hashing algorithm used is MD5.</p>
+<p>Mining AdventCoin is very similar in principle to how Bitcoin is mined.
+The difficulty of mining <em>a block</em> is based on how many leading zeros must appear when hashing the desired block contents with a generated nonce value.
+In the case of AdventCoin, the hashing algorithm used is MD5.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">createHash</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">crypto</span><span class="dl">'</span><span class="p">;</span>
 
@@ -74,25 +74,26 @@ In the case of AdventCoin the hashing algorithm used is MD5.</p>
 <span class="p">};</span>
 </code></pre></div></div>
 
-<p>We begin by creating a small function <code class="language-plaintext highlighter-rouge">calcLowestNonce</code> which uses brute-force to determine the lowest matching nonce value based on the supplied input.
-Once found we then return this nonce value to the callee.</p>
+<p>We begin by creating a small function, <code class="language-plaintext highlighter-rouge">calcLowestNonce</code>, which uses brute force to determine the lowest matching nonce value based on the supplied input.
+Once found, we then return this nonce value to the caller.</p>
 
-<p>To answer part one we are required to find the first valid nonce value which has five leading-zeros, using the above function we are able to return this answer like so 🌟.</p>
+<p>To answer part one, we are required to find the first valid nonce value which has five leading zeros.
+Using the above function, we are able to return this answer like so 🌟.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="nx">calcLowestNonce</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
 </code></pre></div></div>
 
 <h2 id="part-2">Part 2</h2>
 
-<p>The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading-zeros.</p>
+<p>The second part expands upon the first problem and asks us to instead find the lowest nonce value which includes six leading zeros.</p>
 
 <div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="nx">calcLowestNonce</span><span class="p">(</span><span class="nx">input</span><span class="p">,</span> <span class="mi">6</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Tweaking the <code class="language-plaintext highlighter-rouge">totalLeadingZero</code> argument to our <code class="language-plaintext highlighter-rouge">calcLowestNonce</code> function provides us with this answer 🌟.</p>
+<p>Tweaking the <code class="language-plaintext highlighter-rouge">totalLeadingZeros</code> argument to our <code class="language-plaintext highlighter-rouge">calcLowestNonce</code> function provides us with this answer 🌟.</p>
 
-<p>By-design this problem is computational-hard to produce and requires forms of brute-force to be solved.
-As such, there are no real optimisations that can be made - other than possibly designing a <a href="https://en.bitcoin.it/wiki/ASIC">Hardware ASIC miner</a> for AdventCoin!</p>
+<p>By design, this problem is computationally hard to produce and requires forms of brute force to be solved.
+As such, there are no real optimisations that can be made - other than possibly designing a <a href="https://en.bitcoin.it/wiki/ASIC">hardware ASIC miner</a> for AdventCoin!</p>
 
 </article>
 

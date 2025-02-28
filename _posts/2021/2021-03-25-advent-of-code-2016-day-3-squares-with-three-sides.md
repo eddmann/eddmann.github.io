@@ -1,11 +1,11 @@
 ---
 layout: post
 title: 'Advent of Code 2016 - Day 3 - Squares With Three Sides'
-meta: 'Solving the Advent of Code 2016 Day 3 puzzle using Python'
+meta: 'Solving the Advent of Code 2016 Day 3 puzzle using Python.'
 tags: advent-of-code advent-of-code-2016 python
 ---
 
-On the third day of Advent of Code 2016 we are asked to work out how many valid triangles are present in a given listing.
+On the third day of Advent of Code 2016, we are asked to work out how many valid triangles are present in a given listing.
 
 <!--more-->
 
@@ -29,7 +29,7 @@ def is_triangle(triplet):
     return a + b > c
 ```
 
-To answer part one we can combine these two functions using list comprehension, and sum up the `True` values 🌟.
+To answer part one, we can combine these two functions using list comprehension and sum up the `True` values 🌟.
 
 ```python
 def part1(input):
@@ -39,10 +39,10 @@ def part1(input):
 ## Part 2
 
 For part two, we are now instead required to interpret the input in a different form.
-Triplets are now grouped based on transposing (flipping the rows and columns) the listing.
+Triplets are now grouped based on transposing (flipping the rows and columns) of the listing.
 
-So as to complete this task we will need a means to split up a flat listing into triplets.
-Combining `range`, list slicing and subsequently yielding each _chunk_ is a very succinct means to achieve this result.
+To complete this task, we will need a means to split up a flat listing into triplets.
+Combining `range`, list slicing, and subsequently yielding each _chunk_ is a very succinct means to achieve this result.
 
 ```python
 def chunks(l, n):
@@ -50,9 +50,9 @@ def chunks(l, n):
         yield l[i:i + n]
 ```
 
-With this new function available we can transpose the parsed triplets (using `zip`) and _flatten_ each available column triplet chunks.
-This leaves us with a single-level listing (the same form as our input) of which we can validate if the triplets are indeed triangles.
-In a similiar mannor to part one we can sum up the `True` values and return the desired answer 🌟.
+With this new function available, we can transpose the parsed triplets (using `zip`) and _flatten_ each available column triplet chunk.
+This leaves us with a single-level listing (the same form as our input), from which we can validate if the triplets are indeed triangles.
+In a similar manner to part one, we can sum up the `True` values and return the desired answer 🌟.
 
 ```python
 def part2(input):

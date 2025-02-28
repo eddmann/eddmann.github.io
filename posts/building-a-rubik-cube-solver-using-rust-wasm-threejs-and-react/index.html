@@ -54,7 +54,7 @@ In this post I wish to discuss the process I went through in designing and build
 
 
 
-<h3 id="characteristics-of-a-rubik-cube">Characteristics of a Rubik Cube</h3>
+<h2 id="characteristics-of-a-rubik-cube">Characteristics of a Rubik Cube</h2>
 
 <p>As documented in my previous post, a Pocket Cube has a couple of key characteristics which make it easier to construct a solver using conventional <a href="https://en.wikipedia.org/wiki/Graph_traversal">Graph searching algorithms</a>, with minimal pruning or heuristics required.
 However, in the case of a 3x3x3 Rubik Cube this is not the case, thanks in large part to the addition of a centre <em>cubie</em> - the two no longer share the same optimisations that can be performed.
@@ -63,11 +63,11 @@ However, <a href="http://www.cube20.org/">research</a> has been conducted to pro
 
 <p><img src="/uploads/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube.jpg" alt="Characteristics of a Rubik Cube" /></p>
 
-<h3 id="solving-the-cube">Solving the Cube</h3>
+<h2 id="solving-the-cube">Solving the Cube</h2>
 
 <p>Along with conventional <a href="https://en.wikipedia.org/wiki/Layer_by_Layer">Layer by Layer</a> approaches that <em>eventually</em> get you to the solved state, there has been much research in the space of producing algorithms that perform this result more efficiently.</p>
 
-<h4 id="korfs-algorithm">Korf’s algorithm</h4>
+<h3 id="korfs-algorithm">Korf’s algorithm</h3>
 
 <p>Initially, when setting out to build this Rubik Cube Solver I had hoped this to mirror the <a href="https://github.com/eddmann/pocket-cube-solver">2x2x2 counter-part</a>, and be an optimal solver which ran in the browser.
 Prior art in this space documents algorithms such as <a href="https://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf">Richard Korf’s</a> which with the aid of several pruning tables, do provide you with an optimal solution from any initial state; using Iterative deepening depth-first search (IDDFS) to traverse through the search space.
@@ -76,20 +76,20 @@ On top of this, it is not possible to put an upper bound on how long it would ta
 When running tests with such an implementation, I found that any scramble which tipped over ten random turns (starting from the goal state), resulted in an undesired wait for the client to return.
 Although optimal, the memory and time footprint led me to continue my search to find a better fit for the target platform.</p>
 
-<h4 id="thistlethwaites-and-kociembas-algorithms">Thistlethwaite’s and Kociemba’s algorithms</h4>
+<h3 id="thistlethwaites-and-kociembas-algorithms">Thistlethwaite’s and Kociemba’s algorithms</h3>
 
 <p>Based on the above evaluation I instead looked to provide a means to produce a solution which was instead <em>good enough</em> - averaging out to an upper-bound of thirty-five moves or less.
 Both <a href="https://www.jaapsch.net/puzzles/thistle.htm">Morwen Thistlethwaite’s</a> and the improved <a href="https://en.wikipedia.org/wiki/Optimal_solutions_for_Rubik%27s_Cube#Kociemba's_algorithm">Herbert Kociemba’s</a> algorithm both solve a given cube using multiple different phrases (sub-groupings), in-which only certain moves and properties of the cube are of concern at any given time.
 At each phase we end up with a move sequence that matches a given property, in which we can continue on with until we have solved the cube in its entirety.
 Again, prune tables are used to help speed up and aid the transition between the different phases.</p>
 
-<h4 id="pochmanns-algorithm">Pochmann’s algorithm</h4>
+<h3 id="pochmanns-algorithm">Pochmann’s algorithm</h3>
 
 <p>Before setting out to implement one of the above algorithms, I stumbled upon a very interesting <a href="https://www.stefan-pochmann.info/spocc/other_stuff/tools/solver_thistlethwaite/solver_thistlethwaite_cpp.txt">C++ solver</a> which looked ridiculously small in its’ implementation and did not incur any additional memory footprint in regards to expected prune tables?!
 The <a href="https://www.stefan-pochmann.info/spocc/">Stefan Pochmann</a> algorithm takes inspiration from the sub-grouping and multi-phase approach of Thistlethwaite’s, but instead provides several different requirements needed to transition between each phase.
 In doing this we possibly end up with a larger move sequence result, but we are instead able to employ a Bidirectional search (like we did in the Pocket Cube Solver) at each phase which is trivial to implement.</p>
 
-<h3 id="building-the-solver">Building the Solver</h3>
+<h2 id="building-the-solver">Building the Solver</h2>
 
 <p>With multiple different algorithms available to solve a Rubik Cube, I decided to architect my solution in such a way that could cater for multiple different solvers being <em>plugged in</em> to the same cube represenation - achieved using Rust traits.
 This would allow me to explore the advantages and disadvantages of each algorithm going forward.
@@ -101,7 +101,7 @@ Using the Rubik Cube model built I was able to apply a trivial represenation tra
 The only addition included from this reference implementation was to simplify <a href="https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs#L302">multi-face turn moves</a> which could incur between phases.
 Once the solver was <a href="https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs">implemented</a> and adequately tested, I could continue on to visualising the solution to the client.</p>
 
-<h3 id="visualising-the-solution">Visualising the Solution</h3>
+<h2 id="visualising-the-solution">Visualising the Solution</h2>
 
 <p>Similar to how I achieved the visualisation for the Pocket Cube, I was able to take advantage of much of the same model of which had been built in that solution.
 Using a combination of React, <a href="https://threejs.org/">Three.js</a>, <a href="https://github.com/pmndrs/react-three-fiber">react-three-fiber</a> and TypeScript I was able to expand upon the 2x2x2 design already built, and add the necessary additional <em>cubies</em> and rotation animation amendments required.
@@ -109,7 +109,7 @@ I was very pleased with how the previous work completed in building the Pocket C
 
 <p><a href="https://eddmann.com/rubik-cube-solver/"><img src="/uploads/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/solution.gif" alt="Visualising the Solution" /></a></p>
 
-<h3 id="conclusion">Conclusion</h3>
+<h2 id="conclusion">Conclusion</h2>
 
 <p>To conclude exploring the prior work that has been conducted in solving a 3x3x3 Rubik Cube has been very interesting.
 Being able to borrow much of the same code built up from the <a href="https://eddmann.com/pocket-cube-solver/">2x2x2 solver</a> was of great help, and allowed me to concentrate on the differences required to build the solver itself.

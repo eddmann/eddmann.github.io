@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Investigating how to build a 2FA TOTP generator device using a Raspberry Pi Pico and MicroPython">
+    <meta name="description" content="Learn how to build a 2FA TOTP generator device using a Raspberry Pi Pico and MicroPython, including a display and customisable features.">
 
     <title>
         
@@ -49,49 +49,49 @@
                 <article class="post">
     <h1 class="post-title">Building a 2FA TOTP generator using a Raspberry Pi Pico and MicroPython</h1>
     <time datetime="2021-10-20T00:00:00+00:00" class="post-date">20 Oct 2021</time>
-    <p>I have recently become very interested in microcontrollers, in particular the <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a>.
-Not only is it ridiculously affordable (just over £3), it provides so much scope to be used in many different projects.
-One such project I wanted to explore was building an independent <a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">Time-based One-time password</a> (TOTP) device.</p>
+    <p>I have recently become very interested in microcontrollers, particularly the <a href="https://www.raspberrypi.com/products/raspberry-pi-pico/">Raspberry Pi Pico</a>.
+Not only is it ridiculously affordable (just over £3), but it also provides extensive scope for use in various projects.
+One such project I wanted to explore was building an independent <a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">Time-based One-time Password</a> (TOTP) device.</p>
 
 
 
-<p>I have been using the likes of Google Authenticator and Authy for many years, but really wanted to gain a deeper understanding for the specific building blocks that Time-based One-time password’s are built upon.
-This led me to investigate the viability of building such a solution using a Raspberry Pi Pico - combined with <a href="https://micropython.org/">MicroPython</a> and the <a href="https://shop.pimoroni.com/products/pico-display-pack">Pico Display Pack</a>.
-Thanks to some <a href="https://datatracker.ietf.org/doc/html/rfc2104">great</a> <a href="https://datatracker.ietf.org/doc/html/rfc6238">resources</a> I was able to do just that.</p>
+<p>I have been using the likes of Google Authenticator and Authy for many years but wanted to gain a deeper understanding of the specific building blocks that Time-based One-time Passwords are built upon.
+This led me to investigate the viability of building such a solution using a Raspberry Pi Pico, combined with <a href="https://micropython.org/">MicroPython</a> and the <a href="https://shop.pimoroni.com/products/pico-display-pack">Pico Display Pack</a>.
+Thanks to some <a href="https://datatracker.ietf.org/doc/html/rfc2104">great</a> <a href="https://datatracker.ietf.org/doc/html/rfc6238">resources</a>, I was able to do just that.</p>
 
 <p><a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.gif" /></a></p>
 
 <h2 id="features">Features</h2>
 
-<p>Below is a list of the feature-set that the built device provides:</p>
+<p>Below is a list of the feature set that the built device provides:</p>
 
 <ul>
-  <li>Complete <a href="https://github.com/eddmann/pico-2fa-totp/tree/main/totp">MicroPython implementation</a> of the TOTP specification (and underlying HMAC-SHA1, Base32 dependencies).</li>
+  <li>Complete <a href="https://github.com/eddmann/pico-2fa-totp/tree/main/totp">MicroPython implementation</a> of the TOTP specification (including underlying HMAC-SHA1 and Base32 dependencies).</li>
   <li>Customisable background colours per TOTP.</li>
-  <li>Progress bar to present how long till the TOTP is about to expire.</li>
-  <li>Flashing alert LED when the TOTP is about to expire.</li>
-  <li>Initial configuration screen to set the current UTC time - to correct the Raspberry Pi Pico’s RTC.</li>
+  <li>A progress bar to show how long until the TOTP expires.</li>
+  <li>A flashing alert LED when the TOTP is about to expire.</li>
+  <li>An initial configuration screen to set the current UTC time - to correct the Raspberry Pi Pico’s RTC.</li>
 </ul>
 
 <h2 id="usage">Usage</h2>
 
-<p>Once you have downloaded the project from <a href="https://github.com/eddmann/pico-2fa-totp">GitHub</a>, you can the follow the instructions below to get the device setup.</p>
+<p>Once you have downloaded the project from <a href="https://github.com/eddmann/pico-2fa-totp">GitHub</a>, follow the instructions below to set up the device:</p>
 
 <ul>
   <li>Connect the <a href="https://shop.pimoroni.com/products/pico-display-pack">Pico Display Pack</a> to the Raspberry Pi Pico.</li>
-  <li>Create a <code class="language-plaintext highlighter-rouge">codes.json</code> file (based on <code class="language-plaintext highlighter-rouge">codes.json.example</code>) which includes the desired TOTP keys.</li>
+  <li>Create a <code class="language-plaintext highlighter-rouge">codes.json</code> file (based on <code class="language-plaintext highlighter-rouge">codes.json.example</code>) that includes the desired TOTP keys.</li>
   <li>Flash the Raspberry Pi Pico with the latest <a href="https://github.com/pimoroni/pimoroni-pico/releases/latest">MicroPython with Pimoroni Libs</a>.</li>
   <li>Copy the codebase to the Raspberry Pi Pico.</li>
-  <li>Upon boot, you will be required to specify the current UTC time (clicking <code class="language-plaintext highlighter-rouge">B</code> once set).</li>
-  <li>Now you can cycle through your TOTP’s using the <code class="language-plaintext highlighter-rouge">X</code> button.</li>
+  <li>Upon boot, you will be required to specify the current UTC time (click <code class="language-plaintext highlighter-rouge">B</code> once set).</li>
+  <li>Now you can cycle through your TOTPs using the <code class="language-plaintext highlighter-rouge">X</code> button.</li>
 </ul>
 
 <p><a href="https://github.com/eddmann/pico-2fa-totp"><img src="/uploads/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/demo.jpg" /></a></p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>I have been amazed at how easy it is for someone like myself (coming from a high-level programming background), to pick up MicroPython and build non-trivial systems using microcontrollers.
-I found researching and implementing the functionality that performed HMAC-SHA1 to be alot of fun, allowing me to demystify what can seem to be a very <em>magical</em> process.
+<p>I have been amazed at how easy it is for someone like myself, coming from a high-level programming background, to pick up MicroPython and build non-trivial systems using microcontrollers.
+I found researching and implementing the functionality that performed HMAC-SHA1 to be a lot of fun, allowing me to demystify what can seem to be a very <em>magical</em> process.
 Additionally, investigating how to set the Pico’s RTC was an interesting aside, combined with presenting this correction using a purpose-built configuration display screen.</p>
 
 <p>Having success in completing this project has already sparked other ideas that I will discuss in upcoming articles!</p>

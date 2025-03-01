@@ -56,7 +56,7 @@ In this post I wish to discuss how I went about achieving this goal (<em>spoiler
 
 
 
-<h3 id="the-rules">The rules</h3>
+<h2 id="the-rules">The rules</h2>
 
 <p>A month prior to the calendar commencing, I decided to lay out some rules that I would follow whilst completing each solution in C.</p>
 
@@ -75,7 +75,7 @@ This in effect made the task of keeping to under half-a-second even harder, as p
 Instead, I opted to initially complete each solution in Python (a more forgiving dynamic language) first and then set out to complete the C equivalent.
 This allowed me to review possible strategies in a <em>batteries included</em> language that provides rapid development first, and then port these over to C.</p>
 
-<h3 id="things-i-learnt">Things I learnt</h3>
+<h2 id="things-i-learnt">Things I learnt</h2>
 
 <p>The Advent of Code 2021 calendar had some very tricky problems in it.
 Some of which required a lot of thinking and research to reduce down to an adequate runtime to meet the half-a-second target.
@@ -101,12 +101,12 @@ Being able to reuse behaviour within the <a href="https://github.com/eddmann/adv
 However, after the initial learning curve, it became an interesting decision to make on a per-solution basis what the best option was.</li>
 </ul>
 
-<h3 id="the-solutions">The solutions</h3>
+<h2 id="the-solutions">The solutions</h2>
 
 <p>Throughout the course of December, and the subsequent months when revising the C solutions, I documented how each problem was tackled.
 Below are notes on interesting aspects of each solution, and techniques used to increase performance for the end goal.</p>
 
-<h4 id="day-1-sonar-sweep">Day 1: Sonar Sweep</h4>
+<h3 id="day-1-sonar-sweep">Day 1: Sonar Sweep</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day01">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day01">C <code class="language-plaintext highlighter-rouge">runtime: 732 μs</code></a></p>
 
@@ -114,7 +114,7 @@ Below are notes on interesting aspects of each solution, and techniques used to 
 For the C solution I opted to use conventional <em>for</em> loops.
 It gave me my first experience of the dynamic array implementation, allowing me to initially parse the input measurements into a form I wanted to use for the computation.</p>
 
-<h4 id="day-2-dive">Day 2: Dive!</h4>
+<h3 id="day-2-dive">Day 2: Dive!</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day02">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day02">C <code class="language-plaintext highlighter-rouge">runtime: 444 μs</code></a></p>
 
@@ -123,7 +123,7 @@ In hindsight, I would have opted to use an exhaustive <em>match</em> case statem
 The C solution required my first <em>struct</em> to store the course instructions, and followed a simplified mutable pattern to the Python variant.
 It also provided me with my first experience using <code class="language-plaintext highlighter-rouge">scanff</code> to pluck out the desired input.</p>
 
-<h4 id="day-3-binary-diagnostic">Day 3: Binary Diagnostic</h4>
+<h3 id="day-3-binary-diagnostic">Day 3: Binary Diagnostic</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day03">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day03">C <code class="language-plaintext highlighter-rouge">runtime: 761 μs</code></a></p>
 
@@ -132,7 +132,7 @@ Finding the <code class="language-plaintext highlighter-rouge">bit_length</code>
 For the C solution I followed a similar approach, however, for determining the bit width I thought it would be fun to drop-down into some assembly.
 Having targeted the x86 architecture I was able to use the <code class="language-plaintext highlighter-rouge">bsrl</code> CPU operation to determine the bit length.</p>
 
-<h4 id="day-4-giant-squid">Day 4: Giant Squid</h4>
+<h3 id="day-4-giant-squid">Day 4: Giant Squid</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day04">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day04">C <code class="language-plaintext highlighter-rouge">runtime: 2715 μs</code></a></p>
 
@@ -144,7 +144,7 @@ I did find a <code class="language-plaintext highlighter-rouge">goto</code> to b
 Typically, I would short-circuit and return early in the looping construct if the condition had been met.
 This means leaning heavily on the garbage collector etc. in other languages to free any reclaimable memory.</p>
 
-<h4 id="day-5-hydrothermal-venture">Day 5: Hydrothermal Venture</h4>
+<h3 id="day-5-hydrothermal-venture">Day 5: Hydrothermal Venture</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day05">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day05">C <code class="language-plaintext highlighter-rouge">runtime: 1799 μs</code></a></p>
 
@@ -153,7 +153,7 @@ I also took advantage of <code class="language-plaintext highlighter-rouge">True
 For the C solution I used a <a href="https://en.wikipedia.org/wiki/Variable-length_array">variable-length</a> grid to store the counts in, opting to check for <code class="language-plaintext highlighter-rouge">+grid[x][y] == 2</code> to ensure we only counted coordinate overlaps a single time.
 With the inclusion of variable length arrays I started to explore the use of Stack and Heap allocated memory within different scenarios.</p>
 
-<h4 id="day-6-lanternfish">Day 6: Lanternfish</h4>
+<h3 id="day-6-lanternfish">Day 6: Lanternfish</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day06">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day06">C <code class="language-plaintext highlighter-rouge">runtime: 61 μs</code></a></p>
 
@@ -162,14 +162,14 @@ Fishes with a lifetime of 0 will have a timer of 8 on the next iteration (aka. n
 Fishes on the current generation with a timer of 7 today will have a timer of 6 on the next day.
 So, the number of fishes that are reset today (timer of 0) must be added to the one with a timer of 7.</p>
 
-<h4 id="day-7-the-treachery-of-whales">Day 7: The Treachery of Whales</h4>
+<h3 id="day-7-the-treachery-of-whales">Day 7: The Treachery of Whales</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day07">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day07">C <code class="language-plaintext highlighter-rouge">runtime: 11267 μs</code></a></p>
 
 <p>This was another Python solution that leaned heavily on list comprehensions and the standard library, using <a href="https://en.wikipedia.org/wiki/Triangular_number">triangle numbers</a> to keep the formula simple.
 As expected there was a lot more C code required for this one; even though it follows the Python solution, the lack of list comprehensions required a lot of state manipulation.</p>
 
-<h4 id="day-8-seven-segment-search">Day 8: Seven Segment Search</h4>
+<h3 id="day-8-seven-segment-search">Day 8: Seven Segment Search</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day08">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day08">C <code class="language-plaintext highlighter-rouge">runtime: 351 μs</code></a></p>
 
@@ -180,7 +180,7 @@ For the C solution, instead of sets I simply counted the pattern similarities, w
 As we knew the expected input values I was able to bake these in to the <em>struct</em> used, greatly simplifying parsing the input.
 Not making everything dynamic has its wins!</p>
 
-<h4 id="day-9-smoke-basin">Day 9: Smoke Basin</h4>
+<h3 id="day-9-smoke-basin">Day 9: Smoke Basin</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day09">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day09">C <code class="language-plaintext highlighter-rouge">runtime: 1011 μs</code></a></p>
 
@@ -188,7 +188,7 @@ Not making everything dynamic has its wins!</p>
 I opted to use Breadth-first search (BFS) for this solution and found that in the case of the Python solution being able to use negative index to access the end of the array was very handy.
 For the C version I used BFS too, but for the visited set I opted to use a 2D array of booleans instead - this was a tradeoff between memory and lookup time.</p>
 
-<h4 id="day-10-syntax-scoring">Day 10: Syntax Scoring</h4>
+<h3 id="day-10-syntax-scoring">Day 10: Syntax Scoring</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day10">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day10">C <code class="language-plaintext highlighter-rouge">runtime: 436 μs</code></a></p>
 
@@ -199,7 +199,7 @@ Fortunately within the C implementation the dynamic array I used had the ability
 I was additionally able to sort this array using the C standard library’s <a href="https://en.wikipedia.org/wiki/Qsort"><code class="language-plaintext highlighter-rouge">qsort</code></a> function.
 As the dynamic array is internally stored as a regular C array (with some offset metadata) these functions can be used without any additional consideration required.</p>
 
-<h4 id="day-11-dumbo-octopus">Day 11: Dumbo Octopus</h4>
+<h3 id="day-11-dumbo-octopus">Day 11: Dumbo Octopus</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day11">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day11">C <code class="language-plaintext highlighter-rouge">runtime: 250 μs</code></a></p>
 
@@ -207,7 +207,7 @@ As the dynamic array is internally stored as a regular C array (with some offset
 In the C version I opted to use a bounded multidimensional array to represent the grid.
 In this problem I also found how elegant it was to parse integer values using character offsets (i.e. <code class="language-plaintext highlighter-rouge">'number as char' - '0'</code>);</p>
 
-<h4 id="day-12-passage-pathing">Day 12: Passage Pathing</h4>
+<h3 id="day-12-passage-pathing">Day 12: Passage Pathing</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day12">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day12">C <code class="language-plaintext highlighter-rouge">runtime: 5340 μs</code></a></p>
 
@@ -217,7 +217,7 @@ For the C version I used an <code class="language-plaintext highlighter-rouge">i
 With this, I employed a recursive approach to solving the problem at hand, using a boolean flag <code class="language-plaintext highlighter-rouge">small_cave_seen_twice</code> for switching between the two parts.
 I am not a huge fan of this approach, however it gets the job done.</p>
 
-<h4 id="day-13-transparent-origami">Day 13: Transparent Origami</h4>
+<h3 id="day-13-transparent-origami">Day 13: Transparent Origami</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day13">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day13">C <code class="language-plaintext highlighter-rouge">runtime: 3667 μs</code></a></p>
 
@@ -225,7 +225,7 @@ I am not a huge fan of this approach, however it gets the job done.</p>
 It also showed how a functional reduction step could be used to model the problem.
 In the C version as <em>space</em> is always getting smaller (due to the folds) we can continue to use the same <code class="language-plaintext highlighter-rouge">paper_t</code> structure, but update the width/height that we are concerned with at the time.</p>
 
-<h4 id="day-14-extended-polymerization">Day 14: Extended Polymerization</h4>
+<h3 id="day-14-extended-polymerization">Day 14: Extended Polymerization</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day14">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day14">C <code class="language-plaintext highlighter-rouge">runtime: 67 μs</code></a></p>
 
@@ -235,7 +235,7 @@ Having realised that I do not actually care about creating the <em>exact</em> fi
 For the C version I opted to use a bottom-up (tabulation) approach instead, storing pairs as indexed array values; using a similar method to how you would rows/columns in a single dimensional array.
 Modelling this problem in this means was made easier thanks to a couple of small macro function I made to handle the index conversion.</p>
 
-<h4 id="day-15-chiton">Day 15: Chiton</h4>
+<h3 id="day-15-chiton">Day 15: Chiton</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day15">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day15">C <code class="language-plaintext highlighter-rouge">runtime: 16857 μs</code></a></p>
 
@@ -246,7 +246,7 @@ I also enjoyed working out the formula to calculate the scaled risk levels.
 For the C version I decided to follow a similar path, expect this time I was required to build my own heap-based Priority queue implementation.
 Instead of storing the risk levels as x/y tuples like in the Python version, I opted to store them using a single-dimensional array representation.</p>
 
-<h4 id="day-16-packet-decoder">Day 16: Packet Decoder</h4>
+<h3 id="day-16-packet-decoder">Day 16: Packet Decoder</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day16">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day16">C <code class="language-plaintext highlighter-rouge">runtime: 102 μs</code></a></p>
 
@@ -257,7 +257,7 @@ This meant that when I called <code class="language-plaintext highlighter-rouge"
 I preferred the approach in the C version, building up the tree with sub-packet structures allowed me to construct the tree a single time and call either <code class="language-plaintext highlighter-rouge">calc_version_total</code> or <code class="language-plaintext highlighter-rouge">eval</code> based on the part.
 This is in contrast to the Python version, which I was a little lazy with and side-carted solving the initial parts’ version total.</p>
 
-<h4 id="day-17-trick-shot">Day 17: Trick Shot</h4>
+<h3 id="day-17-trick-shot">Day 17: Trick Shot</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day17">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day17">C <code class="language-plaintext highlighter-rouge">runtime: 1679 μs</code></a></p>
 
@@ -266,7 +266,7 @@ Fortunately I modelled this solution in a way that would map well to a C equival
 The key difference of course is the omission of list comprehensions, which means lots of looping!
 Having a look through the subreddit after solving this problem there looks to be a non-brute means in which to solve this problem using some equations of motion.</p>
 
-<h4 id="day-18-snailfish">Day 18: Snailfish</h4>
+<h3 id="day-18-snailfish">Day 18: Snailfish</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day18">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day18">C <code class="language-plaintext highlighter-rouge">runtime: 9027 μs</code></a></p>
 
@@ -279,7 +279,7 @@ This made it easy to perform the split and explode operations.
 I was also interested in using the <code class="language-plaintext highlighter-rouge">memmove</code> function to insert and remove numbers from the tree in a performant manner.
 I found handling raw memory like this is so powerful but scary at the same time.</p>
 
-<h4 id="day-19-beacon-scanner">Day 19: Beacon Scanner</h4>
+<h3 id="day-19-beacon-scanner">Day 19: Beacon Scanner</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day19">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day19">C <code class="language-plaintext highlighter-rouge">runtime: 116330 μs</code></a></p>
 
@@ -292,7 +292,7 @@ I knew my naive approach was not going to cut it, even in a system-level languag
 So instead I resorted to reviewing how some cleaver people on the Advent of Code <a href="https://www.reddit.com/r/adventofcode/comments/rjpf7f/2021_day_19_solutions/">subreddit</a> were able to achieve it.
 Thanks to some key insight I was able to use this to construct my own implementation which heavily relies on linked-lists.</p>
 
-<h4 id="day-20-trench-map">Day 20: Trench Map</h4>
+<h3 id="day-20-trench-map">Day 20: Trench Map</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day20">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day20">C <code class="language-plaintext highlighter-rouge">runtime: 11983 μs</code></a></p>
 
@@ -301,7 +301,7 @@ For the Python version I opted to build the image using a Dictionary.
 Using a Dictionary in this way provides an easy means to navigate through and expand the map going forward.
 For the C solution I decided to instead use a fixed upper-bound multidimensional array, using an accompanying size value to limit the size per enhancement step.</p>
 
-<h4 id="day-21-dirac-dice">Day 21: Dirac Dice</h4>
+<h3 id="day-21-dirac-dice">Day 21: Dirac Dice</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day21">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day21">C <code class="language-plaintext highlighter-rouge">runtime: 29 μs</code></a></p>
 
@@ -309,7 +309,7 @@ For the C solution I decided to instead use a fixed upper-bound multidimensional
 For the C solution another bottom-up tabulation strategy was employed, as this felt simpler than trying to implement function call memorisation in C.
 To make the solution performant as well as space considerate I based my solution on <a href="https://www.reddit.com/r/adventofcode/comments/rl6p8y/comment/hpet9io/">ideas</a> discussed on the subreddit.</p>
 
-<h4 id="day-22-reactor-reboot">Day 22: Reactor Reboot</h4>
+<h3 id="day-22-reactor-reboot">Day 22: Reactor Reboot</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day22">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day22">C <code class="language-plaintext highlighter-rouge">runtime: 50313 μs</code></a></p>
 
@@ -319,7 +319,7 @@ Intersections with positive region generated negative ones and intersections wit
 This canceled out any existing geometry the new cuboid was intersecting.
 This solution mapped well to both Python and C variants, and met my performance needs.</p>
 
-<h4 id="day-23-amphipod">Day 23: Amphipod</h4>
+<h3 id="day-23-amphipod">Day 23: Amphipod</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day23">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day23">C <code class="language-plaintext highlighter-rouge">runtime: 146356 μs</code></a></p>
 
@@ -332,7 +332,7 @@ The lower-bound heuristic used calculated the cost required if every pod could m
 For this solution to work I ended up having to build my own Hash table and Priority queue tailored to this solution.
 It took a while to develop, but the resulting speed gains were worth it.</p>
 
-<h4 id="day-24-arithmetic-logic-unit">Day 24: Arithmetic Logic Unit</h4>
+<h3 id="day-24-arithmetic-logic-unit">Day 24: Arithmetic Logic Unit</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day24">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day24">C <code class="language-plaintext highlighter-rouge">runtime: 82 μs</code></a></p>
 
@@ -340,7 +340,7 @@ It took a while to develop, but the resulting speed gains were worth it.</p>
 After spending far too long going through the assembly code I finally figured out the pattern!
 Both Python and C solutions follow the same idea, using a higher-order function to pass in either the maximum or minimum accumulation functions.</p>
 
-<h4 id="day-25-sea-cucumber">Day 25: Sea Cucumber</h4>
+<h3 id="day-25-sea-cucumber">Day 25: Sea Cucumber</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day25">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day25">C <code class="language-plaintext highlighter-rouge">runtime: 28627 μs</code></a></p>
 

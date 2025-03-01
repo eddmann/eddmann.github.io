@@ -1,22 +1,23 @@
 ---
 layout: post
 title: 'Advent of Code 2015 - Day 22 - Wizard Simulator 20XX'
-meta: 'Solving the Advent of Code 2015 Day 22 puzzle using TypeScript'
+meta: 'Solving the Advent of Code 2015 Day 22 puzzle using TypeScript.'
 tags: advent-of-code advent-of-code-2015 typescript
 ---
 
-On the twenty second day of Advent of Code 2015 we are asked to help 'Little Henry Case' beat the boss in another video game he is stuck on.
+On the twenty-second day of Advent of Code 2015, we are asked to help 'Little Henry Case' beat the boss in another video game he is stuck on.
 
 <!--more-->
 
 ## Part 1
 
-Like the [previous day](https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/) the game is turn-based, however, this time we are able to spend _mana_ in-exchnage for spells we can cast per-round.
-Certain spells have the ability to cause effects which can last between rounds.
-Due to this, we are unable to formulise the battle into a single calculation, so instead must simulate a given battle in its entirety.
-For part one, we are asked to work out what is the minimum about of _mana_ we can spend and still win the battle.
+Like the [previous day](https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/), the game is turn-based.
+However, this time we are able to spend _mana_ in exchange for spells we can cast per round.
+Certain spells have the ability to cause effects that can last between rounds.
+Due to this, we are unable to formulate the battle into a single calculation, so instead, we must simulate a given battle in its entirety.
+For part one, we are asked to work out the minimum amount of _mana_ we can spend and still win the battle.
 
-Based on the rules laid out within the [problem specification](https://adventofcode.com/2015/day/22), we begin by modeling how spells will be represented.
+Based on the rules laid out within the [problem specification](https://adventofcode.com/2015/day/22), we begin by modelling how spells will be represented.
 
 ```typescript
 type Spell = {
@@ -38,8 +39,8 @@ const spells: Spell[] = [
 ];
 ```
 
-This approaches opts to normalise all the possible spell behaviours, creating no-op actions by-way of zero values.
-From here, we model how we wish to store the state of a battle throughout game play.
+This approach opts to normalise all the possible spell behaviours, creating no-op actions by way of zero values.
+From here, we model how we wish to store the state of a battle throughout gameplay.
 
 ```typescript
 type BattleState = {
@@ -54,8 +55,8 @@ type BattleState = {
 ```
 
 There are a couple of rules around which spells are available for a player to cast at a given point in the battle.
-These include if they have enough mana to purchase the spell, and if the spell is an effect that it is either not active or on its last turn.
-We will next translate these rules into a function which we can supply the current `BattleState` to and return the possible `Spell` listing.
+These include whether they have enough mana to purchase the spell and if the spell is an effect that is either not active or on its last turn.
+We will next translate these rules into a function that we can supply the current `BattleState` to and return the possible `Spell` listing.
 
 ```typescript
 const hasBattleEnded = (state: BattleState) =>
@@ -71,9 +72,9 @@ const getAvailableSpells = (state: BattleState): Spell[] => {
 };
 ```
 
-This leads us onto being able to start codifying the steps that a given battle round takes.
+This leads us to being able to start codifying the steps that a given battle round takes.
 We will start by building out all the desired steps as isolated immutable state transitions.
-First we will handle how we apply effects before each particpants turn.
+First, we will handle how we apply effects before each participant's turn.
 
 ```typescript
 type BattleTransition = (state: BattleState) => BattleState;
@@ -94,9 +95,9 @@ const enactEffects: BattleTransition = state => {
 };
 ```
 
-We have used the same `sumProp` function found in the [previous days](https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/) solution to help tally a collections property values.
+We have used the same `sumProp` function found in the [previous day's](https://eddmann.com/posts/advent-of-code-2015-day-21-rpg-simulator-20xx/) solution to help tally a collection's property values.
 Next, we will handle how a player's turn updates the battle state.
-We supply a given `Spell` we wish the player to cast for this round, and return a `BattleTransition` similiar to enacting effects.
+We supply a given `Spell` we wish the player to cast for this round and return a `BattleTransition` similar to enacting effects.
 
 ```typescript
 const playerTurn = (spell: Spell): BattleTransition => state => {
@@ -115,7 +116,7 @@ const playerTurn = (spell: Spell): BattleTransition => state => {
 };
 ```
 
-Following on from the players turn we can now model how a bosses turn updates the battle state.
+Following on from the player's turn, we can now model how a boss's turn updates the battle state.
 
 ```typescript
 const bossTurn: BattleTransition = state => {
@@ -128,9 +129,9 @@ const bossTurn: BattleTransition = state => {
 };
 ```
 
-With the core steps in-place, modeled uniformly as `BattleTransition` types we can begin to think about how we wish stitch these together.
-When reading the problem definition I thought it would be an ideal fit to employ composable state transitions.
-To wire these together I've opted to use a small `pipe` helper function which works in the opposite mannor to a conventional `compose`.
+With the core steps in place, modelled uniformly as `BattleTransition` types, we can begin to think about how we wish to stitch these together.
+When reading the problem definition, I thought it would be an ideal fit to employ composable state transitions.
+To wire these together, I've opted to use a small `pipe` helper function, which works in the opposite manner to a conventional `compose`.
 Instead of being called _right-to-left_, the pipe function composes the provided functions _left-to-right_, which reads more naturally.
 
 ```typescript
@@ -138,7 +139,7 @@ const pipe = <R>(fn1: (a: R) => R, ...fns: Array<(a: R) => R>) =>
   fns.reduce((prevFn, nextFn) => value => nextFn(prevFn(value)), fn1);
 ```
 
-Using this `pipe` function we can build up the steps required to complete a _round_.
+Using this `pipe` function, we can build up the steps required to complete a _round_.
 
 ```typescript
 type BattleRound = (spell: Spell) => BattleTransition;
@@ -147,8 +148,8 @@ const roundOfBattle: BattleRound = spell =>
   pipe(enactEffects, playerTurn(spell), enactEffects, bossTurn);
 ```
 
-With the round simulation modeled, we can go about working on a solution to how we determine the minimum mana required to win the battle.
-To do this we will use a recursive function which takes in a `BattleConfiguration` and `BattleRound` function like so.
+With the round simulation modelled, we can work on a solution to determine the minimum mana required to win the battle.
+To do this, we will use a recursive function that takes in a `BattleConfiguration` and `BattleRound` function like so.
 
 ```typescript
 type BattleConfiguration = Pick<BattleState, 'playerHp' | 'playerMana' | 'bossHp' | 'bossDamage'>;
@@ -186,12 +187,12 @@ const minManaSpent = (
 };
 ```
 
-The `BattleConfiguration` is a [subset type](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys) of the `BattleState`, allowing us to supply the battle properties that define the participants characteristics.
-The `BattleRound` function allows us to supply the `roundOfBattle` function we created earlier, to simulate each given rounds state transition.
-To locate the minimum amount of mana required we store the current minium mana for a winning battle and _prune_ out any branches that exceed this amount until no enactable branches are remaining.
-This allows us to limit the scope of the problem greatly, as upon the first winning game we have ourselves a baseline to _prune_ out any game that exceeds that mana spent.
+The `BattleConfiguration` is a [subset type](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys) of the `BattleState`, allowing us to supply the battle properties that define the participants' characteristics.
+The `BattleRound` function allows us to supply the `roundOfBattle` function we created earlier to simulate each given round's state transition.
+To locate the minimum amount of mana required, we store the current minimum mana for a winning battle and _prune_ out any branches that exceed this amount until no enactable branches remain.
+This allows us to limit the scope of the problem greatly, as upon the first winning game, we have a baseline to _prune_ out any game that exceeds that mana spent.
 
-With this in-place we can parse the bosses characteristics from the supplied input and execute the `minManaSpent` function to find the desired answer 🌟.
+With this in place, we can parse the boss's characteristics from the supplied input and execute the `minManaSpent` function to find the desired answer 🌟.
 
 ```typescript
 const part1 = (input: string): number => {
@@ -206,11 +207,11 @@ const part1 = (input: string): number => {
 
 ## Part 2
 
-For part two we are required to expand upon the game we created in part one.
-We are to now create a _Hard Mode_, in-which at the start of each round the players health is now reduced by one HP.
-Based on this addition we need to work out what the revised minimum mana spent can be to still win the battle.
+For part two, we are required to expand upon the game we created in part one.
+We are now to create a _Hard Mode_, in which, at the start of each round, the player's health is reduced by one HP.
+Based on this addition, we need to determine the revised minimum mana spent required to still win the battle.
 
-We will first create the additional `BattleTransition` step, defining how the Hard Mode modifies the battle state.
+We will first create the additional `BattleTransition` step, defining how Hard Mode modifies the battle state.
 
 ```typescript
 const applyHardMode: BattleTransition = state => ({
@@ -219,15 +220,15 @@ const applyHardMode: BattleTransition = state => ({
 });
 ```
 
-From this, we can create a new _round of battle_ function which pipes the `BattleState` to the `applyHardMode` function before continuing on with the original game.
+From this, we can create a new _round of battle_ function, which pipes the `BattleState` to the `applyHardMode` function before continuing with the original game.
 
 ```typescript
 const hardRoundOfBattle: BattleRound = spell =>
   pipe(applyHardMode, roundOfBattle(spell));
 ```
 
-We can then use the same setup as we did for part one, instead supplying the new `hardRoundOfBattle` function instead.
-In doing so we get the desired answer to the question 🌟.
+We can then use the same setup as we did for part one, instead supplying the new `hardRoundOfBattle` function.
+In doing so, we get the desired answer to the question 🌟.
 
 ```typescript
 const part2 = (input: string): number => {
@@ -240,7 +241,8 @@ const part2 = (input: string): number => {
 };
 ```
 
-I found today's core-problem to not take too long to devise (the minimum pruning technique), however, simulating the game took the majority of the time.
-As mentioned when reading the problem definition I felt there could be a means to provide an elegant composable solution to representing the steps required to perform a round of battle.
+I found today's core problem did not take too long to devise (the minimum pruning technique).
+However, simulating the game took the majority of the time.
+As mentioned when reading the problem definition, I felt there could be a means to provide an elegant, composable solution for representing the steps required to perform a round of battle.
 I'm happy with how the `BattleTransition` type has been employed, lending itself well to the `pipe` operation.
-Reading both the `roundOfBattle` and `hardRoundOfBattle` functions clearly express their intent and the stages of a round.
+Reading both the `roundOfBattle` and `hardRoundOfBattle` functions clearly expresses their intent and the stages of a round.

@@ -34,7 +34,7 @@ COPY . $LAMBDA_TASK_ROOT
 Using the Composer Docker image as a base, we were able to build a `vendor` directory which included only the desired Bref dependencies.
 We were then able to copy this directory into our Lambda container image, making the Bref bootstrap script aware of the custom autoloader path by way of the `BREF_AUTOLOAD_PATH` environment variable.
 
-### Conclusion
+## Conclusion
 
 Although we have only demonstrated this for our own use-case (using a container image), the same idea could be applied for layer-based Lambda functions too.
 Sadly, this approach will not work for [PHP functions](https://bref.sh/docs/runtimes/function.html) due to the means in which the handler is pulled in within the bootstrap script.

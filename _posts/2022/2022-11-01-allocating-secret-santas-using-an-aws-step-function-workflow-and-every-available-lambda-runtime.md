@@ -14,13 +14,13 @@ The final implementation can be found in [this GitHub repository](https://github
 
 I should reiterate that this is heavily over-engineered for solving the problem at hand, with the main driver being to provide me with enough of a problem domain to explore the many different features/states (i.e. Map, Choice, Parallel) of Step Functions, and runtimes available on Lambda.
 
-### Step Function workflows?
+## Step Function workflows?
 
 I have had the opportunity to explore employing an Step Function workflow for several personal projects over the years, providing a high-level of orchestration/durability between task/state transitions.
 One of the key elements I have found is when to model such decisions/execution at the workflow level, or leave it within the code itself.
 Fortunately, this problem could be broken up into several logically separate problems (parsing, allocating, notifying) which allowed me to experiment with handling [failure](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-error-handling.html) and [mapping](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-map-state.html) input in [parallel](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-parallel-state.html) with [choice](https://docs.aws.amazon.com/step-functions/latest/dg/amazon-states-language-choice-state.html) branching.
 
-### Lambda runtimes?
+## Lambda runtimes?
 
 I am a big proponent of Lambda, but due to the languages and runtimes I have been exposed to in the past I have not had the opportunity to explore many of the available runtimes Lambda has to offer.
 Breaking up this problem into many Lambda behaviours felt like a great opportunity to change that.
@@ -28,7 +28,7 @@ Breaking up this problem into many Lambda behaviours felt like a great opportuni
 However, with the availability of the [Custom Runtime API](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-custom.html) the list of _available_ runtimes is **endless**, as such, I decided to limit the scope to all six distinct [supported runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) AWS has to offer, along with a single custom runtime hosted on `provided.al2`.
 This gave me the chance to experience and implement functionality in each language runtime using more than just a simple _Hello world_ example has to offer.
 
-#### Custom runtime
+### Custom runtime
 
 Instead of using a pre-built custom runtime, I opted to additionally take the opportunity of integrating my [own person language](https://github.com/eddmann/santa-lang-ts) I have been developing over the year into a Lambda context.
 I am sure I will be discussing my experience developing this language more in later posts; but at a high-level it is a tree-walking interpreted programming language that is targeted primarily at solving Advent of Code problems.
@@ -38,7 +38,7 @@ I was able to package up the [boostrap](https://github.com/eddmann/santa-lang-ts
 
 This _side-project_ provided me with a great appreciation for the Custom Runtime API that AWS has developed, using HTTP as the common denominator for communication between the desired execution and host Lambda environment.
 
-### The workflow
+## The workflow
 
 For managing and deploying the workflow I opted to use the [Severless Framework](https://www.serverless.com/) and the de-facto [Serverless Step Functions](https://www.serverless.com/plugins/serverless-step-functions) plugin.
 This allowed me to co-locate the workflow and Lambda definitions, which I felt was very beneficial.
@@ -60,7 +60,7 @@ The resulting allocation and notification process was built-up as follows:
 Many of the runtimes required their own specific packaging steps, either for pulling down dependencies and/or compilation.
 As such, I opted to define/document these within [Makefile targets](https://github.com/eddmann/step-function-secret-santa/blob/main/Makefile) which use Docker as the primary means of providing the required execution environment to deterministically package the artifacts.
 
-### Conclusion
+## Conclusion
 
 I really enjoyed building out this behaviour using AWS Step Functions and Lambda runtimes.
 In the time frame I gave myself I was unable to develop a sufficient local execution environment to test the workflow using [Step Functions Local](https://docs.aws.amazon.com/step-functions/latest/dg/sfn-local.html), but in future projects I hope to explore this further.

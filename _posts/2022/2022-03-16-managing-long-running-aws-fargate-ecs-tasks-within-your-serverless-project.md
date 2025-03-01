@@ -14,7 +14,7 @@ In this post I would like to discuss a [Serverless Framework plugin](https://git
 
 <!--more-->
 
-### Why?
+## Why?
 
 Over the past couple of weeks I have been working on a personal project with some behaviour that by-design does not fit into the 15-minute duration limit imposed by AWS Lambda.
 Instead of being able to reengineer the problem into an event-driven architecture, it still is required to be run as a long-polling background process.
@@ -22,7 +22,7 @@ In a conventional compute setting you would employ a [service](https://kubernete
 In doing so however, you lose the level of abstraction you are gifted by Serverless and the Serverless Framework.
 With the desire to maintain this level of abstraction I investigated the possibility of using ECS/AWS Fargate, building additional functionality into the Serverless Framework (by-way of a plugin) to bridge the divide between defining FaaS and container-based compute.
 
-### What is AWS Fargate?
+## What is AWS Fargate?
 
 Fargate is a service offered by AWS which allows you to run containerised workloads at a similar level of abstraction as AWS Lambda does for functions.
 In the case of AWS Lambda you provide the code (or more recently even a container image), where-as in the case of AWS Fargate you provide the container image you wish to run.
@@ -38,7 +38,7 @@ Before we delve into the Serverless plugin itself, it would be useful to provide
 - **Service** - manages the desired amount of a given task you wish to ensure are running at any one time.
 - **Scheduled task** - handles executing a _Task_ at a given time using [AWS EventBridge](https://aws.amazon.com/eventbridge/).
 
-### The Serverless plugin
+## The Serverless plugin
 
 Based on my new understanding of how ECS and Fargate worked, I chose to take a step back and decide how (as an end user) I would like to declare a given _task_ at the level of the Serverless Framework.
 I wanted to take advantage of how the Serverless Framework was able to push built images to ECR, thanks to their [Lambda container-runtime support](https://www.serverless.com/blog/container-support-for-lambda).
@@ -50,7 +50,7 @@ The completed Serverless Framework plugin takes the declared _service/scheduled 
 Using the Framework definition validation (backed by [JSON Schema](https://json-schema.org/)) I was able to validate complex configuration which has been supplied with ease.
 Upon deployment both the Lambda functions and Fargate tasks are provisioned within a single CloudFormation _stack_, with _task_ ARN's being returned as outputs for extended use elsewhere.
 
-### Example usage
+## Example usage
 
 To highlight all the capabilities of the plugin, I created a [contrived example](https://github.com/eddmann/serverless-fargate/tree/main/example) which is present within the Serverless plugin repository.
 This documents how you can create three separate runtimes (PHP, Node and Python) and run long-running behaviour alongside Lambda functions.
@@ -98,7 +98,7 @@ The only excess configuration which does not naturally fit into the Serverless m
 This is optional in a Lambda function based definition, but due to AWS Fargate containers running within `awsvpc` network mode we are required to supply a relevant VPC.
 If Fargate tasks could optionally not require the need for being placed into a VPC (similar to Lambda functions) this would truly honour the same Serverless methodology.
 
-### Conclusion
+## Conclusion
 
 To conclude, I am very excited with how this plugin has progressed since its inception.
 Having been now able to employ its use in the personal project I initially had the need for, has highlighted how powerful it can be.

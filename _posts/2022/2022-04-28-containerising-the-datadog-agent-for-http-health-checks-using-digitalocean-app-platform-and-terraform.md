@@ -138,7 +138,7 @@ resource "datadog_monitor" "datadog_http_check" {
 
 {% endraw %}
 
-#### One small gotcha...
+### One small gotcha...
 
 One additional change we were required to make to the built image for use with DigitalOcean App Platform was the inclusion of an overridden `/proc/cpuinfo` file.
 Upon investigation, it seems as though the `/proc/cpuinfo` output provided by the DigitalOcean host machine includes an `unknown` value for the CPU `stepping` attribute.

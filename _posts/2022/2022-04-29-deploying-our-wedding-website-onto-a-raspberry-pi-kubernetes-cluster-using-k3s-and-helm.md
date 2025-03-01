@@ -23,7 +23,7 @@ In a previous revision of the website, I had explored using a [single-master nod
 Fortunately since this work, [K3s](https://k3s.io/) has joined the party, providing a Kubernetes offering with a small resource footprint, ideal for low-powered devices such as the Raspberry Pi.
 For a project such as mine this was an ideal use-case, allowing me to concentrate efforts on the application deployment itself.
 
-### Configuring the nodes
+## Configuring the nodes
 
 To flash the desired OS to the Raspberry Pi micro-SD cards, I opted to use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
 On top of this, I also found a tool called [k3sup](https://github.com/alexellis/k3sup), which is a small binary executable you can download on your host machine to help assist in configuring each K3s node via SSH.
@@ -191,7 +191,7 @@ The catch however was that without a paid for plan, you were only capable of cre
 I really wanted to replicate the same HTTPS experience that the AWS Lambda environment had.
 I did look at the pricing options but as this was a small experimental project that was going to be torn down in the near future, I not feel I could justify the cost.
 
-### Creating my own tunnel
+## Creating my own tunnel
 
 It was back to the drawing board... but at this time the idea of setting up some form of tunnel between my local Kubernetes cluster and a remote VPS stuck in my head.
 With this idea, I experimented with setting up a [reverse SSH tunnel](https://youtu.be/Wp7boqm3Xts) between one of the nodes Ingress exposed ports (80 and 443) and a EC2 instance.
@@ -210,7 +210,7 @@ Again, as this was just an experimental project this approach would suffice.
 When visiting the web application via HTTPS however, the response returned a self-signed certificate that Traefik had created.
 We were now capable of changing that!
 
-### Issuing SSL certificates using cert-manager
+## Issuing SSL certificates using cert-manager
 
 With public access now available, I could configure [cert-manager](https://cert-manager.io/) within my Kubernetes cluster, to handle issuing SSL certificates via LetsEncrypt.
 This tool not only assists in issuing the SSL certificates, it also provides a means of automatically renewing certificates that are close to expiry.

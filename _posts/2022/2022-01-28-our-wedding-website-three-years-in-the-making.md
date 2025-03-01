@@ -13,7 +13,7 @@ What resulted was a solution that follows DDD, CQRS, Hexagonal Architecture, Eve
 
 <img src="/uploads/our-wedding-website-three-years-in-the-making/our-wedding-website-1.png" />
 
-### How We Got Here...
+## How We Got Here...
 
 The initial idea was formed back in late 2019, where I had been very interested in exploring new concepts (DDD, ES, CQRS) and tooling (Containerisation) within a single project.
 Based on some great resources ([EventSourcery](https://eventsourcery.com/) in particular), I was able to architect a system that followed DDD principles, applying ES and CQRS, based on PHP, PostgreSQL, and Symfony.
@@ -27,7 +27,7 @@ Due to the nature of the business and coupled with a rich domain to model, we de
 It was throughout this time that I was able to take ideas and tooling initially formed within this wedding website and gain experience applying them at a large production level.
 Another interesting piece to the puzzle was that we were targeting deployment to AWS Lambda, making heavy use of Terraform in the process.
 
-### The Now
+## The Now
 
 Fast-forward to late 2021, we were now at a stage where we could finally send out new invites, and this meant dusting off the old website!
 Again, like many developers, I could not simply deploy a personal project that I had written almost two years prior.
@@ -40,7 +40,7 @@ I never did open-source the code for the original website, but I felt that it wo
 As such, I settled on initially publishing an overview of the project (what you are reading now) and the two repositories that make up the system.
 The two repositories include relevant READMEs surrounding core concepts and principles applied, with accompanying diagrams that help explain key elements.
 
-### The Application
+## The Application
 
 <a href="https://github.com/eddmann/our-wedding-website"><img src="/uploads/our-wedding-website-three-years-in-the-making/our-wedding-website-2.png" /></a>
 
@@ -57,7 +57,7 @@ From an implementation point of view, the application is built using PHP 8.1, Sy
 It uses Deptrac to ensure adherence to the strict Hexagonal architectural layering boundaries imposed, Psalm to provide static type-checking support, and PHPUnit to validate the desired behaviour has been implemented.
 The testing strategy employed has been documented within the [project's README](https://github.com/eddmann/our-wedding-website#testing) and closely resembles the layering employed within the application itself.
 
-### The Infrastructure
+## The Infrastructure
 
 <a href="https://github.com/eddmann/our-wedding-infra"><img src="/uploads/our-wedding-website-three-years-in-the-making/our-wedding-infra.png" /></a>
 
@@ -73,7 +73,7 @@ The general philosophy employed is that there should be parity between actions c
 This can be seen by reviewing the [test CI workflow](https://github.com/eddmann/our-wedding-website/blob/main/.github/workflows/test.yml), which delegates to the `can-publish` Makefile target to assert correctness; the same action can be taken within local development without any changes.
 In doing this, consistency is maintained and eliminates any surprises that could occur when merging changes into the service.
 
-### What's Next
+## What's Next
 
 With the project now released, I hope that, in time to come, I will have the opportunity to deep dive and write about specific design and tooling aspects related to the system further.
 Until then, however, if you want to find out more, be sure to check out the [two](https://github.com/eddmann/our-wedding-website) [repositories](https://github.com/eddmann/our-wedding-infra), along with accompanying READMEs that provide more detail.

@@ -109,6 +109,8 @@ resource "datadog_api_key" "datadog_http_check" {
 
 Finally, we were able to provision a DataDog monitor that handled alerting us to any unexpected changes found by the newly created HTTP check service.
 
+{% raw %}
+
 ```hcl
 resource "datadog_monitor" "datadog_http_check" {
   type = "service check"
@@ -133,6 +135,8 @@ resource "datadog_monitor" "datadog_http_check" {
   }
 }
 ```
+
+{% endraw %}
 
 ### One Small Gotcha...
 

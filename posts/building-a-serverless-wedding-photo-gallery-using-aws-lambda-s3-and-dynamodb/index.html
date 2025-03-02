@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discusses the process of building a Serverless Photo Gallery for use by our wedding guests">
+    <meta name="description" content="Explore how to build a serverless wedding photo gallery using AWS Lambda, S3, and DynamoDB, enabling guests to share high-quality photos effortlessly.">
 
     <title>
         
@@ -50,10 +50,10 @@
     <h1 class="post-title">Building a Serverless Wedding Photo Gallery using AWS Lambda, S3 and DynamoDB</h1>
     <time datetime="2022-10-31T00:00:00+00:00" class="post-date">31 Oct 2022</time>
     <p>Whilst <a href="https://github.com/eddmann/our-wedding-infra#stage-applications">documenting</a> how I structured the <a href="https://github.com/eddmann/our-wedding-infra">infrastructure</a> used for hosting our wedding website, I mentioned the possibility of showcasing its use for another application concern.
-In the tradition of over engineering a problem related to our wedding - we really did not want resized/compressed photos shared through WhatsApp/iMessage of the big day.
-So instead, I decided to create a Serverless photo gallery which provided guests with the ability to share the original photos in one place.
-I also wanted to explore the ability to achieve this with having 100% feature parity locally in a development setting.
-In this post I would like to discuss how I went about building these photo-upload/resizing and lazy-loaded gallery capabilities using AWS Lambda, S3 and DynamoDB.
+In the tradition of over-engineering a problem related to our wedding, we really did not want resized/compressed photos shared through WhatsApp/iMessage of the big day.
+So instead, I decided to create a serverless photo gallery that provided guests with the ability to share the original photos in one place.
+I also wanted to explore the ability to achieve this while having 100% feature parity locally in a development setting.
+In this post, I would like to discuss how I went about building these photo-upload/resizing and lazy-loaded gallery capabilities using AWS Lambda, S3 and DynamoDB.
 The final implementation can be found in <a href="https://github.com/eddmann/our-wedding-gallery">this GitHub repository</a>.</p>
 
 
@@ -62,62 +62,62 @@ The final implementation can be found in <a href="https://github.com/eddmann/our
 
 <h2 id="the-api">The API</h2>
 
-<p>For the backend API I opted to use the Node 16 (<code class="language-plaintext highlighter-rouge">nodejs16.x</code>) supported Lambda runtime, conforming to the RESTful Hypertext Application Language (HAL) standard.
-Like in previous projects, I opted to use the <a href="https://www.serverless.com/">Serverless Framework</a> to manage deploying the transient application, whilst leaving the foundational building blocks for Terraform.
-Each API endpoint’s functionality is split into individually packaged artifacts using <a href="https://www.serverless.com/plugins/serverless-esbuild">esbuild</a> for bundling and transpilation.
-This provides smaller artifacts that only contain the dependencies (such as Sharp, AWS-SDK) which are actually required within each of the desired endpoint’s.</p>
+<p>For the backend API, I opted to use the Node 16 (<code class="language-plaintext highlighter-rouge">nodejs16.x</code>) supported Lambda runtime, conforming to the RESTful Hypertext Application Language (HAL) standard.
+Like in previous projects, I used the <a href="https://www.serverless.com/">Serverless Framework</a> to manage deploying the transient application while leaving the foundational building blocks for Terraform.
+Each API endpoint’s functionality is split into individually packaged artefacts using <a href="https://www.serverless.com/plugins/serverless-esbuild">esbuild</a> for bundling and transpilation.
+This provides smaller artefacts that only contain the dependencies (such as Sharp, AWS-SDK) which are actually required within each of the desired endpoints.</p>
 
 <h3 id="persistence">Persistence</h3>
 
 <p><img src="/uploads/building-a-serverless-wedding-photo-gallery-using-aws-lambda-s3-and-dynamodb/nosql-workbench.png" alt="The DynamoDB table schema" /></p>
 
-<p>For storing the photos metadata and gallery listing (used for the infinite scroll) I opted to use a <a href="https://www.alexdebrie.com/posts/dynamodb-single-table/">Single-Table Design</a> DynamoDB table.
-This uses the <code class="language-plaintext highlighter-rouge">PK</code>/<code class="language-plaintext highlighter-rouge">SK</code> and <code class="language-plaintext highlighter-rouge">GSI*PK</code>/<code class="language-plaintext highlighter-rouge">GSI*SK</code> partition/sort key pattern found in Single-Table Design, to be able to optimally fetch data based on pre-defined access patterns.</p>
+<p>For storing the photo metadata and gallery listing (used for infinite scroll), I opted to use a <a href="https://www.alexdebrie.com/posts/dynamodb-single-table/">Single-Table Design</a> DynamoDB table.
+This uses the <code class="language-plaintext highlighter-rouge">PK</code>/<code class="language-plaintext highlighter-rouge">SK</code> and <code class="language-plaintext highlighter-rouge">GSI*PK</code>/<code class="language-plaintext highlighter-rouge">GSI*SK</code> partition/sort key pattern found in Single-Table Design, allowing optimal data retrieval based on predefined access patterns.</p>
 
-<p>The <code class="language-plaintext highlighter-rouge">GSI1PK</code> is used as a <em>hot key</em> 😬 for listing the gallery photos in sorted processed timestamp order - using the last evaluated key as a marker to progressively provide the <em>next</em> batch of gallery photos to the client.
-Using a <em>hot key</em> is not best practise, but based on this usage pattern and load, suffices for this use-case.</p>
+<p>The <code class="language-plaintext highlighter-rouge">GSI1PK</code> is used as a <em>hot key</em> 😬 for listing the gallery photos in sorted processed timestamp order, using the last evaluated key as a marker to progressively provide the <em>next</em> batch of gallery photos to the client.
+Using a <em>hot key</em> is not best practice, but based on this usage pattern and load, it suffices for this use case.</p>
 
-<p>In its current form the use of a <em>Single-Table Design</em> may seem unnecessary with the application lacking lots of different access patterns and concerns.
-However, there is future scope to better showcase the idea with the additional functionality such as photo comments.</p>
+<p>In its current form, the use of a <em>Single-Table Design</em> may seem unnecessary since the application lacks multiple access patterns and concerns.
+However, there is future scope to better showcase the idea with additional functionality, such as photo comments.</p>
 
 <h3 id="photo-upload-and-resizing">Photo Upload and Resizing</h3>
 
-<p>Uploaded photos are stored within an initial <em>upload</em> S3 bucket using pre-signed <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html">form POST requests</a>, which are generated by the API based on a supplied pre-request by the client.
-Upon successful photo upload, the resulting <code class="language-plaintext highlighter-rouge">s3:ObjectCreated</code> event triggers a Lambda whose responsibility is to move the photo to the <em>persistent</em> S3 bucket, and generate resized web and thumbnail variants in WebP (using <a href="https://sharp.pixelplumbing.com/">Node.js Sharp</a>).
-At the end of this process a record with the photo’s metadata is stored in the DynamoDB table, for inclusion into the gallery response.
-The initial <em>upload</em> S3 bucket uses a lifecycle rule to clean up any failed photo uploads after 7 days.</p>
+<p>Uploaded photos are stored within an initial <em>upload</em> S3 bucket using pre-signed <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-UsingHTTPPOST.html">form POST requests</a>, which are generated by the API based on a pre-request supplied by the client.
+Upon successful photo upload, the resulting <code class="language-plaintext highlighter-rouge">s3:ObjectCreated</code> event triggers a Lambda function responsible for moving the photo to the <em>persistent</em> S3 bucket and generating resized web and thumbnail variants in WebP (using <a href="https://sharp.pixelplumbing.com/">Node.js Sharp</a>).
+At the end of this process, a record with the photo’s metadata is stored in the DynamoDB table for inclusion in the gallery response.
+The initial <em>upload</em> S3 bucket uses a lifecycle rule to clean up any failed photo uploads after seven days.</p>
 
 <h3 id="local-development">Local Development</h3>
 
 <p>As stated above, one of my goals was to have local feature parity for development purposes.
-Thanks to a combination of <a href="https://www.serverless.com/plugins/serverless-offline">Serverless Offline</a>, <a href="https://www.serverless.com/plugins/serverless-dynamodb-local">Serverless DynamoDB Local</a> and <a href="https://www.serverless.com/plugins/serverless-s3-local">Serverless S3 Local</a> I was able to achieve just that 🎉.
-I was pleasantly surprised at how easy it was to be able to replicate both pre-signing S3 POST requests and handling S3 event triggers thanks to <a href="https://github.com/jamhall/s3rver">s3rver</a>.
-In doing this I was able to have greater confidence in my implementation before deploying it to AWS.</p>
+Thanks to a combination of <a href="https://www.serverless.com/plugins/serverless-offline">Serverless Offline</a>, <a href="https://www.serverless.com/plugins/serverless-dynamodb-local">Serverless DynamoDB Local</a>, and <a href="https://www.serverless.com/plugins/serverless-s3-local">Serverless S3 Local</a>, I was able to achieve just that 🎉.
+I was pleasantly surprised at how easy it was to replicate both pre-signing S3 POST requests and handling S3 event triggers thanks to <a href="https://github.com/jamhall/s3rver">s3rver</a>.
+Doing this allowed me to have greater confidence in my implementation before deploying it to AWS.</p>
 
 <h2 id="the-client">The Client</h2>
 
-<p><img src="/uploads/building-a-serverless-wedding-photo-gallery-using-aws-lambda-s3-and-dynamodb/gallery.png" alt="The lazy-loaded photo gallery" style="width: 48%; max-width: 250px; display: inline;" /> <img src="/uploads/building-a-serverless-wedding-photo-gallery-using-aws-lambda-s3-and-dynamodb/lightbox.png" alt="The photo lighbox" style="width: 48%; max-width: 250px; display: inline;" /></p>
+<p><img src="/uploads/building-a-serverless-wedding-photo-gallery-using-aws-lambda-s3-and-dynamodb/gallery.png" alt="The lazy-loaded photo gallery" style="width: 48%; max-width: 250px; display: inline;" /> <img src="/uploads/building-a-serverless-wedding-photo-gallery-using-aws-lambda-s3-and-dynamodb/lightbox.png" alt="The photo lightbox" style="width: 48%; max-width: 250px; display: inline;" /></p>
 
-<p>The client is developed as a Single-page application (SPA) using React and Create React App.
-I used this project as a good opportunity to explore using <a href="https://tailwindcss.com/">Tailwind CSS</a> for presentational concerns.
-The client is built statically within the <a href="https://github.com/eddmann/our-wedding-gallery/tree/main/.github/workflows">build pipeline</a>, distributed via S3 and fronted by CloudFront.
-To ensure only authorised users have access to the gallery, a <a href="https://github.com/eddmann/our-wedding-infra/blob/main/stage/apps/gallery/resources/viewer-request.js">CloudFront function</a> is employed to ensure that shared HTTP Basic Authentication credentials are supplied.
-As the same CloudFront distribution is used to front the Client, API and S3 buckets, we can be certain that all requests are protected by these security measures.</p>
+<p>The client is developed as a Single-Page Application (SPA) using React and Create React App.
+I used this project as an opportunity to explore <a href="https://tailwindcss.com/">Tailwind CSS</a> for presentational concerns.
+The client is built statically within the <a href="https://github.com/eddmann/our-wedding-gallery/tree/main/.github/workflows">build pipeline</a>, distributed via S3, and fronted by CloudFront.
+To ensure only authorised users have access to the gallery, a <a href="https://github.com/eddmann/our-wedding-infra/blob/main/stage/apps/gallery/resources/viewer-request.js">CloudFront function</a> enforces that shared HTTP Basic Authentication credentials are supplied.
+As the same CloudFront distribution is used to front the client, API, and S3 buckets, we can be certain that all requests are protected by these security measures.</p>
 
 <h3 id="photo-lazy-loading-and-lightbox">Photo Lazy Loading and Lightbox</h3>
 
 <p>The gallery is presented as an <a href="https://github.com/eddmann/our-wedding-gallery/blob/main/client/src/component/PhotoGallery.js">infinite scrollable list</a>, which progressively (lazily) requests the <em>next</em> available batch of photos.
-When a photo is clicked on, a full-screen <a href="https://github.com/eddmann/our-wedding-gallery/blob/main/client/src/component/Lightbox.js">lightbox variant</a> is presented to the user, providing the ability to visually swipe back and forth (on mobile devices) between photos.
+When a photo is clicked on, a full-screen <a href="https://github.com/eddmann/our-wedding-gallery/blob/main/client/src/component/Lightbox.js">lightbox variant</a> is displayed, providing the ability to visually swipe back and forth (on mobile devices) between photos.
 Effectively handling touch events, with graceful desktop mouse click fallback, was an interesting challenge using React Hooks.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
 <p>I really enjoyed the chance to add additional functionality that could be hosted within the infrastructure project I had set up for our wedding website.
-Being able to replicate all the behaviour within a local setting was very satisfying, enabling a quick REPL for API/Client development.
+Being able to replicate all the behaviour within a local setting was very satisfying, enabling a quick REPL for API/client development.
 I was also very happy with the decision to structure both the client and API in a <a href="https://en.wikipedia.org/wiki/Monorepo">monorepo</a>, with independent <a href="https://github.com/eddmann/our-wedding-gallery/tree/main/.github/workflows">build pipelines</a> for any changes that are pushed.</p>
 
-<p>Finally, since getting the chance to now see how this gallery has been used in practise, I feel the addition of handling video media would be a great future improvement.
-Using <a href="https://aws.amazon.com/mediaconvert/">AWS Elemental MediaConvert</a> as a possible means to handle processing uploaded video media could provide similar <em>elastic compute</em> that Node.js Sharp hosted on Lambda does for photos.</p>
+<p>Finally, after seeing how this gallery has been used in practice, I feel the addition of handling video media would be a great future improvement.
+Using <a href="https://aws.amazon.com/mediaconvert/">AWS Elemental MediaConvert</a> as a possible means to process uploaded video media could provide similar <em>elastic compute</em> functionality that Node.js Sharp, hosted on Lambda, does for photos.</p>
 
 </article>
 

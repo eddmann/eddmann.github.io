@@ -1,8 +1,8 @@
 ---
 layout: post
-title: 'Separating out the Lambda Bref runtime from your projects Composer dependencies'
-canonical: https://tech.mybuilder.com/separating-out-the-lambda-bref-runtime-from-your-projects-composer-dependencies/
-meta: 'Separating out the Lambda Bref runtime from your projects Composer dependencies'
+title: "Separating out the Lambda Bref runtime from your project's Composer dependencies"
+meta: "Learn how to isolate the Lambda Bref runtime from your project's Composer dependencies to avoid conflicts and ensure compatibility."
+tags: lambda serverless bref php aws
 ---
 
 Having had great success using AWS Lambda within our insurance product ([MyBuilder Plus](https://mybuilder-plus.com/)), late last year we made the decision to move **all** our web request traffic over to the platform!
@@ -12,7 +12,7 @@ However, we noticed when attempting to migrate over one application in particula
 
 Thanks to the responsive [enterprise support](https://bref.sh/#enterprise) that Matthieu provides, we discussed a possible solution which involved using a [separate custom autoloader](https://bref.sh/docs/environment/php.html#custom-vendor-path) for use with the Bref runtime.
 Looking through the Bref codebase, we noticed that as we only use the FPM and console runtimes, [both](https://github.com/brefphp/bref/blob/master/runtime/layers/fpm/bootstrap#L35) [variants](https://github.com/brefphp/bref/blob/master/runtime/layers/console/bootstrap#L49) spawn separate PHP processes to handle the actual request.
-This means that the project autoloader does not need to be aware of Bref, and as such, we can isolate away this runtime concern from the project entirely.
+This means that the project autoloader does not need to be aware of Bref, and as such, we can isolate this runtime concern from the project entirely.
 
 The project in question packages the release as a [container image](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html).
 As such, we were able to create a multi-stage Docker build (as shown below) which handles our desired outcome.
@@ -36,7 +36,7 @@ We were then able to copy this directory into our Lambda container image, making
 
 ## Conclusion
 
-Although we have only demonstrated this for our own use-case (using a container image), the same idea could be applied for layer-based Lambda functions too.
-Sadly, this approach will not work for [PHP functions](https://bref.sh/docs/runtimes/function.html) due to the means in which the handler is pulled in within the bootstrap script.
-However, thanks to both the FPM and console layer abstractions we are able to remove these runtime concerns from our project.
+Although we have only demonstrated this for our own use case (using a container image), the same idea could be applied for layer-based Lambda functions too.
+Sadly, this approach will not work for [PHP functions](https://bref.sh/docs/runtimes/function.html) due to the way the handler is pulled in within the bootstrap script.
+However, thanks to both the FPM and console layer abstractions, we are able to remove these runtime concerns from our project.
 This gives us the ability to maintain the runtime and project requirements separately, allowing us to use the latest Bref release in a project that has dependency conflicts.

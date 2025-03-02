@@ -38,6 +38,8 @@ We have been using SendGrid for handling email at MyBuilder for many years and o
 
 With the new GitHub Action, we were now able to bind it to the successful deployment event (as shown below) and remove the need for any more manual tasks!
 
+{% raw %}
+
 ```yaml
 name: Notify Team via Email about Release
 on: deployment_status
@@ -55,6 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+{% endraw %}
+
 ## Slack Release Notifier
 
 <a href="https://github.com/eddmann/slack-release-notifier"><img src="/uploads/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/slack-notification.png" /></a>
@@ -67,6 +71,8 @@ As the Release Drafter has a means to include all the contributor GitHub usernam
 This meant that when a release had Gone Live and the subsequent Slack notification had been sent, interested parties would be alerted to this news instantaneously.
 
 In a similar fashion to how we were able to wire up the Email release notifier, we could bind to the same successful deployment event for Slack communications too.
+
+{% raw %}
 
 ```yaml
 name: Notify Team via Slack about Release
@@ -85,6 +91,8 @@ jobs:
           slackWebhookEndpointUrl: ${{ secrets.RELEASE_SLACK_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+{% endraw %}
 
 _Note:_ Both these tasks could be merged and performed in the same GitHub Action workflow job if desired.
 

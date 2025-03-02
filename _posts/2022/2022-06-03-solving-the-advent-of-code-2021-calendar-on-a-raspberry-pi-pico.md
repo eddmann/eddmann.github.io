@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico'
-meta: 'Exploring how many Advent of Code 2021 solutions can run on a Raspberry Pi Pico using C and C++'
+meta: 'Exploring how many Advent of Code 2021 solutions can run on a Raspberry Pi Pico using C and C++.'
 tags: c advent-of-code pico
 ---
 

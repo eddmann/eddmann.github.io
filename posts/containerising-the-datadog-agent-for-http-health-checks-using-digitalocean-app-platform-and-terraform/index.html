@@ -157,14 +157,14 @@ Coupled with DataDog, we were able to combine the two third-party providers into
   <span class="nx">query</span> <span class="p">=</span> <span class="s2">"</span><span class="se">\"</span><span class="s2">http.can_connect</span><span class="se">\"</span><span class="s2">.over(</span><span class="se">\"</span><span class="s2">*</span><span class="se">\"</span><span class="s2">).by(</span><span class="se">\"</span><span class="s2">url</span><span class="se">\"</span><span class="s2">).last(4).count_by_status()"</span>
 
   <span class="nx">message</span> <span class="p">=</span> <span class="o">&lt;&lt;-</span><span class="no">EOM</span><span class="sh">
-    
-    We are having issues connecting to . 
-    
+    {{#is_alert}}
+    We are having issues connecting to {{url.name}}. {{check_message}}
+    {{/is_alert}}
 
-    
-    We are now able to connect to . 
-</span><span class="no">    
-  EOM
+    {{#is_recovery}}
+    We are now able to connect to {{url.name}}. {{check_message}}
+    {{/is_recovery}}
+</span><span class="no">  EOM
 
 </span>  <span class="nx">monitor_thresholds</span> <span class="p">{</span>
     <span class="nx">critical</span> <span class="p">=</span> <span class="mi">3</span>

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Using GitHub Actions to send Gone Live release notes via Email and Slack">
+    <meta name="description" content="Learn how to use GitHub Actions to automate the distribution of Gone Live release notes via Email and Slack, improving communication and reducing manual tasks.">
 
     <title>
         
@@ -28,8 +28,6 @@
     <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
 
     
-        <link rel="canonical" href="https://tech.mybuilder.com/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/" />
-    
 </head>
 
     <body>
@@ -51,9 +49,9 @@
                 <article class="post">
     <h1 class="post-title">Using GitHub Actions to send Gone Live release notes via Email and Slack</h1>
     <time datetime="2022-02-03T00:00:00+00:00" class="post-date">03 Feb 2022</time>
-    <p>Ensuring that both the tech team and company as a whole are aware of changes that have just been released is very important.
-This keeps everyone <em>in the loop</em> with the work that the tech team are carrying out, and how the system is changing over time.
-Last year MyBuilder transitioned away from Jenkins to GitHub Actions to manage our CI pipelines, and in the process was able to revise how we notified interested parties about releases.</p>
+    <p>Ensuring that both the tech team and the company as a whole are aware of changes that have just been released is very important.
+This keeps everyone <em>in the loop</em> with the work that the tech team are carrying out and how the system is changing over time.
+Last year, MyBuilder transitioned away from Jenkins to GitHub Actions to manage our CI pipelines, and in the process, we were able to revise how we notified interested parties about releases.</p>
 
 
 
@@ -61,35 +59,34 @@ Last year MyBuilder transitioned away from Jenkins to GitHub Actions to manage o
 The ability to additionally tag pull requests and produce sectionable release notes is very useful.
 Adopting GitHub Actions, we now had an easy means of additionally triggering actions based on GitHub events such as successful deployment 😎.</p>
 
-<p>Our primary means of release notification were in the form of Gone Live emails, which required manual means to send out the release notes to the company once the changes had been deployed.
-One of the key drivers of the SRE team at MyBuilder is <a href="https://sre.google/workbook/eliminating-toil/">eliminating toil</a>, and we had pinpointed this as being such a case that needed review.
-With the move to GitHub Actions we could now harness the power of the provided event system and workflows to instead automate the process.
+<p>Our primary means of release notification were in the form of Gone Live emails, which required manual effort to send out the release notes to the company once the changes had been deployed.
+One of the key drivers of the SRE team at MyBuilder is <a href="https://sre.google/workbook/eliminating-toil/">eliminating toil</a>, and we had pinpointed this as a case that needed review.
+With the move to GitHub Actions, we could now harness the power of the provided event system and workflows to automate the process.
 Upon review, we also felt it useful to provide the ability for members of staff to review Gone Live release notes within a dedicated Slack channel, as this had overtaken email as the primary communication platform.</p>
 
-<h2 id="what-we-wanted">What we wanted</h2>
+<h2 id="what-we-wanted">What We Wanted</h2>
 
 <p>We wanted a means of automatically notifying interested parties of Gone Live release notes via both Email and Slack channels upon successful deployment, without any manual intervention.
 Better still, it would be great if we could additionally <a href="https://slack.com/intl/en-gb/help/articles/205240127-Use-mentions-in-Slack"><em>mention</em></a> members of the tech team within the Slack notification based on their involvement.
-So with this in mind, I was able to spend a day building several GitHub Actions which solved these two use-cases.</p>
+So with this in mind, I was able to spend a day building several GitHub Actions that solved these two use cases.</p>
 
-<h2 id="email-release-notifier">Email release notifier</h2>
+<h2 id="email-release-notifier">Email Release Notifier</h2>
 
 <p><a href="https://github.com/eddmann/email-release-notifier"><img src="/uploads/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/email-notification.png" /></a></p>
 
 <p>The completed Email release notifier is available for review and use <a href="https://github.com/eddmann/email-release-notifier">on GitHub</a>.
-When a release is published within GitHub the contents is stored as Markdown, as such, we were required to convert this Markdown to HTML so it could be presented in an Email.
-This was trivial thanks to having access to not only a Node runtime, but the ability to package NPM dependencies as well.
-We have been using SendGrid for handling email at MyBuilder for many years, and opted to use their SDK/API to send out the actual email on our behalf.</p>
+When a release is published within GitHub, the contents are stored as Markdown.
+As such, we were required to convert this Markdown to HTML so it could be presented in an Email.
+This was trivial thanks to having access to not only a Node runtime but also the ability to package NPM dependencies.
+We have been using SendGrid for handling email at MyBuilder for many years and opted to use their SDK/API to send out the actual email on our behalf.</p>
 
-<p>With the new GitHub Action we were now able to bind it to the successful deployment event (as shown below), and remove the need for any more manual tasks!</p>
-
-<!--  -->
+<p>With the new GitHub Action, we were now able to bind it to the successful deployment event (as shown below) and remove the need for any more manual tasks!</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team via Email about Release</span>
 <span class="na">on</span><span class="pi">:</span> <span class="s">deployment_status</span>
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">notify</span><span class="pi">:</span>
-    <span class="na">if</span><span class="pi">:</span> <span class="s">${{ github.event.deployment_status.state == 'success' }}</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">$</span>
     <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-20.04</span>
     <span class="na">steps</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team</span>
@@ -97,32 +94,28 @@ We have been using SendGrid for handling email at MyBuilder for many years, and 
         <span class="na">with</span><span class="pi">:</span>
           <span class="na">to</span><span class="pi">:</span> <span class="s">to@email.com</span>
           <span class="na">from</span><span class="pi">:</span> <span class="s">from@email.com</span>
-          <span class="na">sendGridToken</span><span class="pi">:</span> <span class="s">${{ secrets.SENDGRID_API_TOKEN }}</span>
-          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">${{ secrets.GITHUB_TOKEN }}</span>
+          <span class="na">sendGridToken</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
 </code></pre></div></div>
 
-<!--  -->
-
-<h2 id="slack-release-notifier">Slack release notifier</h2>
+<h2 id="slack-release-notifier">Slack Release Notifier</h2>
 
 <p><a href="https://github.com/eddmann/slack-release-notifier"><img src="/uploads/using-github-actions-to-send-gone-live-release-notes-via-email-and-slack/slack-notification.png" /></a></p>
 
 <p>The completed Slack release notifier is available for review and use <a href="https://github.com/eddmann/slack-release-notifier">on GitHub</a>.
-In this case, we wanted to not only send it to a desired shared channel, but also provide a means of <em>mentioning</em> tech team members based on interested pull request changes going live.
+In this case, we wanted to not only send it to a desired shared channel but also provide a means of <em>mentioning</em> tech team members based on relevant pull request changes going live.
 Slack’s <a href="https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-webhooks-for-Slack">Webhook support</a> allows you to build complex messages using constructs such as <em>blocks</em>.
-These <em>blocks</em> can handle a subset of Markdown which was useful in-regards to the release notes that had been generated.
+These <em>blocks</em> can handle a subset of Markdown, which was useful regarding the release notes that had been generated.
 As the Release Drafter has a means to include all the contributor GitHub usernames within the compiled release, it was a trivial task to replace these occurrences with their associated Slack member identities (by way of a lookup table input).
-This meant that when a release had Gone Live and the the subsequent Slack notification had been sent, interested parties would be alerted to this news instantaneously.</p>
+This meant that when a release had Gone Live and the subsequent Slack notification had been sent, interested parties would be alerted to this news instantaneously.</p>
 
 <p>In a similar fashion to how we were able to wire up the Email release notifier, we could bind to the same successful deployment event for Slack communications too.</p>
-
-<!--  -->
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team via Slack about Release</span>
 <span class="na">on</span><span class="pi">:</span> <span class="s">deployment_status</span>
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">notify</span><span class="pi">:</span>
-    <span class="na">if</span><span class="pi">:</span> <span class="s">${{ github.event.deployment_status.state == 'success' }}</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">$</span>
     <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-20.04</span>
     <span class="na">steps</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team</span>
@@ -131,18 +124,16 @@ This meant that when a release had Gone Live and the the subsequent Slack notifi
           <span class="na">slackTitle</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Your</span><span class="nv"> </span><span class="s">changes</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">live!'</span>
           <span class="na">slackHeading</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Gone</span><span class="nv"> </span><span class="s">Live</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">{tag_name}'</span>
           <span class="na">gitHubSlackUserLookup</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"@GitHubUsername":"SlackMemberId"}'</span>
-          <span class="na">slackWebhookEndpointUrl</span><span class="pi">:</span> <span class="s">${{ secrets.RELEASE_SLACK_WEBHOOK_URL }}</span>
-          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">${{ secrets.GITHUB_TOKEN }}</span>
+          <span class="na">slackWebhookEndpointUrl</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
 </code></pre></div></div>
-
-<!--  -->
 
 <p><em>Note:</em> Both these tasks could be merged and performed in the same GitHub Action workflow job if desired.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
 <p>To conclude, I really enjoyed exploring how we could automate tasks we deem to be toil using GitHub Actions.
-The rich set of GitHub events you are able to trigger behaviour on is invaluable, and makes automating tasks such as this easy to achieve.
+The rich set of GitHub events you can trigger behaviour on is invaluable and makes automating tasks such as this easy to achieve.
 Now that we have moved our entire CI pipeline over to GitHub Actions, I hope to be able to take more advantage of these capabilities in time to come.</p>
 
 </article>

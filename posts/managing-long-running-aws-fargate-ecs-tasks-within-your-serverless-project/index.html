@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documents a recent Serverless Framework plugin I have built to aid in bridging the gap between running behaviour within both AWS Lambda and AWS Fargate compute platforms">
+    <meta name="description" content="Explore how a Serverless Framework plugin bridges the gap between AWS Lambda and AWS Fargate, enabling seamless execution of long-running tasks alongside FaaS compute models.">
 
     <title>
         
@@ -50,57 +50,57 @@
     <h1 class="post-title">Managing long-running AWS Fargate ECS tasks within your Serverless project</h1>
     <time datetime="2022-03-16T00:00:00+00:00" class="post-date">16 Mar 2022</time>
     <p>I am a big proponent of the Serverless movement.
-The ability to concentrate efforts on only the code and infrastructure concerns which directly add business value is very powerful.
-Function-as-a-Service (FaaS) offerings like AWS Lambda impose limitations which help aid in designing more fault tolerant/scalable systems; leaning towards event-driven architectures.
-However, there are times when we need to execute behaviour which exceed common-place FaaS duration limits (i.e. AWS Lambda’s 15-minute limit).
-In this case we ideally do not want to resort to a lower-level of compute (i.e. a VPS such as EC2), but instead be able to define and run such behaviour alongside our FaaS counterparts.
-In this post I would like to discuss a <a href="https://github.com/eddmann/serverless-fargate">Serverless Framework plugin</a> I have written which aids in bridging this gap, by-way of ECS and <a href="https://aws.amazon.com/fargate/">AWS Fargate</a>.</p>
+The ability to concentrate efforts on only the code and infrastructure concerns that directly add business value is very powerful.
+Function-as-a-Service (FaaS) offerings like AWS Lambda impose limitations that help in designing more fault-tolerant and scalable systems, leaning towards event-driven architectures.
+However, there are times when we need to execute behaviour that exceeds common FaaS duration limits (i.e. AWS Lambda’s 15-minute limit).
+In this case, we ideally do not want to resort to a lower level of compute (i.e. a VPS such as EC2), but instead, be able to define and run such behaviour alongside our FaaS counterparts.
+In this post, I would like to discuss a <a href="https://github.com/eddmann/serverless-fargate">Serverless Framework plugin</a> I have written, which aids in bridging this gap by way of ECS and <a href="https://aws.amazon.com/fargate/">AWS Fargate</a>.</p>
 
 
 
 <h2 id="why">Why?</h2>
 
-<p>Over the past couple of weeks I have been working on a personal project with some behaviour that by-design does not fit into the 15-minute duration limit imposed by AWS Lambda.
-Instead of being able to reengineer the problem into an event-driven architecture, it still is required to be run as a long-polling background process.
-In a conventional compute setting you would employ a <a href="https://kubernetes.io/docs/concepts/services-networking/service/">service</a>/<a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">daemon</a> (by-way of your choice of container orchestration platform) or possibly even manage an EC2 instance which runs a process control system such as <a href="http://supervisord.org/">Supervisor</a>.
-In doing so however, you lose the level of abstraction you are gifted by Serverless and the Serverless Framework.
-With the desire to maintain this level of abstraction I investigated the possibility of using ECS/AWS Fargate, building additional functionality into the Serverless Framework (by-way of a plugin) to bridge the divide between defining FaaS and container-based compute.</p>
+<p>Over the past couple of weeks, I have been working on a personal project with some behaviour that, by design, does not fit into the 15-minute duration limit imposed by AWS Lambda.
+Instead of being able to reengineer the problem into an event-driven architecture, it still needs to be run as a long-polling background process.
+In a conventional compute setting, you would employ a <a href="https://kubernetes.io/docs/concepts/services-networking/service/">service</a> or <a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">daemon</a> (by way of your choice of container orchestration platform) or possibly even manage an EC2 instance running a process control system such as <a href="http://supervisord.org/">Supervisor</a>.
+However, in doing so, you lose the level of abstraction that Serverless and the Serverless Framework provide.
+With the desire to maintain this level of abstraction, I investigated the possibility of using ECS/AWS Fargate, building additional functionality into the Serverless Framework (by way of a plugin) to bridge the divide between defining FaaS and container-based compute.</p>
 
 <h2 id="what-is-aws-fargate">What is AWS Fargate?</h2>
 
-<p>Fargate is a service offered by AWS which allows you to run containerised workloads at a similar level of abstraction as AWS Lambda does for functions.
-In the case of AWS Lambda you provide the code (or more recently even a container image), where-as in the case of AWS Fargate you provide the container image you wish to run.
-This then provides you with all the same Serverless benefits; a pay-as-you-go model, no up-front capacity planning and built-in host-level VM separation for security concerns.</p>
+<p>Fargate is a service offered by AWS that allows you to run containerised workloads at a similar level of abstraction as AWS Lambda does for functions.
+In the case of AWS Lambda, you provide the code (or more recently, even a container image), whereas in the case of AWS Fargate, you provide the container image you wish to run.
+This provides you with all the same Serverless benefits: a pay-as-you-go model, no upfront capacity planning, and built-in host-level VM separation for security concerns.</p>
 
-<p>This level of compute is able to be used for both <a href="https://aws.amazon.com/ecs/">ECS</a> and <a href="https://aws.amazon.com/eks/">EKS</a> container orchestration platforms.
-Upon review, I opted to use ECS and this seemed to impose the least friction in both means of definition and execution of the desired behaviour.
-Before we delve into the Serverless plugin itself, it would be useful to provide an overview of the consistent building blocks that are used to construct it.</p>
+<p>This level of compute can be used for both <a href="https://aws.amazon.com/ecs/">ECS</a> and <a href="https://aws.amazon.com/eks/">EKS</a> container orchestration platforms.
+Upon review, I opted to use ECS, as this seemed to impose the least friction in both definition and execution of the desired behaviour.
+Before we delve into the Serverless plugin itself, it would be useful to provide an overview of the constituent building blocks used to construct it:</p>
 
 <ul>
-  <li><strong>Cluster</strong> - an isolated logical grouping of tasks or services which comprise your application.</li>
-  <li><strong>Task definition</strong> - defines one or more containers (with port, parameter configuration) that form your application.</li>
+  <li><strong>Cluster</strong> - an isolated logical grouping of tasks or services that comprise your application.</li>
+  <li><strong>Task definition</strong> - defines one or more containers (with port and parameter configurations) that form your application.</li>
   <li><strong>Task</strong> - instance(s) of a <em>Task definition</em>.</li>
-  <li><strong>Service</strong> - manages the desired amount of a given task you wish to ensure are running at any one time.</li>
+  <li><strong>Service</strong> - manages the desired number of a given task you wish to ensure is running at any one time.</li>
   <li><strong>Scheduled task</strong> - handles executing a <em>Task</em> at a given time using <a href="https://aws.amazon.com/eventbridge/">AWS EventBridge</a>.</li>
 </ul>
 
 <h2 id="the-serverless-plugin">The Serverless plugin</h2>
 
-<p>Based on my new understanding of how ECS and Fargate worked, I chose to take a step back and decide how (as an end user) I would like to declare a given <em>task</em> at the level of the Serverless Framework.
+<p>Based on my new understanding of how ECS and Fargate work, I chose to take a step back and decide how, as an end user, I would like to declare a given <em>task</em> at the level of the Serverless Framework.
 I wanted to take advantage of how the Serverless Framework was able to push built images to ECR, thanks to their <a href="https://www.serverless.com/blog/container-support-for-lambda">Lambda container-runtime support</a>.
-This meant that we could delegate this responsibility to the Framework, and reference images in a similar manner to how the user has grown accustom to.
-I also wanted to ensure that the execution task role created for the <em>tasks</em> honoured any <code class="language-plaintext highlighter-rouge">iamManagedPolicies</code> and <code class="language-plaintext highlighter-rouge">iamRoleStatements</code> declarations found within the provider, again, adding parity with provisioned Lambda functions.
+This meant that we could delegate this responsibility to the Framework and reference images in a similar manner to how users have grown accustomed to.
+I also wanted to ensure that the execution task role created for the <em>tasks</em> honoured any <code class="language-plaintext highlighter-rouge">iamManagedPolicies</code> and <code class="language-plaintext highlighter-rouge">iamRoleStatements</code> declarations found within the provider, again adding parity with provisioned Lambda functions.
 The resulting definition can be found within the <a href="https://github.com/eddmann/serverless-fargate#example">GitHub repository</a>, detailing all the available configuration options.</p>
 
 <p>The completed Serverless Framework plugin takes the declared <em>service/scheduled tasks</em> and generates the underlying CloudFormation resources needed to provision the compute upon deployment.
-Using the Framework definition validation (backed by <a href="https://json-schema.org/">JSON Schema</a>) I was able to validate complex configuration which has been supplied with ease.
-Upon deployment both the Lambda functions and Fargate tasks are provisioned within a single CloudFormation <em>stack</em>, with <em>task</em> ARN’s being returned as outputs for extended use elsewhere.</p>
+Using the Framework definition validation (backed by <a href="https://json-schema.org/">JSON Schema</a>), I was able to validate complex configurations supplied with ease.
+Upon deployment, both the Lambda functions and Fargate tasks are provisioned within a single CloudFormation <em>stack</em>, with <em>task</em> ARNs being returned as outputs for extended use elsewhere.</p>
 
 <h2 id="example-usage">Example usage</h2>
 
-<p>To highlight all the capabilities of the plugin, I created a <a href="https://github.com/eddmann/serverless-fargate/tree/main/example">contrived example</a> which is present within the Serverless plugin repository.
-This documents how you can create three separate runtimes (PHP, Node and Python) and run long-running behaviour alongside Lambda functions.
-Additionally, if you do not wish to mix container task and function layer runtimes (ensuring runtime parity), this can be achieved like so.</p>
+<p>To highlight all the capabilities of the plugin, I created a <a href="https://github.com/eddmann/serverless-fargate/tree/main/example">contrived example</a> within the Serverless plugin repository.
+This demonstrates how you can create three separate runtimes (PHP, Node, and Python) and run long-running behaviour alongside Lambda functions.
+Additionally, if you do not wish to mix container task and function-layer runtimes (ensuring runtime parity), this can be achieved as follows:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">serverless-fargate</span>
 
@@ -134,21 +134,21 @@ Additionally, if you do not wish to mix container task and function layer runtim
       <span class="pi">-</span> <span class="na">httpApi</span><span class="pi">:</span> <span class="s">GET /</span>
 </code></pre></div></div>
 
-<p>Thanks to the extensible nature of the Serverless Framework plugin ecosystem the DSL we have been able to construct almost feels native.
-The above definition shows how a single application artifact image can be built, and then subsequently run, in both a Lambda function and Fargate task setting.
-For Fargate tasks, we are still able to use <a href="https://github.com/aws/aws-lambda-base-images">Lambda compatible runtime images</a>, but instead only need to override the entry point and desired command.
+<p>Thanks to the extensible nature of the Serverless Framework plugin ecosystem, the DSL we have been able to construct almost feels native.
+The above definition shows how a single application artifact image can be built and then subsequently run in both a Lambda function and a Fargate task setting.
+For Fargate tasks, we are still able to use <a href="https://github.com/aws/aws-lambda-base-images">Lambda-compatible runtime images</a>, but we only need to override the entry point and desired command.
 This allows you to maintain parity between application behaviour that requires different execution duration characteristics.</p>
 
-<p>The only excess configuration which does not naturally fit into the Serverless model is the required VPC.
-This is optional in a Lambda function based definition, but due to AWS Fargate containers running within <code class="language-plaintext highlighter-rouge">awsvpc</code> network mode we are required to supply a relevant VPC.
-If Fargate tasks could optionally not require the need for being placed into a VPC (similar to Lambda functions) this would truly honour the same Serverless methodology.</p>
+<p>The only excess configuration that does not naturally fit into the Serverless model is the required VPC.
+This is optional in a Lambda function-based definition, but due to AWS Fargate containers running within <code class="language-plaintext highlighter-rouge">awsvpc</code> network mode, we are required to supply a relevant VPC.
+If Fargate tasks could optionally not require placement within a VPC (similar to Lambda functions), this would truly align with the Serverless methodology.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>To conclude, I am very excited with how this plugin has progressed since its inception.
-Having been now able to employ its use in the personal project I initially had the need for, has highlighted how powerful it can be.
-Going forward I would like to add additional compute support for <a href="https://docs.aws.amazon.com/AmazonECS/latest/bestpracticesguide/ec2-and-fargate-spot.html">Fargate Spot</a> instances.
-There are a couple of interesting technicalities to handling spot instances, which could be abstracted away by means of a plugin.
+<p>To conclude, I am very excited about how this plugin has progressed since its inception.
+Having now been able to employ its use in the personal project I initially needed it for has highlighted how powerful it can be.
+Going forward, I would like to add additional compute support for <a href="https://docs.aws.amazon.com/AmazonECS/latest/bestpracticesguide/ec2-and-fargate-spot.html">Fargate Spot</a> instances.
+There are a couple of interesting technicalities in handling spot instances, which could be abstracted away by means of a plugin.
 I hope to document this work in a future blog post.</p>
 
 </article>

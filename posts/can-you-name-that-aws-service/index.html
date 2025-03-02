@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Documents building an AWS service icon quiz game using React and GitHub Actions">
+    <meta name="description" content="A guide to building an AWS service icon quiz game using React and GitHub Actions.">
 
     <title>
         
@@ -49,10 +49,10 @@
                 <article class="post">
     <h1 class="post-title">Can you name that AWS service?</h1>
     <time datetime="2022-03-25T00:00:00+00:00" class="post-date">25 Mar 2022</time>
-    <p>I have always been amazed by the sheer amount of services AWS offers.
+    <p>I have always been amazed by the sheer number of services AWS offers.
 Although I spend a lot of time working within AWS, I am always surprised to find yet another service that I did not know existed.
-Better still, is with each new service comes an associated new service icon.
-This is why I thought it would be interesting (and somewhat educational) to build a small trivia game which quizzes you on AWS service icons.</p>
+Better still, with each new service comes an associated new service icon.
+This is why I thought it would be interesting (and somewhat educational) to build a small trivia game that quizzes you on AWS service icons.</p>
 
 
 
@@ -60,36 +60,37 @@ This is why I thought it would be interesting (and somewhat educational) to buil
 
 <h2 id="finding-the-services">Finding the Services</h2>
 
-<p>Instead of having to painstakingly crawl through all the available AWS services and associated icons, they fortunately provide an Architecture Icons <a href="https://aws.amazon.com/architecture/icons/">assets package</a>.
-This artifact includes all the available named service icons, grouped by category.
-Having found this, all that was required was to create a <a href="https://github.com/eddmann/name-that-aws-service/blob/main/export-services.js">small script</a> which exported this directory listing.
-Thanks to the service icons being available in SVG format, I was able to keep this service definition contained to a single file.
-Being in a deterministic form, meant that future additions (because AWS is surely going to add more services!) could be performed in an automated fashion.
+<p>Instead of painstakingly crawling through all the available AWS services and associated icons, they fortunately provide an Architecture Icons <a href="https://aws.amazon.com/architecture/icons/">assets package</a>.
+This artefact includes all the available named service icons, grouped by category.
+Having found this, all that was required was to create a <a href="https://github.com/eddmann/name-that-aws-service/blob/main/export-services.js">small script</a> that exported this directory listing.
+Thanks to the service icons being available in SVG format, I was able to keep this service definition contained in a single file.
+Being in a deterministic form meant that future additions (because AWS is surely going to add more services!) could be performed in an automated fashion.
 With the services now in a format we could query, it was time to build the game!</p>
 
 <h2 id="building-the-game">Building the Game</h2>
 
 <p>Thinking of the rules behind the game, I opted to keep it simple at this time.
-That being, each day a new quiz would be generated which consisted of 10 service icons.
-These service icons would each have 4 possible choices, and an optional hint (the supplied category) you could view.
-The participants results would be stored within their web browsers local storage, to provide a crude means of ensuring they only attempted the daily quiz once.
-Like many developers I have been amazed by the success of <a href="https://www.nytimes.com/games/wordle/index.html">Wordle</a>, and with this, I took inspiration for the shared single daily quiz - which helps garner community discussion.</p>
+Each day, a new quiz would be generated, consisting of ten service icons.
+These service icons would each have four possible choices and an optional hint (the supplied category) that you could view.
+The participants’ results would be stored within their web browsers’ local storage, providing a crude means of ensuring they only attempted the daily quiz once.
+Like many developers, I have been amazed by the success of <a href="https://www.nytimes.com/games/wordle/index.html">Wordle</a>.
+With this, I took inspiration from the shared single daily quiz, which helps garner community discussion.</p>
 
 <p>In a similar manner to how I built several small <a href="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/">web-based</a> <a href="https://eddmann.com/posts/building-a-nokia-composer-rtttl-player-and-wav-file-generator-in-the-browser/">applications</a> a couple of years ago, I decided to keep all the client-side React logic within a single <a href="https://github.com/eddmann/name-that-aws-service/blob/main/public/index.html">HTML file</a>.
-This makes it easier for someone who wishes to review the code, and highlights how trivial such behaviour can be built using React.
-Going forward, if additional more complex behaviour is required, I may look to employ tooling such as <a href="https://create-react-app.dev/">Create React App</a>.</p>
+This makes it easier for someone who wishes to review the code and highlights how trivial such behaviour can be built using React.
+Going forward, if additional, more complex behaviour is required, I may look to employ tooling such as <a href="https://create-react-app.dev/">Create React App</a>.</p>
 
 <h2 id="generating-the-quiz">Generating the Quiz</h2>
 
 <p>With the game being static in nature, I decided that hosting it using GitHub Pages would be a great fit.
 With this, I also decided that I could harness GitHub Actions to generate the daily <a href="https://github.com/eddmann/name-that-aws-service/blob/main/generate-quiz.js">random quiz</a> based on a <a href="https://github.com/eddmann/name-that-aws-service/blob/main/.github/workflows/generate.yml">scheduled workflow</a>.
-Each morning the workflow is executed, which in-turn, generates a new quiz and commits it to the GitHub repository.
-This allows me to delegate the responsibility of hosting and compute to GitHub, and only concern myself with the behaviour I wish to build.</p>
+Each morning, the workflow is executed, which in turn generates a new quiz and commits it to the GitHub repository.
+This allows me to delegate the responsibility of hosting and compute to GitHub and only concern myself with the behaviour I wish to build.</p>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Since building the quiz game I have shared it across the team at MyBuilder and seen how well people know their AWS services!
-Going forward I would like to experiment with adding a Social Login component to the game, in-which results can then be centrally stored and shared with other participants.</p>
+<p>Since building the quiz game, I have shared it across the team at MyBuilder and seen how well people know their AWS services!
+Going forward, I would like to experiment with adding a Social Login component to the game, in which results can then be centrally stored and shared with other participants.</p>
 
 </article>
 

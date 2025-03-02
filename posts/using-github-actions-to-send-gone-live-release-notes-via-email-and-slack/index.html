@@ -86,7 +86,7 @@ We have been using SendGrid for handling email at MyBuilder for many years and o
 <span class="na">on</span><span class="pi">:</span> <span class="s">deployment_status</span>
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">notify</span><span class="pi">:</span>
-    <span class="na">if</span><span class="pi">:</span> <span class="s">$</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">${{ github.event.deployment_status.state == 'success' }}</span>
     <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-20.04</span>
     <span class="na">steps</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team</span>
@@ -94,8 +94,8 @@ We have been using SendGrid for handling email at MyBuilder for many years and o
         <span class="na">with</span><span class="pi">:</span>
           <span class="na">to</span><span class="pi">:</span> <span class="s">to@email.com</span>
           <span class="na">from</span><span class="pi">:</span> <span class="s">from@email.com</span>
-          <span class="na">sendGridToken</span><span class="pi">:</span> <span class="s">$</span>
-          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">sendGridToken</span><span class="pi">:</span> <span class="s">${{ secrets.SENDGRID_API_TOKEN }}</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">${{ secrets.GITHUB_TOKEN }}</span>
 </code></pre></div></div>
 
 <h2 id="slack-release-notifier">Slack Release Notifier</h2>
@@ -115,7 +115,7 @@ This meant that when a release had Gone Live and the subsequent Slack notificati
 <span class="na">on</span><span class="pi">:</span> <span class="s">deployment_status</span>
 <span class="na">jobs</span><span class="pi">:</span>
   <span class="na">notify</span><span class="pi">:</span>
-    <span class="na">if</span><span class="pi">:</span> <span class="s">$</span>
+    <span class="na">if</span><span class="pi">:</span> <span class="s">${{ github.event.deployment_status.state == 'success' }}</span>
     <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-20.04</span>
     <span class="na">steps</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Notify Team</span>
@@ -124,8 +124,8 @@ This meant that when a release had Gone Live and the subsequent Slack notificati
           <span class="na">slackTitle</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Your</span><span class="nv"> </span><span class="s">changes</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">live!'</span>
           <span class="na">slackHeading</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Gone</span><span class="nv"> </span><span class="s">Live</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">{tag_name}'</span>
           <span class="na">gitHubSlackUserLookup</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"@GitHubUsername":"SlackMemberId"}'</span>
-          <span class="na">slackWebhookEndpointUrl</span><span class="pi">:</span> <span class="s">$</span>
-          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">slackWebhookEndpointUrl</span><span class="pi">:</span> <span class="s">${{ secrets.RELEASE_SLACK_WEBHOOK_URL }}</span>
+          <span class="na">GITHUB_TOKEN</span><span class="pi">:</span> <span class="s">${{ secrets.GITHUB_TOKEN }}</span>
 </code></pre></div></div>
 
 <p><em>Note:</em> Both these tasks could be merged and performed in the same GitHub Action workflow job if desired.</p>

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Tells the story of how I went about solving the Advent in Code 2021 calendar in under half-a-second using the C programming language">
+    <meta name="description" content="Exploring the journey of solving the Advent of Code 2021 calendar in under half a second using the C programming language.">
 
     <title>
         
@@ -50,87 +50,88 @@
     <h1 class="post-title">Solving the Advent of Code 2021 calendar using C in under half-a-second</h1>
     <time datetime="2022-05-30T00:00:00+00:00" class="post-date">30 May 2022</time>
     <p>Since being introduced to the world of <a href="https://adventofcode.com/">Advent of Code</a> just prior to the 2020 calendar starting, I subsequently spent the majority of 2021 completing (and documenting) the <a href="https://eddmann.com/archive/tag/advent-of-code-2015/">2015</a>, <a href="https://eddmann.com/archive/tag/advent-of-code-2016/">2016</a> and <a href="https://github.com/eddmann/advent-of-code/tree/master/2017/rust">2017</a> calendars.
-For the 2021 calendar I decided that it would be interesting (and challenging) to complete the calendar in C, with an initial solution written in Python to meet the daily aspect of the challenge.
-Additionally, with C being such a performant language, I also wanted to set the goal of ensuring that the entire C calendar was solvable on a single CPU core in under a half-a-second (inspired by <a href="https://dannyvankooten.com/solving-advent-of-code-2020-under-1-second/">this</a> blog post).
-In this post I wish to discuss how I went about achieving this goal (<em>spoiler</em> <code class="language-plaintext highlighter-rouge">410315 μs (0.410 s)</code> on average) and the hurdles I faced along the way.</p>
+For the 2021 calendar, I decided that it would be interesting (and challenging) to complete the calendar in C, with an initial solution written in Python to meet the daily aspect of the challenge.
+Additionally, with C being such a performant language, I also wanted to set the goal of ensuring that the entire C calendar was solvable on a single CPU core in under half a second (inspired by <a href="https://www.dannyvankooten.com/blog/2021/solving-advent-of-code-2020-under-1-second/">this</a> blog post).
+In this post, I wish to discuss how I went about achieving this goal (<em>spoiler</em>: <code class="language-plaintext highlighter-rouge">410315 μs (0.410 s)</code> on average) and the hurdles I faced along the way.</p>
 
 
 
-<h2 id="the-rules">The rules</h2>
+<h2 id="the-rules">The Rules</h2>
 
 <p>A month prior to the calendar commencing, I decided to lay out some rules that I would follow whilst completing each solution in C.</p>
 
 <ol>
   <li>The runtime benchmark would be taken from execution on my current MacBook Pro, running an <a href="https://www.cpubenchmark.net/cpu.php?cpu=Intel+Core+i7-9750H+%40+2.60GHz&amp;id=3425">Intel Core i7-9750H CPU @ 2.60GHz</a>.</li>
-  <li>Each solution written would follow the C11 standard, and compile using the GCC compiler with the following flags <code class="language-plaintext highlighter-rouge">-std=gnu11 -march=native -Ofast -Wall -Werror</code>.</li>
-  <li>No third-party libraries (data-structures and algorithms) could be used within a solution, making each solution self-contained.
+  <li>Each solution written would follow the C11 standard and compile using the GCC compiler with the following flags: <code class="language-plaintext highlighter-rouge">-std=gnu11 -march=native -Ofast -Wall -Werror</code>.</li>
+  <li>No third-party libraries (data structures and algorithms) could be used within a solution, making each solution self-contained.
 I did make one exception, that being the inclusion of a <a href="https://github.com/eddmann/advent-of-code/blob/master/2021/c/shared/dynarray.c">dynamic array</a> implementation, which eased variable input sizes.</li>
   <li>Each solution would clean up any memory allocation it had requested.
-Sure the OS would clean up these allocations once the executable terminates, but in constrained memory environments (i.e. microcontrollers) this would be a necessity, and a possible next project 😉.</li>
-  <li>Each day’s solution parts would be computational self-reliant, meaning that computation completed by part one <strong>could not</strong> be re-used in part two.
-This in effect made the task of keeping to under half-a-second even harder, as performance gains found in re-using previous state was prohibited.</li>
+Sure, the OS would clean up these allocations once the executable terminates, but in constrained memory environments (i.e. microcontrollers), this would be a necessity and a possible next project 😉.</li>
+  <li>Each day’s solution parts would be computationally self-reliant, meaning that computation completed by part one <strong>could not</strong> be reused in part two.
+This, in effect, made the task of keeping under half a second even harder, as performance gains found in reusing previous state were prohibited.</li>
 </ol>
 
-<p>As discussed in the introduction I did not complete each day’s solution in C from the offset.
+<p>As discussed in the introduction, I did not complete each day’s solution in C from the outset.
 Instead, I opted to initially complete each solution in Python (a more forgiving dynamic language) first and then set out to complete the C equivalent.
-This allowed me to review possible strategies in a <em>batteries included</em> language that provides rapid development first, and then port these over to C.</p>
+This allowed me to review possible strategies in a <em>batteries-included</em> language that provides rapid development first and then port these over to C.</p>
 
-<h2 id="things-i-learnt">Things I learnt</h2>
+<h2 id="things-i-learnt">Things I Learnt</h2>
 
 <p>The Advent of Code 2021 calendar had some very tricky problems in it.
-Some of which required a lot of thinking and research to reduce down to an adequate runtime to meet the half-a-second target.
-Over the course of a couple of months I managed to finally achieve this goal, reaching an average runtime of <code class="language-plaintext highlighter-rouge">410315 μs (0.410 s)</code> 🎉.
-Below are key learnings I took away from the experience of initially programming in C, and then trying to make them more performant.</p>
+Some required a lot of thinking and research to reduce down to an adequate runtime to meet the half-a-second target.
+Over the course of a couple of months, I managed to finally achieve this goal, reaching an average runtime of <code class="language-plaintext highlighter-rouge">410315 μs (0.410 s)</code> 🎉.
+Below are key learnings I took away from the experience of initially programming in C and then trying to make them more performant.</p>
 
 <ul>
   <li>C has very unforgiving error messages, runtime <a href="https://en.wikipedia.org/wiki/Segmentation_fault">Segmentation faults</a> are not easy to debug.
-When solving the 2017 calendar in Rust (another system-level language) I think I took for granted how well that language aids the developer in tracking down and correcting bugs.</li>
-  <li>Debugging using tooling such as <a href="https://www.sourceware.org/gdb/">gdb</a> was very useful, but as I had not invested the time in integrating this within an IDE, using the terminal for such tasks was rather painful.
-This meant that I did opt for one too many <code class="language-plaintext highlighter-rouge">getc(stdin)</code>and <code class="language-plaintext highlighter-rouge">printf</code> statement to track execution throughout the course of the calendar.</li>
-  <li><a href="https://valgrind.org/">Valgrind</a> is your friend! When handling cleaning up after each solution having the ability to profile the heap memory usage throughout execution using Valgrind was a life-saver.</li>
-  <li>Due to some data-structures required to adequately solve some days, I unintentionally learnt a lot about how Hash tables and Priority queues are built from first principles.
+When solving the 2017 calendar in Rust (another system-level language), I think I took for granted how well that language aids the developer in tracking down and correcting bugs.</li>
+  <li>Debugging using tools such as <a href="https://www.sourceware.org/gdb/">gdb</a> was very useful, but as I had not invested the time in integrating this within an IDE, using the terminal for such tasks was rather painful.
+This meant that I opted for one too many <code class="language-plaintext highlighter-rouge">getc(stdin)</code> and <code class="language-plaintext highlighter-rouge">printf</code> statements to track execution throughout the course of the calendar.</li>
+  <li><a href="https://valgrind.org/">Valgrind</a> is your friend!
+When handling cleanup after each solution, having the ability to profile the heap memory usage throughout execution using Valgrind was a lifesaver.</li>
+  <li>Due to some data structures required to adequately solve some days, I unintentionally learnt a lot about how hash tables and priority queues are built from first principles.
 Although this was interesting, it did take away from focusing on the problem at hand.
-This made me envious of languages such as C++ and Python which already include tried and true implementations of such structures.</li>
-  <li>On top of the C11 standard I also wished to follow a uniform coding style.
-This lead me to employ use of the <a href="https://www.kernel.org/doc/html/latest/process/clang-format.html">clang-format</a> tool and follow the style laid out in <a href="https://matt.sh/howto-c">How to C in 2016</a>, for example using types found in <a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html">stdint.h</a>.</li>
+This made me envious of languages such as C++ and Python, which already include tried and true implementations of such structures.</li>
+  <li>On top of the C11 standard, I also wished to follow a uniform coding style.
+This led me to employ the use of the <a href="https://www.kernel.org/doc/html/latest/process/clang-format.html">clang-format</a> tool and follow the style laid out in <a href="https://matt.sh/howto-c">How to C in 2016</a>, for example, using types found in <a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdint.h.html">stdint.h</a>.</li>
   <li>Parsing input using <code class="language-plaintext highlighter-rouge">sscanf</code> is not as bad as I feared it would be.
-In fact, for some solutions I actually found it easier to parse the input in the C version than I did the Python equivalent 🤯.</li>
+In fact, for some solutions, I actually found it easier to parse the input in the C version than I did the Python equivalent 🤯.</li>
   <li>Using the C macro system to help reduce boilerplate required to bootstrap each solution was very useful.
-Being able to reuse behaviour within the <a href="https://github.com/eddmann/advent-of-code/blob/master/2021/c/shared/aoc.h"><code class="language-plaintext highlighter-rouge">AOC_MAIN</code></a> macro aided greatly in making each solutions’ implementation very concise to the problem.</li>
-  <li>It took a little while to get used to handling memory allocations on the Stack vs. the Heap - another concept that higher-level languages with more abstract memory models hide from you.
-However, after the initial learning curve, it became an interesting decision to make on a per-solution basis what the best option was.</li>
+Being able to reuse behaviour within the <a href="https://github.com/eddmann/advent-of-code/blob/master/2021/c/shared/aoc.h"><code class="language-plaintext highlighter-rouge">AOC_MAIN</code></a> macro aided greatly in making each solution’s implementation very concise to the problem.</li>
+  <li>It took a little while to get used to handling memory allocations on the stack vs. the heap - another concept that higher-level languages with more abstract memory models hide from you.
+However, after the initial learning curve, it became an interesting decision to make on a per-solution basis as to what the best option was.</li>
 </ul>
 
-<h2 id="the-solutions">The solutions</h2>
+<h2 id="the-solutions">The Solutions</h2>
 
 <p>Throughout the course of December, and the subsequent months when revising the C solutions, I documented how each problem was tackled.
-Below are notes on interesting aspects of each solution, and techniques used to increase performance for the end goal.</p>
+Below are notes on interesting aspects of each solution and techniques used to increase performance for the end goal.</p>
 
 <h3 id="day-1-sonar-sweep">Day 1: Sonar Sweep</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day01">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day01">C <code class="language-plaintext highlighter-rouge">runtime: 732 μs</code></a></p>
 
-<p>The first day provided me with a good use case for Python’s list comprehensions, and allowed me to make use of the <code class="language-plaintext highlighter-rouge">zip</code> function to apply the desired windows.
-For the C solution I opted to use conventional <em>for</em> loops.
-It gave me my first experience of the dynamic array implementation, allowing me to initially parse the input measurements into a form I wanted to use for the computation.</p>
+<p>The first day provided me with a good use case for Python’s list comprehensions and allowed me to make use of the <code class="language-plaintext highlighter-rouge">zip</code> function to apply the desired windows.
+For the C solution, I opted to use conventional <em>for</em> loops.
+It gave me my first experience with the dynamic array implementation, allowing me to initially parse the input measurements into a form I wanted to use for the computation.</p>
 
 <h3 id="day-2-dive">Day 2: Dive!</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day02">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day02">C <code class="language-plaintext highlighter-rouge">runtime: 444 μs</code></a></p>
 
-<p>The Python version was small enough to fit in each parts’ solution functions.
-In hindsight, I would have opted to use an exhaustive <em>match</em> case statement, over <em>if</em> statements.
-The C solution required my first <em>struct</em> to store the course instructions, and followed a simplified mutable pattern to the Python variant.
-It also provided me with my first experience using <code class="language-plaintext highlighter-rouge">scanff</code> to pluck out the desired input.</p>
+<p>The Python version was small enough to fit in each part’s solution functions.
+In hindsight, I would have opted to use an exhaustive <em>match</em> case statement over <em>if</em> statements.
+The C solution required my first <em>struct</em> to store the course instructions and followed a simplified mutable pattern similar to the Python variant.
+It also provided me with my first experience using <code class="language-plaintext highlighter-rouge">scanf</code> to extract the desired input.</p>
 
 <h3 id="day-3-binary-diagnostic">Day 3: Binary Diagnostic</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day03">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day03">C <code class="language-plaintext highlighter-rouge">runtime: 761 μs</code></a></p>
 
-<p>I had a lot of fun using bitwise operations and the handy <a href="https://docs.python.org/3/library/collections.html#collections.Counter"><em>Counter</em></a> data-structure in the Python solution.
+<p>I had a lot of fun using bitwise operations and the handy <a href="https://docs.python.org/3/library/collections.html#collections.Counter"><em>Counter</em></a> data structure in the Python solution.
 Finding the <code class="language-plaintext highlighter-rouge">bit_length</code> method within the standard library was also very useful.
-For the C solution I followed a similar approach, however, for determining the bit width I thought it would be fun to drop-down into some assembly.
-Having targeted the x86 architecture I was able to use the <code class="language-plaintext highlighter-rouge">bsrl</code> CPU operation to determine the bit length.</p>
+For the C solution, I followed a similar approach; however, for determining the bit width, I thought it would be fun to drop down into some assembly.
+Having targeted the x86 architecture, I was able to use the <code class="language-plaintext highlighter-rouge">bsrl</code> CPU operation to determine the bit length.</p>
 
 <h3 id="day-4-giant-squid">Day 4: Giant Squid</h3>
 
@@ -138,11 +139,11 @@ Having targeted the x86 architecture I was able to use the <code class="language
 
 <p>The Python solution made use of <code class="language-plaintext highlighter-rouge">any</code> and <code class="language-plaintext highlighter-rouge">all</code> iterable functions to clearly map intent within the code.
 This again used the powerful <code class="language-plaintext highlighter-rouge">zip</code> function, this time to transpose the lists board rows.
-For the C solution I tried to accommodate for variable size input, resulting in dynamic allocation of the boards.
-This lead to quite a lot of cleanup being required after the computation step.
-I did find a <code class="language-plaintext highlighter-rouge">goto</code> to be useful however, to apply the required cleanup operation before returning.
+For the C solution, I tried to accommodate variable-size input, resulting in dynamic allocation of the boards.
+This led to quite a lot of cleanup being required after the computation step.
+I did find a <code class="language-plaintext highlighter-rouge">goto</code> to be useful, however, to apply the required cleanup operation before returning.
 Typically, I would short-circuit and return early in the looping construct if the condition had been met.
-This means leaning heavily on the garbage collector etc. in other languages to free any reclaimable memory.</p>
+This means leaning heavily on the garbage collector in other languages to free any reclaimable memory.</p>
 
 <h3 id="day-5-hydrothermal-venture">Day 5: Hydrothermal Venture</h3>
 
@@ -150,34 +151,34 @@ This means leaning heavily on the garbage collector etc. in other languages to f
 
 <p>This was another interesting problem and allowed me to use Python’s <code class="language-plaintext highlighter-rouge">zip_longest</code> and <code class="language-plaintext highlighter-rouge">range</code> to determine the intermediate steps of the given lines, with the <em>Counter</em> data structure recording overlaps.
 I also took advantage of <code class="language-plaintext highlighter-rouge">True</code> values being counted as <code class="language-plaintext highlighter-rouge">1</code> within a Python <code class="language-plaintext highlighter-rouge">sum</code> function call.
-For the C solution I used a <a href="https://en.wikipedia.org/wiki/Variable-length_array">variable-length</a> grid to store the counts in, opting to check for <code class="language-plaintext highlighter-rouge">+grid[x][y] == 2</code> to ensure we only counted coordinate overlaps a single time.
-With the inclusion of variable length arrays I started to explore the use of Stack and Heap allocated memory within different scenarios.</p>
+For the C solution, I used a <a href="https://en.wikipedia.org/wiki/Variable-length_array">variable-length</a> grid to store the counts, opting to check for <code class="language-plaintext highlighter-rouge">+grid[x][y] == 2</code> to ensure we only counted coordinate overlaps a single time.
+With the inclusion of variable-length arrays, I started to explore the use of stack and heap allocated memory within different scenarios.</p>
 
 <h3 id="day-6-lanternfish">Day 6: Lanternfish</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day06">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day06">C <code class="language-plaintext highlighter-rouge">runtime: 61 μs</code></a></p>
 
 <p>Having spent some time determining the pattern cycle, the resulting solutions modelled in Python and C were very similar and not very complex.
-Fishes with a lifetime of 0 will have a timer of 8 on the next iteration (aka. newborns).
-Fishes on the current generation with a timer of 7 today will have a timer of 6 on the next day.
-So, the number of fishes that are reset today (timer of 0) must be added to the one with a timer of 7.</p>
+Fishes with a lifetime of 0 will have a timer of 8 on the next iteration (i.e. newborns).
+Fishes in the current generation with a timer of 7 today will have a timer of 6 on the next day.
+So, the number of fishes that are reset today (timer of 0) must be added to those with a timer of 7.</p>
 
 <h3 id="day-7-the-treachery-of-whales">Day 7: The Treachery of Whales</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day07">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day07">C <code class="language-plaintext highlighter-rouge">runtime: 11267 μs</code></a></p>
 
 <p>This was another Python solution that leaned heavily on list comprehensions and the standard library, using <a href="https://en.wikipedia.org/wiki/Triangular_number">triangle numbers</a> to keep the formula simple.
-As expected there was a lot more C code required for this one; even though it follows the Python solution, the lack of list comprehensions required a lot of state manipulation.</p>
+As expected, there was a lot more C code required for this one; even though it follows the Python solution, the lack of list comprehensions required a lot of state manipulation.</p>
 
 <h3 id="day-8-seven-segment-search">Day 8: Seven Segment Search</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day08">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day08">C <code class="language-plaintext highlighter-rouge">runtime: 351 μs</code></a></p>
 
-<p>This problem was one of my favourite from the 2021 calendar.
-I had a lot of fun using sets, <em>match</em> statements and the exploring Python’s type-hinting capabilities.
-The general solution I went with was that based on the characteristics of <em>one</em> and <em>four</em> you can determine the decoded output.
-For the C solution, instead of sets I simply counted the pattern similarities, which did not look to be too much of a performance bottleneck.
-As we knew the expected input values I was able to bake these in to the <em>struct</em> used, greatly simplifying parsing the input.
+<p>This problem was one of my favourites from the 2021 calendar.
+I had a lot of fun using sets, <em>match</em> statements, and exploring Python’s type-hinting capabilities.
+The general solution I went with was that, based on the characteristics of <em>one</em> and <em>four</em>, you can determine the decoded output.
+For the C solution, instead of sets, I simply counted the pattern similarities, which did not seem to be too much of a performance bottleneck.
+As we knew the expected input values, I was able to bake these into the <em>struct</em> used, greatly simplifying parsing the input.
 Not making everything dynamic has its wins!</p>
 
 <h3 id="day-9-smoke-basin">Day 9: Smoke Basin</h3>
@@ -185,37 +186,37 @@ Not making everything dynamic has its wins!</p>
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day09">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day09">C <code class="language-plaintext highlighter-rouge">runtime: 1011 μs</code></a></p>
 
 <p>This was the first map-based problem of the calendar.
-I opted to use Breadth-first search (BFS) for this solution and found that in the case of the Python solution being able to use negative index to access the end of the array was very handy.
-For the C version I used BFS too, but for the visited set I opted to use a 2D array of booleans instead - this was a tradeoff between memory and lookup time.</p>
+I opted to use Breadth-First Search (BFS) for this solution and found that, in the case of the Python solution, being able to use negative indices to access the end of the array was very handy.
+For the C version, I used BFS too, but for the visited set, I opted to use a 2D array of booleans instead - this was a trade-off between memory and lookup time.</p>
 
 <h3 id="day-10-syntax-scoring">Day 10: Syntax Scoring</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day10">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day10">C <code class="language-plaintext highlighter-rouge">runtime: 436 μs</code></a></p>
 
-<p>This problem all revolved around picking the right data-structure, in this case a Stack.
-Although, there were some additional extras at the end (sorting and median calculation) to add another level of complexity.
+<p>This problem revolved around picking the right data structure, in this case, a stack.
+Although there were some additional extras at the end (sorting and median calculation) to add another level of complexity.
 This was very easy to map out and solve within Python, opting to store the score weights within a Dictionary.
-Fortunately within the C implementation the dynamic array I used had the ability to be used as an efficient Stack.
+Fortunately, in the C implementation, the dynamic array I used had the ability to function as an efficient stack.
 I was additionally able to sort this array using the C standard library’s <a href="https://en.wikipedia.org/wiki/Qsort"><code class="language-plaintext highlighter-rouge">qsort</code></a> function.
-As the dynamic array is internally stored as a regular C array (with some offset metadata) these functions can be used without any additional consideration required.</p>
+As the dynamic array is internally stored as a regular C array (with some offset metadata), these functions can be used without any additional consideration required.</p>
 
 <h3 id="day-11-dumbo-octopus">Day 11: Dumbo Octopus</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day11">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day11">C <code class="language-plaintext highlighter-rouge">runtime: 250 μs</code></a></p>
 
 <p>This was another grid-based problem, where-by treating the grid as a Dictionary within Python made it easy to iterate over and apply the neighbouring checks.
-In the C version I opted to use a bounded multidimensional array to represent the grid.
-In this problem I also found how elegant it was to parse integer values using character offsets (i.e. <code class="language-plaintext highlighter-rouge">'number as char' - '0'</code>);</p>
+In the C version, I opted to use a bounded multidimensional array to represent the grid.
+In this problem, I also found how elegant it was to parse integer values using character offsets (i.e. <code class="language-plaintext highlighter-rouge">'number as char' - '0'</code>).</p>
 
 <h3 id="day-12-passage-pathing">Day 12: Passage Pathing</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day12">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day12">C <code class="language-plaintext highlighter-rouge">runtime: 5340 μs</code></a></p>
 
-<p>This problem lent itself well to use BFS again, supplying a predicate function to determine if the cave was explorable.
-The default value capabilities within Python Dictionaries (i.e. <code class="language-plaintext highlighter-rouge">defaultdict(list)</code>) is super useful!
-For the C version I used an <code class="language-plaintext highlighter-rouge">id</code> function to translate the path identifiers into deterministic integers (instead of using a hash function).
+<p>This problem lent itself well to using BFS again, supplying a predicate function to determine if the cave was explorable.
+The default value capabilities within Python Dictionaries (i.e. <code class="language-plaintext highlighter-rouge">defaultdict(list)</code>) are super useful!
+For the C version, I used an <code class="language-plaintext highlighter-rouge">id</code> function to translate the path identifiers into deterministic integers (instead of using a hash function).
 With this, I employed a recursive approach to solving the problem at hand, using a boolean flag <code class="language-plaintext highlighter-rouge">small_cave_seen_twice</code> for switching between the two parts.
-I am not a huge fan of this approach, however it gets the job done.</p>
+I am not a huge fan of this approach; however, it gets the job done.</p>
 
 <h3 id="day-13-transparent-origami">Day 13: Transparent Origami</h3>
 
@@ -223,48 +224,49 @@ I am not a huge fan of this approach, however it gets the job done.</p>
 
 <p>The Python version again leaned heavily on computed sets and list comprehension.
 It also showed how a functional reduction step could be used to model the problem.
-In the C version as <em>space</em> is always getting smaller (due to the folds) we can continue to use the same <code class="language-plaintext highlighter-rouge">paper_t</code> structure, but update the width/height that we are concerned with at the time.</p>
+In the C version, as <em>space</em> is always getting smaller (due to the folds), we can continue to use the same <code class="language-plaintext highlighter-rouge">paper_t</code> structure but update the width/height that we are concerned with at the time.</p>
 
 <h3 id="day-14-extended-polymerization">Day 14: Extended Polymerization</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day14">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day14">C <code class="language-plaintext highlighter-rouge">runtime: 67 μs</code></a></p>
 
-<p>This was a fun Dynamic programming problem.
-Like always, I opted to first go down the naive implementation route for part 1, just to be bit by that decision in part 2.
-Having realised that I do not actually care about creating the <em>exact</em> final string, I was able to break the problem down recursively using memorisation (the <code class="language-plaintext highlighter-rouge">@cache</code> decorator is great) and <em>Counter</em> data-structure.
-For the C version I opted to use a bottom-up (tabulation) approach instead, storing pairs as indexed array values; using a similar method to how you would rows/columns in a single dimensional array.
-Modelling this problem in this means was made easier thanks to a couple of small macro function I made to handle the index conversion.</p>
+<p>This was a fun dynamic programming problem.
+As always, I opted to first go down the naive implementation route for part 1, only to be bitten by that decision in part 2.
+Having realised that I do not actually care about creating the <em>exact</em> final string, I was able to break the problem down recursively using memoisation (the <code class="language-plaintext highlighter-rouge">@cache</code> decorator is great) and the <em>Counter</em> data structure.
+For the C version, I opted to use a bottom-up (tabulation) approach instead, storing pairs as indexed array values, using a similar method to how you would handle rows/columns in a single-dimensional array.
+Modelling this problem in this way was made easier thanks to a couple of small macro functions I made to handle the index conversion.</p>
 
 <h3 id="day-15-chiton">Day 15: Chiton</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day15">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day15">C <code class="language-plaintext highlighter-rouge">runtime: 16857 μs</code></a></p>
 
 <p>This was another grid traversal problem.
-I initially used BFS but then opted to add a Priority queue and use <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra’s algorithm</a> for better performance.
-Within the Python version I did find treating a standard list as a Priority queue (using <code class="language-plaintext highlighter-rouge">heapq</code> methods) felt a little odd; it seemed as thought it could have been abstracted into a different data-structure entirely.
+I initially used BFS but then opted to add a priority queue and use <a href="https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm">Dijkstra’s algorithm</a> for better performance.
+Within the Python version, I found that treating a standard list as a priority queue (using <code class="language-plaintext highlighter-rouge">heapq</code> methods) felt a little odd; it seemed as though it could have been abstracted into a different data structure entirely.
 I also enjoyed working out the formula to calculate the scaled risk levels.
-For the C version I decided to follow a similar path, expect this time I was required to build my own heap-based Priority queue implementation.
+For the C version, I decided to follow a similar path, except this time I was required to build my own heap-based priority queue implementation.
 Instead of storing the risk levels as x/y tuples like in the Python version, I opted to store them using a single-dimensional array representation.</p>
 
 <h3 id="day-16-packet-decoder">Day 16: Packet Decoder</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day16">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day16">C <code class="language-plaintext highlighter-rouge">runtime: 102 μs</code></a></p>
 
-<p>This proved to be a very wordy problem - but like always, I am amazed at how much thought goes into a problem and how much can be packed into such a small input!.
-For the Python variant I opted for a recursive approach, which returned the resulting reduction and pointer to the consumed sub-expression.
-In the C version I created the concept of a <code class="language-plaintext highlighter-rouge">bitstream</code> which stored the transformed hexadecimal to binary character stream, along with a mutating position index pointer.
-This meant that when I called <code class="language-plaintext highlighter-rouge">parse_uint</code> it would update the bitstream to the next available position in the stream (as if we were consuming that part of the stream).
-I preferred the approach in the C version, building up the tree with sub-packet structures allowed me to construct the tree a single time and call either <code class="language-plaintext highlighter-rouge">calc_version_total</code> or <code class="language-plaintext highlighter-rouge">eval</code> based on the part.
-This is in contrast to the Python version, which I was a little lazy with and side-carted solving the initial parts’ version total.</p>
+<p>This proved to be a very wordy problem - but as always, I am amazed at how much thought goes into a problem and how much can be packed into such a small input!
+For the Python variant, I opted for a recursive approach, which returned the resulting reduction and pointer to the consumed sub-expression.
+In the C version, I created the concept of a <code class="language-plaintext highlighter-rouge">bitstream</code>, which stored the transformed hexadecimal-to-binary character stream, along with a mutating position index pointer.
+This meant that when I called <code class="language-plaintext highlighter-rouge">parse_uint</code>, it would update the bitstream to the next available position in the stream, as if we were consuming that part of the stream.
+I preferred the approach in the C version.
+Building up the tree with sub-packet structures allowed me to construct the tree a single time and call either <code class="language-plaintext highlighter-rouge">calc_version_total</code> or <code class="language-plaintext highlighter-rouge">eval</code>, depending on the part.
+This contrasts with the Python version, which I was a little lazy with and side-carted solving the initial parts’ version total.</p>
 
 <h3 id="day-17-trick-shot">Day 17: Trick Shot</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day17">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day17">C <code class="language-plaintext highlighter-rouge">runtime: 1679 μs</code></a></p>
 
-<p>I opted for brute-force to solve this problem, finding Python’s <code class="language-plaintext highlighter-rouge">product</code> and <code class="language-plaintext highlighter-rouge">range</code> combination resulting in very concise code to produce the velocity.
-Fortunately I modelled this solution in a way that would map well to a C equivalent.
-The key difference of course is the omission of list comprehensions, which means lots of looping!
-Having a look through the subreddit after solving this problem there looks to be a non-brute means in which to solve this problem using some equations of motion.</p>
+<p>I opted for brute force to solve this problem, finding Python’s <code class="language-plaintext highlighter-rouge">product</code> and <code class="language-plaintext highlighter-rouge">range</code> combination resulted in very concise code to produce the velocity.
+Fortunately, I modelled this solution in a way that would map well to a C equivalent.
+The key difference, of course, is the omission of list comprehensions, which means lots of looping!
+Having looked through the subreddit after solving this problem, there seems to be a non-brute-force means of solving it using some equations of motion.</p>
 
 <h3 id="day-18-snailfish">Day 18: Snailfish</h3>
 
@@ -272,81 +274,82 @@ Having a look through the subreddit after solving this problem there looks to be
 
 <p>This problem essentially boiled down to a binary tree.
 I opted to mix it up with the Python solution and use an object-oriented approach.
-This provided a good use-case for the <em>match</em> statement with pattern matching to construct each <em>Number</em> recursively.
+This provided a good use case for the <em>match</em> statement with pattern matching to construct each <em>Number</em> recursively.
 Along with this, implementing the <code class="language-plaintext highlighter-rouge">__add__</code> and <code class="language-plaintext highlighter-rouge">__radd__</code> magic methods allowed me to handle the resulting abstraction as if they were true numbers.
-For the C version I stored the tree in a single dimensional array, keeping track of the depth of each node.
+For the C version, I stored the tree in a single-dimensional array, keeping track of the depth of each node.
 This made it easy to perform the split and explode operations.
 I was also interested in using the <code class="language-plaintext highlighter-rouge">memmove</code> function to insert and remove numbers from the tree in a performant manner.
-I found handling raw memory like this is so powerful but scary at the same time.</p>
+I found handling raw memory like this to be so powerful but scary at the same time.</p>
 
 <h3 id="day-19-beacon-scanner">Day 19: Beacon Scanner</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day19">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day19">C <code class="language-plaintext highlighter-rouge">runtime: 116330 μs</code></a></p>
 
-<p>This was without question one of the hardest Advent of Code problems I have encountered!
-Fortunately I had experimented with 3D matrices and matrix transformations whilst working on my <a href="https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/">Rubik Cube solving project</a> mid-last year, so had a feeling to experiment with this when initially reading the problem.
-For my Python solution iteratively mapping successive scanners based on orientation although naive and slow did eventually come to a result.
+<p>This was, without question, one of the hardest Advent of Code problems I have encountered!
+Fortunately, I had experimented with 3D matrices and matrix transformations whilst working on my <a href="https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/">Rubik’s Cube solving project</a> mid-last year.
+So, I had a feeling to experiment with this when initially reading the problem.
+For my Python solution, iteratively mapping successive scanners based on orientation - although naive and slow - eventually produced a result.
 I enjoyed storing the orientations as small lambda functions to make it trivial to apply rotations per scanner beacon.
-Implementing this problem in C was a whole other ball game.
+Implementing this problem in C was a whole other ballgame.
 I knew my naive approach was not going to cut it, even in a system-level language such as C.
-So instead I resorted to reviewing how some cleaver people on the Advent of Code <a href="https://www.reddit.com/r/adventofcode/comments/rjpf7f/2021_day_19_solutions/">subreddit</a> were able to achieve it.
-Thanks to some key insight I was able to use this to construct my own implementation which heavily relies on linked-lists.</p>
+So instead, I resorted to reviewing how some clever people on the Advent of Code <a href="https://www.reddit.com/r/adventofcode/comments/rjpf7f/2021_day_19_solutions/">subreddit</a> were able to achieve it.
+Thanks to some key insights, I was able to use this to construct my own implementation, which heavily relies on linked lists.</p>
 
 <h3 id="day-20-trench-map">Day 20: Trench Map</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day20">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day20">C <code class="language-plaintext highlighter-rouge">runtime: 11983 μs</code></a></p>
 
 <p>This was yet another 2D matrix problem.
-For the Python version I opted to build the image using a Dictionary.
-Using a Dictionary in this way provides an easy means to navigate through and expand the map going forward.
-For the C solution I decided to instead use a fixed upper-bound multidimensional array, using an accompanying size value to limit the size per enhancement step.</p>
+For the Python version, I opted to build the image using a dictionary.
+Using a dictionary in this way provides an easy means to navigate through and expand the map going forward.
+For the C solution, I decided to use a fixed upper-bound multidimensional array instead, using an accompanying size value to limit the size per enhancement step.</p>
 
 <h3 id="day-21-dirac-dice">Day 21: Dirac Dice</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day21">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day21">C <code class="language-plaintext highlighter-rouge">runtime: 29 μs</code></a></p>
 
-<p>This was another fun Dynamic programming problem, in which I decided to again use memorisation (and the <code class="language-plaintext highlighter-rouge">@cache</code> decorator) to solve the problem using Python.
-For the C solution another bottom-up tabulation strategy was employed, as this felt simpler than trying to implement function call memorisation in C.
-To make the solution performant as well as space considerate I based my solution on <a href="https://www.reddit.com/r/adventofcode/comments/rl6p8y/comment/hpet9io/">ideas</a> discussed on the subreddit.</p>
+<p>This was another fun dynamic programming problem, in which I decided to use memoisation (and the <code class="language-plaintext highlighter-rouge">@cache</code> decorator) to solve the problem using Python.
+For the C solution, another bottom-up tabulation strategy was employed, as this felt simpler than trying to implement function call memoisation in C.
+To make the solution performant as well as space-efficient, I based my approach on <a href="https://www.reddit.com/r/adventofcode/comments/rl6p8y/comment/hpet9io/">ideas</a> discussed on the subreddit.</p>
 
 <h3 id="day-22-reactor-reboot">Day 22: Reactor Reboot</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day22">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day22">C <code class="language-plaintext highlighter-rouge">runtime: 50313 μs</code></a></p>
 
-<p>Instead of actually having to go about building up this 3D space and slice up cuboids I was able to employ a neat negation trick.
-To achieve this I added all intersections to the resulting cuboid listing, along with the cuboid itself if it was <em>on</em>.
-Intersections with positive region generated negative ones and intersections with negative regions generated positive ones.
-This canceled out any existing geometry the new cuboid was intersecting.
-This solution mapped well to both Python and C variants, and met my performance needs.</p>
+<p>Instead of explicitly building up the 3D space and slicing cuboids, I employed a neat negation trick.
+To achieve this, I added all intersections to the resulting cuboid listing, along with the cuboid itself if it was <em>on</em>.
+Intersections with positive regions generated negative ones, and intersections with negative regions generated positive ones.
+This cancelled out any existing geometry the new cuboid was intersecting.
+This solution mapped well to both Python and C variants and met my performance needs.</p>
 
 <h3 id="day-23-amphipod">Day 23: Amphipod</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day23">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day23">C <code class="language-plaintext highlighter-rouge">runtime: 146356 μs</code></a></p>
 
-<p>This was another head scratcher of a day, with many intermediate rule states to map.
-For the Python solution I employed Dijkstra’s algorithm which although slow (takes over 10 seconds to complete) was very readable.
-I found that modeling the next valid states as generators was very concise in Python.
-For the C variant I knew I would need to do some better state pruning to meet the desired runtime constraints.
-Again, this lead me down an Advent of Code subreddit rabbit hole, in which, along with pruning superfluous moves I also employed the A* algorithm instead.
+<p>This was another head-scratcher of a day, with many intermediate rule states to map.
+For the Python solution, I employed Dijkstra’s algorithm, which, although slow (taking over 10 seconds to complete), was very readable.
+I found that modelling the next valid states as generators was very concise in Python.
+For the C variant, I knew I would need to perform better state pruning to meet the desired runtime constraints.
+Again, this led me down an Advent of Code subreddit rabbit hole - in which, along with pruning superfluous moves, I also instead employed the A* algorithm.
 The lower-bound heuristic used calculated the cost required if every pod could move through each other to be placed in their correct room.
-For this solution to work I ended up having to build my own Hash table and Priority queue tailored to this solution.
+For this solution to work, I had to build my own hash table and priority queue tailored to this specific problem.
 It took a while to develop, but the resulting speed gains were worth it.</p>
 
 <h3 id="day-24-arithmetic-logic-unit">Day 24: Arithmetic Logic Unit</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day24">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day24">C <code class="language-plaintext highlighter-rouge">runtime: 82 μs</code></a></p>
 
-<p>This problem was all related to the Stack data-structure.
-After spending far too long going through the assembly code I finally figured out the pattern!
+<p>This problem revolved around the stack data structure.
+After spending far too long going through the assembly code, I finally figured out the pattern!
 Both Python and C solutions follow the same idea, using a higher-order function to pass in either the maximum or minimum accumulation functions.</p>
 
 <h3 id="day-25-sea-cucumber">Day 25: Sea Cucumber</h3>
 
 <p>Solution: <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day25">Python</a>, <a href="https://github.com/eddmann/advent-of-code/tree/master/2021/c/day25">C <code class="language-plaintext highlighter-rouge">runtime: 28627 μs</code></a></p>
 
-<p>For the final day I was able to use a Dictionary again to model the growing 2D matrix.
-For the C version I used a fixed-size multidimensional array with a high enough size upper-bound to complete the computation.
-This shows off once again how useful Python’s list comprehensions are, coupled with functions such as <code class="language-plaintext highlighter-rouge">count</code> found in the <a href="https://docs.python.org/3/library/itertools.html">itertools</a> library.</p>
+<p>For the final day, I was able to use a dictionary again to model the growing 2D matrix.
+For the C version, I used a fixed-size multidimensional array with a high enough size upper bound to complete the computation.
+This demonstrates once again how useful Python’s list comprehensions are, coupled with functions such as <code class="language-plaintext highlighter-rouge">count</code> found in the <a href="https://docs.python.org/3/library/itertools.html">itertools</a> library.</p>
 
 </article>
 

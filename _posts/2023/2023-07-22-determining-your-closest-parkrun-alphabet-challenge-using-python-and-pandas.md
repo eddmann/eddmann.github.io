@@ -13,7 +13,7 @@ I also thought this would be a great opportunity to explore [pandas](https://pan
 
 This article was originally written as an Jupyter Notebook which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
 
-### The Dataset
+## The Dataset
 
 My first job was to build a dataset of all the current Parkrun events and their locations.
 Fortunately, the official Parkrun websites provides this dataset indirectly by-way of OpenStreetMap [Features](https://wiki.openstreetmap.org/wiki/Features) in their interactive map.
@@ -35,7 +35,7 @@ with open("closest-parkrun-alphabet-challenge.json", "w") as file:
 This dataset provides me with the required Parkrun event names and location coordinates (longitude and latitude).
 Based on a supplied local Parkrun event I should be able to determine the closest event per-letter of the English alphabet to complete the challenge.
 
-### Calculating Distances using the Haversine Formula
+## Calculating Distances using the Haversine Formula
 
 To calculate the distance between two different events I will use the Haversine formula.
 This formula calculates the shortest distance over the earth's surface – giving an 'as-the-crow-flies' distance between the two points.
@@ -69,7 +69,7 @@ haversine(flip(event_a["geometry"]["coordinates"]), flip(event_b["geometry"]["co
 # 4.952173093357963
 ```
 
-### Putting it all together with Pandas
+## Putting it all together with Pandas
 
 Now that we have the core building blocks in-place we can now go about solving the problem using the panda's library.
 

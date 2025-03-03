@@ -191,7 +191,7 @@ The catch, however, was that without a paid-for plan, you were only capable of c
 I really wanted to replicate the same HTTPS experience that the AWS Lambda environment had.
 I did look at the pricing options, but as this was a small experimental project that was going to be torn down in the near future, I did not feel I could justify the cost.
 
-## Creating My Own Tunnel
+### Creating My Own Tunnel
 
 It was back to the drawing board... but this time, the idea of setting up some form of tunnel between my local Kubernetes cluster and a remote VPS stuck in my head.
 With this idea, I experimented with setting up a [reverse SSH tunnel](https://youtu.be/Wp7boqm3Xts) between one of the nodes' Ingress-exposed ports (80 and 443) and an EC2 instance.
@@ -211,7 +211,7 @@ Again, as this was just an experimental project, this approach would suffice.
 When visiting the web application via HTTPS, however, the response returned a self-signed certificate that Traefik had created.
 We were now capable of changing that!
 
-## Issuing SSL Certificates using cert-manager
+### Issuing SSL Certificates using cert-manager
 
 With public access now available, I could configure [cert-manager](https://cert-manager.io/) within my Kubernetes cluster to handle issuing SSL certificates via Let's Encrypt.
 This tool not only assists in issuing the SSL certificates, but it also provides a means of automatically renewing certificates that are close to expiry.

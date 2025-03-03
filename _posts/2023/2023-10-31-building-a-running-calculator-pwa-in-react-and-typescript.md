@@ -56,7 +56,7 @@ Below I will discuss the different areas I needed to consider which lead to fina
   </div>
 </div>
 
-## Look and Feel
+### Look and Feel
 
 A large area of research and development was making the user experience _look and feel_ like a native application that would be typically found on both mobile and desktop devices.
 A lot of time was spent in essentially _'de-webifying'_ the web application, to follow what users would expect from a native application experience.
@@ -65,7 +65,7 @@ These were all fortunately able to be achieved using CSS, with a small dose of b
 I did however have to resort to some JavaScript for disabling the touch body scroll which is present when the soft-keyboard appears on mobile for focused input fields.
 Although this process overall did take some trial and error, the learnings garnered can be applied going forward to other app-like web experiences and PWAs I wish to develop.
 
-## Mobile
+### Mobile
 
 When the iPhone was initially released, Steve Jobs toted an innovative new way to create web applications _"that look exactly and behave exactly like native apps"_ during the launch's [one last thing](https://www.youtube.com/watch?v=ZlE7dzoD6GA) section.
 However, the momentum soon dwindled with the release of a native SDK several months later - and the subsequent popularity/revenue of the App Store has not made Apple regret that decision.
@@ -74,18 +74,18 @@ iOS is still [way behind](https://firt.dev/notes/pwa-ios/) the awesome web capab
 
 Below are several of the key pain points I have felt whilst developing this PWA on iOS.
 
-### Splash screens
+#### Splash screens
 
 The amount of splash-screen assets that are required to be generated to provide full iOS device support is mind-blowing.
 Not only do you need to supply many assets up-front, iOS requires custom Safari specific meta-tag workarounds to register the different splash-screen variants.
 This is in stark contrast to Android where the system is able to use an existing icon provided by the Web app manifest.
 
-### Orientation
+#### Orientation
 
 iOS lacks support for the Web app manifest [orientation](https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation) (portrait and/or landscape) property, which allows you to specify what orientations the PWA supports.
 Instead you are required to cater for both, or provide crude CSS-based 'Not support in this orientation' messages to the user.
 
-### Installation prompt
+#### Installation prompt
 
 Most annoying of all, iOS lacks native [installation prompts](https://web.dev/learn/pwa/installation-prompt), which on the other hand is fully supported on Android and Chrome desktop devices.
 It does not support the `beforeinstallprompt` event which means that to install a PWA you have to instruct the user to manually visit Safari, open the bottom menu bar and 'Add to Home Screen' 🤦.
@@ -95,7 +95,7 @@ Android on the other hand provides a great user experience, harnessing screensho
 It even packages up the application as a [Trusted Web Activity](https://developer.chrome.com/docs/android/trusted-web-activity/), which treats the PWA as if it were like any other Android application, not just a Safari _bookmark_ icon.
 You can see how the two experiences differ by watching the videos above.
 
-## Desktop
+### Desktop
 
 <div style="display:flex;gap:1rem;flex-direction:row;align-items:center;">
   <div>

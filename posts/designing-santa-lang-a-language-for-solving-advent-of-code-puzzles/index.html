@@ -68,7 +68,7 @@ In this article, I would like to discuss the high-level thought process and desi
 Having done a little research into how other languages had been formed and continued to grow, it seemed that the underlying core values and design principles shaped each new decision.
 As such, I decided to compile a list of my desired direction and feature set for a language that would best help me solve Advent of Code puzzles.</p>
 
-<h2 id="the-language">The Language</h2>
+<h3 id="the-language">The Language</h3>
 
 <ul>
   <li>Dynamically typed, C-like language with a rich suite of core types: integers, decimals, strings, lists, hash maps, and sets.</li>
@@ -81,7 +81,7 @@ As such, I decided to compile a list of my desired direction and feature set for
   <li>No mutation, opting for readability and correctness over outright speed.</li>
 </ul>
 
-<h2 id="the-aoc-runner">The AoC Runner</h2>
+<h3 id="the-aoc-runner">The AoC Runner</h3>
 
 <p>Whilst writing the list above, I soon realised that there was a differentiation between the core language requirements and the Advent of Code <em>runner</em>/<em>runtime</em> in which it would be evaluated.
 Thinking upon past experience whilst solving Advent of Code puzzles, and how a language runtime could aid in solution development, I devised the list below:</p>
@@ -101,7 +101,7 @@ Fortunately, there are <a href="https://interpreterbook.com/">some</a> <a href="
 With respect to my runtime requirements (CLI and Web), and with the feeling that this journey would no doubt be a huge learning experience in itself, I felt it best to opt for a host language I was comfortable in.
 As such, I chose <a href="https://github.com/eddmann/santa-lang-ts">TypeScript</a>.</p>
 
-<h2 id="show-me-the-code">Show me the code?!</h2>
+<h3 id="show-me-the-code">Show me the code?!</h3>
 
 <p>One of the biggest takeaways from the initial development phase was the importance of spending time in the <a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/lang">language</a> you are designing and exercising its use within the domain you want to solve problems in.
 In my case, this was Advent of Code puzzles.
@@ -200,7 +200,7 @@ test: {
 <p>For more examples, check out the TypeScript implementation’s <a href="https://github.com/eddmann/santa-lang-ts#readme">README</a> and <a href="https://github.com/eddmann/santa-lang-ts/tree/main/examples">examples</a> directory.
 One example of note is the re-implementation of <a href="https://github.com/eddmann/santa-lang-ts/blob/main/examples/map-filter-fold-reduce.santa">map, filter, fold, and reduce</a> within the language itself - effectively highlighting the use of pattern matching.</p>
 
-<h2 id="the-cli-runtime">The CLI Runtime</h2>
+<h3 id="the-cli-runtime">The CLI Runtime</h3>
 
 <p>Once I had built the <a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/lang">core language</a> and <a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/runner">runner</a>, a lot of time was then focused on developing the <a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/cli">CLI</a> runtime.
 This was to ensure that I had the correct level of abstraction for what would be required as a runtime (CLI, Web) and core language/runner responsibility.</p>
@@ -219,7 +219,7 @@ In the case of the <a href="https://github.com/eddmann/santa-lang-ts/blob/main/s
 <p>One of my design goals was to ensure that it was easy to locate and determine errors found at runtime.
 Aided by the error details the core language emits, I was able to present errors and the source location in a concise manner.</p>
 
-<h2 id="the-web-runtime">The Web Runtime</h2>
+<h3 id="the-web-runtime">The Web Runtime</h3>
 
 <p>With the CLI runtime built, I then moved on to developing the <a href="https://github.com/eddmann/santa-lang-ts/tree/main/src/web">Web</a> runtime equivalent.</p>
 
@@ -230,7 +230,7 @@ Unlike the CLI, which only required source file location input, this version als
 For this, I employed <a href="https://codemirror.net/">CodeMirror</a>, which has a great library with React bindings.
 Upon solution execution, to avoid blocking the user’s main browser thread, the language runtime is evaluated within a dedicated <a href="https://github.com/eddmann/santa-lang-ts/blob/main/src/web/worker.ts">web worker</a>.</p>
 
-<h2 id="the-bonus-aws-lambda-runtime">The (Bonus) AWS Lambda Runtime</h2>
+<h3 id="the-bonus-aws-lambda-runtime">The (Bonus) AWS Lambda Runtime</h3>
 
 <p>After developing the language and initial CLI and Web runtimes, I took a little time off to focus on my annual <a href="https://eddmann.com/posts/allocating-secret-santas-using-an-aws-step-function-workflow-and-every-available-lambda-runtime/">allocating Secret Santas</a> challenge.
 This year, I decided to combine every supported Lambda runtime into a Step Function workflow (because… why not?!).
@@ -258,7 +258,7 @@ I found that <a href="https://interpreterbook.com/">the book</a> laid this conce
 <p>On top of this, I have been able to define the specification and intended language behaviour entirely through the included tests.
 This provides me not only with confidence in my current implementation but also with a blueprint to implement the language again (i.e. in another host language 😉).</p>
 
-<h2 id="whats-next">What’s Next…</h2>
+<h3 id="whats-next">What’s Next…</h3>
 
 <p>December is fast approaching, and that can only mean one thing - another <a href="https://adventofcode.com/2022">Advent of Code calendar</a> is about to commence!
 This year, I wish to use <em>santa-lang</em> as my primary language in solving as many of the calendar’s puzzles as possible.

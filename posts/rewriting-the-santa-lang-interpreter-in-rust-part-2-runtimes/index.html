@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I integrated the core language library with the desired (delivery) runtimes.">
+    <meta name="description" content="This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I integrated the core language library with the desired (delivery) runtimes.">
 
     <title>
         
@@ -50,7 +50,7 @@
     <h1 class="post-title">Rewriting the santa-lang Interpreter in Rust, Part 2 - Runtimes</h1>
     <time datetime="2023-08-06T00:00:00+00:00" class="post-date">06 Aug 2023</time>
     <p>With the <a href="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/">core language library</a> now written, I could go about building the desired (delivery) runtimes.
-In this article within the series, I will delve into my experience integrating the core language library with these chosen runtimes, documenting some of the challenges that I faced along the way.</p>
+In this post within the series, I will delve into my experience integrating the core language library with these chosen runtimes, documenting some of the challenges that I faced along the way.</p>
 
 
 
@@ -78,7 +78,7 @@ This provided me with confidence that I had correctly integrated the library wit
 
 <p>To aid in performance benchmarking, I added the ability to compile the runtime with <a href="https://github.com/tikv/pprof-rs">pprof</a> code profiling (via a <a href="https://github.com/eddmann/santa-lang-rs/blob/870e364a9ae47c3648e358d89b42e491f9d59577/runtime/cli/Cargo.toml#L26"><code class="language-plaintext highlighter-rouge">profile</code></a> feature flag).
 The chosen library also allowed me to produce <a href="https://www.brendangregg.com/flamegraphs.html">flame graphs</a>, which were used extensively throughout development to help pinpoint areas where performance could be improved.
-Further discussion on performance will be documented in the <a href="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/">next article</a> within the series.</p>
+Further discussion on performance will be documented in the <a href="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/">next post</a> within the series.</p>
 
 <h2 id="web-wasm">Web (WASM)</h2>
 
@@ -148,7 +148,7 @@ This crate looks to expose a similar level of abstraction as the PHP one.</p>
 <h2 id="jupyter-kernel">Jupyter Kernel</h2>
 
 <p>Over the past several months, I have been introduced to the power of <a href="https://jupyter.org/">Jupyter Notebook</a> and the fast REPL it provides.
-This is in large part due to every AI/LLM YouTube video or article I see using it (due to the authors coming from Data Science backgrounds).
+This is in large part due to every AI/LLM YouTube video or post I see using it (due to the authors coming from Data Science backgrounds).
 Similar to the PHP extension, my mind wandered into the possibility of creating a custom <a href="https://docs.jupyter.org/en/latest/projects/kernels.html">Kernel</a> to expose the santa-lang language as an additional runtime.</p>
 
 <p>Thanks to yet another well-thought-out <a href="https://crates.io/crates/jupyter">crate</a>, this task proved to be rather seamless.

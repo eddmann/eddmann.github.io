@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.">
+    <meta name="description" content="This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.">
 
     <title>
         
@@ -50,7 +50,7 @@
     <h1 class="post-title">Rewriting the santa-lang Interpreter in Rust, Part 3 - Performance</h1>
     <time datetime="2023-08-07T00:00:00+00:00" class="post-date">07 Aug 2023</time>
     <p>Now that we have discussed building the core language and desired runtimes, it is time to highlight one of the biggest reasons why I decided to rewrite the interpreter in a lower-level systems language - performance!
-In this article, I will document how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.</p>
+In this post, I will document how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.</p>
 
 
 
@@ -110,7 +110,7 @@ Although this did help with performance, it still was not the boost that I had b
 
 <p>The next step I took was to replace the <a href="https://nnethercote.github.io/perf-book/hashing.html">hash map implementation</a> I used within the environment that holds scoped variables.
 I had noticed that time was spent resolving these environment variables, so I explored replacing the inbuilt hash map with a quicker (although less cryptographically secure) alternative, <a href="https://github.com/cbreeden/fxhash">FxHashMap</a>.
-This again did not reap the rewards that I had been hoping for, and instead, thanks to a <a href="https://www.dannyvankooten.com/blog/2022/rewriting-interpreter-rust/">very interesting article</a>, I opted to use a vector to represent the environment variables.
+This again did not reap the rewards that I had been hoping for, and instead, thanks to a <a href="https://www.dannyvankooten.com/blog/2022/rewriting-interpreter-rust/">very interesting post</a>, I opted to use a vector to represent the environment variables.
 This provided quicker variable resolution, whereby it was, interestingly, more performant to traverse a sequential list in memory than apply a hash and resolve the variable from a determined <em>bucket</em>.
 This performance improvement was based on the code heuristic that there would be a limited number of variables per scope.
 Sadly, after additional benchmarking, this chipped away some execution time, but I was still not satisfied.</p>

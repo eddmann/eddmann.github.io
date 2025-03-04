@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This article explores using LangChain Agents and Tools to answer questions on the NBA with OpenAI">
+    <meta name="description" content="Explore how to use LangChain Agents and Tools with OpenAI to answer questions about recent NBA events and statistics.">
 
     <title>
         
@@ -49,12 +49,13 @@
                 <article class="post">
     <h1 class="post-title">Using LangChain Agents and Tools to answer questions on the NBA with OpenAI</h1>
     <time datetime="2023-06-23T00:00:00+00:00" class="post-date">23 Jun 2023</time>
-    <p>Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
-This article documents the use of <a href="https://www.langchain.com/">LangChain</a> <a href="https://python.langchain.com/docs/modules/agents/">Agents</a>/<a href="https://python.langchain.com/docs/modules/tools/">Tools</a> to help aid in answering questions based on recent NBA events.</p>
+    <p>Large language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
+Like many developers, I am interested in exploring what is possible with this new technology.
+This article documents the use of <a href="https://www.langchain.com/">LangChain</a> <a href="https://python.langchain.com/docs/modules/agents/">Agents</a>/<a href="https://python.langchain.com/docs/modules/tools/">Tools</a> to aid in answering questions based on recent NBA events.</p>
 
 
 
-<p>This article was originally written as an Jupyter Notebook which can be <a href="/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb">downloaded here</a></p>
+<p>This article was originally written as a Jupyter Notebook, which can be <a href="/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb">downloaded here</a>.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">openai</span> <span class="n">bs4</span> <span class="n">requests</span>
 </code></pre></div></div>
@@ -68,9 +69,9 @@ This article documents the use of <a href="https://www.langchain.com/">LangChain
 <span class="p">)</span>
 </code></pre></div></div>
 
-<h2 id="without-a-source">Without a source</h2>
+<h2 id="without-a-source">Without a Source</h2>
 
-<p>The LLM is trained up-to a given point in time, it is not aware of recent events.</p>
+<p>The LLM is trained up to a given point in time; it is not aware of recent events.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Was the 2023 NBA season MVP part of the team that won the NBA championship that year?"</span><span class="p">)</span>
 </code></pre></div></div>
@@ -88,21 +89,21 @@ This article documents the use of <a href="https://www.langchain.com/">LangChain
   <p>No, the 1998 NBA season MVP was Michael Jordan of the Chicago Bulls, but the NBA championship that year was won by the San Antonio Spurs.</p>
 </blockquote>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Who won the 1998 NBA season MVP, what team where they on?, what team won the NBA championship that year?"</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">llm</span><span class="p">(</span><span class="s">"Who won the 1998 NBA season MVP, what team were they on?, what team won the NBA championship that year?"</span><span class="p">)</span>
 </code></pre></div></div>
 
 <blockquote>
   <p>The 1998 NBA season MVP was Michael Jordan of the Chicago Bulls. The Chicago Bulls also won the NBA championship that year.</p>
 </blockquote>
 
-<h2 id="adding-a-source">Adding a source</h2>
+<h2 id="adding-a-source">Adding a Source</h2>
 
 <blockquote>
-  <p>“You Don’t Have to Know Everything. You Just Have to Know Where to Find It.”
+  <p>“You don’t have to know everything. You just have to know where to find it.”
 – <cite>Albert Einstein</cite></p>
 </blockquote>
 
-<p>We can improve the models answer by providing tools for it to use to lookup recent events within a given domain.
+<p>We can improve the model’s answer by providing tools for it to use to look up recent events within a given domain.
 This aids in <em>grounding</em> the model and helps to ensure it does not hallucinate.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.agents</span> <span class="kn">import</span> <span class="n">AgentType</span><span class="p">,</span> <span class="n">load_tools</span><span class="p">,</span> <span class="n">initialize_agent</span><span class="p">,</span> <span class="n">Tool</span>
@@ -118,11 +119,11 @@ This aids in <em>grounding</em> the model and helps to ensure it does not halluc
     <span class="n">name</span> <span class="o">=</span> <span class="s">"Statmuse"</span><span class="p">,</span>
     <span class="n">func</span> <span class="o">=</span> <span class="n">search_statmuse</span><span class="p">,</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s">"""
-        NBA basketball search engine. Use this if the question is related to NBA basktetball stats and trivia.
-        For example: 'who is the highest scoring player in the 2023 season?',
+        NBA basketball search engine. Use this if the question is related to NBA basketball stats and trivia.
+        For example: 'Who is the highest-scoring player in the 2023 season?'
         You must:
         - Always specify a year or timeframe with your search.
-        - Only search for a single player, MVP or team in a single search.
+        - Only search for a single player, MVP, or team in a single search.
     """</span>
 <span class="p">)</span>
 
@@ -194,9 +195,9 @@ Final Answer: Yes, Michael Jordan was part of the team that won the 1998 NBA cha
 
 <p>Much better!</p>
 
-<h3 id="combining-tools">Combining tools</h3>
+<h3 id="combining-tools">Combining Tools</h3>
 
-<p>We now can combine the abilities to; reason about a question, find the relevant information, and then compute a given answer.</p>
+<p>We can now combine the abilities to reason about a question, find the relevant information, and then compute a given answer.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">agent</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="s">"How many combined points did the 2023 NBA season MVP, and the 2023 NBA finals MVP score for the entire 2023 season?"</span><span class="p">)</span>
 </code></pre></div></div>
@@ -237,7 +238,7 @@ Final Answer: The combined points of the 2023 NBA season MVP and the 2023 NBA Fi
   <p>The combined points of the 2023 NBA season MVP and the 2023 NBA Finals MVP for the entire 2023 season was 3,873 points.</p>
 </blockquote>
 
-<p>Lets now add a tool to fetch information from Wikipedia.</p>
+<p>Let’s now add a tool to fetch information from Wikipedia.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tools</span> <span class="o">=</span> <span class="n">load_tools</span><span class="p">([</span><span class="s">"wikipedia"</span><span class="p">],</span> <span class="n">llm</span><span class="o">=</span><span class="n">llm</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">statmuse_tool</span><span class="p">]</span>
 <span class="n">agent</span> <span class="o">=</span> <span class="n">initialize_agent</span><span class="p">(</span><span class="n">tools</span><span class="p">,</span> <span class="n">llm</span><span class="p">,</span> <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="p">.</span><span class="n">ZERO_SHOT_REACT_DESCRIPTION</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -274,8 +275,8 @@ Final Answer: Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and 
   <p>Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and he scored a total of 1,845 points in the 2023 season.</p>
 </blockquote>
 
-<p>Although this is a very contrived example it shows the power of how you can get the LLM to reason about a problem, breaking it up into smaller tasks of which it can use provided tools.
-It does not necessarily need to know the answer, just how to find the answer.</p>
+<p>Although this is a very contrived example, it shows the power of how you can get the LLM to reason about a problem by breaking it up into smaller tasks, using provided tools.
+It does not necessarily need to know the answer - just how to find the answer.</p>
 
 </article>
 

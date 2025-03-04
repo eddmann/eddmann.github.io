@@ -120,7 +120,7 @@ recur([[initial_time, start]], {});
 As you can see, this follows what you would typically see in a conventional looping implementation.
 We dequeue an item, check if it matches our desired end state, find the next unseen items to be visited, and repeat.
 
-When developing the initial solution that employed this algorithm ([day 12](https://github.com/eddmann/advent-of-code/blob/master/2022/santa-lang/aoc2022_day12.santa)), I found upon running it on a sufficiently large input set, I was faced with a host language (JavaScript) `Maximum call stack size exceeded` exception.
+While developing the initial solution using this algorithm ([day 12](https://github.com/eddmann/advent-of-code/blob/master/2022/santa-lang/aoc2022_day12.santa)), I encountered a `Maximum call stack size exceeded` exception in the host language (JavaScript) when running it on a sufficiently large input set.
 This introduced me to the world of _tail-call optimisation_, which can be defined as:
 
 > Tail-call optimisation is where you are able to avoid allocating a new stack frame for a function because the calling function will simply return the value that it gets from the called function.

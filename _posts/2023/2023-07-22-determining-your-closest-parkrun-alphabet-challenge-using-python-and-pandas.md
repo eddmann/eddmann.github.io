@@ -1,22 +1,22 @@
 ---
 layout: post
 title: 'Determining your closest Parkrun Alphabet Challenge using Python and pandas'
-meta: 'This article documents my exploration into using Python and pandas to determine the closest Parkrun Alphabet Challenge for a given local run'
+meta: 'Explore how to use Python and pandas to determine the closest Parkrun events for completing the Alphabet Challenge based on your local run.'
 tags: python
 ---
 
 The Parkrun Alphabet is an [unofficial challenge](https://blog.parkrun.com/uk/2018/07/18/the-parkrun-alphabet/) that sees runners complete a Parkrun at locations starting with each letter of the English alphabet.
-I am a big fan of the Parkrun and wanted to work out how feasible it would be for me to complete the challenge based on the closest _tourist_ locations to my _local_ weekly run.
+I am a big fan of Parkrun and wanted to work out how feasible it would be for me to complete the challenge based on the closest _tourist_ locations to my _local_ weekly run.
 I also thought this would be a great opportunity to explore [pandas](https://pandas.pydata.org/) and work with [DataFrames](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html).
 
 <!--more-->
 
-This article was originally written as an Jupyter Notebook which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
+This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
 
 ## The Dataset
 
 My first job was to build a dataset of all the current Parkrun events and their locations.
-Fortunately, the official Parkrun websites provides this dataset indirectly by-way of OpenStreetMap [Features](https://wiki.openstreetmap.org/wiki/Features) in their interactive map.
+Fortunately, the official Parkrun website provides this dataset indirectly via OpenStreetMap [Features](https://wiki.openstreetmap.org/wiki/Features) in their interactive map.
 
 ```python
 import requests
@@ -25,22 +25,24 @@ import json
 events = json.loads(requests.get("https://images.parkrun.com/events.json").content)
 ```
 
-For historical prosperity I stored a local copy of this dataset; as it is not an official dataset and more an implementation detail of another feature there is a high likely hood it could change.
+For historical prosperity, I stored a local copy of this dataset.
+As it is not an official dataset but rather an implementation detail of another feature, there is a high likelihood it could change.
 
 ```python
 with open("closest-parkrun-alphabet-challenge.json", "w") as file:
     file.write(json.dumps(events, indent=4))
 ```
 
-This dataset provides me with the required Parkrun event names and location coordinates (longitude and latitude).
-Based on a supplied local Parkrun event I should be able to determine the closest event per-letter of the English alphabet to complete the challenge.
+This dataset provides the necessary Parkrun event names and location coordinates (longitude and latitude).
+Based on a supplied local Parkrun event, I should be able to determine the closest event per letter of the English alphabet to complete the challenge.
 
 ## Calculating Distances using the Haversine Formula
 
-To calculate the distance between two different events I will use the Haversine formula.
-This formula calculates the shortest distance over the earth's surface – giving an 'as-the-crow-flies' distance between the two points.
-Although this will not factor in actual travel considerations (such as roads, traffic etc.) it is a _good enough_ metric to solve the problem.
-There are [many](https://nathanrooy.github.io/posts/2016-09-07/haversine-with-python/) [other](https://en.wikipedia.org/wiki/Haversine_formula) [resources](https://www.movable-type.co.uk/scripts/latlong.html) which go into detail on how this formula works; instead of re-implementing it I have decided to use an [existing library](https://pypi.org/project/haversine/).
+To calculate the distance between two different events, I will use the Haversine formula.
+This formula calculates the shortest distance over the Earth's surface, giving an 'as-the-crow-flies' distance between two points.
+Although this does not account for actual travel considerations (such as roads, traffic, etc.), it is a _good enough_ metric to solve the problem.
+There are [many](https://nathanrooy.github.io/posts/2016-09-07/haversine-with-python/) [other](https://en.wikipedia.org/wiki/Haversine_formula) [resources](https://www.movable-type.co.uk/scripts/latlong.html) that explain how this formula works.
+Instead of re-implementing it, I have decided to use an [existing library](https://pypi.org/project/haversine/).
 
 ```python
 !pip install haversine
@@ -54,8 +56,8 @@ event_a["geometry"]["coordinates"]
 # [-0.335791, 51.410992]
 ```
 
-The library I am using looks to require the coordinates to be positioned in the opposite direction (latitude, longitude) to what the dataset has provided (longitude, latitude).
-As such, I will apply a simple transformation over the dataset before usage within the distance calculation.
+The library I am using appears to require the coordinates to be positioned in the opposite order (latitude, longitude) to what the dataset provides (longitude, latitude).
+As such, I will apply a simple transformation over the dataset before using it in the distance calculation.
 
 ```python
 from haversine import haversine
@@ -71,7 +73,7 @@ haversine(flip(event_a["geometry"]["coordinates"]), flip(event_b["geometry"]["co
 
 ## Putting it all together with Pandas
 
-Now that we have the core building blocks in-place we can now go about solving the problem using the panda's library.
+Now that we have the core building blocks in place, we can solve the problem using the pandas library.
 
 ```python
 import pandas as pd
@@ -79,28 +81,28 @@ import pandas as pd
 frame = pd.json_normalize(events["events"]["features"])
 ```
 
-With the normalised dataset now imported into a DataFrame, I will go about applying some initial transformations to prepare the data for use.
-The first of which is, as the imported dataset includes both adult and junior events, I only wish to consider adult events for this problem.
+With the normalised dataset now imported into a DataFrame, I will apply some initial transformations to prepare the data for use.
+The first of these is filtering out junior events, as I only want to consider adult events.
 
 ```python
 ADULT_PARKRUN = 1
 frame = frame[frame["properties.seriesid"] == ADULT_PARKRUN]
 ```
 
-The event names look to conform to lower-case, English alphabet characters (even in the case of international Parkrun events).
-We can produce a new column from this source to group each of the events alphabetically by their first character going forward.
+The event names appear to conform to lowercase English alphabet characters (even for international Parkrun events).
+We can create a new column from this data to group events alphabetically by their first character.
 
 ```python
 frame["letter"] = frame["properties.eventname"].str[0]
 ```
 
-As discussed before, the final piece of dataset preparation we need to do is ensure the the coordinates are supplied to the Haversine formula in the expected order.
+As discussed before, the final dataset transformation ensures that the coordinates are supplied to the Haversine formula in the expected order.
 
 ```python
 frame["geometry.coordinates"] = frame["geometry.coordinates"].apply(flip)
 ```
 
-We can now find the local Parkrun event within the DataFrame.
+We can now locate the local Parkrun event within the DataFrame.
 
 ```python
 local_parkrun = frame.loc[frame["properties.EventShortName"] == "Wimbledon Common"].iloc[0]
@@ -122,7 +124,7 @@ letter                                                      w
 Name: 1, dtype: object
 ```
 
-We can then finally determine each _tourist_ events distance away from the local event.
+Finally, we determine the distance of each _tourist_ event from the local event.
 
 ```python
 frame["distance"] = frame.apply(lambda parkrun: haversine(parkrun["geometry.coordinates"], local_parkrun["geometry.coordinates"], unit='mi'), axis=1)
@@ -186,3 +188,6 @@ y      2297   Yarborough Leisure Centre  125.414614
 z      1905                  Zuiderpark  198.046322
        1779                 Ziegelwiese  523.953296
 ```
+
+This approach provides an efficient way to determine the closest Parkrun events for completing the Alphabet Challenge using Python and pandas.
+Happy running!

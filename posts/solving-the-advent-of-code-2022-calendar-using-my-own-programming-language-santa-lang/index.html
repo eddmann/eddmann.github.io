@@ -134,8 +134,8 @@ Any language, no matter how <em>strict</em> or <em>pure</em>, can be abused if t
 <h3 id="recursion-over-stateful-loops">Recursion Over Stateful Loops</h3>
 
 <p>As I had intentionally omitted standard loop constructs (<code class="language-plaintext highlighter-rouge">for</code>, <code class="language-plaintext highlighter-rouge">while</code>) from the language (which are inherently mutable), I found myself leaning heavily on recursion to provide the same means to an end.
-The calendar had many maze puzzles, in which we were required to find (in varying masqueraded forms) the <em>shortest path</em> between two states; this meant employing the <a href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first search</a> (BFS) algorithm.
-Unlike <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-First Search</a> (DFS), which is inherently recursive by nature (taking advantage of call stack properties), BFS <em>work</em> is stored in a FIFO queue.
+The calendar had many maze puzzles, in which we were required to find (in varying masqueraded forms) the <em>shortest path</em> between two states; this meant employing the <a href="https://en.wikipedia.org/wiki/Breadth-first_search">breadth-first search</a> (BFS) algorithm.
+Unlike <a href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search</a> (DFS), which is inherently recursive by nature (taking advantage of call stack properties), BFS <em>work</em> is stored in a FIFO queue.
 Below is a snippet of my <a href="https://github.com/eddmann/advent-of-code/blob/master/2022/santa-lang/aoc2022_day24.santa">day 24</a> solution, which documents the key characteristics of the BFS algorithm and how recursion is used as a looping construct.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>let recur = |queue, seen| {

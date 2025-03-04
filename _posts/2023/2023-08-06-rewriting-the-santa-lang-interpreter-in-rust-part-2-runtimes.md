@@ -124,4 +124,4 @@ It also make me interested to see how I could possibly use a notebook to help de
 ## What's Next?
 
 Now that all the desired runtimes have been implemented, it is finally time to investigate performance considerations!
-In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/), I will document how I went about benchmarking the two implementations, greatly improving performance, and highlighting interesting findings along the way.
+In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series, I will document how I went about benchmarking the two implementations, greatly improving performance, and highlighting interesting findings along the way.

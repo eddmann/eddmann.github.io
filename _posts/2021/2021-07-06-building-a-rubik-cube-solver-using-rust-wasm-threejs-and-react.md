@@ -26,7 +26,7 @@ Along with conventional [Layer by Layer](https://en.wikipedia.org/wiki/Layer_by_
 ### Korf's Algorithm
 
 Initially, when setting out to build this Rubik's Cube Solver, I had hoped to mirror the [2x2x2 counterpart](https://github.com/eddmann/pocket-cube-solver) and create an optimal solver that ran in the browser.
-Prior work in this space documents algorithms such as [Richard Korf's](https://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf), which, with the aid of several pruning tables, can provide an optimal solution from any initial state using Iterative Deepening Depth-First Search (IDDFS) to traverse the search space.
+Prior work in this space documents algorithms such as [Richard Korf's](https://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf), which, with the aid of several pruning tables, can provide an optimal solution from any initial state using Iterative deepening depth-first search (IDDFS) to traverse the search space.
 However, these pruning tables must be generated upfront and incur a large memory footprint - reaching upwards of 250MB in my experiments.
 Additionally, it is not possible to set an upper bound on how long it would take to find an optimal solution, sometimes taking over forty minutes to complete!
 When running tests, I found that any scramble exceeding ten random turns (starting from the goal state) resulted in an undesired wait for the client to return.

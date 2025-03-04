@@ -138,7 +138,7 @@ Not making everything dynamic has its wins!
 Solution: [Python](https://github.com/eddmann/advent-of-code/tree/master/2021/python/src/day09), [C `runtime: 1011 μs`](https://github.com/eddmann/advent-of-code/tree/master/2021/c/day09)
 
 This was the first map-based problem of the calendar.
-I opted to use Breadth-First Search (BFS) for this solution and found that, in the case of the Python solution, being able to use negative indices to access the end of the array was very handy.
+I opted to use breadth-first search (BFS) for this solution and found that, in the case of the Python solution, being able to use negative indices to access the end of the array was very handy.
 For the C version, I used BFS too, but for the visited set, I opted to use a 2D array of booleans instead - this was a trade-off between memory and lookup time.
 
 ### Day 10: Syntax Scoring

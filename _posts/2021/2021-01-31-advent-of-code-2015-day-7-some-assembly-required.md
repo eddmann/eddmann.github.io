@@ -139,7 +139,7 @@ const createInstructionExecutionOrder = (
 };
 ```
 
-Treating the instruction booklet as a DAG allows us to perform the Topological Sort (opting for the [Depth-First Search approach](https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search)) and return the ordered instructions.
+Treating the instruction booklet as a DAG allows us to perform the Topological Sort (opting for the [depth-first search approach](https://en.wikipedia.org/wiki/Topological_sorting#Depth-first_search)) and return the ordered instructions.
 With this in hand, we now need a means to emulate and return the signal value for a given wire’s instruction - based on the signal mapping that we have built up to that point.
 
 ```typescript

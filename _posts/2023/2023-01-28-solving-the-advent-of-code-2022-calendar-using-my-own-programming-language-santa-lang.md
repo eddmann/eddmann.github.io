@@ -89,8 +89,8 @@ Any language, no matter how _strict_ or _pure_, can be abused if the code author
 ### Recursion Over Stateful Loops
 
 As I had intentionally omitted standard loop constructs (`for`, `while`) from the language (which are inherently mutable), I found myself leaning heavily on recursion to provide the same means to an end.
-The calendar had many maze puzzles, in which we were required to find (in varying masqueraded forms) the _shortest path_ between two states; this meant employing the [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (BFS) algorithm.
-Unlike [Depth-First Search](https://en.wikipedia.org/wiki/Depth-first_search) (DFS), which is inherently recursive by nature (taking advantage of call stack properties), BFS _work_ is stored in a FIFO queue.
+The calendar had many maze puzzles, in which we were required to find (in varying masqueraded forms) the _shortest path_ between two states; this meant employing the [breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search) (BFS) algorithm.
+Unlike [depth-first search](https://en.wikipedia.org/wiki/Depth-first_search) (DFS), which is inherently recursive by nature (taking advantage of call stack properties), BFS _work_ is stored in a FIFO queue.
 Below is a snippet of my [day 24](https://github.com/eddmann/advent-of-code/blob/master/2022/santa-lang/aoc2022_day24.santa) solution, which documents the key characteristics of the BFS algorithm and how recursion is used as a looping construct.
 
 ```

@@ -9,7 +9,7 @@ Graph theory and, in particular, the graph ADT (abstract data type) is widely ex
 Consisting of vertices (nodes) and the edges (optionally directed or weighted) that connect them, the data structure is effectively able to represent and solve many problem domains.
 One of the most popular areas of algorithm design within this space is the problem of checking for the existence of, or the (shortest) path between, two or more vertices in the graph. <!--more-->
 Properties such as edge weighting and direction are two factors that the algorithm designer can take into consideration.
-In this post I will be exploring two of the simpler available algorithms, Depth-First and Breadth-First search, to achieve the goals highlighted below:
+In this post I will be exploring two of the simpler available algorithms, depth-first and breadth-first search, to achieve the goals highlighted below:
 
 - Find all vertices in a subject vertex's [connected component](<http://en.wikipedia.org/wiki/Connected_component_(graph_theory)>).
 - Return all available paths between two vertices.
@@ -39,7 +39,7 @@ This has been purposely included to provide the algorithms with the option to re
 
 ## Depth-First Search
 
-The first algorithm I will be discussing is Depth-First search, which, as the name hints, explores possible vertices (from a supplied root) down each branch before backtracking.
+The first algorithm I will be discussing is depth-first search, which, as the name hints, explores possible vertices (from a supplied root) down each branch before backtracking.
 This property allows the algorithm to be implemented succinctly in both iterative and recursive forms.
 Below is a listing of the actions performed upon each visit to a node:
 
@@ -117,9 +117,9 @@ list(dfs_paths(graph, 'C', 'F')) # [['C', 'F'], ['C', 'A', 'B', 'E', 'F']]
 
 ## Breadth-First Search
 
-An alternative algorithm called Breadth-First search provides us with the ability to return the same results as DFS, but with the added guarantee of returning the shortest path first.
+An alternative algorithm called breadth-first search provides us with the ability to return the same results as DFS, but with the added guarantee of returning the shortest path first.
 This algorithm is a little more tricky to implement in a recursive manner; instead, using the queue data structure is preferable, as such I will only be documenting the iterative approach.
-The actions performed per each explored vertex are the same as the Depth-First implementation, however, replacing the stack with a queue will instead explore the breadth of a vertex's depth before moving on.
+The actions performed per each explored vertex are the same as the depth-first implementation, however, replacing the stack with a queue will instead explore the breadth of a vertex's depth before moving on.
 This behaviour guarantees that the first path located is one of the shortest paths present, based on the number of edges being the cost factor.
 
 ### Connected Component

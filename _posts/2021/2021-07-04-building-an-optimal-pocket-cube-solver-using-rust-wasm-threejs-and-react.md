@@ -28,10 +28,10 @@ I was able to model [this representation](https://github.com/eddmann/pocket-cube
 
 ## Using a Bidirectional Search
 
-As we know the desired goal state and the initial cube state, we can employ two simultaneous Breadth-First Searches - one going forward from the initial state and one backward from the goal state, stopping when they meet.
+As we know the desired goal state and the initial cube state, we can employ two simultaneous breadth-first searches - one going forward from the initial state and one backward from the goal state, stopping when they meet.
 In doing this, we provide a means to restrict the branching that occurs when the search is being performed into two separate sub-graphs, dramatically reducing the amount of exploration required.
 
-> Suppose the branching factor of the tree is `b`, and the distance of the goal vertex from the source is `d`, then the trivial Breadth-First Search complexity would be `O(b^d)`.
+> Suppose the branching factor of the tree is `b`, and the distance of the goal vertex from the source is `d`, then the trivial breadth-first search complexity would be `O(b^d)`.
 > On the other hand, if we execute two search operations, then the complexity would be `O(b^(d/2))` for each search, with a total complexity of `O(b^(d/2) + b^(d/2))`, which is far less than `O(b^d)`.
 
 On top of this, we are able to prune out move sequences that exceed [God's Number](https://en.wikipedia.org/wiki/God%27s_algorithm), which is eleven moves for a Pocket Cube.

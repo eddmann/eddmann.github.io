@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database">
+    <meta name="description" content="This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database.">
 
     <title>
         
@@ -49,19 +49,20 @@
                 <article class="post">
     <h1 class="post-title">Q&A Retrieval Augmented Generation (RAG) with LangChain and Chroma</h1>
     <time datetime="2023-05-10T00:00:00+00:00" class="post-date">10 May 2023</time>
-    <p>Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
+    <p>Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
+Like many developers, I am interested in exploring what is possible with this new technology.
 This article documents my experience exploring how to implement <a href="https://python.langchain.com/docs/use_cases/question_answering/">Q&amp;A Retrieval Augmented Generation</a> (RAG) using LangChain and the <a href="https://www.trychroma.com/">Chroma</a> vector database.</p>
 
 
 
-<p>This article was originally written as an Jupyter Notebook which can be <a href="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb">downloaded here</a></p>
+<p>This article was originally written as a Jupyter Notebook, which can be <a href="/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb">downloaded here</a>.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">langchain</span> <span class="n">openai</span> <span class="n">datasets</span> <span class="n">chromadb</span>
 </code></pre></div></div>
 
 <h2 id="loading-a-dataset-into-chroma">Loading a Dataset into Chroma</h2>
 
-<p>We will initially load a data-set (Wikipedia article corpus) and chunk it into input that we can feed into the vector database.</p>
+<p>We will initially load a dataset (Wikipedia article corpus) and chunk it into input that we can feed into the vector database.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
@@ -83,7 +84,7 @@ This article documents my experience exploring how to implement <a href="https:/
  'The Stoney family were once prominent landlords, here in North Tipperary. His mother Ethel Sara Stoney (1881–1976) was daughter of Edward Waller Stoney (Borrisokane, North Tipperary) and Sarah Crawford (Cartron Abbey, Co. Longford); Protestant Anglo-Irish gentry.']
 </code></pre></div></div>
 
-<p>We can now generate embeddings of each of the data-set chunks and store these within the Chroma vector database.</p>
+<p>We can now generate embeddings of each dataset chunk and store these within the Chroma vector database.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.docstore.document</span> <span class="kn">import</span> <span class="n">Document</span>
 <span class="kn">from</span> <span class="nn">langchain.vectorstores</span> <span class="kn">import</span> <span class="n">Chroma</span>
@@ -101,7 +102,7 @@ This article documents my experience exploring how to implement <a href="https:/
 
 <p>We can then search the vector database for the given articles that have the most relevance to the given query.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"Where was Alan Turing born and what is an Engima machine?"</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"Where was Alan Turing born and what is an Enigma machine?"</span>
 
 <span class="n">store</span><span class="p">.</span><span class="n">similarity_search</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
 </code></pre></div></div>
@@ -112,7 +113,7 @@ This article documents my experience exploring how to implement <a href="https:/
  Document(page_content='Education \nTuring went to St. Michael\'s, a school at 20 Charles Road, St Leonards-on-sea, when he was five years old.\n"This is only a foretaste of what is to come, and only the shadow of what is going to be.” – Alan Turing.', metadata={'id': '131', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'})]
 </code></pre></div></div>
 
-<h2 id="integrating-the-data-source-with-a-llm">Integrating the data-source with a LLM</h2>
+<h2 id="integrating-the-data-source-with-an-llm">Integrating the Data Source with an LLM</h2>
 
 <p>Now we can wire up the LLM to use the Chroma vector database within a <code class="language-plaintext highlighter-rouge">RetrievalQA</code> chain.</p>
 
@@ -187,12 +188,12 @@ It then passes all the new documents to a separate combine documents chain to ge
   <p>The given portion of the document does not provide any information about where Alan Turing was born or what an Enigma machine is.</p>
 </blockquote>
 
-<p>Sadly this type of chain does not look to have returned the desired results.</p>
+<p>Unfortunately, this type of chain does not appear to return the desired results.</p>
 
 <h2 id="building-a-qa-chatbot">Building a Q&amp;A Chatbot</h2>
 
-<p>We can also use the <code class="language-plaintext highlighter-rouge">ConversationalRetrievalChain</code> to build a Chatbot that we can interact with to answer the desired questions.
-This includes adding a <em>memory</em> in which we can ask additional question based on previous questions and answers.</p>
+<p>We can also use the <code class="language-plaintext highlighter-rouge">ConversationalRetrievalChain</code> to build a chatbot that we can interact with to answer the desired questions.
+This includes adding <em>memory</em>, which allows us to ask follow-up questions based on previous conversations.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">langchain.chains</span> <span class="kn">import</span> <span class="n">ConversationalRetrievalChain</span>
 <span class="kn">from</span> <span class="nn">langchain.memory</span> <span class="kn">import</span> <span class="n">ConversationBufferMemory</span>
@@ -229,7 +230,7 @@ This includes adding a <em>memory</em> in which we can ask additional question b
 
 <h3 id="adding-a-ui">Adding a UI</h3>
 
-<p>Thanks to <a href="https://www.gradio.app/">gradio</a> we can front this chain with a simple Chat UI.</p>
+<p>Thanks to <a href="https://www.gradio.app/">Gradio</a>, we can front this chain with a simple chat UI.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">gradio</span>
 </code></pre></div></div>

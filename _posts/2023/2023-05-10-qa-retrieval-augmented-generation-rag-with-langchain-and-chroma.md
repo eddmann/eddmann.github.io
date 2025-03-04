@@ -1,16 +1,17 @@
 ---
 layout: post
 title: 'Q&A Retrieval Augmented Generation (RAG) with LangChain and Chroma'
-meta: 'This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database'
-tags: llm langchain
+meta: 'This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database.'
+tags: llm langchain chromadb
 ---
 
-Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
+Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
+Like many developers, I am interested in exploring what is possible with this new technology.
 This article documents my experience exploring how to implement [Q&A Retrieval Augmented Generation](https://python.langchain.com/docs/use_cases/question_answering/) (RAG) using LangChain and the [Chroma](https://www.trychroma.com/) vector database.
 
 <!--more-->
 
-This article was originally written as an Jupyter Notebook which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb)
+This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb).
 
 ```python
 !pip install langchain openai datasets chromadb
@@ -18,7 +19,7 @@ This article was originally written as an Jupyter Notebook which can be [downloa
 
 ## Loading a Dataset into Chroma
 
-We will initially load a data-set (Wikipedia article corpus) and chunk it into input that we can feed into the vector database.
+We will initially load a dataset (Wikipedia article corpus) and chunk it into input that we can feed into the vector database.
 
 ```python
 from datasets import load_dataset
@@ -43,7 +44,7 @@ text_splitter.split_text(data[6]['text'])[:3]
  'The Stoney family were once prominent landlords, here in North Tipperary. His mother Ethel Sara Stoney (1881–1976) was daughter of Edward Waller Stoney (Borrisokane, North Tipperary) and Sarah Crawford (Cartron Abbey, Co. Longford); Protestant Anglo-Irish gentry.']
 ```
 
-We can now generate embeddings of each of the data-set chunks and store these within the Chroma vector database.
+We can now generate embeddings of each dataset chunk and store these within the Chroma vector database.
 
 ```python
 from langchain.docstore.document import Document
@@ -63,7 +64,7 @@ store = Chroma.from_documents(documents, embeddings)
 We can then search the vector database for the given articles that have the most relevance to the given query.
 
 ```python
-query = "Where was Alan Turing born and what is an Engima machine?"
+query = "Where was Alan Turing born and what is an Enigma machine?"
 
 store.similarity_search(query)
 ```
@@ -75,7 +76,7 @@ store.similarity_search(query)
  Document(page_content='Education \nTuring went to St. Michael\'s, a school at 20 Charles Road, St Leonards-on-sea, when he was five years old.\n"This is only a foretaste of what is to come, and only the shadow of what is going to be.” – Alan Turing.', metadata={'id': '131', 'source': 'https://simple.wikipedia.org/wiki/Alan%20Turing'})]
 ```
 
-## Integrating the data-source with a LLM
+## Integrating the Data Source with an LLM
 
 Now we can wire up the LLM to use the Chroma vector database within a `RetrievalQA` chain.
 
@@ -147,12 +148,12 @@ qa.run(query)
 
 > The given portion of the document does not provide any information about where Alan Turing was born or what an Enigma machine is.
 
-Sadly this type of chain does not look to have returned the desired results.
+Unfortunately, this type of chain does not appear to return the desired results.
 
 ## Building a Q&A Chatbot
 
-We can also use the `ConversationalRetrievalChain` to build a Chatbot that we can interact with to answer the desired questions.
-This includes adding a _memory_ in which we can ask additional question based on previous questions and answers.
+We can also use the `ConversationalRetrievalChain` to build a chatbot that we can interact with to answer the desired questions.
+This includes adding _memory_, which allows us to ask follow-up questions based on previous conversations.
 
 ```python
 from langchain.chains import ConversationalRetrievalChain
@@ -193,7 +194,7 @@ qa({"question": query, "chat_history": []})
 
 ### Adding a UI
 
-Thanks to [gradio](https://www.gradio.app/) we can front this chain with a simple Chat UI.
+Thanks to [Gradio](https://www.gradio.app/), we can front this chain with a simple chat UI.
 
 ```python
 !pip install gradio

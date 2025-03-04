@@ -1,16 +1,17 @@
 ---
 layout: post
 title: 'Using LangChain Agents and Tools to answer questions on the NBA with OpenAI'
-meta: 'This article explores using LangChain Agents and Tools to answer questions on the NBA with OpenAI'
+meta: 'Explore how to use LangChain Agents and Tools with OpenAI to answer questions about recent NBA events and statistics.'
 tags: openai llm langchain
 ---
 
-Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment, and like many developers I am interested at exploring what is possible with this new technology.
-This article documents the use of [LangChain](https://www.langchain.com/) [Agents](https://python.langchain.com/docs/modules/agents/)/[Tools](https://python.langchain.com/docs/modules/tools/) to help aid in answering questions based on recent NBA events.
+Large language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
+Like many developers, I am interested in exploring what is possible with this new technology.
+This article documents the use of [LangChain](https://www.langchain.com/) [Agents](https://python.langchain.com/docs/modules/agents/)/[Tools](https://python.langchain.com/docs/modules/tools/) to aid in answering questions based on recent NBA events.
 
 <!--more-->
 
-This article was originally written as an Jupyter Notebook which can be [downloaded here](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb)
+This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb).
 
 ```python
 !pip install langchain openai bs4 requests
@@ -26,9 +27,9 @@ llm = OpenAI(
 )
 ```
 
-## Without a source
+## Without a Source
 
-The LLM is trained up-to a given point in time, it is not aware of recent events.
+The LLM is trained up to a given point in time; it is not aware of recent events.
 
 ```python
 llm("Was the 2023 NBA season MVP part of the team that won the NBA championship that year?")
@@ -45,17 +46,17 @@ llm("Was the 1998 NBA season MVP part of the team that won the NBA championship 
 > No, the 1998 NBA season MVP was Michael Jordan of the Chicago Bulls, but the NBA championship that year was won by the San Antonio Spurs.
 
 ```python
-llm("Who won the 1998 NBA season MVP, what team where they on?, what team won the NBA championship that year?")
+llm("Who won the 1998 NBA season MVP, what team were they on?, what team won the NBA championship that year?")
 ```
 
 > The 1998 NBA season MVP was Michael Jordan of the Chicago Bulls. The Chicago Bulls also won the NBA championship that year.
 
-## Adding a source
+## Adding a Source
 
-> "You Don't Have to Know Everything. You Just Have to Know Where to Find It."
+> "You don't have to know everything. You just have to know where to find it."
 > -- <cite>Albert Einstein</cite>
 
-We can improve the models answer by providing tools for it to use to lookup recent events within a given domain.
+We can improve the model's answer by providing tools for it to use to look up recent events within a given domain.
 This aids in _grounding_ the model and helps to ensure it does not hallucinate.
 
 ```python
@@ -72,11 +73,11 @@ statmuse_tool = Tool(
     name = "Statmuse",
     func = search_statmuse,
     description = """
-        NBA basketball search engine. Use this if the question is related to NBA basktetball stats and trivia.
-        For example: 'who is the highest scoring player in the 2023 season?',
+        NBA basketball search engine. Use this if the question is related to NBA basketball stats and trivia.
+        For example: 'Who is the highest-scoring player in the 2023 season?'
         You must:
         - Always specify a year or timeframe with your search.
-        - Only search for a single player, MVP or team in a single search.
+        - Only search for a single player, MVP, or team in a single search.
     """
 )
 
@@ -148,9 +149,9 @@ Final Answer: Yes, Michael Jordan was part of the team that won the 1998 NBA cha
 
 Much better!
 
-### Combining tools
+### Combining Tools
 
-We now can combine the abilities to; reason about a question, find the relevant information, and then compute a given answer.
+We can now combine the abilities to reason about a question, find the relevant information, and then compute a given answer.
 
 ```python
 agent.run("How many combined points did the 2023 NBA season MVP, and the 2023 NBA finals MVP score for the entire 2023 season?")
@@ -191,7 +192,7 @@ Final Answer: The combined points of the 2023 NBA season MVP and the 2023 NBA Fi
 
 > The combined points of the 2023 NBA season MVP and the 2023 NBA Finals MVP for the entire 2023 season was 3,873 points.
 
-Lets now add a tool to fetch information from Wikipedia.
+Let's now add a tool to fetch information from Wikipedia.
 
 ```python
 tools = load_tools(["wikipedia"], llm=llm) + [statmuse_tool]
@@ -228,5 +229,5 @@ Final Answer: Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and 
 
 > Nikola Jokić was born in Sombor, Serbia on February 19, 1995 and he scored a total of 1,845 points in the 2023 season.
 
-Although this is a very contrived example it shows the power of how you can get the LLM to reason about a problem, breaking it up into smaller tasks of which it can use provided tools.
-It does not necessarily need to know the answer, just how to find the answer.
+Although this is a very contrived example, it shows the power of how you can get the LLM to reason about a problem by breaking it up into smaller tasks, using provided tools.
+It does not necessarily need to know the answer - just how to find the answer.

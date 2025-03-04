@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 1 - Implementing the Core'
-meta: 'This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I organised the project and built the core language.'
+meta: 'This blog series details my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I organised the project and built the core language.'
 tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 

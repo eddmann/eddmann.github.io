@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 3 - Performance'
-meta: 'This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.'
+meta: 'This blog series details my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.'
 tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution'
-meta: 'This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.'
+meta: 'This blog series details my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.'
 tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 

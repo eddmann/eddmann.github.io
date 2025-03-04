@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens'
 meta: 'This technical post explains how to implement authentication with Amazon Cognito and JSON Web Tokens in a Serverless environment.'
-tags: cognito serverless security mince-pie-challenge
+tags: cognito serverless security mince-pie-challenge-series
 ---
 
 Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.
@@ -353,4 +353,4 @@ If you are interested in seeing the entire deployment and testing process for al
 <p><script src="https://asciinema.org/a/w6hj8mSNhjbttO56KTKBolwyK.js" id="asciicast-w6hj8mSNhjbttO56KTKBolwyK" async></script></p>
 
 We have now successfully exercised the ability to sign up and authenticate users with the application.
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/) where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.

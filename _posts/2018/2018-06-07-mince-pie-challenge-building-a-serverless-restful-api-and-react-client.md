@@ -2,11 +2,11 @@
 layout: post
 title: 'Mince Pie Challenge: Building a Serverless RESTful API and React Client'
 meta: 'Guide to building a Serverless RESTful API and React Client using AWS services and modern development tools.'
-tags: serverless aws lambda react javascript mince-pie-challenge
+tags: serverless aws lambda react javascript mince-pie-challenge-series
 ---
 
 Since moving our infrastructure over to the AWS stack, I have been keen to explore how we can take advantage of the numerous services at our disposal, alongside the serverless methodology.
-In this blog [series](https://eddmann.com/archive/tag/mince-pie-challenge/), I wish to document my experience of building a complete serverless application which harnesses as many of the AWS offerings as possible.
+In this blog [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), I wish to document my experience of building a complete serverless application which harnesses as many of the AWS offerings as possible.
 We will explore building both a RESTful API and a React client, all hosted without any servers to maintain!
 
 <!--more-->
@@ -46,4 +46,4 @@ Although this may seem like a trivial CRUD system, it will allow us to explore m
 - [Terraform](https://www.terraform.io/) to provision the static endpoint to which we will publish the resulting client.
 
 With so much to do, we had better get started!
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/) where we will go about designing and documenting our RESTful API using RAML and HAL.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where we will go about designing and documenting our RESTful API using RAML and HAL.

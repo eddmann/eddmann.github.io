@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding Test Coverage using Jest and Travis CI'
 meta: 'A comprehensive guide to enhancing your API project with test coverage using Jest and Travis CI, ensuring robust code quality and continuous integration.'
-tags: jest testing javascript mince-pie-challenge
+tags: jest testing javascript mince-pie-challenge-series
 ---
 
 Following on from [adding Flow](https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/) to the API project, I now wish to garner further confidence in the code by adding tests.
@@ -304,4 +304,4 @@ You can see how a successful build looks in the screenshot below.
 <img src="/uploads/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/travis-ci.png" alt="Travis CI" />
 
 We now have a well-equipped Continuous Integration pipeline in place.
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) where we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using [Serverless Offline](https://github.com/dherault/serverless-offline).
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using [Serverless Offline](https://github.com/dherault/serverless-offline).

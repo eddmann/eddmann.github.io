@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Designing the RESTful API with RAML'
 meta: 'Learn how to design a RESTful API using RAML for the Mince Pie Challenge with detailed guidelines, best practices and authentication strategies.'
-tags: rest raml mince-pie-challenge
+tags: rest raml mince-pie-challenge-series
 ---
 
 Now that we are aware of what needs to be done, we can go about designing the RESTful API that will be used to process and persist those vital mince pies.
@@ -408,4 +408,4 @@ You can explore this [documentation](/uploads/mince-pie-challenge-designing-the-
 <a href="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api.html"><img src="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api-documentation.png" alt="API Documentation" /></a>
 
 With the API design now finalised, we can move on to actually building it!
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/) where we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.

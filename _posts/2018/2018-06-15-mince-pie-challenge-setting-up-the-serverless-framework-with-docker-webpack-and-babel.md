@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Setting up the Serverless Framework with Docker, Webpack and Babel'
 meta: 'Learn how to set up the Serverless Framework with Docker, Webpack and Babel for building robust AWS Lambda functions as part of the Mince Pie Challenge.'
-tags: serverless docker webpack babel lambda mince-pie-challenge
+tags: serverless docker webpack babel lambda mince-pie-challenge-series
 ---
 
 Now that we have spent some time working out how the API is going to look, we can move on to building it!
@@ -229,4 +229,4 @@ You can see this module installation and deployment process in action within the
 <p><script src="https://asciinema.org/a/6BAfJE1YFYLoSw0StVA9jWUaN.js" id="asciicast-6BAfJE1YFYLoSw0StVA9jWUaN" async></script></p>
 
 With the Serverless Framework configured and a sample function now deployed, we can begin the process of implementing our API.
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/) where I will discuss the process of configuring [Amazon Cognito](https://aws.amazon.com/cognito/), the authentication service that will be used within our API.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where I will discuss the process of configuring [Amazon Cognito](https://aws.amazon.com/cognito/), the authentication service that will be used within our API.

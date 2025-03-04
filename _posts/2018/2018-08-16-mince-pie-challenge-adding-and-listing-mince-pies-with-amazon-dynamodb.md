@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding and Listing Mince Pies with Amazon DynamoDB'
 meta: 'Explore the process of adding and listing mince pies with Amazon DynamoDB using Lambda and offline development with DynamoDB Local.'
-tags: serverless aws lambda dynamodb javascript mince-pie-challenge
+tags: serverless aws lambda dynamodb javascript mince-pie-challenge-series
 ---
 
 In the [previous post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) we began to implement the API endpoints, starting off with creating the bootstrap response.
@@ -585,4 +585,4 @@ In the case of the local DynamoDB instance, we are able to inspect the current s
 <img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" />
 
 I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manner.
-In the [next post](https://eddmann.com/posts/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/) we shall be expanding the API further, by adding the capability to view and remove specified mince pies.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), we shall be expanding the API further, by adding the capability to view and remove specified mince pies.

@@ -2,7 +2,7 @@
 layout: post
 title: 'Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline'
 meta: 'Discover how to implement a Bootstrap API endpoint and configure Serverless Offline for efficient local development.'
-tags: serverless mince-pie-challenge
+tags: serverless mince-pie-challenge-series
 ---
 
 Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication.
@@ -246,4 +246,4 @@ Any changes that you make to the handler implementation will be automatically re
 <img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap.png" alt="Offline Bootstrap Endpoint" />
 
 We have now created our first Mince Pie Challenge API endpoint, which not only works within the online `dev` stage, but is also equipped to handle offline access.
-Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/) where we will be adding the ability to add and list Mince Pies to the API, using both an online and local [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) instance.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/) of the [series](https://eddmann.com/archive/tag/mince-pie-challenge-series/), where we will be adding the ability to add and list Mince Pies to the API, using both an online and local [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) instance.

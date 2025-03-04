@@ -2,7 +2,7 @@
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 3 - Performance'
 meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I went about benchmarking the two implementations (TypeScript/Node and Rust), greatly improving performance and highlighting interesting findings along the way.'
-tags: rust santa-lang interpreter
+tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 Now that we have discussed building the core language and desired runtimes, it is time to highlight one of the biggest reasons why I decided to rewrite the interpreter in a lower-level systems language - performance!

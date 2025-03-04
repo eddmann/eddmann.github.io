@@ -2,7 +2,7 @@
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 1 - Implementing the Core'
 meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I organised the project and built the core language.'
-tags: rust santa-lang interpreter
+tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 After implementing santa-lang in [TypeScript (Node)](https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/), I wanted to explore rewriting the tree-walking interpreter in a lower-level systems language for efficiency and performance gains.

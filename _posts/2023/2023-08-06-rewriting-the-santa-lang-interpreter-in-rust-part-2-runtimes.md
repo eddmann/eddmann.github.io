@@ -2,7 +2,7 @@
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 2 - Runtimes'
 meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I integrated the core language library with the desired (delivery) runtimes.'
-tags: rust santa-lang interpreter
+tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 With the [core language library](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/) now written, I could go about building the desired (delivery) runtimes.

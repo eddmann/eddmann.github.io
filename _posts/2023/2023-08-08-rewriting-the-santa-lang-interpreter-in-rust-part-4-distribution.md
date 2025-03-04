@@ -2,7 +2,7 @@
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution'
 meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.'
-tags: rust santa-lang interpreter
+tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 Now that the interpreter's performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed.

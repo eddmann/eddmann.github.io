@@ -353,4 +353,4 @@ If you are interested in seeing the entire deployment and testing process for al
 <p><script src="https://asciinema.org/a/w6hj8mSNhjbttO56KTKBolwyK.js" id="asciicast-w6hj8mSNhjbttO56KTKBolwyK" async></script></p>
 
 We have now successfully exercised the ability to sign up and authenticate users with the application.
-Join me in the next post where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/) where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.

@@ -304,4 +304,4 @@ You can see how a successful build looks in the screenshot below.
 <img src="/uploads/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/travis-ci.png" alt="Travis CI" />
 
 We now have a well-equipped Continuous Integration pipeline in place.
-Join me in the next post where we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using [Serverless Offline](https://github.com/dherault/serverless-offline).
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/) where we will begin implementing the Bootstrap API endpoint, experimenting with running the endpoint locally using [Serverless Offline](https://github.com/dherault/serverless-offline).

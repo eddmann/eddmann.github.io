@@ -229,4 +229,4 @@ You can see this module installation and deployment process in action within the
 <p><script src="https://asciinema.org/a/6BAfJE1YFYLoSw0StVA9jWUaN.js" id="asciicast-6BAfJE1YFYLoSw0StVA9jWUaN" async></script></p>
 
 With the Serverless Framework configured and a sample function now deployed, we can begin the process of implementing our API.
-Join me in the next post where I will discuss the process of configuring [Amazon Cognito](https://aws.amazon.com/cognito/), the authentication service that will be used within our API.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/) where I will discuss the process of configuring [Amazon Cognito](https://aws.amazon.com/cognito/), the authentication service that will be used within our API.

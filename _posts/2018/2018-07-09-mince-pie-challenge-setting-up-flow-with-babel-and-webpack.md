@@ -240,4 +240,4 @@ In doing so, we are able to get real-time Flow analysis, which makes it easier t
 <img src="/uploads/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/flow-ide.png" alt="Flow IDE" />
 
 With Flow now configured, I wish to increase our code confidence even more by adding the unit testing framework [Jest](https://jestjs.io/) into the project.
-Join me in the next post where we will look into testing the application using Jest, and add continuous integration via [Travis CI](https://travis-ci.org/).
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-adding-test-coverage-using-jest-and-travis-ci/) where we will look into testing the application using Jest, and add continuous integration via [Travis CI](https://travis-ci.org/).

@@ -408,4 +408,4 @@ You can explore this [documentation](/uploads/mince-pie-challenge-designing-the-
 <a href="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api.html"><img src="/uploads/mince-pie-challenge-designing-the-restful-api-with-raml/api-documentation.png" alt="API Documentation" /></a>
 
 With the API design now finalised, we can move on to actually building it!
-Join me in the next post where we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.
+Join me in the [next post](https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/) where we will go about locally setting up the Serverless Framework with Docker, Webpack and Babel.

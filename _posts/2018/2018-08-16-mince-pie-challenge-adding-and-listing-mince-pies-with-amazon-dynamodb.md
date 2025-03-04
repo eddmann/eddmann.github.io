@@ -585,4 +585,4 @@ In the case of the local DynamoDB instance, we are able to inspect the current s
 <img src="/uploads/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/local-shell-dynamodb.png" alt="Local DynamoDB Shell" />
 
 I hope you have enjoyed exploring working with DynamoDB using Lambda, and adding the ability to develop the service in an offline manner.
-In the next post we shall be expanding the API further, by adding the capability to view and remove specified mince pies.
+In the [next post](https://eddmann.com/posts/mince-pie-challenge-viewing-and-removing-mince-pies-with-amazon-dynamodb/) we shall be expanding the API further, by adding the capability to view and remove specified mince pies.

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This post documents my experience building a Progress Web Application which calculates running pace, time and distance, along with common-place imperial/metric measurement conversions">
+    <meta name="description" content="This post documents my experience building a Progressive Web Application (PWA) that calculates running pace, time, and distance, along with common imperial/metric measurement conversions.">
 
     <title>
         
@@ -50,9 +50,9 @@
     <h1 class="post-title">Building a Running Calculator PWA in React and TypeScript</h1>
     <time datetime="2023-10-31T00:00:00+00:00" class="post-date">31 Oct 2023</time>
     <p>I have been an avid runner for many years now, but I still get confused by imperial and metric measurements.
-On top of this, the amount of times I seek out a random website to perform some form of pace/distance calculation is too often to count.
-What I wanted was a desktop and mobile application that could perform pace, distance and time calculations, along with imperial/metric conversions - <em>a swiss-army knife of running calculators</em>.
-In this post I would like to document my experience building a <a href="https://web.dev/articles/what-are-pwas">Progress Web Application</a> (PWA) which does just this; providing a native app-like experience across iOS, Android and Desktop.</p>
+On top of this, the number of times I seek out a random website to perform some form of pace/distance calculation is too often to count.
+What I wanted was a desktop and mobile application that could perform pace, distance, and time calculations, along with imperial/metric conversions - <em>a swiss-army knife of running calculators</em>.
+In this post, I would like to document my experience building a <a href="https://web.dev/articles/what-are-pwas">Progressive Web Application</a> (PWA) that does just this, providing a native app-like experience across iOS, Android, and Desktop.</p>
 
 
 
@@ -60,9 +60,9 @@ In this post I would like to document my experience building a <a href="https://
   <img src="/uploads/building-a-running-calculator-pwa-in-react-and-typescript/app-icon.png" style="max-width:150px;border-radius:20%;margin:0 auto;" alt="App Icon" />
 </a></p>
 
-<p>Progress Web Applications provide a means of leveraging the browser and web technologies to enable a <em>native app</em>-like mobile and desktop experience.
-They use the conventional web stack that web developers are familiar with; HTML, JavaScript and CSS.
-This in-turn allows you to deploy at the same frequency and ease as you would a conventional website, but without the head-aches of app store submissions.</p>
+<p>Progressive Web Applications provide a means of leveraging the browser and web technologies to enable a <em>native app</em>-like mobile and desktop experience.
+They use the conventional web stack that web developers are familiar with: HTML, JavaScript, and CSS.
+This, in turn, allows you to deploy at the same frequency and ease as you would a conventional website, but without the headaches of app store submissions.</p>
 
 <h2 id="the-app">The App</h2>
 
@@ -78,12 +78,12 @@ This in-turn allows you to deploy at the same frequency and ease as you would a 
   </div>
 </div>
 
-<p>The resulting application has been built using React, TypeScript, CSS-in-JS (<a href="https://styled-components.com/">styled-components</a>) and bundled with <a href="https://vitejs.dev/">Vite</a>.
-I have leveraged the <a href="https://vite-pwa-org.netlify.app/">Vite PWA plugin</a> to abstract away generating the required Service Worker, Web app manifest and icon assets to <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Installable_PWAs#requirements">meet PWA requirements</a>.
-Under-the-hood Google’s <a href="https://developer.chrome.com/docs/workbox/">Workbox</a> project is used to handle managing caching assets for offline use and updating the registered Service Worker.</p>
+<p>The resulting application has been built using React, TypeScript, CSS-in-JS (<a href="https://styled-components.com/">styled-components</a>), and bundled with <a href="https://vitejs.dev/">Vite</a>.
+I have leveraged the <a href="https://vite-pwa-org.netlify.app/">Vite PWA plugin</a> to abstract away generating the required Service Worker, Web App Manifest, and icon assets to <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Tutorials/js13kGames/Installable_PWAs#requirements">meet PWA requirements</a>.
+Under the hood, Google’s <a href="https://developer.chrome.com/docs/workbox/">Workbox</a> project is used to handle managing cached assets for offline use and updating the registered Service Worker.</p>
 
-<p>When initially researching PWA development, you would naively assume it is just a case of adding a Web app manifest and Service Worker to your project, serving the content over HTTPS and you’re done… not quite.
-Below I will discuss the different areas I needed to consider which lead to final result shown above.</p>
+<p>When initially researching PWA development, you might naively assume it is just a case of adding a Web App Manifest and Service Worker to your project, serving the content over HTTPS, and you’re done… not quite.
+Below, I will discuss the different areas I needed to consider, which led to the final result shown above.</p>
 
 <h2 id="appification">App’ification</h2>
 
@@ -102,41 +102,42 @@ Below I will discuss the different areas I needed to consider which lead to fina
 
 <h3 id="look-and-feel">Look and Feel</h3>
 
-<p>A large area of research and development was making the user experience <em>look and feel</em> like a native application that would be typically found on both mobile and desktop devices.
-A lot of time was spent in essentially <em>‘de-webifying’</em> the web application, to follow what users would expect from a native application experience.
-This included disabling page zooming capabilities, user text selection and document overflow scrolling.
-These were all fortunately able to be achieved using CSS, with a small dose of browser-specific prefixes (Safari…).
-I did however have to resort to some JavaScript for disabling the touch body scroll which is present when the soft-keyboard appears on mobile for focused input fields.
-Although this process overall did take some trial and error, the learnings garnered can be applied going forward to other app-like web experiences and PWAs I wish to develop.</p>
+<p>A large area of research and development was making the user experience <em>look and feel</em> like a native application typically found on both mobile and desktop devices.
+A lot of time was spent essentially <em>‘de-webifying’</em> the web application to align with user expectations of a native app experience.
+This included disabling page zooming capabilities, user text selection, and document overflow scrolling.
+These were all fortunately achievable using CSS, with a small dose of browser-specific prefixes (Safari…).
+I did, however, have to resort to some JavaScript to disable touch body scroll when the soft keyboard appears on mobile for focused input fields.
+Although this process required trial and error, the learnings garnered can be applied going forward to other app-like web experiences and PWAs I wish to develop.</p>
 
 <h3 id="mobile">Mobile</h3>
 
-<p>When the iPhone was initially released, Steve Jobs toted an innovative new way to create web applications <em>“that look exactly and behave exactly like native apps”</em> during the launch’s <a href="https://www.youtube.com/watch?v=ZlE7dzoD6GA">one last thing</a> section.
-However, the momentum soon dwindled with the release of a native SDK several months later - and the subsequent popularity/revenue of the App Store has not made Apple regret that decision.
-This has lead to much of my PWA development experience sadly feeling like how can I make this work on iOS… (and this is coming from an Apple fanboy).
-iOS is still <a href="https://firt.dev/notes/pwa-ios/">way behind</a> the awesome web capability support that is present on Android, for example it has only finally added <a href="https://developer.mozilla.org/en-US/docs/Web/API/Push_API">Web Push</a> capabilities since iOS 16.4.</p>
+<p>When the iPhone was initially released, Steve Jobs touted an innovative new way to create web applications <em>“that look exactly and behave exactly like native apps”</em> during the launch’s <a href="https://www.youtube.com/watch?v=ZlE7dzoD6GA">one more thing</a> section.
+However, the momentum soon dwindled with the release of a native SDK several months later - and the subsequent popularity and revenue of the App Store have not made Apple regret that decision.
+This has led to much of my PWA development experience feeling like a constant struggle to make things work on iOS… (and this is coming from an Apple fanboy).
+iOS is still <a href="https://firt.dev/notes/pwa-ios/">way behind</a> the fantastic web capability support present on Android.
+For instance, it has only recently added <a href="https://developer.mozilla.org/en-US/docs/Web/API/Push_API">Web Push</a> capabilities since iOS 16.4.</p>
 
-<p>Below are several of the key pain points I have felt whilst developing this PWA on iOS.</p>
+<p>Below are several key pain points I encountered while developing this PWA on iOS.</p>
 
-<h4 id="splash-screens">Splash screens</h4>
+<h4 id="splash-screens">Splash Screens</h4>
 
-<p>The amount of splash-screen assets that are required to be generated to provide full iOS device support is mind-blowing.
-Not only do you need to supply many assets up-front, iOS requires custom Safari specific meta-tag workarounds to register the different splash-screen variants.
-This is in stark contrast to Android where the system is able to use an existing icon provided by the Web app manifest.</p>
+<p>The number of splash screen assets required for full iOS device support is mind-blowing.
+Not only do you need to supply numerous assets upfront, but iOS also requires custom Safari-specific meta-tag workarounds to register different splash screen variants.
+This is in stark contrast to Android, where the system can use an existing icon provided by the Web App Manifest.</p>
 
 <h4 id="orientation">Orientation</h4>
 
-<p>iOS lacks support for the Web app manifest <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">orientation</a> (portrait and/or landscape) property, which allows you to specify what orientations the PWA supports.
-Instead you are required to cater for both, or provide crude CSS-based ‘Not support in this orientation’ messages to the user.</p>
+<p>iOS lacks support for the Web App Manifest <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/orientation">orientation</a> property, which allows you to specify whether the PWA supports portrait and/or landscape modes.
+Instead, you must cater for both orientations or display crude CSS-based ‘Not supported in this orientation’ messages to the user.</p>
 
-<h4 id="installation-prompt">Installation prompt</h4>
+<h4 id="installation-prompt">Installation Prompt</h4>
 
-<p>Most annoying of all, iOS lacks native <a href="https://web.dev/learn/pwa/installation-prompt">installation prompts</a>, which on the other hand is fully supported on Android and Chrome desktop devices.
-It does not support the <code class="language-plaintext highlighter-rouge">beforeinstallprompt</code> event which means that to install a PWA you have to instruct the user to manually visit Safari, open the bottom menu bar and ‘Add to Home Screen’ 🤦.
-Third-party browsers (i.e. Chrome) although being required to use the Safari web-engine do not have support for installing PWAs.
-This really puts PWA adoption on the back foot compared to the seamless experience that iOS provides for App Store installations.
-Android on the other hand provides a great user experience, harnessing screenshots found in the Web app manifest to aid the user in installing your application.
-It even packages up the application as a <a href="https://developer.chrome.com/docs/android/trusted-web-activity/">Trusted Web Activity</a>, which treats the PWA as if it were like any other Android application, not just a Safari <em>bookmark</em> icon.
+<p>Most annoyingly, iOS lacks native <a href="https://web.dev/learn/pwa/installation-prompt">installation prompts</a>, whereas Android and Chrome desktop devices fully support them.
+It does not support the <code class="language-plaintext highlighter-rouge">beforeinstallprompt</code> event, meaning that to install a PWA, users must manually visit Safari, open the bottom menu bar, and select ‘Add to Home Screen’ 🤦.
+Third-party browsers (e.g. Chrome), although required to use the Safari web engine, do not support installing PWAs.
+This severely hinders PWA adoption compared to the seamless experience iOS provides for App Store installations.
+Android, on the other hand, offers a great user experience, leveraging screenshots found in the Web App Manifest to aid installation.
+It even packages the application as a <a href="https://developer.chrome.com/docs/android/trusted-web-activity/">Trusted Web Activity</a>, treating the PWA as a standard Android application rather than a mere Safari <em>bookmark</em>.
 You can see how the two experiences differ by watching the videos above.</p>
 
 <h3 id="desktop">Desktop</h3>
@@ -150,8 +151,8 @@ You can see how the two experiences differ by watching the videos above.</p>
   </div>
 </div>
 
-<p>In contrast to the work required on mobile to meet the desired look and feel, desktop development did not require as much attention.
-As PWAs support is only present within Google Chrome (and variants such as Microsoft Edge), this limited the scope of browsers that needed to be catered for.
+<p>In contrast to mobile development, making the app feel native on desktop required less attention.
+Since PWAs are only supported in Google Chrome (and variants such as Microsoft Edge), the scope of browsers that needed catering was limited.
 What is great about this approach is that there is no need to wrap your application in an <a href="https://www.electronjs.org/">Electron</a>/<a href="https://tauri.app/">Tauri</a> wrapper if the APIs supplied by Google Chrome meet your needs.</p>
 
 <video style="width:100%" controls="" muted="">
@@ -160,10 +161,10 @@ What is great about this approach is that there is no need to wrap your applicat
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>I am very happy with the PWA that I have been able to build over the past week or so.
-Although the application itself is simple, it has allowed me to explore many of the fundamental areas of PWA development that need to considered when building web applications that should look and feel native.
+<p>I am very happy with the PWA I have built over the past week or so.
+Although the application itself is simple, it has allowed me to explore many fundamental aspects of PWA development that need to considered when building web applications that should look and feel native.
 iOS support, although lacking behind Android considerably, at least provides a native look and feel once it has been installed on to the device.
-To help aid in this issue, going forward I would like to explore how I can use projects such as <a href="https://www.pwabuilder.com/">PWABuilder</a> to package the PWA into an application that can be submitted onto both the Google Play and Apple App Store.</p>
+Going forward, I would like to explore how I can use projects such as <a href="https://www.pwabuilder.com/">PWABuilder</a> to package the PWA for submission to the Google Play and Apple App Store, helping to address some of the discussed shortcomings.</p>
 
 </article>
 

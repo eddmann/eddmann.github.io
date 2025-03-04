@@ -6,7 +6,7 @@ tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 With the [core language library](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/) now written, I could go about building the desired (delivery) runtimes.
-In this post within the series, I will delve into my experience integrating the core language library with these chosen runtimes, documenting some of the challenges that I faced along the way.
+In this post within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will delve into my experience integrating the core language library with these chosen runtimes, documenting some of the challenges that I faced along the way.
 
 <!--more-->
 
@@ -34,7 +34,7 @@ This provided me with confidence that I had correctly integrated the library wit
 
 To aid in performance benchmarking, I added the ability to compile the runtime with [pprof](https://github.com/tikv/pprof-rs) code profiling (via a [`profile`](https://github.com/eddmann/santa-lang-rs/blob/870e364a9ae47c3648e358d89b42e491f9d59577/runtime/cli/Cargo.toml#L26) feature flag).
 The chosen library also allowed me to produce [flame graphs](https://www.brendangregg.com/flamegraphs.html), which were used extensively throughout development to help pinpoint areas where performance could be improved.
-Further discussion on performance will be documented in the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series.
+Further discussion on performance will be documented in the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/).
 
 ## Web (WASM)
 
@@ -124,4 +124,4 @@ It also make me interested to see how I could possibly use a notebook to help de
 ## What's Next?
 
 Now that all the desired runtimes have been implemented, it is finally time to investigate performance considerations!
-In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series, I will document how I went about benchmarking the two implementations, greatly improving performance, and highlighting interesting findings along the way.
+In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will document how I went about benchmarking the two implementations, greatly improving performance, and highlighting interesting findings along the way.

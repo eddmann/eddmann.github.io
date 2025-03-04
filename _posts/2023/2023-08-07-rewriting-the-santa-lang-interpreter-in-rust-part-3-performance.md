@@ -113,5 +113,5 @@ I had only really touched upon the low-hanging fruit - with more drastic changes
 ## What's Next?
 
 Now that I have been able to explore and document the performance improvements I could make to the Rust implementation, I want to switch tracks and look at one last important topic - distribution.
-In the [last post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/) within the series, I will discuss how I built out a CI/CD pipeline to handle packaging and distributing the different runtimes to their relevant targets.
+In the [last post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/) within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will discuss how I built out a CI/CD pipeline to handle packaging and distributing the different runtimes to their relevant targets.
 This proved to be an interesting endeavour in itself.

@@ -6,7 +6,7 @@ tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 Now that the interpreter's performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed.
-In the final post within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.
+In the final post within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.
 
 <!--more-->
 

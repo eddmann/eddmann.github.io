@@ -8,7 +8,7 @@ tags: rust santa-lang interpreter santa-lang-in-rust-series
 After implementing santa-lang in [TypeScript (Node)](https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/), I wanted to explore rewriting the tree-walking interpreter in a lower-level systems language for efficiency and performance gains.
 My goal was to be able to run the entire [Advent of Code 2022 calendar](https://adventofcode.com/2022) _quicker_ than the Node variant.
 I settled on using Rust due to its blend of high and low-level constructs, its vibrant package registry (Cargo), memory management model, and previous [enjoyable experience using the language](https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/).
-In this first post within the series, I will document how I went about organising the project and rewriting the core language within Rust.
+In this first post within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will document how I went about organising the project and rewriting the core language within Rust.
 
 <!--more-->
 
@@ -102,7 +102,7 @@ Represented as an [enumeration](https://github.com/eddmann/santa-lang-rs/blob/ec
 
 Like the TypeScript implementation, trying to break up the evaluation behaviour into manageable-sized chunks was an important task.
 To achieve this, I decided to break up key behaviours into separate functions (located in separate files).
-To ensure that there was no performance penalty or unnecessary function invocation for this decision, I used [inline annotations](https://nnethercote.github.io/perf-book/inlining.html), which will be discussed more in a [future post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series.
+To ensure that there was no performance penalty or unnecessary function invocation for this decision, I used [inline annotations](https://nnethercote.github.io/perf-book/inlining.html), which will be discussed more in a [future post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/).
 Some behaviours that I separated out were language [function invocation](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/function.rs) (user-land, memoized, closures, external and built-in), [infix operations](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/infix.rs), and santa-lang's [match expressions](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/matcher.rs).
 
 ### Rc\<RefCell\<T\>\>
@@ -192,4 +192,4 @@ This ensured that the internal error types remained private and were not leaked 
 ## What's Next...
 
 With the core language library now implemented and tested, it was time to move on to the different runtimes.
-In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/) within the series, I will document how I went about integrating the core language library into the (delivery) runtimes.
+In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/) within the [series](https://eddmann.com/archive/tag/santa-lang-in-rust-series/), I will document how I went about integrating the core language library into the (delivery) runtimes.

@@ -3,7 +3,7 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This article documents my exploration into using Python and pandas to determine the closest Parkrun Alphabet Challenge for a given local run">
+    <meta name="description" content="Explore how to use Python and pandas to determine the closest Parkrun events for completing the Alphabet Challenge based on your local run.">
 
     <title>
         
@@ -50,17 +50,17 @@
     <h1 class="post-title">Determining your closest Parkrun Alphabet Challenge using Python and pandas</h1>
     <time datetime="2023-07-22T00:00:00+00:00" class="post-date">22 Jul 2023</time>
     <p>The Parkrun Alphabet is an <a href="https://blog.parkrun.com/uk/2018/07/18/the-parkrun-alphabet/">unofficial challenge</a> that sees runners complete a Parkrun at locations starting with each letter of the English alphabet.
-I am a big fan of the Parkrun and wanted to work out how feasible it would be for me to complete the challenge based on the closest <em>tourist</em> locations to my <em>local</em> weekly run.
+I am a big fan of Parkrun and wanted to work out how feasible it would be for me to complete the challenge based on the closest <em>tourist</em> locations to my <em>local</em> weekly run.
 I also thought this would be a great opportunity to explore <a href="https://pandas.pydata.org/">pandas</a> and work with <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html">DataFrames</a>.</p>
 
 
 
-<p>This article was originally written as an Jupyter Notebook which can be <a href="/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb">downloaded here</a>.</p>
+<p>This article was originally written as a Jupyter Notebook, which can be <a href="/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb">downloaded here</a>.</p>
 
 <h2 id="the-dataset">The Dataset</h2>
 
 <p>My first job was to build a dataset of all the current Parkrun events and their locations.
-Fortunately, the official Parkrun websites provides this dataset indirectly by-way of OpenStreetMap <a href="https://wiki.openstreetmap.org/wiki/Features">Features</a> in their interactive map.</p>
+Fortunately, the official Parkrun website provides this dataset indirectly via OpenStreetMap <a href="https://wiki.openstreetmap.org/wiki/Features">Features</a> in their interactive map.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -68,21 +68,23 @@ Fortunately, the official Parkrun websites provides this dataset indirectly by-w
 <span class="n">events</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">loads</span><span class="p">(</span><span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"https://images.parkrun.com/events.json"</span><span class="p">).</span><span class="n">content</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>For historical prosperity I stored a local copy of this dataset; as it is not an official dataset and more an implementation detail of another feature there is a high likely hood it could change.</p>
+<p>For historical prosperity, I stored a local copy of this dataset.
+As it is not an official dataset but rather an implementation detail of another feature, there is a high likelihood it could change.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"closest-parkrun-alphabet-challenge.json"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
     <span class="nb">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p>This dataset provides me with the required Parkrun event names and location coordinates (longitude and latitude).
-Based on a supplied local Parkrun event I should be able to determine the closest event per-letter of the English alphabet to complete the challenge.</p>
+<p>This dataset provides the necessary Parkrun event names and location coordinates (longitude and latitude).
+Based on a supplied local Parkrun event, I should be able to determine the closest event per letter of the English alphabet to complete the challenge.</p>
 
 <h2 id="calculating-distances-using-the-haversine-formula">Calculating Distances using the Haversine Formula</h2>
 
-<p>To calculate the distance between two different events I will use the Haversine formula.
-This formula calculates the shortest distance over the earth’s surface – giving an ‘as-the-crow-flies’ distance between the two points.
-Although this will not factor in actual travel considerations (such as roads, traffic etc.) it is a <em>good enough</em> metric to solve the problem.
-There are <a href="https://nathanrooy.github.io/posts/2016-09-07/haversine-with-python/">many</a> <a href="https://en.wikipedia.org/wiki/Haversine_formula">other</a> <a href="https://www.movable-type.co.uk/scripts/latlong.html">resources</a> which go into detail on how this formula works; instead of re-implementing it I have decided to use an <a href="https://pypi.org/project/haversine/">existing library</a>.</p>
+<p>To calculate the distance between two different events, I will use the Haversine formula.
+This formula calculates the shortest distance over the Earth’s surface, giving an ‘as-the-crow-flies’ distance between two points.
+Although this does not account for actual travel considerations (such as roads, traffic, etc.), it is a <em>good enough</em> metric to solve the problem.
+There are <a href="https://nathanrooy.github.io/posts/2016-09-07/haversine-with-python/">many</a> <a href="https://en.wikipedia.org/wiki/Haversine_formula">other</a> <a href="https://www.movable-type.co.uk/scripts/latlong.html">resources</a> that explain how this formula works.
+Instead of re-implementing it, I have decided to use an <a href="https://pypi.org/project/haversine/">existing library</a>.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">haversine</span>
 </code></pre></div></div>
@@ -94,8 +96,8 @@ There are <a href="https://nathanrooy.github.io/posts/2016-09-07/haversine-with-
 <span class="c1"># [-0.335791, 51.410992]
 </span></code></pre></div></div>
 
-<p>The library I am using looks to require the coordinates to be positioned in the opposite direction (latitude, longitude) to what the dataset has provided (longitude, latitude).
-As such, I will apply a simple transformation over the dataset before usage within the distance calculation.</p>
+<p>The library I am using appears to require the coordinates to be positioned in the opposite order (latitude, longitude) to what the dataset provides (longitude, latitude).
+As such, I will apply a simple transformation over the dataset before using it in the distance calculation.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">haversine</span> <span class="kn">import</span> <span class="n">haversine</span>
 
@@ -110,32 +112,32 @@ As such, I will apply a simple transformation over the dataset before usage with
 
 <h2 id="putting-it-all-together-with-pandas">Putting it all together with Pandas</h2>
 
-<p>Now that we have the core building blocks in-place we can now go about solving the problem using the panda’s library.</p>
+<p>Now that we have the core building blocks in place, we can solve the problem using the pandas library.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
 
 <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">json_normalize</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="s">"events"</span><span class="p">][</span><span class="s">"features"</span><span class="p">])</span>
 </code></pre></div></div>
 
-<p>With the normalised dataset now imported into a DataFrame, I will go about applying some initial transformations to prepare the data for use.
-The first of which is, as the imported dataset includes both adult and junior events, I only wish to consider adult events for this problem.</p>
+<p>With the normalised dataset now imported into a DataFrame, I will apply some initial transformations to prepare the data for use.
+The first of these is filtering out junior events, as I only want to consider adult events.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ADULT_PARKRUN</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">frame</span><span class="p">[</span><span class="s">"properties.seriesid"</span><span class="p">]</span> <span class="o">==</span> <span class="n">ADULT_PARKRUN</span><span class="p">]</span>
 </code></pre></div></div>
 
-<p>The event names look to conform to lower-case, English alphabet characters (even in the case of international Parkrun events).
-We can produce a new column from this source to group each of the events alphabetically by their first character going forward.</p>
+<p>The event names appear to conform to lowercase English alphabet characters (even for international Parkrun events).
+We can create a new column from this data to group events alphabetically by their first character.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"letter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">"properties.eventname"</span><span class="p">].</span><span class="nb">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></div>
 
-<p>As discussed before, the final piece of dataset preparation we need to do is ensure the the coordinates are supplied to the Haversine formula in the expected order.</p>
+<p>As discussed before, the final dataset transformation ensures that the coordinates are supplied to the Haversine formula in the expected order.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">flip</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>We can now find the local Parkrun event within the DataFrame.</p>
+<p>We can now locate the local Parkrun event within the DataFrame.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">local_parkrun</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">frame</span><span class="p">[</span><span class="s">"properties.EventShortName"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"Wimbledon Common"</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div></div>
@@ -155,7 +157,7 @@ letter                                                      w
 Name: 1, dtype: object
 </code></pre></div></div>
 
-<p>We can then finally determine each <em>tourist</em> events distance away from the local event.</p>
+<p>Finally, we determine the distance of each <em>tourist</em> event from the local event.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">frame</span><span class="p">[</span><span class="s">"distance"</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">parkrun</span><span class="p">:</span> <span class="n">haversine</span><span class="p">(</span><span class="n">parkrun</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">],</span> <span class="n">local_parkrun</span><span class="p">[</span><span class="s">"geometry.coordinates"</span><span class="p">],</span> <span class="n">unit</span><span class="o">=</span><span class="s">'mi'</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -217,6 +219,9 @@ y      2297   Yarborough Leisure Centre  125.414614
 z      1905                  Zuiderpark  198.046322
        1779                 Ziegelwiese  523.953296
 </code></pre></div></div>
+
+<p>This approach provides an efficient way to determine the closest Parkrun events for completing the Alphabet Challenge using Python and pandas.
+Happy running!</p>
 
 </article>
 

@@ -5,7 +5,7 @@ meta: 'Unlock AWS WAF logs easily using Serverless, Lambda and AWS SDK to gain d
 tags: aws waf serverless security
 ---
 
-In this article we discuss our recent move to route all requests through [CloudFront](https://aws.amazon.com/cloudfront/).
+In this post we discuss our recent move to route all requests through [CloudFront](https://aws.amazon.com/cloudfront/).
 This allows us to parse all traffic through the [AWS Web Application Firewall](https://aws.amazon.com/waf/) (WAF).
 We highlight the reasoning behind this change, and some issues and remedies encountered when trying to garner concrete logs from the WAF instance.
 

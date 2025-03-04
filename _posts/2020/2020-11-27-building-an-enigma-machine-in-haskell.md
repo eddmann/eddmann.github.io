@@ -185,7 +185,7 @@ main = hspec $ do
 Coupled with the help of [Hspec](https://hspec.github.io/), we are then able to define the two static example-based tests that we created before, along with the two machine properties that we wish to hold true.
 Although the syntax is naturally different, the general philosophy of how a property-based test is expressed and validated is very similar to the ClojureScript counterpart.
 
-As stated in the previous article this test-suite is by no means exhaustive and can be expanded upon greatly.
+As stated in the previous post this test-suite is by no means exhaustive and can be expanded upon greatly.
 The goal of this is to highlight the key differences between conventional test assertions and testing validity of _System under test_ (SUT) properties.
 This test-suite can be run locally using the `make test` target, or you can see example resulting output by-way of the configured [GitHub Action](https://github.com/eddmann/enigma-machine-haskell/actions).
 

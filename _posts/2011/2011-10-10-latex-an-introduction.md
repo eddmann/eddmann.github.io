@@ -94,7 +94,7 @@ Other notable syntax used includes the command `\textbf` to bold the column titl
 
 ## Wrap Up
 
-I hope that this article has provided you with enough information to help you begin using LaTeX and has perhaps convinced you to delve a little deeper into its many powerful features.
+I hope that this post has provided you with enough information to help you begin using LaTeX and has perhaps convinced you to delve a little deeper into its many powerful features.
 If you are looking for a more in-depth overview of individual aspects of LaTeX, use the resources provided below as a good starting point.
 Additionally, you are welcome to check out a heavily commented VIM cheat sheet I have created using many of LaTeX's prominent features.
 This document is available [here](http://github.com/eddmann/vim-cheat-sheet) on GitHub, and pull requests are highly welcome.

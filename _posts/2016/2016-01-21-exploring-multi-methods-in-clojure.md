@@ -12,7 +12,7 @@ I decided that it would be interesting to see this feature in action, so I opene
 
 ## FizzBuzz
 
-The implementation below carries on from where my article about [FizzBuzz in Clojure](/posts/fizzbuzz-in-clojure/) left off.
+The implementation below carries on from where my post about [FizzBuzz in Clojure](/posts/fizzbuzz-in-clojure/) left off.
 Using the two documented `fizz?` and `buzz?` helpers, followed by the [`juxt`](https://clojuredocs.org/clojure.core/juxt) core function, we are able to codify the problem in a highly descriptive manner.
 
 ```clojure

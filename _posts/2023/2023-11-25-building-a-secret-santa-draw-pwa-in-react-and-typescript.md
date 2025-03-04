@@ -1,14 +1,14 @@
 ---
 layout: post
 title: 'Building a Secret Santa Draw PWA in React and TypeScript'
-meta: 'This article documents my experience building a Progress Web Application which performs Secret Santa draws in both a local and remote setting'
+meta: 'This post documents my experience building a Progress Web Application which performs Secret Santa draws in both a local and remote setting'
 tags: pwa react typescript
 ---
 
 Over the [past](https://eddmann.com/posts/allocating-and-notifying-secret-santas-via-email-using-clojure/) [several](https://eddmann.com/posts/building-a-secret-santa-allocator-and-sms-sender-using-a-raspberry-pi-pico-micropython-and-sim800l-module/) [years](https://eddmann.com/posts/allocating-secret-santas-using-an-aws-step-function-workflow-and-every-available-lambda-runtime/) I have taken the opportunity of allocating Secret Santa's for members of my family as a means of exploring new technologies.
 For the past several months I have been interested in the concept of Progress Web Application's (thanks in large part to [this series](https://frontendmasters.com/courses/pwas/)), and getting more hands-on experience in with the ever-changing frontend landscape.
 As such, I decided that this year I would build a small application that works across Desktop, iOS and Android to perform Secret Santa draws in both a local and remote setting.
-In this article I would like to document how I went about building this application.
+In this post I would like to document how I went about building this application.
 
 <!--more-->
 

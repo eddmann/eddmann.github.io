@@ -8,7 +8,7 @@ tags: javascript
 The `new` keyword in JavaScript can sometimes slip up new and experienced programmers alike.
 We typically associate this word with classical-based object-oriented languages (such as Java, etc.), whereas in JavaScript it works a little differently. <!--more-->
 In fact, due to the language's prototypical behaviour, any function can be used as a constructor call, which adds more fuel to the confusion.
-To demystify the process that occurs, this article will take you through the four operations that occur when the `new` keyword is invoked on a Function.
+To demystify the process that occurs, this post will take you through the four operations that occur when the `new` keyword is invoked on a Function.
 After describing these steps, we will then work through codifying a user-land function that mimics its behaviour.
 
 1. It creates a plain ol' object.

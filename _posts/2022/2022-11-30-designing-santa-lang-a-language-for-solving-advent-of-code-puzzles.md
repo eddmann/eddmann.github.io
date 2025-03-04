@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 'Designing santa-lang, a language for solving Advent of Code puzzles'
-meta: 'This article documents my experience developing a functional, C-like programming language for solving Advent of Code puzzles.'
+meta: 'This post documents my experience developing a functional, C-like programming language for solving Advent of Code puzzles.'
 tags: typescript santa-lang advent-of-code
 ---
 

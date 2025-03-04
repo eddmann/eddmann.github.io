@@ -5,7 +5,7 @@ meta: 'Discover the benefits and trade-offs between Bit Flags and EnumSets in Ja
 tags: java
 ---
 
-This article examines two popular methods for handling multiple boolean values in Java.
+This post examines two popular methods for handling multiple boolean values in Java.
 It explores the traditional approach of using bit flags and compares it with the more modern EnumSet implementation.
 By analysing both techniques, you will gain insights into their performance, readability, and type safety.
 

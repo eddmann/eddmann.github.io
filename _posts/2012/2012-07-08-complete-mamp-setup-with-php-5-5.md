@@ -7,7 +7,7 @@ tags: php mamp
 
 I have been a loyal [MAMP Pro](http://www.mamp.info/en/mamp-pro/) user for many years.
 I fell in love with how easy it was to set up custom hosts, without the need to tweak the hosts file myself.
-However, ever since I documented my [experiences](http://eddmann.com/posts/dnsmasq-your-local-development-dns/) with DNSMasq, I have been interested in how [this](http://davidwinter.me/articles/2011/06/18/simple-local-web-development-with-apache-and-dnsmasq/) article documented setting up a web stack with Apache, similar to Ruby's [Pow](http://pow.cx/).
+However, ever since I documented my [experiences](http://eddmann.com/posts/dnsmasq-your-local-development-dns/) with DNSMasq, I have been interested in how [this](http://davidwinter.me/articles/2011/06/18/simple-local-web-development-with-apache-and-dnsmasq/) post documented setting up a web stack with Apache, similar to Ruby's [Pow](http://pow.cx/).
 The ability to set up a new development site with only the creation of a new folder (i.e. a folder called test could be accessible at test.dev) appealed to me greatly.
 
 <!--more-->

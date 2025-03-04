@@ -1,14 +1,14 @@
 ---
 layout: post
 title: 'Building a Running Calculator PWA in React and TypeScript'
-meta: 'This article documents my experience building a Progress Web Application which calculates running pace, time and distance, along with common-place imperial/metric measurement conversions'
+meta: 'This post documents my experience building a Progress Web Application which calculates running pace, time and distance, along with common-place imperial/metric measurement conversions'
 tags: pwa react typescript
 ---
 
 I have been an avid runner for many years now, but I still get confused by imperial and metric measurements.
 On top of this, the amount of times I seek out a random website to perform some form of pace/distance calculation is too often to count.
 What I wanted was a desktop and mobile application that could perform pace, distance and time calculations, along with imperial/metric conversions - _a swiss-army knife of running calculators_.
-In this article I would like to document my experience building a [Progress Web Application](https://web.dev/articles/what-are-pwas) (PWA) which does just this; providing a native app-like experience across iOS, Android and Desktop.
+In this post I would like to document my experience building a [Progress Web Application](https://web.dev/articles/what-are-pwas) (PWA) which does just this; providing a native app-like experience across iOS, Android and Desktop.
 
 <!--more-->
 

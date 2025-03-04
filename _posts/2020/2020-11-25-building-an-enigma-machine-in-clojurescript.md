@@ -221,7 +221,7 @@ One of the true powers of this testing approach is that if a property does not h
 
 Having modelled and verified the correctness of the machine behaviour, we can move on to providing the client with a user interface.
 For this, we will be using [Reagent](https://reagent-project.github.io/), which provides ClojureScript bindings for the React library.
-So as not to overload this article with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
+So as not to overload this post with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
 Instead, I invite you to head over to the [`app.cljs`](https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs) implementation, which describes how we use Reagent to interact with our machine implementation.
 Below, you will see how we combine all the child input components declared in `app.cljs` into the stateful parent component which is rendered to the DOM.
 

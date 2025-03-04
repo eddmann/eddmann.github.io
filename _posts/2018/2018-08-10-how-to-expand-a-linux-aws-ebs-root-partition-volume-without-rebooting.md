@@ -6,7 +6,7 @@ tags: aws linux
 ---
 
 Over the past couple of months I have found myself having to look up how to expand a Linux-based AWS EBS volume.
-This article showcases a simple step-by-step guide to performing this action.
+This post showcases a simple step-by-step guide to performing this action.
 
 <!--more-->
 

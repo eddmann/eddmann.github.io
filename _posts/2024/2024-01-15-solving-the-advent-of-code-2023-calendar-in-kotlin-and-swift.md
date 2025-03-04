@@ -1,14 +1,14 @@
 ---
 layout: post
 title: 'Solving the Advent of Code 2023 calendar in Kotlin and Swift'
-meta: 'This article documents my experience solving the Advent of Code 2023 calendar using both Kotlin and Swift'
+meta: 'This post documents my experience solving the Advent of Code 2023 calendar using both Kotlin and Swift'
 tags: advent-of-code swift kotlin
 ---
 
 Another year, another [Advent of Code](https://adventofcode.com/2023), another excuse to explore new languages.
 After my recent exploration into [PWA's](https://eddmann.com/posts/building-a-secret-santa-draw-pwa-in-react-and-typescript/) this past year I wanted a reason to explore Kotlin and Swift, two languages equipped for native mobile (Android and iOS) development.
 Before delving into the mobile-domain I wanted to see what each language had to offer.
-In this article I will document my experience completing the Advent of Code 2023 calendar in both [Kotlin](https://github.com/eddmann/advent-of-code/tree/master/2023/kotlin) and [Swift](https://github.com/eddmann/advent-of-code/tree/master/2023/swift).
+In this post I will document my experience completing the Advent of Code 2023 calendar in both [Kotlin](https://github.com/eddmann/advent-of-code/tree/master/2023/kotlin) and [Swift](https://github.com/eddmann/advent-of-code/tree/master/2023/swift).
 
 <!--more-->
 
@@ -146,7 +146,7 @@ Sadly, Swift does not provide such a data-structure, so I had to go about buildi
 ### Day 18
 
 I originally had written down how I wished that Swift had `switch`/`if` expression support, similar to Kotlin.
-However, upon writing this article I have seen that Swift 5.9 has [support](https://github.com/apple/swift-evolution/blob/main/proposals/0380-if-switch-expressions.md) for it, so I just need to upgrade from 5.8!
+However, upon writing this post I have seen that Swift 5.9 has [support](https://github.com/apple/swift-evolution/blob/main/proposals/0380-if-switch-expressions.md) for it, so I just need to upgrade from 5.8!
 
 ### Day 19
 

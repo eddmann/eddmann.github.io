@@ -86,7 +86,7 @@ if ($phpass->CheckPassword($password, $hash))
 
 I am an avid CodeIgniter user at present, and I was happy to discover that a quick search on GitHub returned a very cool PHPass wrapper library (I love the use of the `_call` function).
 The library can be found [here](http://github.com/segersjens/CodeIgniter-Phpass-Library).
-The one and only point I hope you take away from this article is that if you are using PHP, you should use PHPass as your password hashing library!
+The one and only point I hope you take away from this post is that if you are using PHP, you should use PHPass as your password hashing library!
 
 ## Update
 

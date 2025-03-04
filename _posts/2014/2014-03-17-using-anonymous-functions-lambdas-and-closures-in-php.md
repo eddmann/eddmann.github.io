@@ -54,7 +54,7 @@ The `$inc` and `$step` variables are local function variables that are bound or 
 
 ## Validation Library Example
 
-Although these trivial examples serve well in an article context, a concrete use-case may better illustrate the power of these two concepts.
+Although these trivial examples serve well in an post context, a concrete use-case may better illustrate the power of these two concepts.
 Combined, the two provide you with the ability to allow clients to easily extend a defined implementation by supplying their own behaviour, without the overhead of using object-oriented inheritance.
 
 To provide a real-life use-case, I have abstracted the dynamic method implementation into a trait that can then be reused.

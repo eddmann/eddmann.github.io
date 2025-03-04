@@ -6,7 +6,7 @@ tags: ssh scp
 ---
 
 When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker.
-Provided in this article are a couple of the commands I use frequently when handling files and directories via SSH and SCP.
+Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP.
 
 <!--more-->
 

@@ -78,7 +78,7 @@ I was pleasantly surprised at how performant this runtime was in practice, with 
   <img src="/uploads/rewriting-the-santa-lang-interpreter-in-rust/lambda-runtime.png" alt="Lambda Runtime" />
 </div>
 
-## PHP extension
+## PHP Extension
 
 One evening, I spotted an interesting [crate](https://github.com/davidcole1340/ext-php-rs), which provided an abstraction around creating PHP extensions within Rust.
 As all I had been thinking about over the past several months was santa-lang, the first thing that came into my mind was: could I make a runtime for it?!
@@ -121,7 +121,7 @@ It also make me interested to see how I could possibly use a notebook to help de
   <img src="/uploads/rewriting-the-santa-lang-interpreter-in-rust/jupyter-kernel.png" alt="Jupyter Kernel" />
 </div>
 
-## What's next?
+## What's Next?
 
 Now that all the desired runtimes have been implemented, it is finally time to investigate performance considerations!
 In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/), I will document how I went about benchmarking the two implementations, greatly improving performance, and highlighting interesting findings along the way.

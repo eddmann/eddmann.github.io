@@ -189,7 +189,7 @@ At this step, I enjoyed building a [`Time`](https://github.com/eddmann/santa-lan
 I also encapsulated the internal Parser and Runtime errors into a type that is publicly accessible to the runtimes using the `From` trait (`From<RuntimeErr> for RunErr`).
 This ensured that the internal error types remained private and were not leaked out of the _core domain_.
 
-## What's next...
+## What's Next...
 
 With the core language library now implemented and tested, it was time to move on to the different runtimes.
 In the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/) within the series, I will document how I went about integrating the core language library into the (delivery) runtimes.

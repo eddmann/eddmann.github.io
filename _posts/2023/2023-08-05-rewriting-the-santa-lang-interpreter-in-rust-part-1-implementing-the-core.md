@@ -1,14 +1,14 @@
 ---
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 1 - Implementing the Core'
-meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I delve into how I organised the project and built the core language.'
+meta: 'This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how I organised the project and built the core language.'
 tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 After implementing santa-lang in [TypeScript (Node)](https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/), I wanted to explore rewriting the tree-walking interpreter in a lower-level systems language for efficiency and performance gains.
 My goal was to be able to run the entire [Advent of Code 2022 calendar](https://adventofcode.com/2022) _quicker_ than the Node variant.
 I settled on using Rust due to its blend of high and low-level constructs, its vibrant package registry (Cargo), memory management model, and previous [enjoyable experience using the language](https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/).
-In this first article within the series, I will document how I went about organising the project and rewriting the core language within Rust.
+In this first post within the series, I will document how I went about organising the project and rewriting the core language within Rust.
 
 <!--more-->
 
@@ -102,7 +102,7 @@ Represented as an [enumeration](https://github.com/eddmann/santa-lang-rs/blob/ec
 
 Like the TypeScript implementation, trying to break up the evaluation behaviour into manageable-sized chunks was an important task.
 To achieve this, I decided to break up key behaviours into separate functions (located in separate files).
-To ensure that there was no performance penalty or unnecessary function invocation for this decision, I used [inline annotations](https://nnethercote.github.io/perf-book/inlining.html), which will be discussed more in a [future article](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series.
+To ensure that there was no performance penalty or unnecessary function invocation for this decision, I used [inline annotations](https://nnethercote.github.io/perf-book/inlining.html), which will be discussed more in a [future post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/) within the series.
 Some behaviours that I separated out were language [function invocation](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/function.rs) (user-land, memoized, closures, external and built-in), [infix operations](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/infix.rs), and santa-lang's [match expressions](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/matcher.rs).
 
 ### Rc\<RefCell\<T\>\>
@@ -178,7 +178,7 @@ It allows me to clearly define a function's parameters and implement pattern-mat
 Along with providing built-in functions defined within the core language, the TypeScript implementation included a means of adding external functions, which are defined during evaluator instantiation.
 These external functions can be used to provide runtime-specific behaviour, for example, implementing I/O concerns such as `puts` and `read`.
 To implement this capability within the interpreter, I was required to use a `dyn Fn` [trait object](https://doc.rust-lang.org/std/keyword.dyn.html) definition over basic function pointers.
-This provides the ability to pass _Closures_ as external functions, which was a requirement when building the WASM runtime (discussed in the [next article](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/)).
+This provides the ability to pass _Closures_ as external functions, which was a requirement when building the WASM runtime (discussed in the [next post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-2-runtimes/)).
 There are some performance disadvantages to modelling it this way due to extra indirection via the _vtable_ lookup.
 However, it should be noted that a heap allocation is not required if the trait object it is storing has zero size, which is the case for functions and Closures that do not capture any variables.
 

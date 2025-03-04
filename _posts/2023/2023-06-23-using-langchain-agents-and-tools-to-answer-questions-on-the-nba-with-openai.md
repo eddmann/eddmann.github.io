@@ -7,11 +7,11 @@ tags: openai llm langchain
 
 Large language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
 Like many developers, I am interested in exploring what is possible with this new technology.
-This article documents the use of [LangChain](https://www.langchain.com/) [Agents](https://python.langchain.com/docs/modules/agents/)/[Tools](https://python.langchain.com/docs/modules/tools/) to aid in answering questions based on recent NBA events.
+This post documents the use of [LangChain](https://www.langchain.com/) [Agents](https://python.langchain.com/docs/modules/agents/)/[Tools](https://python.langchain.com/docs/modules/tools/) to aid in answering questions based on recent NBA events.
 
 <!--more-->
 
-This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb).
+This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb).
 
 ```python
 !pip install langchain openai bs4 requests

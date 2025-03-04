@@ -7,11 +7,11 @@ tags: llm langchain postgres
 
 Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
 Like many developers, I am interested in exploring what is possible with this new technology.
-This article documents my experience exploring how to implement [Q&A Retrieval Augmented Generation](https://python.langchain.com/docs/use_cases/question_answering/) (RAG) using LangChain and Postgres (using the [pgvector](https://github.com/pgvector/pgvector) extension).
+This post documents my experience exploring how to implement [Q&A Retrieval Augmented Generation](https://python.langchain.com/docs/use_cases/question_answering/) (RAG) using LangChain and Postgres (using the [pgvector](https://github.com/pgvector/pgvector) extension).
 
 <!--more-->
 
-This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/qa-retrieval-with-pgvector.ipynb).
+This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-postgres/qa-retrieval-with-pgvector.ipynb).
 
 ```python
 !pip install langchain openai datasets pgvector psycopg2-binary

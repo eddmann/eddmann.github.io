@@ -7,7 +7,7 @@ tags: advent-of-code santa-lang
 
 December has come and gone, and the dust has settled on completing the Advent of Code 2022 calendar.
 As highlighted in my [previous post](https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/), I wanted to complete this year's puzzles using my own programming language, santa-lang, which I have tailored to help aid in solving such problems.
-In this article, I want to discuss this experience, how the language aided in solution development, and where additions or changes were made to improve it along the way.
+In this post, I want to discuss this experience, how the language aided in solution development, and where additions or changes were made to improve it along the way.
 
 <!--more-->
 
@@ -19,7 +19,7 @@ The 2022 calendar would be the first set of unknown puzzles that the language wo
 More so, it would be the first time primarily using the language to solve these puzzles.
 I was initially wary of not being capable of completing each day in the language, perhaps even having to resort to another one.
 
-Fortunately, this was not the case, and the _TL;DR_ of this article would be that I was able to successfully implement each puzzle solution using santa-lang as my primary language 🎉.
+Fortunately, this was not the case, and the _TL;DR_ of this post would be that I was able to successfully implement each puzzle solution using santa-lang as my primary language 🎉.
 Throughout the calendar, I made a conscious effort to note down interesting aspects of the experience, which I have since categorised and wish to present below.
 
 ## The Journey
@@ -32,7 +32,7 @@ Now that is out of the way, we can begin...
 
 ### Running with the Runner
 
-Most of this article's discussion will no doubt be centred around the language and standard library.
+Most of this post's discussion will no doubt be centred around the language and standard library.
 Upon reviewing my notes, I realised that I had not given much thought towards [the runner](https://eddmann.com/posts/designing-santa-lang-a-language-for-solving-advent-of-code-puzzles/#the-aoc-runner) itself 😢.
 In hindsight, I think the reason for this was probably the biggest compliment I could give - it just worked!
 I spent the majority of my time using the CLI runtime, and with the combination of the test runner and in-built means of downloading the puzzle input, I was able to get _up n' problem-solving_ very quickly each day.
@@ -337,7 +337,7 @@ It also lends itself well to _decorating_ functions, in a similar manner to how 
 ## Conclusion
 
 Having spent some time now reflecting on my experience solving the 2022 calendar in santa-lang, I am very pleased with how many of the fundamental decisions made upfront paid off.
-Aside from the small additions discussed in this article, much of the language and its underlying philosophy have held up.
+Aside from the small additions discussed in this post, much of the language and its underlying philosophy have held up.
 The one possible argument against this claim would be the inclusion of mutable `let` bindings, but after going back and forth on this decision, I feel that it has a deserved place in the language.
 
 ### Possible Improvements
@@ -357,7 +357,7 @@ Having seen examples in other languages such as Rust using libraries like [nom](
 
 ### What's Next?
 
-Something I did not really touch upon throughout this article was performance.
+Something I did not really touch upon throughout this post was performance.
 This was intentional, as it was not a fundamental goal of the language, opting instead for readability and correctness.
 As such, not much work was done (other than tail-recursive calls, which were more of a necessity at the time) within language evaluation to improve this.
 I did [benchmark](https://github.com/eddmann/advent-of-code/blob/master/2022/santa-lang/benchmark.txt) each solution to see how the language/runtime implementation fared, and in some cases, the solution performance was in the 5-minute range 😬.

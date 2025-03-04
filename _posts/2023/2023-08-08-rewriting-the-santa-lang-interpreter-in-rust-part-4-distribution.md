@@ -1,18 +1,18 @@
 ---
 layout: post
 title: 'Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution'
-meta: 'This series of articles documents my experience rewriting the santa-lang interpreter in Rust. In this article, I document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.'
+meta: 'This series of posts documents my experience rewriting the santa-lang interpreter in Rust. In this post, I document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.'
 tags: rust santa-lang interpreter santa-lang-in-rust-series
 ---
 
 Now that the interpreter's performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed.
-In the final article within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.
+In the final post within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.
 
 <!--more-->
 
 ## Pipeline
 
-As documented in a [previous article](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/), the project has been structured as a monorepo Cargo workspace, with the language and runtimes being separated into different packages.
+As documented in a [previous post](https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/), the project has been structured as a monorepo Cargo workspace, with the language and runtimes being separated into different packages.
 This allows the packages to be built and tested in isolation from one another.
 To provide a deterministic build and release process, I created a [CI/CD pipeline](https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github) using [GitHub Action workflows](https://docs.github.com/en/actions/using-workflows).
 I also opted to add a GitHub Action called [Release Drafter](https://github.com/release-drafter/release-drafter) to the project.

@@ -11,7 +11,7 @@ I also thought this would be a great opportunity to explore [pandas](https://pan
 
 <!--more-->
 
-This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
+This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
 
 ## The Dataset
 

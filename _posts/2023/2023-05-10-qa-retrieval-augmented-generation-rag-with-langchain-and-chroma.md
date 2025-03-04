@@ -1,17 +1,17 @@
 ---
 layout: post
 title: 'Q&A Retrieval Augmented Generation (RAG) with LangChain and Chroma'
-meta: 'This article documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database.'
+meta: 'This post documents my experience exploring how to implement Q&A Retrieval Augmented Generation (RAG) using LangChain and the Chroma vector database.'
 tags: llm langchain chromadb
 ---
 
 Large-language models (OpenAI/ChatGPT in particular) are all the rage at the moment.
 Like many developers, I am interested in exploring what is possible with this new technology.
-This article documents my experience exploring how to implement [Q&A Retrieval Augmented Generation](https://python.langchain.com/docs/use_cases/question_answering/) (RAG) using LangChain and the [Chroma](https://www.trychroma.com/) vector database.
+This post documents my experience exploring how to implement [Q&A Retrieval Augmented Generation](https://python.langchain.com/docs/use_cases/question_answering/) (RAG) using LangChain and the [Chroma](https://www.trychroma.com/) vector database.
 
 <!--more-->
 
-This article was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb).
+This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/qa-retrieval-augmented-generation-rag-with-langchain-and-chroma/qa-retrieval-with-chroma.ipynb).
 
 ```python
 !pip install langchain openai datasets chromadb

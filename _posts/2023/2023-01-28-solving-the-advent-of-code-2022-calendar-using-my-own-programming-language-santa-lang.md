@@ -140,7 +140,7 @@ An example of this would be defining the identity function like so: `|a| a`.
 
 I did not know how much traction infix function invocation would get throughout the course of the calendar.
 Turns out, I used it a lot!
-Although you have the option to invoke functions like `vec_add(a, b)`, some expressions read better when defined in infix form, like `` a `vec_add` b ``.
+Although you have the option to invoke functions like `vec_add(a, b)`, some expressions are more readable in infix form, like `` a `vec_add` b ``.
 The ability to do this with user-land/standard library functions and not only special operators was especially powerful.
 
 Placeholder syntax is something I had been introduced to through Scala several years back and had greatly enjoyed.

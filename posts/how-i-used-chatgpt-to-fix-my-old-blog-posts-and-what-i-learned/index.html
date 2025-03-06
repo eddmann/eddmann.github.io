@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring how large language models (LLMs) can enhance blog content review, technical accuracy, and image generation for a more engaging and accessible experience.">
+
+    <title>
+        
+            How I Used ChatGPT to Fix My Old Blog Posts (And What I Learned) &middot; Edd Mann
+        
+    </title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
+    <script>
+       window.dataLayer = window.dataLayer || [];
+       function gtag(){dataLayer.push(arguments);}
+       gtag('js', new Date());
+       gtag('config', 'G-ZPQ7WHNXH4');
+    </script>
+
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles.css">
+
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
+
+    
+</head>
+
+    <body>
+        <div class="container content">
+            <header class="masthead">
+                <h3 class="masthead-title">
+                    <a href="/" title="Home">Edd Mann</a>
+                    <small><i class="fa fa-code"></i> Developer</small>
+                </h3>
+                <nav>
+                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
+                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
+                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
+                </nav>
+                <div class="cf"></div>
+            </header>
+
+            <main>
+                <article class="post">
+    <h1 class="post-title">How I Used ChatGPT to Fix My Old Blog Posts (And What I Learned)</h1>
+    <time datetime="2025-03-06T00:00:00+00:00" class="post-date">06 Mar 2025</time>
+    <p>Over the past week, I have dedicated some of my free time to a long-overdue blog redesign.
+During this process, I stumbled upon several glaring spelling mistakes in older posts, which led me down the path of manually reviewing all my previous entries.
+This felt a lot like <a href="https://en.wiktionary.org/wiki/yak_shaving">yak shaving</a>, prompting me to consider whether leveraging a Large Language Model (LLM) could be an effective solution to this problem.</p>
+
+
+
+<p><img src="/uploads/how-i-used-chatgpt-to-fix-my-old-blog-posts-and-what-i-learned/editor.jpg" alt="A futuristic workspace with a glowing keyboard, digital pen, and a holographic display showing &quot;AI-POWERED EDITING&quot; and a robotic figure." /></p>
+
+<h2 id="content-review">Content Review</h2>
+
+<p>My initial goal was to ensure that blog content was grammatically correct and free of spelling mistakes.
+While numerous tools are available, such as <a href="https://www.grammarly.com/">Grammarly</a>, I found that large language models (LLMs) offer exceptional contextual understanding, enhancing the review process.</p>
+
+<p>Beyond this, I also wished to leverage LLMs for summarisation - one of their most powerful features.
+Specifically, I aimed to have the model revise each blog post’s meta description and add relevant tags, which would be highly beneficial for the upcoming blog redesign.
+Over the years, I had been pretty lax in the time spent writing meta descriptions, and many older posts lacked tags altogether.</p>
+
+<p>To achieve this, I used the following prompt with the GPT-4o model:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You are a highly skilled technical blog post reviewer. Your task is to review the provided Markdown technical blog post while ensuring the following:
+
+- *Correct spelling and grammar mistakes* without altering the meaning or shortening the content.
+- Use *British English* throughout.
+- Ensure that *each sentence in a Markdown paragraph* (ending in a full stop) appears on a *new line*, without trailing whitespace.
+- Ensure all *Markdown syntax* and *heading casing* are correct.
+- Add an *SEO-optimised meta description* within the YAML front matter using the format: `meta: &lt;description&gt;`.
+- Include *at least two relevant tags* (in snake_case) within the YAML front matter, following this format: `tags: tag1 my-tag-2 tag3`.
+- Convert all code blocks formatted as ```&lt;lang&gt; to ~~~&lt;lang&gt;.
+
+Return the entire reviewed Markdown content inside a *single code block*.
+
+&lt;content&gt;
+</code></pre></div></div>
+
+<p>Notably, I requested code blocks to be returned in the <code class="language-plaintext highlighter-rouge">~~~</code> format and the output to be enclosed within a single code block.
+Since I have been using ChatGPT instead of the API for these experiments, I wanted to ensure the results were easily transferable to raw Markdown rather than being formatted for conversational output.</p>
+
+<blockquote>
+  <p><em>An interesting takeaway:</em> Iterating on the prompt itself - using the LLM to refine it - significantly improved the resulting output.</p>
+</blockquote>
+
+<h2 id="technical-review">Technical Review</h2>
+
+<p>When running the above prompt on the blog posts, I noticed that it not only reviewed the textual content but also identified errors in the code examples!
+This observation led me to consider that the model could review both the content and the <em>intent</em> behind the blog post.
+I wondered whether it could assess if the article fulfilled its intended purpose as stated in the introduction, whether it ended abruptly, and if it was technically accurate.</p>
+
+<p>I then experimented with the following prompt, coupled with the GPT-4o model, to obtain this feedback:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>You are a highly skilled technical blog post reviewer.
+Your task is to review the provided Markdown technical blog post for technical accuracy and coherence.
+Please provide suggestions for any necessary corrections or improvements.
+
+&lt;content&gt;
+</code></pre></div></div>
+
+<p>Much like the previous prompt, this provided me with some very interesting insights.
+Rather than allowing the LLM to simply replace content for me, I used its feedback as a set of points to consider during revision.</p>
+
+<blockquote>
+  <p><em>An interesting takeaway:</em> I found that specifying the language, e.g., “You are a highly skilled {language} blog post reviewer,” significantly improved the quality of the output.</p>
+</blockquote>
+
+<h2 id="image-generation">Image Generation</h2>
+
+<p>I find that adding images to a blog post makes it more engaging.
+Therefore, I thought it would be interesting to have the LLM generate a suitable image to accompany the blog post.</p>
+
+<p>I approached this in two steps:</p>
+
+<ol>
+  <li>First, I asked the model (GPT-4o) to describe an image that would complement the blog based on its title.
+In some cases, I requested multiple descriptions and selected the most appropriate one.</li>
+  <li>Then, I used the model (DALL·E) to generate the image based on this description.</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Generate a detailed description for an image that should accompany the blog post entitled '&lt;title&gt;'.
+Ensure the image is visually appealing and relevant to the content.
+</code></pre></div></div>
+
+<p>I found that making small iterative tweaks to the resulting image was challenging, as even minor adjustments could significantly alter it.
+Instead, generating multiple versions and selecting the <em>best one</em> proved to be an effective strategy.</p>
+
+<h2 id="image-descriptions">Image Descriptions</h2>
+
+<p>In the past, I often found my image <code class="language-plaintext highlighter-rouge">alt</code> text lacking detail, making it less useful for users relying on screen readers.
+Using the LLM, I was able to create more precise and informative descriptions.</p>
+
+<p>I used the following prompt to generate suitable alternative text for newly created images:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Describe the following image for use in an HTML `alt` tag.
+Ensure the response is short, informative and concise.
+</code></pre></div></div>
+
+<p>LLMs excel at describing images succinctly, providing clear and informative descriptions.
+This approach has helped me improve the accessibility of my blog, ensuring that all users can better understand the content of my images.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What started as a <em>small task</em> turned into a fascinating investigation, and I am pleased with the results.</p>
+
+<p>Throughout this process, I used ChatGPT via my Plus subscription rather than the API, as I was not ready to explore its pricing model just yet.
+However, my findings suggest potential for automation - perhaps even developing an automated blog reviewer in the future 🤔.
+Aside: it will be interesting to see how the ChatGPT and API products differ.</p>
+
+<p>For now, though, my focus is finally back on redesigning the blog! 🎨</p>
+
+</article>
+
+            </main>
+
+            <footer class="footer">
+                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
+                <ul>
+                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
+                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
+                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
+                </ul>
+                <div class="cf"></div>
+            </footer>
+        </div>
+    </body>
+</html>

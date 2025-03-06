@@ -45,6 +45,8 @@ alias packer='docker run -it --rm -v $(pwd):/app/ -w /app/ eddmann/packer-cli'
 
 With this set up we can define our Caddy Server image within a file called `caddy.json`, which will be used to shape the resulting AWS artifact.
 
+{% raw %}
+
 ```json
 {
   "builders": [
@@ -99,6 +101,8 @@ With this set up we can define our Caddy Server image within a file called `cadd
   ]
 }
 ```
+
+{% endraw %}
 
 You can see that we first define the builder that we wish to use for this machine image.
 We have opted for a single [`amazon-ebs`](https://www.packer.io/docs/builders/amazon-ebs.html), which will boot up a temporary `m3.medium` EC2 instance with a base AMI (the latest Ubuntu 16.04), and create a new AMI using the supplied name template once the instance has been provisioned.

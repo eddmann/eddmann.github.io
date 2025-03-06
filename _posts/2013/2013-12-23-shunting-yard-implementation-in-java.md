@@ -13,6 +13,8 @@ Although it is possible to evaluate more, including functions and associativity,
 
 <!--more-->
 
+{% raw %}
+
 ```java
 import java.util.*;
 
@@ -73,6 +75,8 @@ public class ShuntingYard {
 
 }
 ```
+
+{% endraw %}
 
 The example implementation above first creates an enumerated type called `Operator` which stores the increasing precedence of the four operators.
 Following this, a map is initialised using [double bracket syntax](http://c2.com/cgi/wiki?DoubleBraceInitialization), pairing the enumerated type with its symbol equivalent.

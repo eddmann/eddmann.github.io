@@ -109,6 +109,8 @@ To ease deployment and hosting, I decided to leverage GitHub Actions and GitHub 
 Upon a successful Git push, using the provided `Makefile` and Docker-setup, we first compile the application and subsequently release the artifact to the `gh-pages` branch.
 This branch is then used to host the web application made available [here](https://eddmann.com/mystery-calculator-clojurescript/).
 
+{% raw %}
+
 ```yaml
 name: Release
 
@@ -125,7 +127,9 @@ jobs:
       - run: make release
       - uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          ACCESS_TOKEN: {% raw %}${{ secrets.ACCESS_TOKEN }}{%endraw%}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: public
 ```
+
+{%endraw%}

@@ -144,8 +144,9 @@ digraph G
 
 Using [this](http://huffman.ooz.ie/) generator I was able to visually represent the Huffman Tree for a given string.
 
+{% raw %}
+
 ```
-{%- raw -%}
 digraph G
 {
     edge [label=0];
@@ -176,8 +177,9 @@ digraph G
     TCOMASR -> SR -> R [label=1];
     18 -> 10 -> 6 -> L [label=1];
 }
-{% endraw -%}
 ```
+
+{% endraw %}
 
 ## Resources
 

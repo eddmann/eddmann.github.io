@@ -11,6 +11,8 @@ I also thought this would be a great opportunity to explore [pandas](https://pan
 
 <!--more-->
 
+![A pair of worn-out running shoes on a colorful map marked with various "parkrun" event locations.](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/shoes.jpg)
+
 This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/determining-your-closest-parkrun-alphabet-challenge-using-python-and-pandas/closest-parkrun-alphabet-challenge.ipynb).
 
 ## The Dataset

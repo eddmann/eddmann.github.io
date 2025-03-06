@@ -11,6 +11,8 @@ This post documents the use of [LangChain](https://www.langchain.com/) [Agents](
 
 <!--more-->
 
+![Futuristic holographic basketball analytics display with player figures, charts, and statistics related to AI technologies like LangChain and OpenAI.](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/stats.jpg)
+
 This post was originally written as a Jupyter Notebook, which can be [downloaded here](/uploads/using-langchain-agents-and-tools-to-answer-questions-on-the-nba-with-openai/nba-stats.ipynb).
 
 ```python

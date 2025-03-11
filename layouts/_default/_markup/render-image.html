@@ -1,0 +1,29 @@
+{{- $src := .Page.Resources.GetMatch (.Destination) -}}
+{{- if and $src (or (eq $src.MediaType.Type "image/jpeg") (eq $src.MediaType.Type "image/png")) -}}
+  {{- $width := $src.Width -}}
+  {{- if ge $width 1280 -}}
+    {{- $width = 1280 -}}
+  {{- end -}}
+  {{- $jpg := $src.Resize (print $width "x jpg box") -}}
+  <picture>
+    <source type="image/webp" srcset="{{- ($src.Resize (print $width `x webp photo box`)).RelPermalink -}}" />
+    <source type="image/jpeg" srcset="{{- $jpg.RelPermalink -}}" />
+    <img src="{{- $jpg.RelPermalink -}}" alt="{{- .PlainText -}}" loading="lazy"
+      {{- with .Title -}} title="{{- . -}}" {{- end -}}
+      {{- range $k, $v := .Attributes -}}
+        {{- if $v -}}
+          {{- printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr -}}
+        {{- end -}}
+      {{- end -}}
+    />
+  </picture>
+{{- else -}}
+  <img src="{{- .Destination -}}" alt="{{- .PlainText -}}"
+    {{- with .Title -}} title="{{- . -}}" {{- end -}}
+    {{- range $k, $v := .Attributes -}}
+      {{- if $v -}}
+        {{- printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr -}}
+      {{- end -}}
+    {{- end -}}
+  />
+{{- end -}}

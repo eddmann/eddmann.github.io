@@ -1,0 +1,26 @@
+{{- define "main" -}}
+
+<main class="wrapper">
+  <header class="page-title">
+    <h1><span class="visually-hidden">{{ site.Title }}'s</span> Archive</h1>
+  </header>
+
+  <section class="archive">
+    {{- range (where .Site.RegularPages "Section" "posts").GroupByDate "2006" -}}
+      <div class="archive__year">
+        <h2 class="archive__year-title">{{- .Key -}}</h2>
+        <div class="archive__posts">
+          {{- range .Pages -}}
+          <div class="archive__post">
+            <h3 class="underline">{{- .Title -}}</h3>
+            <time>{{- .Date | time.Format ":date_medium" -}}</time>
+            <a class="overlay" href="{{- .RelPermalink -}}">Read more</a>
+          </div>
+          {{- end -}}
+        </div>
+      </div>
+    {{- end -}}
+  </section>
+</main>
+
+{{- end -}}

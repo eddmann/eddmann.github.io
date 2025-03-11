@@ -1,0 +1,214 @@
+/* inspired by: https://github.com/tailwindlabs/tailwindcss-typography */
+.prose {
+  font-size: 1.125rem;
+  line-height: 2rem;
+
+  h2 {
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+
+  h3 {
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+  }
+
+  h4 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  h5 {
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
+  }
+
+  h6 {
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
+  }
+
+  h2 + *,
+  h3 + *,
+  h4 + *,
+  h5 + *,
+  h6 + * {
+    margin-top: 0;
+  }
+
+  p {
+    margin-bottom: 1.25em;
+
+    &:has(img),
+    &:has(picture),
+    &:has(video) {
+      display: grid;
+      grid-auto-flow: column;
+      align-items: center;
+      gap: var(--spacing-2);
+
+      img,
+      picture,
+      video {
+        margin-inline: auto;
+        max-height: var(--prose-max-asset-height);
+      }
+    }
+  }
+
+  code {
+    font-weight: var(--font-weight-2);
+    font-size: var(--font-size--1);
+    line-height: 1rem;
+
+    &::before,
+    &::after {
+      content: '`';
+    }
+  }
+
+  pre {
+    overflow-x: auto;
+    font-weight: var(--font-weight-0);
+    font-size: var(--font-size--1);
+    line-height: 1.7rem;
+    border-radius: var(--border-radius-2);
+    padding: var(--spacing-4);
+    margin-block: var(--spacing-8);
+    background-color: #272822; /* taken from monokai */
+    color: #f8f8f2; /* taken from monokai */
+
+    code {
+      background-color: transparent;
+      font-weight: inherit;
+      color: inherit;
+      font-size: inherit;
+      font-family: inherit;
+      line-height: inherit;
+
+      &::before,
+      &::after {
+        display: none;
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+    table-layout: auto;
+    margin-block: var(--spacing-8);
+    font-size: var(--font-size-0);
+    line-height: 1.7rem;
+    border-collapse: collapse;
+
+    thead {
+      border-bottom: 1px solid rgb(var(--text-colour-rgb) / 20%);
+
+      th {
+        font-weight: var(--font-weight-2);
+        padding-bottom: var(--spacing-2);
+        text-align: start;
+
+        &:first-child {
+          padding-left: 0;
+        }
+      }
+    }
+
+    tbody {
+      td {
+        padding: var(--spacing-2) 0;
+        text-align: start;
+      }
+
+      tr {
+        border-bottom: 1px solid rgb(var(--text-colour-rgb) / 10%);
+
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+  }
+
+  kbd {
+    font-weight: var(--font-weight-1);
+    font-family: inherit;
+    box-shadow: var(--text-colour-rgb) 1px rgb(var(--text-colour-rgb) / 10%),
+      0 3px rgb(var(--text-colour-rgb) / 10%);
+    font-size: var(--font-size--1);
+    border-radius: var(--border-radius-1);
+    padding: var(--spacing-1);
+
+    &:has(kbd) {
+      box-shadow: 0 0 rgb(var(--text-colour-rgb)),
+        0 0 rgb(var(--text-colour-rgb));
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol li,
+  ul li {
+    padding-left: var(--spacing-1);
+    margin-block: var(--spacing-2);
+
+    &::marker {
+      color: rgb(var(--text-colour-rgb) / 50%);
+    }
+  }
+
+  hr {
+    margin-block: var(--spacing-12);
+    border: none;
+    height: 1px;
+    background-color: rgb(var(--text-colour-rgb) / 10%);
+  }
+
+  a {
+    text-decoration: underline;
+    font-weight: var(--font-weight-1);
+
+    &[rel~='external']:not(:has(img))::after {
+      --_size: 0.75rem;
+
+      content: '';
+      display: inline-block;
+      width: var(--_size);
+      height: var(--_size);
+      margin-left: var(--spacing-1);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='currentColor' d='M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a.5.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1-0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z'/%3E%3Cpath fill='currentColor' d='M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+  }
+
+  video {
+    max-height: var(--prose-max-asset-height);
+  }
+
+  blockquote {
+    font-style: italic;
+    border-left: 0.25rem solid rgb(var(--text-colour-rgb) / 10%);
+    margin-block: 1.6em;
+    padding-inline-start: 1em;
+  }
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  font-size: 0;
+}

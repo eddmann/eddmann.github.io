@@ -10,12 +10,12 @@
     let ticking = false;
     window.addEventListener('scroll', () => {
       if (ticking) return;
-      const currentPosition = window.pageYOffset;
-      window.requestAnimationFrame(() => {
+      setTimeout(() => {
+        const currentPosition = window.pageYOffset;
         header.classList.toggle('is-sticky', previousPosition > currentPosition);
         previousPosition = currentPosition;
         ticking = false;
-      });
+      }, 500);
       ticking = true;
     });
   })();

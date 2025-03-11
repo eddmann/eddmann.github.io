@@ -1,300 +1,153 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to build a 'Winning' audio Lambda service using the Serverless framework, AWS Polly and compiled SOX. This comprehensive guide covers compiling native code, integrating AWS services and generating dynamic audio outputs.">
-
-    <title>
-        
-            Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX</h1>
-    <time datetime="2017-12-11T00:00:00+00:00" class="post-date">11 Dec 2017</time>
-    <p>Following on from my previous post which discussed <a href="https://eddmann.com/posts/memes-as-a-service-using-lambda-serverless-and-imagemagick/">manipulating images</a>, I would now like to expand upon this and look into how you can interact with audio using Lambda.
-To highlight this use-case we will be creating a simple service which, given a name and an optional voice (provided by <a href="https://aws.amazon.com/polly/">Polly</a>), will synthesise the name and include it in a returned “And the winner is…” applause MP3 file.
-This will demonstrate how to integrate Polly within Lambda, compile and execute native code within Lambda and return a binary MP3 file to the client.</p>
-
-
-
-<h2 id="compiling-sox-for-lambda">Compiling SOX for Lambda</h2>
-
-<p>As we wish to join our static intro and outro audio files with the dynamically produced Polly response, we will need an application that can achieve this.
-I have decided to use <a href="http://sox.sourceforge.net/">SOX</a> for this task, as it provides us with a very simple API for joining multiple files together into a single track.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX - Edd Mann</title>
+<meta name=description content="Learn how to build a 'Winning' audio Lambda service using the Serverless framework, AWS Polly and compiled SOX. This comprehensive guide covers compiling native code, integrating AWS services and generating dynamic audio outputs."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"><meta itemprop=description content="Following on from my previous post which discussed manipulating images, I would now like to expand upon this and look into how you can interact with audio using Lambda. To highlight this use-case we will be creating a simple service which, given a name and an optional voice (provided by Polly), will synthesise the name and include it in a returned “And the winner is…” applause MP3 file. This will demonstrate how to integrate Polly within Lambda, compile and execute native code within Lambda and return a binary MP3 file to the client."><meta itemprop=datePublished content="2017-12-11T00:00:00+00:00"><meta itemprop=dateModified content="2017-12-11T00:00:00+00:00"><meta itemprop=wordCount content="1233"><meta itemprop=keywords content="Serverless,Aws,Lambda,Javascript"><meta property="og:url" content="https://eddmann.com/posts/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"><meta property="og:description" content="Following on from my previous post which discussed manipulating images, I would now like to expand upon this and look into how you can interact with audio using Lambda. To highlight this use-case we will be creating a simple service which, given a name and an optional voice (provided by Polly), will synthesise the name and include it in a returned “And the winner is…” applause MP3 file. This will demonstrate how to integrate Polly within Lambda, compile and execute native code within Lambda and return a binary MP3 file to the client."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2017-12-11T00:00:00+00:00"><meta property="article:modified_time" content="2017-12-11T00:00:00+00:00"><meta property="article:tag" content="Serverless"><meta property="article:tag" content="Aws"><meta property="article:tag" content="Lambda"><meta property="article:tag" content="Javascript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX"><meta name=twitter:description content="Following on from my previous post which discussed manipulating images, I would now like to expand upon this and look into how you can interact with audio using Lambda. To highlight this use-case we will be creating a simple service which, given a name and an optional voice (provided by Polly), will synthesise the name and include it in a returned “And the winner is…” applause MP3 file. This will demonstrate how to integrate Polly within Lambda, compile and execute native code within Lambda and return a binary MP3 file to the client."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Creating a 'Winning' Audio Lambda Service using Serverless, Polly and compiled SOX</h1><time class=post__time>Dec 11, 2017</time></header><main class=prose><p>Following on from my previous post which discussed <a href=/posts/memes-as-a-service-using-lambda-serverless-and-imagemagick/>manipulating images</a>, I would now like to expand upon this and look into how you can interact with audio using Lambda.
+To highlight this use-case we will be creating a simple service which, given a name and an optional voice (provided by <a href=https://aws.amazon.com/polly/ rel="external noopener" target=_blank>Polly</a>), will synthesise the name and include it in a returned &ldquo;And the winner is&mldr;&rdquo; applause MP3 file.
+This will demonstrate how to integrate Polly within Lambda, compile and execute native code within Lambda and return a binary MP3 file to the client.</p><h2 id=compiling-sox-for-lambda>Compiling SOX for Lambda</h2><p>As we wish to join our static intro and outro audio files with the dynamically produced Polly response, we will need an application that can achieve this.
+I have decided to use <a href=http://sox.sourceforge.net/ rel="external noopener" target=_blank>SOX</a> for this task, as it provides us with a very simple API for joining multiple files together into a single track.
 Lambda allows us to execute natively compiled code, providing that it has been correctly compiled for the underlying host operating system.
-To correctly compile SOX for Lambda, we will be using a <a href="https://github.com/lambci/docker-lambda">Docker image</a> which locally replicates the environment as best it can, providing all the necessary build tooling.
-First, we need to start up a container (of this image) with <code class="language-plaintext highlighter-rouge">bash</code> running, so we can compile SOX and its required dependencies.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker run <span class="nt">-it</span> lambci/lambda:build bash
-</code></pre></div></div>
-
-<p>This will pull down the required image from Docker Hub and begin a <code class="language-plaintext highlighter-rouge">bash</code> interpreter session.
-Within this session, we will start by compiling <a href="https://sourceforge.net/projects/mad/">MPEG Audio Decoder</a>, which is a dependency of SOX.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-L</span> <span class="nt">-o</span> libmad-0.15.1b.tar.gz <span class="s2">"http://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz"</span>
-<span class="nv">$ </span><span class="nb">tar </span>zxf libmad-0.15.1b.tar.gz <span class="o">&amp;&amp;</span> <span class="nb">cd </span>libmad-0.15.1b
-<span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'/-fforce-mem/d'</span> configure <span class="c"># https://stackoverflow.com/questions/14015747/gccs-fforce-mem-option</span>
-<span class="nv">$ </span>./configure <span class="nt">--prefix</span><span class="o">=</span>/usr/libmad-0.15.1b <span class="nt">--disable-shared</span> <span class="nt">--enable-static</span>
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make <span class="nb">install</span>
-</code></pre></div></div>
-
-<p>Next we will compile <a href="http://lame.sourceforge.net/">LAME</a>, which will allow us to encode the desired MP3 audio file within SOX.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-L</span> <span class="nt">-o</span> lame-3.100.tar.gz <span class="s2">"https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz"</span>
-<span class="nv">$ </span><span class="nb">tar </span>zxf lame-3.100.tar.gz <span class="o">&amp;&amp;</span> <span class="nb">cd </span>lame-3.100
-<span class="nv">$ </span>./configure <span class="nt">--prefix</span><span class="o">=</span>/usr/lame-3.100 <span class="nt">--disable-shared</span> <span class="nt">--enable-static</span>
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make <span class="nb">install</span>
-</code></pre></div></div>
-
-<p>Finally, we are able to compile SOX, providing locations to the previously compiled libraries.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-L</span> <span class="nt">-o</span> sox-14.4.2.tar.bz2 <span class="s2">"http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2"</span>
-<span class="nv">$ </span><span class="nb">tar </span>jxf sox-14.4.2.tar.bz2 <span class="o">&amp;&amp;</span> <span class="nb">cd </span>sox-14.4.2
-<span class="nv">$ CPPFLAGS</span><span class="o">=</span><span class="s2">"-I/usr/libmad-0.15.1b/include -I/usr/lame-3.100/include"</span> <span class="se">\</span>
-  <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">"-L/usr/libmad-0.15.1b/lib -L/usr/lame-3.100/lib"</span> <span class="se">\</span>
-  ./configure <span class="nt">--prefix</span><span class="o">=</span>/usr/sox-14.4.2 <span class="nt">--disable-shared</span> <span class="nt">--enable-static</span>
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make <span class="nb">install</span>
-</code></pre></div></div>
-
-<p>You will notice that we have <a href="https://en.wikipedia.org/wiki/Static_build#Static_building">statically compiled</a> all these applications, as we desire to depend on only a single executable within the Lambda service.
-With SOX now compiled, we can open up a host terminal session and copy the newly compiled <code class="language-plaintext highlighter-rouge">sox</code> executable from the container.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker ps <span class="c"># displays the running container's ID</span>
-<span class="nv">$ </span>docker <span class="nb">cp</span> <span class="o">{</span>CONTAINER-ID<span class="o">}</span>:/usr/sox-14.4.2/bin/sox ~/sox
-</code></pre></div></div>
-
-<h2 id="creating-the-serverless-project">Creating the Serverless Project</h2>
-
-<p>Now with the native executable compiled, we can create the accompanying Lambda service.
-In a similar manner to the previous blog post, we will first create a skeleton <a href="https://serverless.com/">Serverless</a> project template.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless create <span class="nt">--template</span> aws-nodejs <span class="nt">--path</span> and-the-winner-is
-</code></pre></div></div>
-
-<p>Running this will create the basic handler and Serverless definition file.
-Replace the given Serverless definition file with the following:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">service</span><span class="pi">:</span> <span class="s">and-the-winner-is</span>
-
-<span class="na">provider</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">aws</span>
-  <span class="na">runtime</span><span class="pi">:</span> <span class="s">nodejs6.10</span>
-  <span class="na">stage</span><span class="pi">:</span> <span class="s">prod</span>
-  <span class="na">region</span><span class="pi">:</span> <span class="s">eu-west-1</span>
-  <span class="na">environment</span><span class="pi">:</span>
-    <span class="na">SOX_EXEC</span><span class="pi">:</span> <span class="s">./sox</span>
-    <span class="na">INTRO_FILE</span><span class="pi">:</span> <span class="s">./intro.mp3</span>
-    <span class="na">OUTRO_FILE</span><span class="pi">:</span> <span class="s">./outro.mp3</span>
-  <span class="na">iamRoleStatements</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">Effect</span><span class="pi">:</span> <span class="s">Allow</span>
-      <span class="na">Action</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">polly:DescribeVoices</span>
-        <span class="pi">-</span> <span class="s">polly:SynthesizeSpeech</span>
-      <span class="na">Resource</span><span class="pi">:</span> <span class="s1">'</span><span class="s">*'</span>
-
-<span class="na">plugins</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">serverless-apigw-binary</span>
-
-<span class="na">custom</span><span class="pi">:</span>
-  <span class="na">apigwBinary</span><span class="pi">:</span>
-    <span class="na">types</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="s1">'</span><span class="s">*/*'</span>
-
-<span class="na">functions</span><span class="pi">:</span>
-  <span class="na">winner</span><span class="pi">:</span>
-    <span class="na">handler</span><span class="pi">:</span> <span class="s">handler.winner</span>
-    <span class="na">events</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
-          <span class="na">path</span><span class="pi">:</span> <span class="s">/</span>
-          <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
-</code></pre></div></div>
-
-<p>This configuration defines a single Lambda function which is exposed via a root API Gateway path.
+To correctly compile SOX for Lambda, we will be using a <a href=https://github.com/lambci/docker-lambda rel="external noopener" target=_blank>Docker image</a> which locally replicates the environment as best it can, providing all the necessary build tooling.
+First, we need to start up a container (of this image) with <code>bash</code> running, so we can compile SOX and its required dependencies.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ docker run -it lambci/lambda:build bash
+</span></span></code></pre></div><p>This will pull down the required image from Docker Hub and begin a <code>bash</code> interpreter session.
+Within this session, we will start by compiling <a href=https://sourceforge.net/projects/mad/ rel="external noopener" target=_blank>MPEG Audio Decoder</a>, which is a dependency of SOX.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl -L -o libmad-0.15.1b.tar.gz <span style=color:#e6db74>&#34;http://downloads.sourceforge.net/project/mad/libmad/0.15.1b/libmad-0.15.1b.tar.gz&#34;</span>
+</span></span><span style=display:flex><span>$ tar zxf libmad-0.15.1b.tar.gz <span style=color:#f92672>&amp;&amp;</span> cd libmad-0.15.1b
+</span></span><span style=display:flex><span>$ sed -i <span style=color:#e6db74>&#39;/-fforce-mem/d&#39;</span> configure <span style=color:#75715e># https://stackoverflow.com/questions/14015747/gccs-fforce-mem-option</span>
+</span></span><span style=display:flex><span>$ ./configure --prefix<span style=color:#f92672>=</span>/usr/libmad-0.15.1b --disable-shared --enable-static
+</span></span><span style=display:flex><span>$ make <span style=color:#f92672>&amp;&amp;</span> make install
+</span></span></code></pre></div><p>Next we will compile <a href=http://lame.sourceforge.net/ rel="external noopener" target=_blank>LAME</a>, which will allow us to encode the desired MP3 audio file within SOX.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl -L -o lame-3.100.tar.gz <span style=color:#e6db74>&#34;https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz&#34;</span>
+</span></span><span style=display:flex><span>$ tar zxf lame-3.100.tar.gz <span style=color:#f92672>&amp;&amp;</span> cd lame-3.100
+</span></span><span style=display:flex><span>$ ./configure --prefix<span style=color:#f92672>=</span>/usr/lame-3.100 --disable-shared --enable-static
+</span></span><span style=display:flex><span>$ make <span style=color:#f92672>&amp;&amp;</span> make install
+</span></span></code></pre></div><p>Finally, we are able to compile SOX, providing locations to the previously compiled libraries.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ curl -L -o sox-14.4.2.tar.bz2 <span style=color:#e6db74>&#34;http://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.bz2&#34;</span>
+</span></span><span style=display:flex><span>$ tar jxf sox-14.4.2.tar.bz2 <span style=color:#f92672>&amp;&amp;</span> cd sox-14.4.2
+</span></span><span style=display:flex><span>$ CPPFLAGS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;-I/usr/libmad-0.15.1b/include -I/usr/lame-3.100/include&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  LDFLAGS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;-L/usr/libmad-0.15.1b/lib -L/usr/lame-3.100/lib&#34;</span> <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  ./configure --prefix<span style=color:#f92672>=</span>/usr/sox-14.4.2 --disable-shared --enable-static
+</span></span><span style=display:flex><span>$ make <span style=color:#f92672>&amp;&amp;</span> make install
+</span></span></code></pre></div><p>You will notice that we have <a href=https://en.wikipedia.org/wiki/Static_build#Static_building rel="external noopener" target=_blank>statically compiled</a> all these applications, as we desire to depend on only a single executable within the Lambda service.
+With SOX now compiled, we can open up a host terminal session and copy the newly compiled <code>sox</code> executable from the container.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ docker ps <span style=color:#75715e># displays the running container&#39;s ID</span>
+</span></span><span style=display:flex><span>$ docker cp <span style=color:#f92672>{</span>CONTAINER-ID<span style=color:#f92672>}</span>:/usr/sox-14.4.2/bin/sox ~/sox
+</span></span></code></pre></div><h2 id=creating-the-serverless-project>Creating the Serverless Project</h2><p>Now with the native executable compiled, we can create the accompanying Lambda service.
+In a similar manner to the previous blog post, we will first create a skeleton <a href=https://serverless.com/ rel="external noopener" target=_blank>Serverless</a> project template.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ serverless create --template aws-nodejs --path and-the-winner-is
+</span></span></code></pre></div><p>Running this will create the basic handler and Serverless definition file.
+Replace the given Serverless definition file with the following:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>service</span>: <span style=color:#ae81ff>and-the-winner-is</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>provider</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>aws</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>runtime</span>: <span style=color:#ae81ff>nodejs6.10</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eu-west-1</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>SOX_EXEC</span>: <span style=color:#ae81ff>./sox</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>INTRO_FILE</span>: <span style=color:#ae81ff>./intro.mp3</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>OUTRO_FILE</span>: <span style=color:#ae81ff>./outro.mp3</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>iamRoleStatements</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>Effect</span>: <span style=color:#ae81ff>Allow</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Action</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>polly:DescribeVoices</span>
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>polly:SynthesizeSpeech</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Resource</span>: <span style=color:#e6db74>&#39;*&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>plugins</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>serverless-apigw-binary</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>custom</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>apigwBinary</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>types</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#e6db74>&#39;*/*&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>functions</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>winner</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>handler</span>: <span style=color:#ae81ff>handler.winner</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>events</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>method</span>: <span style=color:#ae81ff>get</span>
+</span></span></code></pre></div><p>This configuration defines a single Lambda function which is exposed via a root API Gateway path.
 It also provides a couple of environment variables which specify the SOX executable location, along with the desired intro and outro audio files.
-We then use a <a href="https://github.com/maciejtreder/serverless-apigw-binary">Serverless plugin</a> to correctly add binary support to the API Gateway.
-As we desire to use Polly within Lambda, we permit access to both the <code class="language-plaintext highlighter-rouge">DescribeVoices</code> and <code class="language-plaintext highlighter-rouge">SynthesizeSpeech</code> actions.
-Before continuing, we should include the Serverless plugin we have defined as a development dependency.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>serverless-apigw-binary <span class="nt">--save-dev</span>
-</code></pre></div></div>
-
-<h2 id="synthesising-the-name">Synthesising the Name</h2>
-
-<p>With this definition in place, we will move on to generating (synthesising) the name provided by the client using Polly.
+We then use a <a href=https://github.com/maciejtreder/serverless-apigw-binary rel="external noopener" target=_blank>Serverless plugin</a> to correctly add binary support to the API Gateway.
+As we desire to use Polly within Lambda, we permit access to both the <code>DescribeVoices</code> and <code>SynthesizeSpeech</code> actions.
+Before continuing, we should include the Serverless plugin we have defined as a development dependency.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ npm install serverless-apigw-binary --save-dev
+</span></span></code></pre></div><h2 id=synthesising-the-name>Synthesising the Name</h2><p>With this definition in place, we will move on to generating (synthesising) the name provided by the client using Polly.
 If the client does not supply a desired voice, we will randomly choose one from the list of available options.
-After creating a new file called <code class="language-plaintext highlighter-rouge">synthesise-name.js</code>, copy the following functions into the file:</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">AWS</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">aws-sdk</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">const</span> <span class="nx">random</span> <span class="o">=</span> <span class="nx">arr</span> <span class="o">=&gt;</span> <span class="nx">arr</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">)];</span>
-
-<span class="kd">const</span> <span class="nx">polly</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AWS</span><span class="p">.</span><span class="nx">Polly</span><span class="p">();</span>
-
-<span class="kd">const</span> <span class="nx">getRandomVoice</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span>
-  <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">polly</span><span class="p">.</span><span class="nx">describeVoices</span><span class="p">({},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="p">{</span> <span class="nx">Voices</span> <span class="p">})</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">rej</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
-      <span class="k">else</span> <span class="nx">res</span><span class="p">(</span><span class="nx">random</span><span class="p">(</span><span class="nx">Voices</span><span class="p">).</span><span class="nx">Id</span><span class="p">);</span>
-    <span class="p">});</span>
-  <span class="p">});</span>
-
-<span class="kd">const</span> <span class="nx">synthesiseSpeech</span> <span class="o">=</span> <span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">voice</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
-      <span class="na">OutputFormat</span><span class="p">:</span> <span class="dl">'</span><span class="s1">mp3</span><span class="dl">'</span><span class="p">,</span>
-      <span class="na">SampleRate</span><span class="p">:</span> <span class="dl">'</span><span class="s1">22050</span><span class="dl">'</span><span class="p">,</span>
-      <span class="na">Text</span><span class="p">:</span> <span class="nx">text</span><span class="p">,</span>
-      <span class="na">TextType</span><span class="p">:</span> <span class="dl">'</span><span class="s1">text</span><span class="dl">'</span><span class="p">,</span>
-      <span class="na">VoiceId</span><span class="p">:</span> <span class="nx">voice</span><span class="p">,</span>
-    <span class="p">};</span>
-
-    <span class="nx">polly</span><span class="p">.</span><span class="nx">synthesizeSpeech</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">speech</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="nx">rej</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
-      <span class="k">else</span> <span class="nx">res</span><span class="p">(</span><span class="nx">speech</span><span class="p">.</span><span class="nx">AudioStream</span><span class="p">);</span>
-    <span class="p">});</span>
-  <span class="p">});</span>
-
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">voice</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">voice</span> <span class="o">||</span> <span class="nx">getRandomVoice</span><span class="p">()).</span><span class="nx">then</span><span class="p">(</span><span class="nx">voice</span> <span class="o">=&gt;</span> <span class="nx">synthesiseSpeech</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">voice</span><span class="p">));</span>
-</code></pre></div></div>
-
-<p>We have a couple of helper functions - one returns a randomly selected Polly voice (if no voice is supplied), and another generates the audio representation of the supplied name.
-Combining these two helpers returns an audio buffer stream which we can later use in our response.</p>
-
-<h2 id="joining-audio-files-using-sox">Joining audio files using SOX</h2>
-
-<p>Having synthesised the client’s desired name, we now wish to join the multiple audio files together and generate the output track.
+After creating a new file called <code>synthesise-name.js</code>, copy the following functions into the file:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#e6db74>&#39;use strict&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>AWS</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;aws-sdk&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>random</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>arr</span> =&gt; <span style=color:#a6e22e>arr</span>[Math.<span style=color:#a6e22e>floor</span>(Math.<span style=color:#a6e22e>random</span>() <span style=color:#f92672>*</span> <span style=color:#a6e22e>arr</span>.<span style=color:#a6e22e>length</span>)];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>polly</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>AWS</span>.<span style=color:#a6e22e>Polly</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>getRandomVoice</span> <span style=color:#f92672>=</span> () =&gt;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>new</span> Promise((<span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>rej</span>) =&gt; {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>polly</span>.<span style=color:#a6e22e>describeVoices</span>({}, <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>err</span>, { <span style=color:#a6e22e>Voices</span> }) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>err</span>) <span style=color:#a6e22e>rej</span>(<span style=color:#a6e22e>err</span>);
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>else</span> <span style=color:#a6e22e>res</span>(<span style=color:#a6e22e>random</span>(<span style=color:#a6e22e>Voices</span>).<span style=color:#a6e22e>Id</span>);
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>synthesiseSpeech</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>text</span>, <span style=color:#a6e22e>voice</span>) =&gt;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>new</span> Promise((<span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>rej</span>) =&gt; {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>params</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>OutputFormat</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;mp3&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>SampleRate</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;22050&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>Text</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>text</span>,
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>TextType</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;text&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>VoiceId</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>voice</span>,
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>polly</span>.<span style=color:#a6e22e>synthesizeSpeech</span>(<span style=color:#a6e22e>params</span>, <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>err</span>, <span style=color:#a6e22e>speech</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>err</span>) <span style=color:#a6e22e>rej</span>(<span style=color:#a6e22e>err</span>);
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>else</span> <span style=color:#a6e22e>res</span>(<span style=color:#a6e22e>speech</span>.<span style=color:#a6e22e>AudioStream</span>);
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>module</span>.<span style=color:#a6e22e>exports</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>name</span>, <span style=color:#a6e22e>voice</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>undefined</span>) =&gt;
+</span></span><span style=display:flex><span>  Promise.<span style=color:#a6e22e>resolve</span>(<span style=color:#a6e22e>voice</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>getRandomVoice</span>()).<span style=color:#a6e22e>then</span>(<span style=color:#a6e22e>voice</span> =&gt; <span style=color:#a6e22e>synthesiseSpeech</span>(<span style=color:#a6e22e>name</span>, <span style=color:#a6e22e>voice</span>));
+</span></span></code></pre></div><p>We have a couple of helper functions - one returns a randomly selected Polly voice (if no voice is supplied), and another generates the audio representation of the supplied name.
+Combining these two helpers returns an audio buffer stream which we can later use in our response.</p><h2 id=joining-audio-files-using-sox>Joining audio files using SOX</h2><p>Having synthesised the client&rsquo;s desired name, we now wish to join the multiple audio files together and generate the output track.
 SOX requires that all audio files be of the same sample rate and channel count to successfully produce a joined file.
 As Polly returns a mono-channel audio file with a sample rate of 22050, the intro and outro I have provided are re-sampled to these requirements.
-After creating a new file called <code class="language-plaintext highlighter-rouge">generate-track.js</code>, copy the following logic into the file:</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">fs</span><span class="dl">'</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">tempfile</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">tempfile</span><span class="dl">'</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">childProcess</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">child_process</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">const</span> <span class="p">{</span> <span class="nx">SOX_EXEC</span><span class="p">,</span> <span class="nx">INTRO_FILE</span><span class="p">,</span> <span class="nx">OUTRO_FILE</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
-
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">nameAudio</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">nameTempFile</span> <span class="o">=</span> <span class="nx">tempfile</span><span class="p">(</span><span class="dl">'</span><span class="s1">.mp3</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">fs</span><span class="p">.</span><span class="nx">writeFileSync</span><span class="p">(</span><span class="nx">nameTempFile</span><span class="p">,</span> <span class="nx">nameAudio</span><span class="p">);</span>
-
-  <span class="kd">const</span> <span class="nx">trackTempFile</span> <span class="o">=</span> <span class="nx">tempfile</span><span class="p">(</span><span class="dl">'</span><span class="s1">.mp3</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">childProcess</span><span class="p">.</span><span class="nx">execFileSync</span><span class="p">(</span><span class="nx">SOX_EXEC</span><span class="p">,</span> <span class="p">[</span><span class="nx">INTRO_FILE</span><span class="p">,</span> <span class="nx">nameTempFile</span><span class="p">,</span> <span class="nx">OUTRO_FILE</span><span class="p">,</span> <span class="nx">trackTempFile</span><span class="p">]);</span>
-
-  <span class="k">return</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="nx">trackTempFile</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>This function simply takes in the audio buffer stream returned from the Polly service and writes it to a temporary file.
-We use an external temporary file library to achieve this, so we need to include it as a project dependency.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install </span>tempfile <span class="nt">--save</span>
-</code></pre></div></div>
-
-<p>We then supply this file, along with the intro and outro audio files, to the SOX executable to generate the final joined output track.
-As this output is written to a temporary file, we then read its contents into a buffer which we can later use within our service.</p>
-
-<h2 id="wiring-it-all-together">Wiring it all together</h2>
-
-<p>With the two key problems now solved, we can now wire the handler together.
-Replace the sample <code class="language-plaintext highlighter-rouge">handler.js</code> file contents with the following:</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">use strict</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">synthesiseName</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">./synthesise-name</span><span class="dl">'</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">generateTrack</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">./generate-track</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">winner</span> <span class="o">=</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">callback</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">queryStringParameters</span> <span class="o">||</span> <span class="p">{};</span>
-
-  <span class="nx">synthesiseName</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">name</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">All of us</span><span class="dl">'</span><span class="p">,</span> <span class="nx">input</span><span class="p">.</span><span class="nx">voice</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">generateTrack</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">track</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">callback</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span>
-        <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-        <span class="na">headers</span><span class="p">:</span> <span class="p">{</span> <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">audio/mpeg</span><span class="dl">'</span> <span class="p">},</span>
-        <span class="na">body</span><span class="p">:</span> <span class="nx">track</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="dl">'</span><span class="s1">base64</span><span class="dl">'</span><span class="p">),</span>
-        <span class="na">isBase64Encoded</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-      <span class="p">});</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>This composes the two functions together, returning the resulting audio track back to the client.
-API Gateway requires that we Base-64 encode the binary response, so we do so within the callback.</p>
-
-<h2 id="we-are-all-winners">We are all winners</h2>
-
-<p>With the implementation now fully complete, we can deploy the Lambda service by executing:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>serverless deploy <span class="nt">-v</span>
-</code></pre></div></div>
-
-<p>Finally, we can visit the returned endpoint URL and enjoy creating our own winning audio tracks!
-You can find the code in its entirety, along with supporting assets, in <a href="https://github.com/eddmann/and-the-winner-is-serverless">this</a> GitHub repository.</p>
-
-<p>
-  <audio controls="">
-    <source src="/uploads/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/winner.mp3" type="audio/mpeg" />
-    Your browser does not support the audio tag.
-  </audio>
-</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+After creating a new file called <code>generate-track.js</code>, copy the following logic into the file:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#e6db74>&#39;use strict&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>fs</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;fs&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>tempfile</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;tempfile&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>childProcess</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;child_process&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>SOX_EXEC</span>, <span style=color:#a6e22e>INTRO_FILE</span>, <span style=color:#a6e22e>OUTRO_FILE</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>process</span>.<span style=color:#a6e22e>env</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>module</span>.<span style=color:#a6e22e>exports</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>nameAudio</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>nameTempFile</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>tempfile</span>(<span style=color:#e6db74>&#39;.mp3&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fs</span>.<span style=color:#a6e22e>writeFileSync</span>(<span style=color:#a6e22e>nameTempFile</span>, <span style=color:#a6e22e>nameAudio</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>trackTempFile</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>tempfile</span>(<span style=color:#e6db74>&#39;.mp3&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>childProcess</span>.<span style=color:#a6e22e>execFileSync</span>(<span style=color:#a6e22e>SOX_EXEC</span>, [<span style=color:#a6e22e>INTRO_FILE</span>, <span style=color:#a6e22e>nameTempFile</span>, <span style=color:#a6e22e>OUTRO_FILE</span>, <span style=color:#a6e22e>trackTempFile</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>fs</span>.<span style=color:#a6e22e>readFileSync</span>(<span style=color:#a6e22e>trackTempFile</span>);
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>This function simply takes in the audio buffer stream returned from the Polly service and writes it to a temporary file.
+We use an external temporary file library to achieve this, so we need to include it as a project dependency.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ npm install tempfile --save
+</span></span></code></pre></div><p>We then supply this file, along with the intro and outro audio files, to the SOX executable to generate the final joined output track.
+As this output is written to a temporary file, we then read its contents into a buffer which we can later use within our service.</p><h2 id=wiring-it-all-together>Wiring it all together</h2><p>With the two key problems now solved, we can now wire the handler together.
+Replace the sample <code>handler.js</code> file contents with the following:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#e6db74>&#39;use strict&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>synthesiseName</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;./synthesise-name&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>generateTrack</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>require</span>(<span style=color:#e6db74>&#39;./generate-track&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>module</span>.<span style=color:#a6e22e>exports</span>.<span style=color:#a6e22e>winner</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>event</span>, <span style=color:#a6e22e>context</span>, <span style=color:#a6e22e>callback</span>) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>input</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>queryStringParameters</span> <span style=color:#f92672>||</span> {};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>synthesiseName</span>(<span style=color:#a6e22e>input</span>.<span style=color:#a6e22e>name</span> <span style=color:#f92672>||</span> <span style=color:#e6db74>&#39;All of us&#39;</span>, <span style=color:#a6e22e>input</span>.<span style=color:#a6e22e>voice</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>then</span>(<span style=color:#a6e22e>generateTrack</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>then</span>(<span style=color:#a6e22e>track</span> =&gt; {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>callback</span>(<span style=color:#66d9ef>null</span>, {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>statusCode</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>200</span>,
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>headers</span><span style=color:#f92672>:</span> { <span style=color:#e6db74>&#39;Content-Type&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;audio/mpeg&#39;</span> },
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>body</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>track</span>.<span style=color:#a6e22e>toString</span>(<span style=color:#e6db74>&#39;base64&#39;</span>),
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>isBase64Encoded</span><span style=color:#f92672>:</span> <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>This composes the two functions together, returning the resulting audio track back to the client.
+API Gateway requires that we Base-64 encode the binary response, so we do so within the callback.</p><h2 id=we-are-all-winners>We are all winners</h2><p>With the implementation now fully complete, we can deploy the Lambda service by executing:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ serverless deploy -v
+</span></span></code></pre></div><p>Finally, we can visit the returned endpoint URL and enjoy creating our own winning audio tracks!
+You can find the code in its entirety, along with supporting assets, in <a href=https://github.com/eddmann/and-the-winner-is-serverless rel="external noopener" target=_blank>this</a> GitHub repository.</p><audio style=width:100% preload=metadata controls><source src=/posts/creating-a-winning-audio-lambda-service-using-serverless-polly-and-compiled-sox/winner.mp3 type=audio/mpeg>Your browser does not support the audio element.</audio></main><footer class=post__tags><a href=/archive/tag/serverless>serverless</a><a href=/archive/tag/aws>aws</a><a href=/archive/tag/lambda>lambda</a><a href=/archive/tag/javascript>javascript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

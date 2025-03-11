@@ -1,134 +1,34 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explores multiple Clojure solutions for the classic FizzBuzz code kata. Discovering clean and concise implementations that showcase the elegance of Lisp.">
-
-    <title>
-        
-            FizzBuzz in Clojure &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">FizzBuzz in Clojure</h1>
-    <time datetime="2015-12-31T00:00:00+00:00" class="post-date">31 Dec 2015</time>
-    <p>This past Christmas break I had the chance to finally pick up <a href="https://www.manning.com/books/the-joy-of-clojure">The Joy of Clojure</a> book and delve into the world of Lisp.
-Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the <a href="http://rosettacode.org/wiki/FizzBuzz">FizzBuzz</a> code kata.
-In this post I will be explaining a couple of the implementations that I created.</p>
-
-
-
-<p>Each of the four solutions below share the following predicate functions.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">3</span><span class="p">)))</span><span class="w">
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">zero?</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="mi">5</span><span class="p">)))</span><span class="w">
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizzbuzz?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nf">fizz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">buzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>And can return the desired results by mapping it over a supplied range.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">(</span><span class="nb">range</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">101</span><span class="p">))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="solution-1">Solution 1</h2>
-
-<p>This solution is the most trivial, taking advantage of <code class="language-plaintext highlighter-rouge">cond</code> over multiple <code class="language-plaintext highlighter-rouge">if</code> statements.
-So as to remove some boilerplate, the anonymous function shorthand has been used.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w">
-  </span><span class="o">#</span><span class="p">(</span><span class="k">cond</span><span class="w">
-    </span><span class="p">(</span><span class="nf">fizzbuzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"FizzBuzz"</span><span class="w">
-    </span><span class="p">(</span><span class="nf">fizz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"Fizz"</span><span class="w">
-    </span><span class="p">(</span><span class="nf">buzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"Buzz"</span><span class="w">
-    </span><span class="no">:else</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="solution-2">Solution 2</h2>
-
-<p>The solution below uses the <code class="language-plaintext highlighter-rouge">let</code> statement in combination with <code class="language-plaintext highlighter-rouge">str</code> to produce an output string.
-If the output string is empty, however, the provided number is returned instead.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">s</span><span class="w"> </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">fizz?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="s">"Fizz"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">buzz?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">empty?</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">s</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="solution-3">Solution 3</h2>
-
-<p>Conceptually similar to the <code class="language-plaintext highlighter-rouge">cond</code> implementation, <code class="language-plaintext highlighter-rouge">some-fn</code> allows us to create a function which includes a list of predicates along with their desired return values.
-In the case of a match not being found, the supplied number is returned instead.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w"> </span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">to-words</span><span class="w"> </span><span class="p">(</span><span class="nf">some-fn</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nf">fizzbuzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"FizzBuzz"</span><span class="p">)</span><span class="w">
-                          </span><span class="o">#</span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nf">fizz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"Fizz"</span><span class="p">)</span><span class="w">
-                          </span><span class="o">#</span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nf">buzz?</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nf">to-words</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="n">n</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="solution-4">Solution 4</h2>
-
-<p>The final solution uses a couple of great Clojure features, including multi-arity overloading to supply a default lookup map, as well as an array map which maintains insertion order.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>FizzBuzz in Clojure - Edd Mann</title>
+<meta name=description content="Explores multiple Clojure solutions for the classic FizzBuzz code kata. Discovering clean and concise implementations that showcase the elegance of Lisp."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="FizzBuzz in Clojure"><meta itemprop=description content="This past Christmas break I had the chance to finally pick up The Joy of Clojure book and delve into the world of Lisp. Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the FizzBuzz code kata. In this post I will be explaining a couple of the implementations that I created."><meta itemprop=datePublished content="2015-12-31T00:00:00+00:00"><meta itemprop=dateModified content="2015-12-31T00:00:00+00:00"><meta itemprop=wordCount content="373"><meta itemprop=keywords content="Clojure"><meta property="og:url" content="https://eddmann.com/posts/fizzbuzz-in-clojure/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="FizzBuzz in Clojure"><meta property="og:description" content="This past Christmas break I had the chance to finally pick up The Joy of Clojure book and delve into the world of Lisp. Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the FizzBuzz code kata. In this post I will be explaining a couple of the implementations that I created."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2015-12-31T00:00:00+00:00"><meta property="article:modified_time" content="2015-12-31T00:00:00+00:00"><meta property="article:tag" content="Clojure"><meta name=twitter:card content="summary"><meta name=twitter:title content="FizzBuzz in Clojure"><meta name=twitter:description content="This past Christmas break I had the chance to finally pick up The Joy of Clojure book and delve into the world of Lisp. Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the FizzBuzz code kata. In this post I will be explaining a couple of the implementations that I created."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/fizzbuzz-in-clojure/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>FizzBuzz in Clojure</h1><time class=post__time>Dec 31, 2015</time></header><main class=prose><p>This past Christmas break I had the chance to finally pick up <a href=https://www.manning.com/books/the-joy-of-clojure rel="external noopener" target=_blank>The Joy of Clojure</a> book and delve into the world of Lisp.
+Along with the commonplace merge-sort algorithm, I find it beneficial to explore a new language and its capabilities by solving the <a href=http://rosettacode.org/wiki/FizzBuzz rel="external noopener" target=_blank>FizzBuzz</a> code kata.
+In this post I will be explaining a couple of the implementations that I created.</p><p>Each of the four solutions below share the following predicate functions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span>fizz? <span style=color:#f92672>#</span>(zero? (<span style=color:#a6e22e>mod</span> % <span style=color:#ae81ff>3</span>)))
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span>buzz? <span style=color:#f92672>#</span>(zero? (<span style=color:#a6e22e>mod</span> % <span style=color:#ae81ff>5</span>)))
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span>fizzbuzz? <span style=color:#f92672>#</span>(and (<span style=color:#a6e22e>fizz?</span> %) (<span style=color:#a6e22e>buzz?</span> %)))
+</span></span></code></pre></div><p>And can return the desired results by mapping it over a supplied range.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(map fizzbuzz (range <span style=color:#ae81ff>1</span> <span style=color:#ae81ff>101</span>))
+</span></span></code></pre></div><h2 id=solution-1>Solution 1</h2><p>This solution is the most trivial, taking advantage of <code>cond</code> over multiple <code>if</code> statements.
+So as to remove some boilerplate, the anonymous function shorthand has been used.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span>fizzbuzz
+</span></span><span style=display:flex><span>  <span style=color:#f92672>#</span>(<span style=color:#a6e22e>cond</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>fizzbuzz?</span> %) <span style=color:#e6db74>&#34;FizzBuzz&#34;</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>fizz?</span> %) <span style=color:#e6db74>&#34;Fizz&#34;</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>buzz?</span> %) <span style=color:#e6db74>&#34;Buzz&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>:else</span> %))
+</span></span></code></pre></div><h2 id=solution-2>Solution 2</h2><p>The solution below uses the <code>let</code> statement in combination with <code>str</code> to produce an output string.
+If the output string is empty, however, the provided number is returned instead.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>fizzbuzz [n]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[s (str (<span style=color:#66d9ef>if </span>(<span style=color:#a6e22e>fizz?</span> n) <span style=color:#e6db74>&#34;Fizz&#34;</span>) (<span style=color:#66d9ef>if </span>(<span style=color:#a6e22e>buzz?</span> n) <span style=color:#e6db74>&#34;Buzz&#34;</span>))]
+</span></span><span style=display:flex><span>    (<span style=color:#66d9ef>if </span>(<span style=color:#a6e22e>empty?</span> s) n s)))
+</span></span></code></pre></div><h2 id=solution-3>Solution 3</h2><p>Conceptually similar to the <code>cond</code> implementation, <code>some-fn</code> allows us to create a function which includes a list of predicates along with their desired return values.
+In the case of a match not being found, the supplied number is returned instead.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>fizzbuzz [n]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[to-words (<span style=color:#a6e22e>some-fn</span> <span style=color:#f92672>#</span>(when (<span style=color:#a6e22e>fizzbuzz?</span> %) <span style=color:#e6db74>&#34;FizzBuzz&#34;</span>)
+</span></span><span style=display:flex><span>                          <span style=color:#f92672>#</span>(when (<span style=color:#a6e22e>fizz?</span> %) <span style=color:#e6db74>&#34;Fizz&#34;</span>)
+</span></span><span style=display:flex><span>                          <span style=color:#f92672>#</span>(when (<span style=color:#a6e22e>buzz?</span> %) <span style=color:#e6db74>&#34;Buzz&#34;</span>))]
+</span></span><span style=display:flex><span>    (or (<span style=color:#a6e22e>to-words</span> n) n)))
+</span></span></code></pre></div><h2 id=solution-4>Solution 4</h2><p>The final solution uses a couple of great Clojure features, including multi-arity overloading to supply a default lookup map, as well as an array map which maintains insertion order.
 Each entry in the map is deconstructed into its predicate and return word (key, value) and then used to test against the supplied number.
-If the predicate passes, the entry is kept and finally joined together to return the output using the <code class="language-plaintext highlighter-rouge">apply</code> and <code class="language-plaintext highlighter-rouge">str</code> functions.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">fizzbuzz</span><span class="w">
-  </span><span class="p">([</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="nf">fizzbuzz</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">(</span><span class="nb">array-map</span><span class="w"> </span><span class="n">fizz?</span><span class="w"> </span><span class="s">"Fizz"</span><span class="w"> </span><span class="n">buzz?</span><span class="w"> </span><span class="s">"Buzz"</span><span class="p">)))</span><span class="w">
-  </span><span class="p">([</span><span class="n">n</span><span class="w"> </span><span class="n">lookup</span><span class="p">]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">if-let</span><span class="w"> </span><span class="p">[</span><span class="n">matches</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="p">(</span><span class="nf">keep</span><span class="w"> </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[[</span><span class="n">pred?</span><span class="w"> </span><span class="n">word</span><span class="p">]]</span><span class="w"> </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nf">pred?</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="n">word</span><span class="p">))</span><span class="w"> </span><span class="n">lookup</span><span class="p">))]</span><span class="w">
-      </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">str</span><span class="w"> </span><span class="n">matches</span><span class="p">)</span><span class="w">
-      </span><span class="n">n</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+If the predicate passes, the entry is kept and finally joined together to return the output using the <code>apply</code> and <code>str</code> functions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>fizzbuzz
+</span></span><span style=display:flex><span>  ([n] (<span style=color:#a6e22e>fizzbuzz</span> n (array-map fizz? <span style=color:#e6db74>&#34;Fizz&#34;</span> buzz? <span style=color:#e6db74>&#34;Buzz&#34;</span>)))
+</span></span><span style=display:flex><span>  ([n lookup]
+</span></span><span style=display:flex><span>    (if-let [matches (seq (<span style=color:#a6e22e>keep</span> (<span style=color:#66d9ef>fn </span>[[pred? word]] (when (<span style=color:#a6e22e>pred?</span> n) word)) lookup))]
+</span></span><span style=display:flex><span>      (apply str matches)
+</span></span><span style=display:flex><span>      n)))
+</span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/clojure>clojure</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

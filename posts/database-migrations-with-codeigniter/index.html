@@ -1,160 +1,70 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to manage database migrations with CodeIgniter through practical examples and step-by-step guidance on synchronising your database schema with your source code.">
-
-    <title>
-        
-            Database Migrations with CodeIgniter &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Database Migrations with CodeIgniter</h1>
-    <time datetime="2012-06-08T00:00:00+00:00" class="post-date">08 Jun 2012</time>
-    <p>I first became aware of database migrations a few years ago when I was exploring the world of <a href="http://rubyonrails.org/">Rails</a>.
-However, I have only recently used them again, prompted by a gentle nudge from SE-Radio (<a href="http://www.se-radio.net/2012/06/episode-186-martin-fowler-and-pramod-sadalage-on-agile-database-development/">Episode 186</a>) and a large web application build which re-introduced them into my development lifecycle.
-Due to current events, I, for one, do not wish to see them go any time soon.</p>
-
-
-
-<h2 id="so-what-are-database-migrations">So What Are Database Migrations?</h2>
-
-<p>Since it is extremely rare for any common web application to not be driven by a database, it is crucial to maintain synchronisation between the state of the schema and the source code.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Database Migrations with CodeIgniter - Edd Mann</title>
+<meta name=description content="Discover how to manage database migrations with CodeIgniter through practical examples and step-by-step guidance on synchronising your database schema with your source code."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Database Migrations with CodeIgniter"><meta itemprop=description content="I first became aware of database migrations a few years ago when I was exploring the world of Rails. However, I have only recently used them again, prompted by a gentle nudge from SE-Radio (Episode 186) and a large web application build which re-introduced them into my development lifecycle. Due to current events, I, for one, do not wish to see them go any time soon."><meta itemprop=datePublished content="2012-06-08T00:00:00+00:00"><meta itemprop=dateModified content="2012-06-08T00:00:00+00:00"><meta itemprop=wordCount content="549"><meta itemprop=keywords content="Codeigniter,Php"><meta property="og:url" content="https://eddmann.com/posts/database-migrations-with-codeigniter/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Database Migrations with CodeIgniter"><meta property="og:description" content="I first became aware of database migrations a few years ago when I was exploring the world of Rails. However, I have only recently used them again, prompted by a gentle nudge from SE-Radio (Episode 186) and a large web application build which re-introduced them into my development lifecycle. Due to current events, I, for one, do not wish to see them go any time soon."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2012-06-08T00:00:00+00:00"><meta property="article:modified_time" content="2012-06-08T00:00:00+00:00"><meta property="article:tag" content="Codeigniter"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Database Migrations with CodeIgniter"><meta name=twitter:description content="I first became aware of database migrations a few years ago when I was exploring the world of Rails. However, I have only recently used them again, prompted by a gentle nudge from SE-Radio (Episode 186) and a large web application build which re-introduced them into my development lifecycle. Due to current events, I, for one, do not wish to see them go any time soon."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/database-migrations-with-codeigniter/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Database Migrations with CodeIgniter</h1><time class=post__time>Jun 8, 2012</time></header><main class=prose><p>I first became aware of database migrations a few years ago when I was exploring the world of <a href=http://rubyonrails.org/ rel="external noopener" target=_blank>Rails</a>.
+However, I have only recently used them again, prompted by a gentle nudge from SE-Radio (<a href=http://www.se-radio.net/2012/06/episode-186-martin-fowler-and-pramod-sadalage-on-agile-database-development/ rel="external noopener" target=_blank>Episode 186</a>) and a large web application build which re-introduced them into my development lifecycle.
+Due to current events, I, for one, do not wish to see them go any time soon.</p><h2 id=so-what-are-database-migrations>So What Are Database Migrations?</h2><p>Since it is extremely rare for any common web application to not be driven by a database, it is crucial to maintain synchronisation between the state of the schema and the source code.
 Migrations are used to achieve this goal, providing you with the ability to version control your schema alterations, so to speak.
-Using this approach, developers can pull down schema changes along with source code alterations (if using some form of <a href="http://en.wikipedia.org/wiki/Source_Control_Management">SCM</a>), without the need to run external tear up/down scripts.
+Using this approach, developers can pull down schema changes along with source code alterations (if using some form of <a href=http://en.wikipedia.org/wiki/Source_Control_Management rel="external noopener" target=_blank>SCM</a>), without the need to run external tear up/down scripts.
 As a result, it allows you to quickly roll back and forth through the history of the schema to work with the desired version.
-These migrations are commonly used to easily modify the state of the database based on the environment, for example, development, testing/QA or production.</p>
-
-<h2 id="an-example">An Example…</h2>
-
-<p>I have spent more and more time using CodeIgniter (and, as a result, PHP) over the past few weeks.
-This coincided with my interest in migrations, as I was pleasantly surprised to discover that CodeIgniter provides a simple out-of-the-box <a href="http://codeigniter.com/user_guide/libraries/migration.html">database migration implementation</a>.
+These migrations are commonly used to easily modify the state of the database based on the environment, for example, development, testing/QA or production.</p><h2 id=an-example>An Example&mldr;</h2><p>I have spent more and more time using CodeIgniter (and, as a result, PHP) over the past few weeks.
+This coincided with my interest in migrations, as I was pleasantly surprised to discover that CodeIgniter provides a simple out-of-the-box <a href=http://codeigniter.com/user_guide/libraries/migration.html rel="external noopener" target=_blank>database migration implementation</a>.
 It should be noted that many different migration tools are available in most programming languages.
-Be warned against vendor lock-in; spend some time making your decision.</p>
-
-<p>Below is a sample migration that should be created inside <code class="language-plaintext highlighter-rouge">./application/migrations/</code> with the filename <code class="language-plaintext highlighter-rouge">001-create-users.php</code>.
-Migration files in CodeIgniter follow the convention of prefixing the version number, followed by a descriptive name (commonly the class name).</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Migration_Create_Users</span> <span class="kd">extends</span> <span class="nc">CI_Migration</span> <span class="p">{</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="n">up</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="nv">$fields</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-      <span class="s1">'id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT'</span><span class="p">,</span>
-      <span class="s1">'username VARCHAR(10) DEFAULT NULL'</span><span class="p">,</span>
-      <span class="s1">'password VARCHAR(50) DEFAULT NULL'</span>
-    <span class="p">);</span>
-
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">add_field</span><span class="p">(</span><span class="nv">$fields</span><span class="p">);</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">add_key</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="kc">TRUE</span><span class="p">);</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">create_table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="n">down</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">drop_table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The code snippet above creates a table (in MySQL) with an auto-incrementing primary key called <code class="language-plaintext highlighter-rouge">id</code> and columns for <code class="language-plaintext highlighter-rouge">username</code> and <code class="language-plaintext highlighter-rouge">password</code>.
-If this migration is rolled back, the <code class="language-plaintext highlighter-rouge">users</code> table is dropped from the schema.
-To run this migration, you must first ensure that migrations are enabled and that the desired version is set in your application’s configuration file (found at <code class="language-plaintext highlighter-rouge">./application/config/migration.php</code>).
-Once configured, you can create a simple controller, as displayed below, which calls the migration library when visited.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Migrate</span> <span class="kd">extends</span> <span class="nc">CI_Controller</span> <span class="p">{</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="n">index</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">load</span><span class="o">-&gt;</span><span class="nf">library</span><span class="p">(</span><span class="s1">'migration'</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">migration</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">())</span> <span class="p">{</span>
-      <span class="nf">show_error</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">migration</span><span class="o">-&gt;</span><span class="nf">error_string</span><span class="p">());</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>By adding a second migration (named <code class="language-plaintext highlighter-rouge">002-add-name-fields.php</code>) to the application, you can see how the database can be procedurally altered.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Migration_Add_Name_Fields</span> <span class="kd">extends</span> <span class="nc">CI_Migration</span> <span class="p">{</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="n">up</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="nv">$fields</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-      <span class="s1">'first_name VARCHAR(50) DEFAULT NULL'</span><span class="p">,</span>
-      <span class="s1">'last_name VARCHAR(50) DEFAULT NULL'</span>
-    <span class="p">);</span>
-
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">add_column</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span> <span class="nv">$fields</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="k">public</span> <span class="k">function</span> <span class="n">down</span><span class="p">()</span>
-  <span class="p">{</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">drop_column</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span> <span class="s1">'first_name'</span><span class="p">);</span>
-    <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">dbforge</span><span class="o">-&gt;</span><span class="nf">drop_column</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span> <span class="s1">'last_name'</span><span class="p">);</span>
-  <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>As demonstrated by these two migration examples, switching between versions is incredibly simple.
+Be warned against vendor lock-in; spend some time making your decision.</p><p>Below is a sample migration that should be created inside <code>./application/migrations/</code> with the filename <code>001-create-users.php</code>.
+Migration files in CodeIgniter follow the convention of prefixing the version number, followed by a descriptive name (commonly the class name).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Migration_Create_Users</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>CI_Migration</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>up</span>()
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $fields <span style=color:#f92672>=</span> <span style=color:#66d9ef>array</span>(
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#39;id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#39;username VARCHAR(10) DEFAULT NULL&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#39;password VARCHAR(50) DEFAULT NULL&#39;</span>
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>add_field</span>($fields);
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>add_key</span>(<span style=color:#e6db74>&#39;id&#39;</span>, <span style=color:#66d9ef>TRUE</span>);
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>create_table</span>(<span style=color:#e6db74>&#39;users&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>down</span>()
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>drop_table</span>(<span style=color:#e6db74>&#39;users&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The code snippet above creates a table (in MySQL) with an auto-incrementing primary key called <code>id</code> and columns for <code>username</code> and <code>password</code>.
+If this migration is rolled back, the <code>users</code> table is dropped from the schema.
+To run this migration, you must first ensure that migrations are enabled and that the desired version is set in your application&rsquo;s configuration file (found at <code>./application/config/migration.php</code>).
+Once configured, you can create a simple controller, as displayed below, which calls the migration library when visited.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Migrate</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>CI_Controller</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>index</span>()
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>load</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>library</span>(<span style=color:#e6db74>&#39;migration&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>migration</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span>()) {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>show_error</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>migration</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>error_string</span>());
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>By adding a second migration (named <code>002-add-name-fields.php</code>) to the application, you can see how the database can be procedurally altered.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Migration_Add_Name_Fields</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>CI_Migration</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>up</span>()
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $fields <span style=color:#f92672>=</span> <span style=color:#66d9ef>array</span>(
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#39;first_name VARCHAR(50) DEFAULT NULL&#39;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>&#39;last_name VARCHAR(50) DEFAULT NULL&#39;</span>
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>add_column</span>(<span style=color:#e6db74>&#39;users&#39;</span>, $fields);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>down</span>()
+</span></span><span style=display:flex><span>  {
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>drop_column</span>(<span style=color:#e6db74>&#39;users&#39;</span>, <span style=color:#e6db74>&#39;first_name&#39;</span>);
+</span></span><span style=display:flex><span>    $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>dbforge</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>drop_column</span>(<span style=color:#e6db74>&#39;users&#39;</span>, <span style=color:#e6db74>&#39;last_name&#39;</span>);
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As demonstrated by these two migration examples, switching between versions is incredibly simple.
 This simplicity arises from the creation of well-thought-out methods for both applying (tear up) and reverting (tear down) migrations.
-Reflecting on the migration ethos, I can certainly appreciate the benefits of managing schemas in this manner.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Reflecting on the migration ethos, I can certainly appreciate the benefits of managing schemas in this manner.</p></main><footer class=post__tags><a href=/archive/tag/codeigniter>codeigniter</a><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

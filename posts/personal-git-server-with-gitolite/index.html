@@ -1,131 +1,26 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to create your own centralised Git server with Gitolite for enhanced access control and custom repository management.">
-
-    <title>
-        
-            Personal Git Server with Gitolite &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Personal Git Server with Gitolite</h1>
-    <time datetime="2013-11-25T00:00:00+00:00" class="post-date">25 Nov 2013</time>
-    <p>Github and Bitbucket are great, however, there may come a time when you wish to set up a personal Git server.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Personal Git Server with Gitolite - Edd Mann</title>
+<meta name=description content="Discover how to create your own centralised Git server with Gitolite for enhanced access control and custom repository management."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Personal Git Server with Gitolite"><meta itemprop=description content="Github and Bitbucket are great, however, there may come a time when you wish to set up a personal Git server. There are many reasons for this, you may legally not be permitted to host the repository externally, or you want to have more control over access privileges. Gitolite is here to help remedy this desire, allowing you to simply set up Git hosting on a central server with fine-grained access control capabilities."><meta itemprop=datePublished content="2013-11-25T00:00:00+00:00"><meta itemprop=dateModified content="2013-11-25T00:00:00+00:00"><meta itemprop=wordCount content="472"><meta itemprop=keywords content="Git,Gitolite"><meta property="og:url" content="https://eddmann.com/posts/personal-git-server-with-gitolite/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Personal Git Server with Gitolite"><meta property="og:description" content="Github and Bitbucket are great, however, there may come a time when you wish to set up a personal Git server. There are many reasons for this, you may legally not be permitted to host the repository externally, or you want to have more control over access privileges. Gitolite is here to help remedy this desire, allowing you to simply set up Git hosting on a central server with fine-grained access control capabilities."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2013-11-25T00:00:00+00:00"><meta property="article:modified_time" content="2013-11-25T00:00:00+00:00"><meta property="article:tag" content="Git"><meta property="article:tag" content="Gitolite"><meta name=twitter:card content="summary"><meta name=twitter:title content="Personal Git Server with Gitolite"><meta name=twitter:description content="Github and Bitbucket are great, however, there may come a time when you wish to set up a personal Git server. There are many reasons for this, you may legally not be permitted to host the repository externally, or you want to have more control over access privileges. Gitolite is here to help remedy this desire, allowing you to simply set up Git hosting on a central server with fine-grained access control capabilities."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/personal-git-server-with-gitolite/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Personal Git Server with Gitolite</h1><time class=post__time>Nov 25, 2013</time></header><main class=prose><p>Github and Bitbucket are great, however, there may come a time when you wish to set up a personal Git server.
 There are many reasons for this, you may legally not be permitted to host the repository externally, or you want to have more control over access privileges.
-<a href="http://gitolite.com/gitolite/index.html">Gitolite</a> is here to help remedy this desire, allowing you to simply set up Git hosting on a central server with fine-grained access control capabilities.</p>
-
-
-
-<p>In this post I will take you through the steps required to set up Gitolite on a base CentOS 6.4 installation.
-I will assume you have such an installation (or equivalent) available throughout the post.</p>
-
-<h2 id="installation">Installation</h2>
-
-<p>The first step is to add the <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> repository (if not already present), along with installing Git and Gitolite using YUM.
-Alternatively, you are able to install Gitolite from <a href="http://github.com/sitaramc/gitolite">source</a>, instructions of which can be found there.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>rpm <span class="nt">-Uvh</span> http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-<span class="nv">$ </span><span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> git gitolite3
-</code></pre></div></div>
-
-<p>Gitolite intuitively uses a Git repository itself to handle the hosted repositories and user accounts.
+<a href=http://gitolite.com/gitolite/index.html rel="external noopener" target=_blank>Gitolite</a> is here to help remedy this desire, allowing you to simply set up Git hosting on a central server with fine-grained access control capabilities.</p><p>In this post I will take you through the steps required to set up Gitolite on a base CentOS 6.4 installation.
+I will assume you have such an installation (or equivalent) available throughout the post.</p><h2 id=installation>Installation</h2><p>The first step is to add the <a href=http://fedoraproject.org/wiki/EPEL rel="external noopener" target=_blank>EPEL</a> repository (if not already present), along with installing Git and Gitolite using YUM.
+Alternatively, you are able to install Gitolite from <a href=http://github.com/sitaramc/gitolite rel="external noopener" target=_blank>source</a>, instructions of which can be found there.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ sudo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+</span></span><span style=display:flex><span>$ sudo yum install -y git gitolite3
+</span></span></code></pre></div><p>Gitolite intuitively uses a Git repository itself to handle the hosted repositories and user accounts.
 We will be assuming that you wish to use your current logged-in account for initial management of this repository - and as such we must create an SSH key-pair (if not already present).
-We then copy over the public key to a location accessible to a new account we will be creating next.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh-keygen <span class="nt">-q</span> <span class="nt">-t</span> rsa <span class="nt">-C</span> <span class="s2">"your@email.com"</span>
-<span class="nv">$ </span><span class="nb">cp</span> ~/.ssh/id_rsa.pub /tmp/server.pub
-</code></pre></div></div>
-
-<p>It is best practice to set up and access your Gitolite server from its own dedicated locked-down user account.
-The ‘gitolite setup’ command below will add the copied over public key to the list of users able to manage the admin repository.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>useradd <span class="nt">-U</span> git
-<span class="nv">$ </span><span class="nb">sudo </span>su - git
-<span class="nv">$ </span>gitolite setup <span class="nt">-pk</span> /tmp/server.pub
-<span class="nv">$ </span><span class="nb">rm</span> /tmp/server.pub
-<span class="nv">$ </span><span class="nb">exit</span>
-</code></pre></div></div>
-
-<h2 id="usage">Usage</h2>
-
-<p>With the initial setup now complete, from the previously used account we can list the available repositories and clone the admin repository.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh git@localhost info
-<span class="nv">$ </span>git clone git@localhost:gitolite-admin.git
-</code></pre></div></div>
-
-<p>We are now able to manage the server’s repositories and user access privileges from ‘conf/gitolite.conf’.
-Adding and then committing/pushing the following change will create a new empty repository called ‘helloworld’ which everyone has read/write access to.</p>
-
-<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>repo helloworld
-    RW+ = @all
-</code></pre></div></div>
-
-<p>Finally, you are able to follow the same commit/push routine when adding users’ public keys to the ‘keydir’ directory.
-Take note that the name of the public key will be how you reference that user in the configuration file (i.e. bob.pub would be ‘bob’).</p>
-
-<h2 id="vagrant-demo">Vagrant Demo</h2>
-
-<p>To test this setup I used Vagrant and a simple shell-script provisioner, and I thought it would be useful to provide it.
-One note on the provisioner file, due to being run as ‘root’, it is necessary to switch to the correct account for each required command.</p>
-
-<ul>
-  <li><a href="/uploads/personal-git-server-with-gitolite/Vagrantfile">Vagrantfile</a> - Vagrant configuration file</li>
-  <li><a href="/uploads/personal-git-server-with-gitolite/bootstrap.sh">bootstrap.sh</a> - Shell-script provisioner</li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+We then copy over the public key to a location accessible to a new account we will be creating next.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ ssh-keygen -q -t rsa -C <span style=color:#e6db74>&#34;your@email.com&#34;</span>
+</span></span><span style=display:flex><span>$ cp ~/.ssh/id_rsa.pub /tmp/server.pub
+</span></span></code></pre></div><p>It is best practice to set up and access your Gitolite server from its own dedicated locked-down user account.
+The &lsquo;gitolite setup&rsquo; command below will add the copied over public key to the list of users able to manage the admin repository.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ useradd -U git
+</span></span><span style=display:flex><span>$ sudo su - git
+</span></span><span style=display:flex><span>$ gitolite setup -pk /tmp/server.pub
+</span></span><span style=display:flex><span>$ rm /tmp/server.pub
+</span></span><span style=display:flex><span>$ exit
+</span></span></code></pre></div><h2 id=usage>Usage</h2><p>With the initial setup now complete, from the previously used account we can list the available repositories and clone the admin repository.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ ssh git@localhost info
+</span></span><span style=display:flex><span>$ git clone git@localhost:gitolite-admin.git
+</span></span></code></pre></div><p>We are now able to manage the server&rsquo;s repositories and user access privileges from &lsquo;conf/gitolite.conf&rsquo;.
+Adding and then committing/pushing the following change will create a new empty repository called &lsquo;helloworld&rsquo; which everyone has read/write access to.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>repo helloworld
+</span></span><span style=display:flex><span>    RW+ = @all
+</span></span></code></pre></div><p>Finally, you are able to follow the same commit/push routine when adding users&rsquo; public keys to the &lsquo;keydir&rsquo; directory.
+Take note that the name of the public key will be how you reference that user in the configuration file (i.e. bob.pub would be &lsquo;bob&rsquo;).</p><h2 id=vagrant-demo>Vagrant Demo</h2><p>To test this setup I used Vagrant and a simple shell-script provisioner, and I thought it would be useful to provide it.
+One note on the provisioner file, due to being run as &lsquo;root&rsquo;, it is necessary to switch to the correct account for each required command.</p><ul><li><a href=/posts/personal-git-server-with-gitolite/Vagrantfile>Vagrantfile</a> - Vagrant configuration file</li><li><a href=/posts/personal-git-server-with-gitolite/bootstrap.sh>bootstrap.sh</a> - Shell-script provisioner</li></ul></main><footer class=post__tags><a href=/archive/tag/git>git</a><a href=/archive/tag/gitolite>gitolite</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

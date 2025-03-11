@@ -1,297 +1,157 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to implement a Bootstrap API endpoint and configure Serverless Offline for efficient local development.">
-
-    <title>
-        
-            Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline</h1>
-    <time datetime="2018-07-27T00:00:00+00:00" class="post-date">27 Jul 2018</time>
-    <p>Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline - Edd Mann</title>
+<meta name=description content="Discover how to implement a Bootstrap API endpoint and configure Serverless Offline for efficient local development."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline"><meta itemprop=description content="Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication. We will now move on to implementing the first real API endpoint, that being the Bootstrap response. Along the way, we will configure Serverless Offline, allowing us to locally interact with the API without having to provision any online resources."><meta itemprop=datePublished content="2018-07-27T00:00:00+00:00"><meta itemprop=dateModified content="2018-07-27T00:00:00+00:00"><meta itemprop=wordCount content="1222"><meta itemprop=keywords content="Serverless,Mince-Pie-Challenge-Series"><meta property="og:url" content="https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline"><meta property="og:description" content="Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication. We will now move on to implementing the first real API endpoint, that being the Bootstrap response. Along the way, we will configure Serverless Offline, allowing us to locally interact with the API without having to provision any online resources."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-07-27T00:00:00+00:00"><meta property="article:modified_time" content="2018-07-27T00:00:00+00:00"><meta property="article:tag" content="Serverless"><meta property="article:tag" content="Mince-Pie-Challenge-Series"><meta name=twitter:card content="summary"><meta name=twitter:title content="Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline"><meta name=twitter:description content="Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication. We will now move on to implementing the first real API endpoint, that being the Bootstrap response. Along the way, we will configure Serverless Offline, allowing us to locally interact with the API without having to provision any online resources."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Mince Pie Challenge: Adding the Bootstrap Endpoint and Serverless Offline</h1><time class=post__time>Jul 27, 2018</time></header><main class=prose><p>Up until now, we have spent our time setting up the API project to provide a confident testing pipeline (with types) and Amazon Cognito authentication.
 We will now move on to implementing the first <strong>real</strong> API endpoint, that being the Bootstrap response.
-Along the way, we will configure <a href="https://github.com/dherault/serverless-offline">Serverless Offline</a>, allowing us to locally interact with the API without having to provision any online resources.</p>
-
-
-
-<p>If you are keen to see how the finished example looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/05-bootstrap-offline">API repository</a>.</p>
-
-<h2 id="adding-the-bootstrap-endpoint">Adding the Bootstrap Endpoint</h2>
-
-<p>If we <a href="https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#bootstrap">look back</a> at the RAML API definition, we can see that this endpoint is used to help aid the client in discovering all the different endpoints/actions that are available to them.
+Along the way, we will configure <a href=https://github.com/dherault/serverless-offline rel="external noopener" target=_blank>Serverless Offline</a>, allowing us to locally interact with the API without having to provision any online resources.</p><p>If you are keen to see how the finished example looks, you can access it within the <a href=https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/05-bootstrap-offline rel="external noopener" target=_blank>API repository</a>.</p><h2 id=adding-the-bootstrap-endpoint>Adding the Bootstrap Endpoint</h2><p>If we <a href=/posts/mince-pie-challenge-designing-the-restful-api-with-raml/#bootstrap>look back</a> at the RAML API definition, we can see that this endpoint is used to help aid the client in discovering all the different endpoints/actions that are available to them.
 We also provide the base endpoint and some Amazon Cognito User Pool specific information.
-To start with, we will replace the user authentication handler examples present within <code class="language-plaintext highlighter-rouge">functions.yml</code> with our Bootstrap handler.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">bootstrap</span><span class="pi">:</span>
-  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/bootstrap.handler</span>
-  <span class="na">environment</span><span class="pi">:</span>
-    <span class="na">USER_POOL_CLIENT_ID</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):userPoolClientId}</span>
-    <span class="na">BASE_ENDPOINT_URL</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):baseEndpointUrl}</span>
-  <span class="na">events</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
-        <span class="na">path</span><span class="pi">:</span> <span class="s">/</span>
-        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
-        <span class="na">cors</span><span class="pi">:</span> <span class="no">true</span>
-</code></pre></div></div>
-
-<p>In this case, we are explicitly supplying several additional environment variables to this particular handler.
-As these are only required for this endpoint, the <a href="https://en.wikipedia.org/wiki/Principle_of_least_privilege">principle of least privilege</a> dictates that they should only be provided here.
-We are fetching these values from the stage-specific configuration file (<code class="language-plaintext highlighter-rouge">config.dev.yml</code>), referencing the User Pool Client resource in a similar manner to how we referenced the User Pool in the previous post.
-We also <a href="https://serverless.com/framework/docs/providers/aws/events/apigateway/#enabling-cors">enable CORS</a> support within the API Gateway endpoint, as the API will be hosted on a different sub-domain to the client.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># ..</span>
-<span class="na">baseEndpointUrl</span><span class="pi">:</span> <span class="s1">'</span><span class="s">https://dev.api.mincepiechallenge.com'</span>
-<span class="na">userPoolClientId</span><span class="pi">:</span>
-  <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieUserPoolClient</span>
-</code></pre></div></div>
-
-<p>With this endpoint now defined, we can move on to implementing the behaviour.
-We will first add a <a href="https://github.com/byteclubfr/js-hal">new dependency</a> to the <code class="language-plaintext highlighter-rouge">package.json</code>, which provides a nice abstraction around managing HAL resources.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"hal"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.2.0"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<p>From here, we can implement the delivery-specific handler within <code class="language-plaintext highlighter-rouge">src/bootstrap.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
-
-<span class="k">import</span> <span class="nx">bootstrap</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./handlers/bootstrap</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="p">{</span> <span class="nx">USER_POOL_ID</span><span class="p">,</span> <span class="nx">USER_POOL_CLIENT_ID</span><span class="p">,</span> <span class="nx">BASE_ENDPOINT_URL</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">USER_POOL_ID</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_POOL_ID is not present</span><span class="dl">'</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">USER_POOL_CLIENT_ID</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">USER_POOL_CLIENT_ID is not present</span><span class="dl">'</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">BASE_ENDPOINT_URL</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">BASE_ENDPOINT_URL is not present</span><span class="dl">'</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="nx">bootstrap</span><span class="p">({</span>
-  <span class="na">getPoolId</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">USER_POOL_ID</span><span class="p">,</span>
-  <span class="na">getClientId</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">USER_POOL_CLIENT_ID</span><span class="p">,</span>
-  <span class="na">getBaseEndpointUrl</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">BASE_ENDPOINT_URL</span><span class="p">,</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>This file exports the concrete handler that is called when the API Gateway endpoint is triggered.
+To start with, we will replace the user authentication handler examples present within <code>functions.yml</code> with our Bootstrap handler.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>bootstrap</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>handler</span>: <span style=color:#ae81ff>src/bootstrap.handler</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>USER_POOL_CLIENT_ID</span>: <span style=color:#ae81ff>${file(./config.${self:provider.stage}.yml):userPoolClientId}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>BASE_ENDPOINT_URL</span>: <span style=color:#ae81ff>${file(./config.${self:provider.stage}.yml):baseEndpointUrl}</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>events</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>method</span>: <span style=color:#ae81ff>get</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>cors</span>: <span style=color:#66d9ef>true</span>
+</span></span></code></pre></div><p>In this case, we are explicitly supplying several additional environment variables to this particular handler.
+As these are only required for this endpoint, the <a href=https://en.wikipedia.org/wiki/Principle_of_least_privilege rel="external noopener" target=_blank>principle of least privilege</a> dictates that they should only be provided here.
+We are fetching these values from the stage-specific configuration file (<code>config.dev.yml</code>), referencing the User Pool Client resource in a similar manner to how we referenced the User Pool in the previous post.
+We also <a href=https://serverless.com/framework/docs/providers/aws/events/apigateway/#enabling-cors rel="external noopener" target=_blank>enable CORS</a> support within the API Gateway endpoint, as the API will be hosted on a different sub-domain to the client.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># ..</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>baseEndpointUrl</span>: <span style=color:#e6db74>&#39;https://dev.api.mincepiechallenge.com&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>userPoolClientId</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>Ref</span>: <span style=color:#ae81ff>PieUserPoolClient</span>
+</span></span></code></pre></div><p>With this endpoint now defined, we can move on to implementing the behaviour.
+We will first add a <a href=https://github.com/byteclubfr/js-hal rel="external noopener" target=_blank>new dependency</a> to the <code>package.json</code>, which provides a nice abstraction around managing HAL resources.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;dependencies&#34;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;hal&#34;</span>: <span style=color:#e6db74>&#34;^1.2.0&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>From here, we can implement the delivery-specific handler within <code>src/bootstrap.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#75715e>// @flow
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>bootstrap</span> <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;./handlers/bootstrap&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>USER_POOL_ID</span>, <span style=color:#a6e22e>USER_POOL_CLIENT_ID</span>, <span style=color:#a6e22e>BASE_ENDPOINT_URL</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>process</span>.<span style=color:#a6e22e>env</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>USER_POOL_ID</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> Error(<span style=color:#e6db74>&#39;USER_POOL_ID is not present&#39;</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>USER_POOL_CLIENT_ID</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> Error(<span style=color:#e6db74>&#39;USER_POOL_CLIENT_ID is not present&#39;</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>BASE_ENDPOINT_URL</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> Error(<span style=color:#e6db74>&#39;BASE_ENDPOINT_URL is not present&#39;</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>handler</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>bootstrap</span>({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>getPoolId</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#a6e22e>USER_POOL_ID</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>getClientId</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#a6e22e>USER_POOL_CLIENT_ID</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>getBaseEndpointUrl</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#a6e22e>BASE_ENDPOINT_URL</span>,
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>This file exports the concrete handler that is called when the API Gateway endpoint is triggered.
 We pull together all the externally required dependencies, in this case environment variables.
-We ensure these environment variables are present and then encapsulate them into small services that the underlying handler will use.</p>
-
-<p>This allows us to now create the underlying handler implementation within <code class="language-plaintext highlighter-rouge">src/handlers/bootstrap.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
-
-<span class="k">import</span> <span class="p">{</span> <span class="nx">createHandler</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">ok</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../helpers/http</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="p">{</span> <span class="nx">Resource</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">hal</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">bootstrap</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="na">services</span><span class="p">:</span> <span class="p">{</span> <span class="nx">getPoolId</span><span class="p">,</span> <span class="nx">getClientId</span><span class="p">,</span> <span class="nx">getBaseEndpointUrl</span> <span class="p">}</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">resource</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Resource</span><span class="p">(</span>
-    <span class="p">{</span>
-      <span class="na">cognito</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">poolId</span><span class="p">:</span> <span class="nx">getPoolId</span><span class="p">(),</span>
-        <span class="na">clientId</span><span class="p">:</span> <span class="nx">getClientId</span><span class="p">(),</span>
-      <span class="p">},</span>
-      <span class="na">baseEndpointUrl</span><span class="p">:</span> <span class="nx">getBaseEndpointUrl</span><span class="p">(),</span>
-    <span class="p">},</span>
-    <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span>
-  <span class="p">);</span>
-
-  <span class="nx">resource</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="dl">'</span><span class="s1">list</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/pies</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">resource</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="dl">'</span><span class="s1">add</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/pies</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">resource</span><span class="p">.</span><span class="nx">link</span><span class="p">(</span><span class="dl">'</span><span class="s1">view</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">href</span><span class="p">:</span> <span class="dl">'</span><span class="s1">/pies/{id}</span><span class="dl">'</span><span class="p">,</span> <span class="na">templated</span><span class="p">:</span> <span class="kc">true</span> <span class="p">});</span>
-
-  <span class="k">return</span> <span class="nx">ok</span><span class="p">(</span><span class="nx">resource</span><span class="p">);</span>
-<span class="p">};</span>
-
-<span class="k">export</span> <span class="k">default</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">bootstrap</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>The handler uses the newly added dependency to build up a HAL-compliant resource which is returned to the client.
+We ensure these environment variables are present and then encapsulate them into small services that the underlying handler will use.</p><p>This allows us to now create the underlying handler implementation within <code>src/handlers/bootstrap.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#75715e>// @flow
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> { <span style=color:#a6e22e>createHandler</span> } <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;../helpers/handlers&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> { <span style=color:#a6e22e>ok</span> } <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;../helpers/http&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> { <span style=color:#a6e22e>Resource</span> } <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;hal&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>bootstrap</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>async</span> ({ <span style=color:#a6e22e>services</span><span style=color:#f92672>:</span> { <span style=color:#a6e22e>getPoolId</span>, <span style=color:#a6e22e>getClientId</span>, <span style=color:#a6e22e>getBaseEndpointUrl</span> } }) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>resource</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Resource</span>(
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>cognito</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>poolId</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>getPoolId</span>(),
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>clientId</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>getClientId</span>(),
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>baseEndpointUrl</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>getBaseEndpointUrl</span>(),
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;/&#39;</span>
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>resource</span>.<span style=color:#a6e22e>link</span>(<span style=color:#e6db74>&#39;list&#39;</span>, <span style=color:#e6db74>&#39;/pies&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>resource</span>.<span style=color:#a6e22e>link</span>(<span style=color:#e6db74>&#39;add&#39;</span>, <span style=color:#e6db74>&#39;/pies&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>resource</span>.<span style=color:#a6e22e>link</span>(<span style=color:#e6db74>&#39;view&#39;</span>, { <span style=color:#a6e22e>href</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;/pies/{id}&#39;</span>, <span style=color:#a6e22e>templated</span><span style=color:#f92672>:</span> <span style=color:#66d9ef>true</span> });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ok</span>(<span style=color:#a6e22e>resource</span>);
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> <span style=color:#a6e22e>createHandler</span>(<span style=color:#a6e22e>bootstrap</span>);
+</span></span></code></pre></div><p>The handler uses the newly added dependency to build up a HAL-compliant resource which is returned to the client.
 The supplied services are then used to correctly set the resource values based on the current setup.
-We finally return a newly created <code class="language-plaintext highlighter-rouge">ok</code> response, which needs to be added to <code class="language-plaintext highlighter-rouge">src/helpers/http.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @flow</span>
-
-<span class="k">import</span> <span class="nx">type</span> <span class="p">{</span> <span class="nx">HALResource</span><span class="p">,</span> <span class="nx">Response</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../types</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">ok</span> <span class="o">=</span> <span class="p">(</span><span class="nx">resource</span><span class="p">:</span> <span class="nx">HALResource</span><span class="p">):</span> <span class="nx">Response</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="dl">'</span><span class="s1">Access-Control-Allow-Origin</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">Access-Control-Allow-Credentials</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/hal+json</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">},</span>
-  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">resource</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">()),</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>The helper function requires that a <code class="language-plaintext highlighter-rouge">HALResource</code> be supplied, along with a <code class="language-plaintext highlighter-rouge">Response</code> returned.
-We shall define the structure of what a <code class="language-plaintext highlighter-rouge">HALResource</code> looks like within <code class="language-plaintext highlighter-rouge">src/types/index.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="nx">type</span> <span class="nx">HALResource</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">_links</span><span class="p">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">string</span><span class="p">]:</span> <span class="nx">any</span> <span class="p">},</span>
-  <span class="na">toJSON</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{},</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Within our domain, a <code class="language-plaintext highlighter-rouge">HALResource</code> must provide a set of <code class="language-plaintext highlighter-rouge">_links</code> and a <code class="language-plaintext highlighter-rouge">toJSON</code> method, which converts the internal representation into JSON that can be consumed by the client.
+We finally return a newly created <code>ok</code> response, which needs to be added to <code>src/helpers/http.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#75715e>// @flow
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>type</span> { <span style=color:#a6e22e>HALResource</span>, <span style=color:#a6e22e>Response</span> } <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;../types&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>ok</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>resource</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>HALResource</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Response</span> =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>statusCode</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>200</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>headers</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Access-Control-Allow-Origin&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;*&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Access-Control-Allow-Credentials&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;*&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Content-Type&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;application/hal+json&#39;</span>,
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>body</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>stringify</span>(<span style=color:#a6e22e>resource</span>.<span style=color:#a6e22e>toJSON</span>()),
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>The helper function requires that a <code>HALResource</code> be supplied, along with a <code>Response</code> returned.
+We shall define the structure of what a <code>HALResource</code> looks like within <code>src/types/index.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#a6e22e>type</span> <span style=color:#a6e22e>HALResource</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>_links</span><span style=color:#f92672>:</span> { [<span style=color:#a6e22e>string</span>]<span style=color:#f92672>:</span> <span style=color:#a6e22e>any</span> },
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>toJSON</span><span style=color:#f92672>:</span> () =&gt; {},
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Within our domain, a <code>HALResource</code> must provide a set of <code>_links</code> and a <code>toJSON</code> method, which converts the internal representation into JSON that can be consumed by the client.
 We can now move on to covering this new handler with sufficient test coverage.
-We will create a new test within <code class="language-plaintext highlighter-rouge">src/__tests__/bootstrap.js</code>, and ensure that the handler responds with the expected output, based on the supplied service definitions.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">handler</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../handlers/bootstrap</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="nx">it</span><span class="p">(</span><span class="dl">'</span><span class="s1">displays the bootstrap details</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">services</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">getPoolId</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">POOL_ID</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">getClientId</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">CLIENT_ID</span><span class="dl">'</span><span class="p">,</span>
-    <span class="na">getBaseEndpointUrl</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">BASE_ENDPOINT_URL</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">};</span>
-
-  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">parseResponse</span><span class="p">(</span><span class="k">await</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">services</span><span class="p">)({},</span> <span class="p">{}));</span>
-
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">cognito</span><span class="p">.</span><span class="nx">poolId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">POOL_ID</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">cognito</span><span class="p">.</span><span class="nx">clientId</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">CLIENT_ID</span><span class="dl">'</span><span class="p">);</span>
-  <span class="nx">expect</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">baseEndpointUrl</span><span class="p">).</span><span class="nx">toBe</span><span class="p">(</span><span class="dl">'</span><span class="s1">BASE_ENDPOINT_URL</span><span class="dl">'</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>With this addition, we can run <code class="language-plaintext highlighter-rouge">make test</code> locally to ensure the handler honours the agreement.
+We will create a new test within <code>src/__tests__/bootstrap.js</code>, and ensure that the handler responds with the expected output, based on the supplied service definitions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>handler</span> <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;../handlers/bootstrap&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>it</span>(<span style=color:#e6db74>&#39;displays the bootstrap details&#39;</span>, <span style=color:#66d9ef>async</span> () =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>services</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>getPoolId</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#e6db74>&#39;POOL_ID&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>getClientId</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#e6db74>&#39;CLIENT_ID&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>getBaseEndpointUrl</span><span style=color:#f92672>:</span> () =&gt; <span style=color:#e6db74>&#39;BASE_ENDPOINT_URL&#39;</span>,
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>response</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>parseResponse</span>(<span style=color:#66d9ef>await</span> <span style=color:#a6e22e>handler</span>(<span style=color:#a6e22e>services</span>)({}, {}));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>expect</span>(<span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>statusCode</span>).<span style=color:#a6e22e>toBe</span>(<span style=color:#ae81ff>200</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>expect</span>(<span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>body</span>.<span style=color:#a6e22e>cognito</span>.<span style=color:#a6e22e>poolId</span>).<span style=color:#a6e22e>toBe</span>(<span style=color:#e6db74>&#39;POOL_ID&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>expect</span>(<span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>body</span>.<span style=color:#a6e22e>cognito</span>.<span style=color:#a6e22e>clientId</span>).<span style=color:#a6e22e>toBe</span>(<span style=color:#e6db74>&#39;CLIENT_ID&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>expect</span>(<span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>body</span>.<span style=color:#a6e22e>baseEndpointUrl</span>).<span style=color:#a6e22e>toBe</span>(<span style=color:#e6db74>&#39;BASE_ENDPOINT_URL&#39;</span>);
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>With this addition, we can run <code>make test</code> locally to ensure the handler honours the agreement.
 Committing these changes to the GitHub repository will in turn invoke a new Travis CI build.
-Finally, we can run <code class="language-plaintext highlighter-rouge">make deploy</code> to see this endpoint in action within our <code class="language-plaintext highlighter-rouge">dev</code> AWS stage.</p>
-
-<p><img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap.png" alt="Online Bootstrap Endpoint" /></p>
-
-<h2 id="adding-serverless-offline">Adding Serverless Offline</h2>
-
-<p>We can now access this Bootstrap endpoint online within our <code class="language-plaintext highlighter-rouge">dev</code> AWS stage.
-This is great, but wouldn’t it be even better if we could interact with this project locally?
-In doing so, we would be able to quickly inspect the API’s behaviour without having to deploy the resources to AWS.
-Once we are satisfied with the implementation, we could then deploy the changes to our online <code class="language-plaintext highlighter-rouge">dev</code> stage, and subsequently to <code class="language-plaintext highlighter-rouge">prod</code> when we wish to release it to the world.</p>
-
-<p>To do this, we will add Serverless Offline to our project, which locally emulates AWS Lambda and API Gateway.
+Finally, we can run <code>make deploy</code> to see this endpoint in action within our <code>dev</code> AWS stage.</p><p><picture><source type=image/webp srcset=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap_hu_67da70a09db84e1e.webp><source type=image/jpeg srcset=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap_hu_dfdcb71a97a1df8e.jpg><img src=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/online-bootstrap_hu_dfdcb71a97a1df8e.jpg alt="Online Bootstrap Endpoint" loading=lazy></picture></p><h2 id=adding-serverless-offline>Adding Serverless Offline</h2><p>We can now access this Bootstrap endpoint online within our <code>dev</code> AWS stage.
+This is great, but wouldn&rsquo;t it be even better if we could interact with this project locally?
+In doing so, we would be able to quickly inspect the API&rsquo;s behaviour without having to deploy the resources to AWS.
+Once we are satisfied with the implementation, we could then deploy the changes to our online <code>dev</code> stage, and subsequently to <code>prod</code> when we wish to release it to the world.</p><p>To do this, we will add Serverless Offline to our project, which locally emulates AWS Lambda and API Gateway.
 Internally, it starts up a small HTTP server which handles request lifecycles like API Gateway does, invoking the desired handlers.
-To start with, we shall add a new development dependency to the <code class="language-plaintext highlighter-rouge">package.json</code> file.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"serverless-offline"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.25.6"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<p>We can then update the <code class="language-plaintext highlighter-rouge">serverless.yml</code> configuration, amending the default stage (if one is not provided via command-line invocation) to be <code class="language-plaintext highlighter-rouge">offline</code>.
-For the sake of clarity, we will also specify the default <code class="language-plaintext highlighter-rouge">host</code> and <code class="language-plaintext highlighter-rouge">port</code> to which the Serverless Offline HTTP server should bind.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">provider</span><span class="pi">:</span>
-  <span class="na">stage</span><span class="pi">:</span> <span class="s">${opt:stage, 'offline'}</span>
-
-<span class="na">custom</span><span class="pi">:</span>
-  <span class="na">serverless-offline</span><span class="pi">:</span>
-    <span class="na">host</span><span class="pi">:</span> <span class="s">0.0.0.0</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="m">3000</span>
-</code></pre></div></div>
-
-<p>As we now wish to make container requests to port 3000, we will create an additional service exposing this port within the <code class="language-plaintext highlighter-rouge">docker-compose.yml</code> file.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
-  <span class="na">serverless-offline</span><span class="pi">:</span>
-    <span class="na">build</span><span class="pi">:</span> <span class="s">.</span>
-    <span class="na">env_file</span><span class="pi">:</span> <span class="s">.env</span>
-    <span class="na">ports</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="s">3000:3000</span>
-    <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="s">.:/opt/app</span>
-      <span class="pi">-</span> <span class="s">app-modules:/opt/app/node_modules</span>
-</code></pre></div></div>
-
-<p>Subsequently, as we are now defaulting to a new <code class="language-plaintext highlighter-rouge">offline</code> stage, we must define the required configuration within a <code class="language-plaintext highlighter-rouge">config.offline.yml</code> file.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">baseEndpointUrl</span><span class="pi">:</span> <span class="s1">'</span><span class="s">http://0.0.0.0:3000'</span>
-<span class="na">userPoolId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">OFFLINE_USER_POOL_ID'</span>
-<span class="na">userPoolClientId</span><span class="pi">:</span> <span class="s1">'</span><span class="s">OFFLINE_USER_POOL_CLIENT_ID'</span>
-</code></pre></div></div>
-
-<p>As we do not wish to use the online Amazon Cognito instance whilst in the <code class="language-plaintext highlighter-rouge">offline</code> stage, we will provide static dummy pool identifiers instead.
-We can then add a new target to the <code class="language-plaintext highlighter-rouge">Makefile</code> to correctly open the service ports and run the offline HTTP server.</p>
-
-<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">offline</span><span class="o">:</span>
-  <span class="err">docker-compose</span> <span class="err">run</span> <span class="err">--service-ports</span> <span class="err">--rm</span> <span class="err">serverless-offline</span> <span class="err">sls</span> <span class="err">offline</span> <span class="nv">--stage</span><span class="o">=</span>offline
-</code></pre></div></div>
-
-<p>With this in place, we can run <code class="language-plaintext highlighter-rouge">make offline</code>.
-You should now be able to access the offline endpoint by visiting <code class="language-plaintext highlighter-rouge">http://0.0.0.0:3000</code>.
-Any changes that you make to the handler implementation will be automatically reflected within the offline instance, providing you with a much quicker development REPL cycle.</p>
-
-<p><img src="/uploads/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap.png" alt="Offline Bootstrap Endpoint" /></p>
-
-<p>We have now created our first Mince Pie Challenge API endpoint, which not only works within the online <code class="language-plaintext highlighter-rouge">dev</code> stage, but is also equipped to handle offline access.
-Join me in the <a href="https://eddmann.com/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/">next post</a> of the <a href="https://eddmann.com/archive/tag/mince-pie-challenge-series/">series</a>, where we will be adding the ability to add and list Mince Pies to the API, using both an online and local <a href="https://aws.amazon.com/dynamodb/">Amazon DynamoDB</a> instance.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+To start with, we shall add a new development dependency to the <code>package.json</code> file.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;devDependencies&#34;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;serverless-offline&#34;</span>: <span style=color:#e6db74>&#34;^3.25.6&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We can then update the <code>serverless.yml</code> configuration, amending the default stage (if one is not provided via command-line invocation) to be <code>offline</code>.
+For the sake of clarity, we will also specify the default <code>host</code> and <code>port</code> to which the Serverless Offline HTTP server should bind.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>provider</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${opt:stage, &#39;offline&#39;}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>custom</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>serverless-offline</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>host</span>: <span style=color:#ae81ff>0.0.0.0</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>3000</span>
+</span></span></code></pre></div><p>As we now wish to make container requests to port 3000, we will create an additional service exposing this port within the <code>docker-compose.yml</code> file.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>services</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>serverless-offline</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>build</span>: <span style=color:#ae81ff>.</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>env_file</span>: <span style=color:#ae81ff>.env</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>ports</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>3000</span>:<span style=color:#ae81ff>3000</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>volumes</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>.:/opt/app</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>app-modules:/opt/app/node_modules</span>
+</span></span></code></pre></div><p>Subsequently, as we are now defaulting to a new <code>offline</code> stage, we must define the required configuration within a <code>config.offline.yml</code> file.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>baseEndpointUrl</span>: <span style=color:#e6db74>&#39;http://0.0.0.0:3000&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>userPoolId</span>: <span style=color:#e6db74>&#39;OFFLINE_USER_POOL_ID&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>userPoolClientId</span>: <span style=color:#e6db74>&#39;OFFLINE_USER_POOL_CLIENT_ID&#39;</span>
+</span></span></code></pre></div><p>As we do not wish to use the online Amazon Cognito instance whilst in the <code>offline</code> stage, we will provide static dummy pool identifiers instead.
+We can then add a new target to the <code>Makefile</code> to correctly open the service ports and run the offline HTTP server.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-make data-lang=make><span style=display:flex><span><span style=color:#a6e22e>offline</span><span style=color:#f92672>:</span>
+</span></span><span style=display:flex><span>  docker-compose run --service-ports --rm serverless-offline sls offline --stage<span style=color:#f92672>=</span>offline
+</span></span></code></pre></div><p>With this in place, we can run <code>make offline</code>.
+You should now be able to access the offline endpoint by visiting <code>http://0.0.0.0:3000</code>.
+Any changes that you make to the handler implementation will be automatically reflected within the offline instance, providing you with a much quicker development REPL cycle.</p><p><picture><source type=image/webp srcset=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap_hu_3ce039aa196eb0ab.webp><source type=image/jpeg srcset=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap_hu_7934f25f84e51a1d.jpg><img src=/posts/mince-pie-challenge-adding-the-bootstrap-endpoint-and-serverless-offline/offline-bootstrap_hu_7934f25f84e51a1d.jpg alt="Offline Bootstrap Endpoint" loading=lazy></picture></p><p>We have now created our first Mince Pie Challenge API endpoint, which not only works within the online <code>dev</code> stage, but is also equipped to handle offline access.
+Join me in the <a href=/posts/mince-pie-challenge-adding-and-listing-mince-pies-with-amazon-dynamodb/>next post</a> of the <a href=/archive/tag/mince-pie-challenge-series>series</a>, where we will be adding the ability to add and list Mince Pies to the API, using both an online and local <a href=https://aws.amazon.com/dynamodb/ rel="external noopener" target=_blank>Amazon DynamoDB</a> instance.</p></main><footer class=post__tags><a href=/archive/tag/serverless>serverless</a><a href=/archive/tag/mince-pie-challenge-series>mince-pie-challenge-series</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

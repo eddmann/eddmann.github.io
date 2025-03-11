@@ -1,176 +1,88 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to implement accessors (getter/setter) and singleton traits in PHP to reduce boilerplate code and accelerate development.">
-
-    <title>
-        
-            Accessors (Getter/Setter) and Singleton Traits in PHP &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Accessors (Getter/Setter) and Singleton Traits in PHP</h1>
-    <time datetime="2014-01-28T00:00:00+00:00" class="post-date">28 Jan 2014</time>
-    <p>Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Accessors (Getter/Setter) and Singleton Traits in PHP - Edd Mann</title>
+<meta name=description content="Learn how to implement accessors (getter/setter) and singleton traits in PHP to reduce boilerplate code and accelerate development."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Accessors (Getter/Setter) and Singleton Traits in PHP"><meta itemprop=description content="Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared. One such instance is the reduction in boilerplate code when prototyping a new idea. Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle."><meta itemprop=datePublished content="2014-01-28T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-28T00:00:00+00:00"><meta itemprop=wordCount content="492"><meta itemprop=keywords content="Php"><meta property="og:url" content="https://eddmann.com/posts/accessors-getter-setter-and-singleton-traits-in-php/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Accessors (Getter/Setter) and Singleton Traits in PHP"><meta property="og:description" content="Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared. One such instance is the reduction in boilerplate code when prototyping a new idea. Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-28T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-28T00:00:00+00:00"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Accessors (Getter/Setter) and Singleton Traits in PHP"><meta name=twitter:description content="Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared. One such instance is the reduction in boilerplate code when prototyping a new idea. Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/accessors-getter-setter-and-singleton-traits-in-php/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Accessors (Getter/Setter) and Singleton Traits in PHP</h1><time class=post__time>Jan 28, 2014</time></header><main class=prose><p>Traits were introduced into the PHP language in 5.4, and from this point many interesting use-cases have appeared.
 One such instance is the reduction in boilerplate code when prototyping a new idea.
-Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle.</p>
-
-
-
-<h2 id="accessors-gettersetter">Accessors (Getter/Setter)</h2>
-
-<p>With encapsulation being an incredibly important aspect of object-oriented programming, accessors and mutator methods provide the user with an interface to interact with a class instance in a controlled manner.
+Though these should be implemented within the project before completion, I have found that using the two traits below helps to speed up the development life-cycle.</p><h2 id=accessors-gettersetter>Accessors (Getter/Setter)</h2><p>With encapsulation being an incredibly important aspect of object-oriented programming, accessors and mutator methods provide the user with an interface to interact with a class instance in a controlled manner.
 However, during the early stages of development, creating these methods can be very cumbersome and time-consuming.
 Sure, you can let your IDE do all the boilerplate insertion, or maybe we should all move to a language such as C# which has great syntactic sugar for these properties.
 The trait below, however, dynamically sets and gets instance properties based on the common method naming pattern.
-For example, <code class="language-plaintext highlighter-rouge">setFirstName</code> will set the <code class="language-plaintext highlighter-rouge">firstName</code> property, whereas <code class="language-plaintext highlighter-rouge">getFirstName</code> will return the instance’s value.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Accessors</span> <span class="p">{</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">preg_match</span><span class="p">(</span><span class="s1">'/(?P&lt;accessor&gt;set|get)(?P&lt;property&gt;[A-Z][a-zA-Z0-9]*)/'</span><span class="p">,</span> <span class="nv">$method</span><span class="p">,</span> <span class="nv">$match</span><span class="p">)</span> <span class="o">||</span>
-             <span class="o">!</span> <span class="nb">property_exists</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">,</span> <span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">lcfirst</span><span class="p">(</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]))</span>
-        <span class="p">)</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nc">BadMethodCallException</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span>
-                <span class="s2">"'%s' does not exist in '%s'."</span><span class="p">,</span> <span class="nv">$method</span><span class="p">,</span> <span class="nb">get_class</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">)</span>
-            <span class="p">));</span>
-        <span class="p">}</span>
-
-        <span class="k">switch</span> <span class="p">(</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'accessor'</span><span class="p">])</span> <span class="p">{</span>
-            <span class="k">case</span> <span class="s1">'get'</span><span class="o">:</span>
-                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]};</span>
-            <span class="k">case</span> <span class="s1">'set'</span><span class="o">:</span>
-                <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$args</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">throw</span> <span class="k">new</span> <span class="nc">InvalidArgumentException</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span><span class="s2">"'%s' requires an argument value."</span><span class="p">,</span> <span class="nv">$method</span><span class="p">));</span>
-                <span class="p">}</span>
-                <span class="nv">$this</span><span class="o">-&gt;</span><span class="p">{</span><span class="nv">$match</span><span class="p">[</span><span class="s1">'property'</span><span class="p">]}</span> <span class="o">=</span> <span class="nv">$args</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-                <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Looking at the code above, you will notice that we use PHP’s <code class="language-plaintext highlighter-rouge">__call</code> magic method to determine if the user’s invoked method is of interest to us.
-To maintain control of this trait’s <em>magic</em>, the call only looks for properties that exist within the class that the trait has been used in.
-However, you are able to replace <code class="language-plaintext highlighter-rouge">__CLASS__</code> with <code class="language-plaintext highlighter-rouge">$this</code> to provide the entire class’s properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
-Below is an example use-case for including this trait.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">User</span> <span class="p">{</span>
-    <span class="kn">use</span> <span class="nc">Accessors</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$age</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">User</span><span class="p">();</span>
-<span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">setName</span><span class="p">(</span><span class="s1">'Joe Bloggs'</span><span class="p">);</span>
-<span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">setAge</span><span class="p">(</span><span class="mi">24</span><span class="p">);</span>
-
-<span class="nb">sprintf</span><span class="p">(</span><span class="s2">"Name: %s, Age: %s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">getName</span><span class="p">(),</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="nf">getAge</span><span class="p">());</span> <span class="c1">// Name: Joe Bloggs, Age: 24</span>
-</code></pre></div></div>
-
-<h2 id="singleton">Singleton</h2>
-
-<p>Another trait that I have found very useful in the initial stages of development is for implementing the <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton pattern</a>.
-Below is an example implementation which, on the first <code class="language-plaintext highlighter-rouge">getInstance</code> invocation, creates a class instance with the provided arguments.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">trait</span> <span class="nc">Singleton</span> <span class="p">{</span>
-
-    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$instance</span><span class="p">;</span>
-
-    <span class="k">final</span> <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">getInstance</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">isset</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="nv">$instance</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nv">$class</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ReflectionClass</span><span class="p">(</span><span class="k">__CLASS__</span><span class="p">);</span>
-            <span class="k">self</span><span class="o">::</span><span class="nv">$instance</span> <span class="o">=</span> <span class="nv">$class</span><span class="o">-&gt;</span><span class="nf">newInstanceArgs</span><span class="p">(</span><span class="nb">func_get_args</span><span class="p">());</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nv">$instance</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">final</span> <span class="k">private</span> <span class="k">function</span> <span class="n">__clone</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
-
-    <span class="k">final</span> <span class="k">private</span> <span class="k">function</span> <span class="n">__wakeup</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The code snippet above uses PHP’s <a href="http://www.php.net/manual/en/class.reflectionclass.php">ReflectionClass</a> to enable classes that incorporate it to still define a unique constructor method.
-Below is an example that highlights the trait in action.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Logger</span> <span class="p">{</span>
-    <span class="kn">use</span> <span class="nc">Singleton</span><span class="p">;</span>
-
-    <span class="k">private</span> <span class="nv">$init</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$init</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">init</span> <span class="o">=</span> <span class="nv">$init</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">getInitTime</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">init</span><span class="p">;</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
-
-<span class="nv">$logger</span> <span class="o">=</span> <span class="nc">Logger</span><span class="o">::</span><span class="nf">getInstance</span><span class="p">(</span><span class="nb">time</span><span class="p">());</span>
-
-<span class="nv">$logger</span><span class="o">-&gt;</span><span class="nf">getInitTime</span><span class="p">();</span> <span class="c1">// 1390901816</span>
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+For example, <code>setFirstName</code> will set the <code>firstName</code> property, whereas <code>getFirstName</code> will return the instance&rsquo;s value.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>Accessors</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __call($method, $args)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> <span style=color:#a6e22e>preg_match</span>(<span style=color:#e6db74>&#39;/(?P&lt;accessor&gt;set|get)(?P&lt;property&gt;[A-Z][a-zA-Z0-9]*)/&#39;</span>, $method, $match) <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>             <span style=color:#f92672>!</span> <span style=color:#a6e22e>property_exists</span>(<span style=color:#66d9ef>__CLASS__</span>, $match[<span style=color:#e6db74>&#39;property&#39;</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>lcfirst</span>($match[<span style=color:#e6db74>&#39;property&#39;</span>]))
+</span></span><span style=display:flex><span>        ) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>BadMethodCallException</span>(<span style=color:#a6e22e>sprintf</span>(
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>&#34;&#39;%s&#39; does not exist in &#39;%s&#39;.&#34;</span>, $method, <span style=color:#a6e22e>get_class</span>(<span style=color:#66d9ef>__CLASS__</span>)
+</span></span><span style=display:flex><span>            ));
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>switch</span> ($match[<span style=color:#e6db74>&#39;accessor&#39;</span>]) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;get&#39;</span><span style=color:#f92672>:</span>
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span>{$match[<span style=color:#e6db74>&#39;property&#39;</span>]};
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#39;set&#39;</span><span style=color:#f92672>:</span>
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> $args) {
+</span></span><span style=display:flex><span>                    <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>InvalidArgumentException</span>(<span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;&#39;%s&#39; requires an argument value.&#34;</span>, $method));
+</span></span><span style=display:flex><span>                }
+</span></span><span style=display:flex><span>                $this<span style=color:#f92672>-&gt;</span>{$match[<span style=color:#e6db74>&#39;property&#39;</span>]} <span style=color:#f92672>=</span> $args[<span style=color:#ae81ff>0</span>];
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span> $this;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the code above, you will notice that we use PHP&rsquo;s <code>__call</code> magic method to determine if the user&rsquo;s invoked method is of interest to us.
+To maintain control of this trait&rsquo;s <em>magic</em>, the call only looks for properties that exist within the class that the trait has been used in.
+However, you are able to replace <code>__CLASS__</code> with <code>$this</code> to provide the entire class&rsquo;s properties with these capabilities, but I found this restriction beneficial when refactoring the code-base.
+Below is an example use-case for including this trait.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>User</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>Accessors</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $name, $age;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$user <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>User</span>();
+</span></span><span style=display:flex><span>$user<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>setName</span>(<span style=color:#e6db74>&#39;Joe Bloggs&#39;</span>);
+</span></span><span style=display:flex><span>$user<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>setAge</span>(<span style=color:#ae81ff>24</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;Name: %s, Age: %s</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, $user<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getName</span>(), $user<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getAge</span>()); <span style=color:#75715e>// Name: Joe Bloggs, Age: 24
+</span></span></span></code></pre></div><h2 id=singleton>Singleton</h2><p>Another trait that I have found very useful in the initial stages of development is for implementing the <a href=http://en.wikipedia.org/wiki/Singleton_pattern rel="external noopener" target=_blank>Singleton pattern</a>.
+Below is an example implementation which, on the first <code>getInstance</code> invocation, creates a class instance with the provided arguments.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>trait</span> <span style=color:#a6e22e>Singleton</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> $instance;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>getInstance</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> <span style=color:#a6e22e>isset</span>(<span style=color:#a6e22e>self</span><span style=color:#f92672>::</span>$instance)) {
+</span></span><span style=display:flex><span>            $class <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>ReflectionClass</span>(<span style=color:#66d9ef>__CLASS__</span>);
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span>$instance <span style=color:#f92672>=</span> $class<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>newInstanceArgs</span>(<span style=color:#a6e22e>func_get_args</span>());
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span>$instance;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> __clone() { }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>final</span> <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> __wakeup() { }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The code snippet above uses PHP&rsquo;s <a href=http://www.php.net/manual/en/class.reflectionclass.php rel="external noopener" target=_blank>ReflectionClass</a> to enable classes that incorporate it to still define a unique constructor method.
+Below is an example that highlights the trait in action.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Logger</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>use</span> <span style=color:#a6e22e>Singleton</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $init;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __construct($init)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span> <span style=color:#f92672>=</span> $init;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>getInitTime</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>init</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$logger <span style=color:#f92672>=</span> <span style=color:#a6e22e>Logger</span><span style=color:#f92672>::</span><span style=color:#a6e22e>getInstance</span>(<span style=color:#a6e22e>time</span>());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$logger<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getInitTime</span>(); <span style=color:#75715e>// 1390901816
+</span></span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

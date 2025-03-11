@@ -1,126 +1,32 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2016 Day 9 puzzle using Python.">
-
-    <title>
-        
-            Advent of Code 2016 - Day 9 - Explosives in Cyberspace &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Advent of Code 2016 - Day 9 - Explosives in Cyberspace</h1>
-    <time datetime="2021-04-02T00:00:00+00:00" class="post-date">02 Apr 2021</time>
-    <p>On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file.</p>
-
-
-
-<h2 id="part-1">Part 1</h2>
-
-<p>We are supplied with a compressed file format as our input, of which we are required to calculate the decompressed length.
-The format is structured as follows:</p>
-
-<blockquote>
-  <p>The format compresses a sequence of characters.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Advent of Code 2016 - Day 9 - Explosives in Cyberspace - Edd Mann</title>
+<meta name=description content="Solving the Advent of Code 2016 Day 9 puzzle using Python."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Advent of Code 2016 - Day 9 - Explosives in Cyberspace"><meta itemprop=description content="On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file."><meta itemprop=datePublished content="2021-04-02T00:00:00+00:00"><meta itemprop=dateModified content="2021-04-02T00:00:00+00:00"><meta itemprop=wordCount content="361"><meta itemprop=keywords content="Advent-of-Code,Advent-of-Code-2016,Python"><meta property="og:url" content="https://eddmann.com/posts/advent-of-code-2016-day-9-explosives-in-cyberspace/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Advent of Code 2016 - Day 9 - Explosives in Cyberspace"><meta property="og:description" content="On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-04-02T00:00:00+00:00"><meta property="article:modified_time" content="2021-04-02T00:00:00+00:00"><meta property="article:tag" content="Advent-of-Code"><meta property="article:tag" content="Advent-of-Code-2016"><meta property="article:tag" content="Python"><meta name=twitter:card content="summary"><meta name=twitter:title content="Advent of Code 2016 - Day 9 - Explosives in Cyberspace"><meta name=twitter:description content="On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/advent-of-code-2016-day-9-explosives-in-cyberspace/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Advent of Code 2016 - Day 9 - Explosives in Cyberspace</h1><time class=post__time>Apr 2, 2021</time></header><main class=prose><p>On the ninth day of Advent of Code 2016, we are asked to calculate the decompressed length of a file.</p><h2 id=part-1>Part 1</h2><p>We are supplied with a compressed file format as our input, of which we are required to calculate the decompressed length.
+The format is structured as follows:</p><blockquote><p>The format compresses a sequence of characters.
 Whitespace is ignored.
 To indicate that some sequence should be repeated, a marker is added to the file, like (10x2).
 To decompress this marker, take the subsequent 10 characters and repeat them 2 times.
 Then, continue reading the file after the repeated data.
-The marker itself is not included in the decompressed output.</p>
-</blockquote>
-
-<p>Based on these rules, we can now create a function that calculates the length based on a supplied file.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">acc</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">file</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
-
-    <span class="n">marker</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s">"^\((\d+)x(\d+)\)"</span><span class="p">,</span> <span class="nb">file</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">marker</span><span class="p">:</span>
-        <span class="n">length</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">marker</span><span class="p">.</span><span class="n">groups</span><span class="p">())</span>
-        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">marker</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">marker</span><span class="p">.</span><span class="n">end</span><span class="p">()</span> <span class="o">+</span> <span class="n">length</span>
-        <span class="k">return</span> <span class="n">times</span> <span class="o">*</span> <span class="n">acc</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span> <span class="o">+</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="n">end</span><span class="p">:],</span> <span class="n">acc</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">acc</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>The function above recursively decompresses the file, applying the provided accumulator function based on any markers it encounters.
-Once the file has been exhausted, the function call stack will bubble up, and we will return the total decompressed file length.</p>
-
-<p>Using the above implementation, we can supply the built-in <code class="language-plaintext highlighter-rouge">len</code> function as our accumulator to be applied upon the occurrence of markers.
-In doing so, we will be returned with the desired answer 🌟.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part1</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="nb">len</span><span class="p">)</span>
-</code></pre></div></div>
-
-<h2 id="part-2">Part 2</h2>
-
-<p>For part two, we are required to expand upon part one’s decompression implementation and cater for an <em>improved</em> compression format.
+The marker itself is not included in the decompressed output.</p></blockquote><p>Based on these rules, we can now create a function that calculates the length based on a supplied file.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>decompressed_length</span>(file, acc):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> file:
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    marker <span style=color:#f92672>=</span> re<span style=color:#f92672>.</span><span style=color:#66d9ef>match</span>(<span style=color:#e6db74>r</span><span style=color:#e6db74>&#34;^\((\d+)x(\d+)\)&#34;</span>, file)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> marker:
+</span></span><span style=display:flex><span>        length, times <span style=color:#f92672>=</span> map(int, marker<span style=color:#f92672>.</span>groups())
+</span></span><span style=display:flex><span>        start, end <span style=color:#f92672>=</span> marker<span style=color:#f92672>.</span>end(), marker<span style=color:#f92672>.</span>end() <span style=color:#f92672>+</span> length
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> times <span style=color:#f92672>*</span> acc(file[start:end]) <span style=color:#f92672>+</span> decompressed_length(file[end:], acc)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>1</span> <span style=color:#f92672>+</span> decompressed_length(file[<span style=color:#ae81ff>1</span>:], acc)
+</span></span></code></pre></div><p>The function above recursively decompresses the file, applying the provided accumulator function based on any markers it encounters.
+Once the file has been exhausted, the function call stack will bubble up, and we will return the total decompressed file length.</p><p>Using the above implementation, we can supply the built-in <code>len</code> function as our accumulator to be applied upon the occurrence of markers.
+In doing so, we will be returned with the desired answer 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>part1</span>(input):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> decompressed_length(input, len)
+</span></span></code></pre></div><h2 id=part-2>Part 2</h2><p>For part two, we are required to expand upon part one&rsquo;s decompression implementation and cater for an <em>improved</em> compression format.
 In version two, the only difference is that markers within decompressed data are also decompressed.
-So instead of simply computing the length of a marker sub-section, we are required to decompress this string as well.</p>
-
-<p>Fortunately, as we supply how we wish to accumulate markers within the <code class="language-plaintext highlighter-rouge">decompressed_length</code> function, we can instead supply a means of recursively decompressing the file until we reach the final length.
-With this new <code class="language-plaintext highlighter-rouge">recursive_len</code> function, we can now calculate the decompressed length again, returning the desired answer 🌟.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">part2</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">recursive_len</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">recursive_len</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">decompressed_length</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">recursive_len</span><span class="p">)</span>
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+So instead of simply computing the length of a marker sub-section, we are required to decompress this string as well.</p><p>Fortunately, as we supply how we wish to accumulate markers within the <code>decompressed_length</code> function, we can instead supply a means of recursively decompressing the file until we reach the final length.
+With this new <code>recursive_len</code> function, we can now calculate the decompressed length again, returning the desired answer 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>part2</span>(input):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>recursive_len</span>(file):
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> decompressed_length(file, recursive_len)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> decompressed_length(input, recursive_len)
+</span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/advent-of-code>advent-of-code</a><a href=/archive/tag/advent-of-code-2016>advent-of-code-2016</a><a href=/archive/tag/python>python</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

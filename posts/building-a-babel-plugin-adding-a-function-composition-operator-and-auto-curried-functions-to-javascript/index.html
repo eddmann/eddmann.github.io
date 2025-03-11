@@ -1,277 +1,141 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to build a Babel plugin that adds a function composition operator and auto-curried functions to JavaScript through detailed AST manipulation.">
-
-    <title>
-        
-            Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript</h1>
-    <time datetime="2018-07-20T00:00:00+00:00" class="post-date">20 Jul 2018</time>
-    <p>In a recent Software Engineering Daily <a href="https://softwareengineeringdaily.com/2018/06/21/babel-with-henry-zhu/">podcast</a> Henry Zhu discussed the <a href="https://babeljs.io/">Babel</a> project, and shed some light on how the transpiler works under the hood.
-He touched upon how <a href="https://babeljs.io/docs/en/plugins.html">Plugins</a> can be created to alter the resulting compiled code.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript - Edd Mann</title>
+<meta name=description content="Learn how to build a Babel plugin that adds a function composition operator and auto-curried functions to JavaScript through detailed AST manipulation."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript"><meta itemprop=description content="In a recent Software Engineering Daily podcast Henry Zhu discussed the Babel project, and shed some light on how the transpiler works under the hood. He touched upon how Plugins can be created to alter the resulting compiled code. I was very interested in experimenting with this capability. In this post I wish to highlight the process by which Babel transforms your code, developing several interesting plugins along the way."><meta itemprop=datePublished content="2018-07-20T00:00:00+00:00"><meta itemprop=dateModified content="2018-07-20T00:00:00+00:00"><meta itemprop=wordCount content="1184"><meta itemprop=keywords content="Babel,Javascript"><meta property="og:url" content="https://eddmann.com/posts/building-a-babel-plugin-adding-a-function-composition-operator-and-auto-curried-functions-to-javascript/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript"><meta property="og:description" content="In a recent Software Engineering Daily podcast Henry Zhu discussed the Babel project, and shed some light on how the transpiler works under the hood. He touched upon how Plugins can be created to alter the resulting compiled code. I was very interested in experimenting with this capability. In this post I wish to highlight the process by which Babel transforms your code, developing several interesting plugins along the way."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-07-20T00:00:00+00:00"><meta property="article:modified_time" content="2018-07-20T00:00:00+00:00"><meta property="article:tag" content="Babel"><meta property="article:tag" content="Javascript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript"><meta name=twitter:description content="In a recent Software Engineering Daily podcast Henry Zhu discussed the Babel project, and shed some light on how the transpiler works under the hood. He touched upon how Plugins can be created to alter the resulting compiled code. I was very interested in experimenting with this capability. In this post I wish to highlight the process by which Babel transforms your code, developing several interesting plugins along the way."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/building-a-babel-plugin-adding-a-function-composition-operator-and-auto-curried-functions-to-javascript/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Building a Babel Plugin: Adding a Function Composition Operator and Auto-Curried Functions to JavaScript</h1><time class=post__time>Jul 20, 2018</time></header><main class=prose><p>In a recent Software Engineering Daily <a href=https://softwareengineeringdaily.com/2018/06/21/babel-with-henry-zhu/ rel="external noopener" target=_blank>podcast</a> Henry Zhu discussed the <a href=https://babeljs.io/ rel="external noopener" target=_blank>Babel</a> project, and shed some light on how the transpiler works under the hood.
+He touched upon how <a href=https://babeljs.io/docs/en/plugins.html rel="external noopener" target=_blank>Plugins</a> can be created to alter the resulting compiled code.
 I was very interested in experimenting with this capability.
-In this post I wish to highlight the process by which Babel transforms your code, developing several interesting plugins along the way.</p>
-
-
-
-<h2 id="how-does-babel-work">How does Babel work?</h2>
-
-<p>There are three main stages to the Babel lifecycle, and these are:</p>
-
-<ul>
-  <li><strong>Parse</strong> - takes the supplied code and produces an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a> (AST) from it.</li>
-  <li><strong>Transform</strong> - traverses this created AST, applying any plugin modifications along the way.</li>
-  <li><strong>Generate</strong> - takes this transformed AST and converts it back into code form.</li>
-</ul>
-
-<p>As you can see, plugins target the second stage of this lifecycle.
-The AST is traversed using the <a href="https://sourcemaking.com/design_patterns/visitor">Visitor pattern</a>, which allows us to build plugins that only target specific node types, manipulating them as we desire.
-I highly recommend that you take a look at the <a href="https://github.com/jamiebuilds/babel-handbook">Babel Handbook</a> to gain a more in-depth insight into how these underlying concepts work.</p>
-
-<p>Now that we have a basic understanding of how Babel works, we can move on to building some example plugins!
-For this we will be using an excellent online <a href="https://astexplorer.net/">AST Explorer</a>, which allows us to not only build the plugin, but also inspect both the intermediate (AST) and compiled form.</p>
-
-<h2 id="adding-a-function-composition-operator">Adding a Function Composition Operator</h2>
-
-<p>In languages such as Haskell and F#, you can simply compose two functions together using infix <code class="language-plaintext highlighter-rouge">.</code> and <code class="language-plaintext highlighter-rouge">&gt;&gt;</code> operators respectively.
-In the case of F#, this allows you to visualise the call stack going left-to-right, as opposed to in-out.</p>
-
-<p>As it is not yet possible (by official means) to add user-defined syntax to JavaScript using Babel, we will instead repurpose the infix <code class="language-plaintext highlighter-rouge">&amp;</code> bitwise AND operator token.
-Using this plugin we wish to be able to provide and generate the code example shown below.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">toUpperCase</span> <span class="o">&amp;</span> <span class="nx">trim</span> <span class="o">&amp;</span> <span class="nx">emphasise</span><span class="p">;</span>
-<span class="c1">// converts to</span>
-<span class="kd">const</span> <span class="nx">format</span> <span class="o">=</span> <span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">emphasise</span><span class="p">(</span><span class="nx">trim</span><span class="p">(</span><span class="nx">toUpperCase</span><span class="p">(</span><span class="nx">x</span><span class="p">)));</span>
-</code></pre></div></div>
-
-<p>We can achieve this by using the following documented plugin.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="na">visitor</span><span class="p">:</span> <span class="p">{</span>
-    <span class="nx">BinaryExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">t</span><span class="p">.</span><span class="nx">isBinaryExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">node</span><span class="p">,</span> <span class="p">{</span> <span class="na">operator</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span> <span class="p">}))</span> <span class="p">{</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="kd">const</span> <span class="nx">flatten</span> <span class="o">=</span> <span class="nx">node</span> <span class="o">=&gt;</span>
-        <span class="nx">t</span><span class="p">.</span><span class="nx">isBinaryExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">,</span> <span class="p">{</span> <span class="na">operator</span><span class="p">:</span> <span class="dl">'</span><span class="s1">&amp;</span><span class="dl">'</span> <span class="p">})</span>
-          <span class="p">?</span> <span class="p">[...</span><span class="nx">flatten</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">left</span><span class="p">),</span> <span class="p">...</span><span class="nx">flatten</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">right</span><span class="p">)]</span>
-          <span class="p">:</span> <span class="p">[</span><span class="nx">node</span><span class="p">];</span>
-
-      <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">flatten</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">node</span><span class="p">);</span>
-
-      <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
-        <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">(</span>
-          <span class="p">[</span><span class="nx">t</span><span class="p">.</span><span class="nx">identifier</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">)],</span>
-          <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
-            <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">call</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">call</span><span class="p">,</span> <span class="p">[</span><span class="nx">expr</span><span class="p">]),</span>
-            <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">head</span><span class="p">,</span> <span class="p">[</span><span class="nx">t</span><span class="p">.</span><span class="nx">identifier</span><span class="p">(</span><span class="dl">'</span><span class="s1">x</span><span class="dl">'</span><span class="p">)])</span>
-          <span class="p">)</span>
-        <span class="p">)</span>
-      <span class="p">);</span>
-    <span class="p">},</span>
-  <span class="p">},</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>As you can see, we only wish to target <code class="language-plaintext highlighter-rouge">BinaryExpression</code> nodes which reference the <code class="language-plaintext highlighter-rouge">&amp;</code> operator.
+In this post I wish to highlight the process by which Babel transforms your code, developing several interesting plugins along the way.</p><h2 id=how-does-babel-work>How does Babel work?</h2><p>There are three main stages to the Babel lifecycle, and these are:</p><ul><li><strong>Parse</strong> - takes the supplied code and produces an <a href=https://en.wikipedia.org/wiki/Abstract_syntax_tree rel="external noopener" target=_blank>Abstract Syntax Tree</a> (AST) from it.</li><li><strong>Transform</strong> - traverses this created AST, applying any plugin modifications along the way.</li><li><strong>Generate</strong> - takes this transformed AST and converts it back into code form.</li></ul><p>As you can see, plugins target the second stage of this lifecycle.
+The AST is traversed using the <a href=https://sourcemaking.com/design_patterns/visitor rel="external noopener" target=_blank>Visitor pattern</a>, which allows us to build plugins that only target specific node types, manipulating them as we desire.
+I highly recommend that you take a look at the <a href=https://github.com/jamiebuilds/babel-handbook rel="external noopener" target=_blank>Babel Handbook</a> to gain a more in-depth insight into how these underlying concepts work.</p><p>Now that we have a basic understanding of how Babel works, we can move on to building some example plugins!
+For this we will be using an excellent online <a href=https://astexplorer.net/ rel="external noopener" target=_blank>AST Explorer</a>, which allows us to not only build the plugin, but also inspect both the intermediate (AST) and compiled form.</p><h2 id=adding-a-function-composition-operator>Adding a Function Composition Operator</h2><p>In languages such as Haskell and F#, you can simply compose two functions together using infix <code>.</code> and <code>>></code> operators respectively.
+In the case of F#, this allows you to visualise the call stack going left-to-right, as opposed to in-out.</p><p>As it is not yet possible (by official means) to add user-defined syntax to JavaScript using Babel, we will instead repurpose the infix <code>&</code> bitwise AND operator token.
+Using this plugin we wish to be able to provide and generate the code example shown below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>format</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>toUpperCase</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>trim</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>emphasise</span>;
+</span></span><span style=display:flex><span><span style=color:#75715e>// converts to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>format</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>x</span> =&gt; <span style=color:#a6e22e>emphasise</span>(<span style=color:#a6e22e>trim</span>(<span style=color:#a6e22e>toUpperCase</span>(<span style=color:#a6e22e>x</span>)));
+</span></span></code></pre></div><p>We can achieve this by using the following documented plugin.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> ({ <span style=color:#a6e22e>types</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>t</span> }) =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>visitor</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>BinaryExpression</span>(<span style=color:#a6e22e>path</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>isBinaryExpression</span>(<span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>node</span>, { <span style=color:#a6e22e>operator</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;&amp;&#39;</span> })) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>flatten</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>node</span> =&gt;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>isBinaryExpression</span>(<span style=color:#a6e22e>node</span>, { <span style=color:#a6e22e>operator</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;&amp;&#39;</span> })
+</span></span><span style=display:flex><span>          <span style=color:#f92672>?</span> [...<span style=color:#a6e22e>flatten</span>(<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>left</span>), ...<span style=color:#a6e22e>flatten</span>(<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>right</span>)]
+</span></span><span style=display:flex><span>          <span style=color:#f92672>:</span> [<span style=color:#a6e22e>node</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>head</span>, ...<span style=color:#a6e22e>tail</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>flatten</span>(<span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>node</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>replaceWith</span>(
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>arrowFunctionExpression</span>(
+</span></span><span style=display:flex><span>          [<span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>identifier</span>(<span style=color:#e6db74>&#39;x&#39;</span>)],
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>tail</span>.<span style=color:#a6e22e>reduce</span>(
+</span></span><span style=display:flex><span>            (<span style=color:#a6e22e>expr</span>, <span style=color:#a6e22e>call</span>) =&gt; <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>callExpression</span>(<span style=color:#a6e22e>call</span>, [<span style=color:#a6e22e>expr</span>]),
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>callExpression</span>(<span style=color:#a6e22e>head</span>, [<span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>identifier</span>(<span style=color:#e6db74>&#39;x&#39;</span>)])
+</span></span><span style=display:flex><span>          )
+</span></span><span style=display:flex><span>        )
+</span></span><span style=display:flex><span>      );
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>As you can see, we only wish to target <code>BinaryExpression</code> nodes which reference the <code>&</code> operator.
 Once found, we then traverse this expression, returning all nested expression values.
 This allows us to compose many functions together optimally, as highlighted in the example use-case above.
-We are then able to build a new nested <code class="language-plaintext highlighter-rouge">CallExpression</code>, and replace the <code class="language-plaintext highlighter-rouge">BinaryExpression</code> node itself with a single <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code>.</p>
-
-<p>You can see this plugin in action by visiting the accompanying <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47">AST Explorer snippet</a>.</p>
-
-<h2 id="auto-curried-functions">Auto-Curried Functions</h2>
-
-<p>Another feature that can be found in languages such as Haskell and F# is the concept of all functions (by default) being <a href="https://en.wikipedia.org/wiki/Currying">curried</a>.
+We are then able to build a new nested <code>CallExpression</code>, and replace the <code>BinaryExpression</code> node itself with a single <code>ArrowFunctionExpression</code>.</p><p>You can see this plugin in action by visiting the accompanying <a href=https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47 rel="external noopener" target=_blank>AST Explorer snippet</a>.</p><h2 id=auto-curried-functions>Auto-Curried Functions</h2><p>Another feature that can be found in languages such as Haskell and F# is the concept of all functions (by default) being <a href=https://en.wikipedia.org/wiki/Currying rel="external noopener" target=_blank>curried</a>.
 This can be observed as all functions with multiple parameters being broken up into a chained series of single-parameter functions.
-This results in the ability to easily create new functions from existing ones, with minimal boilerplate.</p>
-
-<p>We will now try and apply this idea to JavaScript.
+This results in the ability to easily create new functions from existing ones, with minimal boilerplate.</p><p>We will now try and apply this idea to JavaScript.
 This will mean that all created functions (regardless of parameter arity) are internally made using a series of single-parameter functions.
 From here, we will then expand upon this and cater for partial application - converting calls that provide more than one argument into their curried counterparts.
-These use-cases are best shown with examples.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="c1">// converts to</span>
-<span class="kd">function</span> <span class="nx">add</span><span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
-  <span class="p">};</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">subtract</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
-<span class="p">};</span>
-<span class="c1">// converts to</span>
-<span class="kd">var</span> <span class="nx">subtract</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
-  <span class="p">};</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">multiply</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
-<span class="c1">// converts to</span>
-<span class="kd">const</span> <span class="nx">multiply</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">b</span> <span class="o">=&gt;</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
-</code></pre></div></div>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-<span class="c1">// converts to</span>
-<span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="mi">2</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>As you can see, there are three different ways of declaring a function in JavaScript.
-We will start by addressing the first two, <code class="language-plaintext highlighter-rouge">FunctionDeclaration</code> and <code class="language-plaintext highlighter-rouge">FunctionExpression</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="na">visitor</span><span class="p">:</span> <span class="p">{</span>
-    <span class="dl">'</span><span class="s1">FunctionDeclaration|FunctionExpression</span><span class="dl">'</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
-
-      <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="kd">const</span> <span class="nx">build</span> <span class="o">=</span> <span class="p">([</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">])</span> <span class="o">=&gt;</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">head</span><span class="p">)</span> <span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">blockStatement</span><span class="p">([</span>
-          <span class="nx">t</span><span class="p">.</span><span class="nx">returnStatement</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">functionExpression</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">],</span> <span class="nx">build</span><span class="p">(</span><span class="nx">tail</span><span class="p">))),</span>
-        <span class="p">]);</span>
-      <span class="p">};</span>
-
-      <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">;</span>
-
-      <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span><span class="nx">t</span><span class="p">[</span><span class="nx">node</span><span class="p">.</span><span class="nx">type</span><span class="p">](</span><span class="nx">node</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">],</span> <span class="nx">build</span><span class="p">(</span><span class="nx">tail</span><span class="p">)));</span>
-    <span class="p">},</span>
-  <span class="p">},</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>We are able to target several different node types within the same visitor function.
+These use-cases are best shown with examples.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>add</span>(<span style=color:#a6e22e>a</span>, <span style=color:#a6e22e>b</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#75715e>// converts to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>add</span>(<span style=color:#a6e22e>a</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>b</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>subtract</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>a</span>, <span style=color:#a6e22e>b</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span><span style=color:#75715e>// converts to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>var</span> <span style=color:#a6e22e>subtract</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>a</span>) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>b</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>multiply</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>a</span>, <span style=color:#a6e22e>b</span>) =&gt; <span style=color:#a6e22e>a</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span><span style=color:#75715e>// converts to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>multiply</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>a</span> =&gt; <span style=color:#a6e22e>b</span> =&gt; <span style=color:#a6e22e>a</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>b</span>;
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#a6e22e>add</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>2</span>);
+</span></span><span style=display:flex><span><span style=color:#75715e>// converts to
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>add</span>(<span style=color:#ae81ff>1</span>)(<span style=color:#ae81ff>2</span>);
+</span></span></code></pre></div><p>As you can see, there are three different ways of declaring a function in JavaScript.
+We will start by addressing the first two, <code>FunctionDeclaration</code> and <code>FunctionExpression</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> ({ <span style=color:#a6e22e>types</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>t</span> }) =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>visitor</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;FunctionDeclaration|FunctionExpression&#39;</span>(<span style=color:#a6e22e>path</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>node</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>path</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>params</span>.<span style=color:#a6e22e>length</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>build</span> <span style=color:#f92672>=</span> ([<span style=color:#a6e22e>head</span>, ...<span style=color:#a6e22e>tail</span>]) =&gt; {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>head</span>) <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>body</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>blockStatement</span>([
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>returnStatement</span>(<span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>functionExpression</span>(<span style=color:#66d9ef>null</span>, [<span style=color:#a6e22e>head</span>], <span style=color:#a6e22e>build</span>(<span style=color:#a6e22e>tail</span>))),
+</span></span><span style=display:flex><span>        ]);
+</span></span><span style=display:flex><span>      };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>head</span>, ...<span style=color:#a6e22e>tail</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>params</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>replaceWith</span>(<span style=color:#a6e22e>t</span>[<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>type</span>](<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>id</span>, [<span style=color:#a6e22e>head</span>], <span style=color:#a6e22e>build</span>(<span style=color:#a6e22e>tail</span>)));
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>We are able to target several different node types within the same visitor function.
 When we encounter one of these nodes, we first ensure that there is more than one parameter present within the function - as there is no need to modify it if this is not the case.
-After this check, we recursively build up a nested <code class="language-plaintext highlighter-rouge">FunctionExpression</code> which breaks each parameter up into a separate function call.
-Finally, we replace the node with one of the same type, ensuring that any function identifier is included within this declaration.</p>
-
-<p>The third way in which a function can be declared in JavaScript is with an <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code>.
-In this instance, we are able to provide a simpler means of producing the intended output.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="nx">ArrowFunctionExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">reverse</span><span class="p">();</span>
-
-    <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
-      <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span>
-        <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">param</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">([</span><span class="nx">param</span><span class="p">],</span> <span class="nx">expr</span><span class="p">),</span>
-        <span class="nx">t</span><span class="p">.</span><span class="nx">arrowFunctionExpression</span><span class="p">([</span><span class="nx">head</span><span class="p">],</span> <span class="nx">node</span><span class="p">.</span><span class="nx">body</span><span class="p">)</span>
-      <span class="p">)</span>
-    <span class="p">);</span>
-  <span class="p">},</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>For this change we only need to do a single right fold over the parameters, building a new nested <code class="language-plaintext highlighter-rouge">ArrowFunctionExpression</code> that replaces the current node.</p>
-
-<p>Finally, we can now look into how we should handle the transformation of function invocations that provide more than one argument.
+After this check, we recursively build up a nested <code>FunctionExpression</code> which breaks each parameter up into a separate function call.
+Finally, we replace the node with one of the same type, ensuring that any function identifier is included within this declaration.</p><p>The third way in which a function can be declared in JavaScript is with an <code>ArrowFunctionExpression</code>.
+In this instance, we are able to provide a simpler means of producing the intended output.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> ({ <span style=color:#a6e22e>types</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>t</span> }) =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>ArrowFunctionExpression</span>(<span style=color:#a6e22e>path</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>node</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>path</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>params</span>.<span style=color:#a6e22e>length</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>head</span>, ...<span style=color:#a6e22e>tail</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>params</span>.<span style=color:#a6e22e>reverse</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>replaceWith</span>(
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>tail</span>.<span style=color:#a6e22e>reduce</span>(
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>expr</span>, <span style=color:#a6e22e>param</span>) =&gt; <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>arrowFunctionExpression</span>([<span style=color:#a6e22e>param</span>], <span style=color:#a6e22e>expr</span>),
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>arrowFunctionExpression</span>([<span style=color:#a6e22e>head</span>], <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>body</span>)
+</span></span><span style=display:flex><span>      )
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>For this change we only need to do a single right fold over the parameters, building a new nested <code>ArrowFunctionExpression</code> that replaces the current node.</p><p>Finally, we can now look into how we should handle the transformation of function invocations that provide more than one argument.
 Modifying these allows us to ensure that our new curried paradigm is compatible with existing code.
-We can achieve this as follows.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="k">default</span> <span class="p">({</span> <span class="na">types</span><span class="p">:</span> <span class="nx">t</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="nx">CallExpression</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="p">{</span> <span class="nx">node</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">path</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">isMemberExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">callee</span><span class="p">))</span> <span class="p">{</span>
-      <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">const</span> <span class="p">[</span><span class="nx">head</span><span class="p">,</span> <span class="p">...</span><span class="nx">tail</span><span class="p">]</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">arguments</span><span class="p">;</span>
-
-    <span class="nx">path</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span>
-      <span class="nx">tail</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">exp</span><span class="p">,</span> <span class="nx">arg</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">exp</span><span class="p">,</span> <span class="p">[</span><span class="nx">arg</span><span class="p">]),</span> <span class="nx">t</span><span class="p">.</span><span class="nx">callExpression</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">callee</span><span class="p">,</span> <span class="p">[</span><span class="nx">head</span><span class="p">]))</span>
-    <span class="p">);</span>
-  <span class="p">},</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>We first need to ensure that the <code class="language-plaintext highlighter-rouge">CallExpression</code> has more than the intended one argument.
-If this is the case, we then need to check that the call does not originate from an object member invocation (<code class="language-plaintext highlighter-rouge">object.fn()</code>) as we do not wish to modify this form.
-With these checks now complete, we can simply perform a left fold over the arguments, building up a final <code class="language-plaintext highlighter-rouge">CallExpression</code> that handles one argument at a time.</p>
-
-<p>You can see this plugin in action by visiting the accompanying <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd">AST Explorer snippet</a>.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>I hope this post has given you some practical insight into how a Babel plugin is created using AST manipulation.
-As highlighted throughout the post, you can experiment with both the <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47">Function Composition Operator</a> and <a href="https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd">Auto-Curried Functions</a> plugins on AST Explorer.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+We can achieve this as follows.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> ({ <span style=color:#a6e22e>types</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>t</span> }) =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>CallExpression</span>(<span style=color:#a6e22e>path</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>node</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>path</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>arguments</span>.<span style=color:#a6e22e>length</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>isMemberExpression</span>(<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>callee</span>)) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>head</span>, ...<span style=color:#a6e22e>tail</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>arguments</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>path</span>.<span style=color:#a6e22e>replaceWith</span>(
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>tail</span>.<span style=color:#a6e22e>reduce</span>((<span style=color:#a6e22e>exp</span>, <span style=color:#a6e22e>arg</span>) =&gt; <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>callExpression</span>(<span style=color:#a6e22e>exp</span>, [<span style=color:#a6e22e>arg</span>]), <span style=color:#a6e22e>t</span>.<span style=color:#a6e22e>callExpression</span>(<span style=color:#a6e22e>node</span>.<span style=color:#a6e22e>callee</span>, [<span style=color:#a6e22e>head</span>]))
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>We first need to ensure that the <code>CallExpression</code> has more than the intended one argument.
+If this is the case, we then need to check that the call does not originate from an object member invocation (<code>object.fn()</code>) as we do not wish to modify this form.
+With these checks now complete, we can simply perform a left fold over the arguments, building up a final <code>CallExpression</code> that handles one argument at a time.</p><p>You can see this plugin in action by visiting the accompanying <a href=https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd rel="external noopener" target=_blank>AST Explorer snippet</a>.</p><h2 id=conclusion>Conclusion</h2><p>I hope this post has given you some practical insight into how a Babel plugin is created using AST manipulation.
+As highlighted throughout the post, you can experiment with both the <a href=https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/014e51be5e9b20cf37b4903eb97f1e61277e9f47 rel="external noopener" target=_blank>Function Composition Operator</a> and <a href=https://astexplorer.net/#/gist/a5bd7b8c733fd52e3b51d3f713b5a3d3/a663f9b0d674301574a5d5c63504a6fb870c33dd rel="external noopener" target=_blank>Auto-Curried Functions</a> plugins on AST Explorer.</p></main><footer class=post__tags><a href=/archive/tag/babel>babel</a><a href=/archive/tag/javascript>javascript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

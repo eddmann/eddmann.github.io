@@ -1,221 +1,122 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to implement the efficient heapsort algorithm in Java and C with detailed code examples and explanations on building a tree-based heap data structure for sorting.">
-
-    <title>
-        
-            Implementing Heapsort in Java and C &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Implementing Heapsort in Java and C</h1>
-    <time datetime="2014-01-06T00:00:00+00:00" class="post-date">06 Jan 2014</time>
-    <p>In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array.
-We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code.</p>
-
-
-
-<h2 id="how-it-works">How it works</h2>
-
-<p>Heapsort is a sorting algorithm which can be split into two distinct steps.</p>
-
-<p>The first step is to build a tree-based heap data structure from the supplied input.
-Conforming to the <a href="http://en.wikipedia.org/wiki/Binary_heap">heap property</a> requires the structure to ensure that all parent nodes are greater than or equal to their children (with the highest at the root), or the inverse.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Implementing Heapsort in Java and C - Edd Mann</title>
+<meta name=description content="Discover how to implement the efficient heapsort algorithm in Java and C with detailed code examples and explanations on building a tree-based heap data structure for sorting."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Implementing Heapsort in Java and C"><meta itemprop=description content="In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array. We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code."><meta itemprop=datePublished content="2014-01-06T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-06T00:00:00+00:00"><meta itemprop=wordCount content="836"><meta itemprop=keywords content="Java,C,Algorithms"><meta property="og:url" content="https://eddmann.com/posts/implementing-heapsort-in-java-and-c/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Implementing Heapsort in Java and C"><meta property="og:description" content="In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array. We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-06T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-06T00:00:00+00:00"><meta property="article:tag" content="Java"><meta property="article:tag" content="C"><meta property="article:tag" content="Algorithms"><meta name=twitter:card content="summary"><meta name=twitter:title content="Implementing Heapsort in Java and C"><meta name=twitter:description content="In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array. We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/implementing-heapsort-in-java-and-c/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Implementing Heapsort in Java and C</h1><time class=post__time>Jan 6, 2014</time></header><main class=prose><p>In this post, we will delve into the mechanics of heapsort by building a tree-based heap data structure and then methodically extracting a sorted array.
+We will then implement said algorithm in both Java and C to get a feel for how the process is modelled in code.</p><h2 id=how-it-works>How it works</h2><p>Heapsort is a sorting algorithm which can be split into two distinct steps.</p><p>The first step is to build a tree-based heap data structure from the supplied input.
+Conforming to the <a href=http://en.wikipedia.org/wiki/Binary_heap rel="external noopener" target=_blank>heap property</a> requires the structure to ensure that all parent nodes are greater than or equal to their children (with the highest at the root), or the inverse.
 Being called a max-heap and a min-heap respectively, this step in itself has many interesting use cases outside of simply sorting an input.
 Implementing the heap as an array allows us to reuse the input array for both the heap and the resulting output.
-All binary trees can be represented in array form, but as a heap is always weighted towards completeness, it can be stored very efficiently.</p>
-
-<p>The second step simply builds up the sorted array, with the next element removed from the heap structure (reconstructing the heap after each iteration) until no elements remain.
+All binary trees can be represented in array form, but as a heap is always weighted towards completeness, it can be stored very efficiently.</p><p>The second step simply builds up the sorted array, with the next element removed from the heap structure (reconstructing the heap after each iteration) until no elements remain.
 The implementation works in both minimum and maximum forms, with only the direction in the second step requiring alteration.
 Being a comparison-based algorithm, it caters for a user-supplied comparison operation, determining which of the two subject elements should occur first in the output.
-However, despite the option for in-place sorting, it is not stable, resulting in the possibility of initially ordered equal keys being reordered.</p>
-
-<h2 id="java-implementation">Java Implementation</h2>
-
-<p>Below is an implementation of the Heapsort algorithm written in Java.
-I was able to add the flexibility provided by generalising the sorting algorithm to any class that implemented the <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html">Comparable</a> interface.</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Heap</span> <span class="o">{</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">total</span><span class="o">;</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">swap</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">a</span><span class="o">,</span> <span class="kt">int</span> <span class="n">b</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="nc">Comparable</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">a</span><span class="o">];</span>
-        <span class="n">arr</span><span class="o">[</span><span class="n">a</span><span class="o">]</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">b</span><span class="o">];</span>
-        <span class="n">arr</span><span class="o">[</span><span class="n">b</span><span class="o">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">;</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">heapify</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">i</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">lft</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="o">;</span>
-        <span class="kt">int</span> <span class="n">rgt</span> <span class="o">=</span> <span class="n">lft</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
-        <span class="kt">int</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">i</span><span class="o">;</span>
-
-        <span class="k">if</span> <span class="o">(</span><span class="n">lft</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&amp;&amp;</span> <span class="n">arr</span><span class="o">[</span><span class="n">lft</span><span class="o">].</span><span class="na">compareTo</span><span class="o">(</span><span class="n">arr</span><span class="o">[</span><span class="n">grt</span><span class="o">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">lft</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">rgt</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&amp;&amp;</span> <span class="n">arr</span><span class="o">[</span><span class="n">rgt</span><span class="o">].</span><span class="na">compareTo</span><span class="o">(</span><span class="n">arr</span><span class="o">[</span><span class="n">grt</span><span class="o">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">rgt</span><span class="o">;</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">grt</span> <span class="o">!=</span> <span class="n">i</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">swap</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">grt</span><span class="o">);</span>
-            <span class="n">heapify</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">grt</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">total</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span>
-            <span class="n">heapify</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">total</span><span class="o">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">--)</span> <span class="o">{</span>
-            <span class="n">swap</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">i</span><span class="o">);</span>
-            <span class="n">total</span><span class="o">--;</span>
-            <span class="n">heapify</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="kd">final</span> <span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="nc">Integer</span><span class="o">[]</span> <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Integer</span><span class="o">[]</span> <span class="o">{</span> <span class="mi">3</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">4</span> <span class="o">};</span>
-
-        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">arr</span><span class="o">));</span>
-        <span class="n">sort</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
-        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">arr</span><span class="o">));</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>Looking at the implementation above you will notice that the first step the sorting method takes is to create a heap structure from the input.
-Calling the <code class="language-plaintext highlighter-rouge">heapify</code> method on the first half of the input array guarantees (by recursion) that the heap data structure is built and the heap property is fulfilled.
-Once this step has been completed, we loop through each item in the heap, swapping the first and last heap elements, reducing and reconstructing the structure after each iteration.</p>
-
-<h2 id="c-implementation">C Implementation</h2>
-
-<p>Below is a C implementation, similar to the above Java example.
+However, despite the option for in-place sorting, it is not stable, resulting in the possibility of initially ordered equal keys being reordered.</p><h2 id=java-implementation>Java Implementation</h2><p>Below is an implementation of the Heapsort algorithm written in Java.
+I was able to add the flexibility provided by generalising the sorting algorithm to any class that implemented the <a href=http://docs.oracle.com/javase/7/docs/api/java/lang/Comparable.html rel="external noopener" target=_blank>Comparable</a> interface.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Heap</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> total;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>swap</span>(Comparable<span style=color:#f92672>[]</span> arr, <span style=color:#66d9ef>int</span> a, <span style=color:#66d9ef>int</span> b)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        Comparable tmp <span style=color:#f92672>=</span> arr<span style=color:#f92672>[</span>a<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>        arr<span style=color:#f92672>[</span>a<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> arr<span style=color:#f92672>[</span>b<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>        arr<span style=color:#f92672>[</span>b<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> tmp;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>heapify</span>(Comparable<span style=color:#f92672>[]</span> arr, <span style=color:#66d9ef>int</span> i)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> lft <span style=color:#f92672>=</span> i <span style=color:#f92672>*</span> 2;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> rgt <span style=color:#f92672>=</span> lft <span style=color:#f92672>+</span> 1;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> grt <span style=color:#f92672>=</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (lft <span style=color:#f92672>&lt;=</span> total <span style=color:#f92672>&amp;&amp;</span> arr<span style=color:#f92672>[</span>lft<span style=color:#f92672>]</span>.<span style=color:#a6e22e>compareTo</span>(arr<span style=color:#f92672>[</span>grt<span style=color:#f92672>]</span>) <span style=color:#f92672>&gt;</span> 0) grt <span style=color:#f92672>=</span> lft;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (rgt <span style=color:#f92672>&lt;=</span> total <span style=color:#f92672>&amp;&amp;</span> arr<span style=color:#f92672>[</span>rgt<span style=color:#f92672>]</span>.<span style=color:#a6e22e>compareTo</span>(arr<span style=color:#f92672>[</span>grt<span style=color:#f92672>]</span>) <span style=color:#f92672>&gt;</span> 0) grt <span style=color:#f92672>=</span> rgt;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (grt <span style=color:#f92672>!=</span> i) {
+</span></span><span style=display:flex><span>            swap(arr, i, grt);
+</span></span><span style=display:flex><span>            heapify(arr, grt);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sort</span>(Comparable<span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        total <span style=color:#f92672>=</span> arr.<span style=color:#a6e22e>length</span> <span style=color:#f92672>-</span> 1;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> total <span style=color:#f92672>/</span> 2; i <span style=color:#f92672>&gt;=</span> 0; i<span style=color:#f92672>--</span>)
+</span></span><span style=display:flex><span>            heapify(arr, i);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> total; i <span style=color:#f92672>&gt;</span> 0; i<span style=color:#f92672>--</span>) {
+</span></span><span style=display:flex><span>            swap(arr, 0, i);
+</span></span><span style=display:flex><span>            total<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>            heapify(arr, 0);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>final</span> String<span style=color:#f92672>[]</span> args)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        Integer<span style=color:#f92672>[]</span> arr <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Integer<span style=color:#f92672>[]</span> { 3, 2, 1, 5, 4 };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        System.<span style=color:#a6e22e>out</span>.<span style=color:#a6e22e>println</span>(java.<span style=color:#a6e22e>util</span>.<span style=color:#a6e22e>Arrays</span>.<span style=color:#a6e22e>toString</span>(arr));
+</span></span><span style=display:flex><span>        sort(arr);
+</span></span><span style=display:flex><span>        System.<span style=color:#a6e22e>out</span>.<span style=color:#a6e22e>println</span>(java.<span style=color:#a6e22e>util</span>.<span style=color:#a6e22e>Arrays</span>.<span style=color:#a6e22e>toString</span>(arr));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the implementation above you will notice that the first step the sorting method takes is to create a heap structure from the input.
+Calling the <code>heapify</code> method on the first half of the input array guarantees (by recursion) that the heap data structure is built and the heap property is fulfilled.
+Once this step has been completed, we loop through each item in the heap, swapping the first and last heap elements, reducing and reconstructing the structure after each iteration.</p><h2 id=c-implementation>C Implementation</h2><p>Below is a C implementation, similar to the above Java example.
 Using macros, I was able to abstract away some of the repetitive code used to count and swap items in the subject array.
-In this case, I decided against adding confusion to the resulting implementation with the introduction of void pointer generalisation, and instead focused only on integer input.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-</span>
-<span class="cp">#define COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
-</span>
-<span class="cp">#define SWAP(arr, a, b) \
-  do { \
-    int tmp = arr[a]; \
-    arr[a] = arr[b]; \
-    arr[b] = tmp; \
-  } while (0)
-</span>
-<span class="cp">#define PRINT(arr, size) \
-  do { \
-    for (int i = 0; i &lt; size; i++) printf("%d ", arr[i]); \
-    printf("\n"); \
-  } while (0)
-</span>
-<span class="kt">int</span> <span class="n">total</span><span class="p">;</span>
-
-<span class="kt">void</span> <span class="nf">heapify</span><span class="p">(</span><span class="kt">int</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">i</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">lft</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">rgt</span> <span class="o">=</span> <span class="n">lft</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">lft</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&amp;&amp;</span> <span class="n">arr</span><span class="p">[</span><span class="n">lft</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">grt</span><span class="p">])</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">lft</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">rgt</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&amp;&amp;</span> <span class="n">arr</span><span class="p">[</span><span class="n">rgt</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="p">[</span><span class="n">grt</span><span class="p">])</span> <span class="n">grt</span> <span class="o">=</span> <span class="n">rgt</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">grt</span> <span class="o">!=</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">SWAP</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">grt</span><span class="p">);</span>
-        <span class="n">heapify</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">grt</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">sort</span><span class="p">(</span><span class="kt">int</span> <span class="n">arr</span><span class="p">[],</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">total</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">total</span> <span class="o">/</span> <span class="mi">2</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span>
-        <span class="n">heapify</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">total</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">SWAP</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-        <span class="n">total</span><span class="o">--</span><span class="p">;</span>
-        <span class="n">heapify</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">arr</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span> <span class="p">};</span>
-    <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="n">COUNT</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
-
-    <span class="n">PRINT</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-    <span class="n">sort</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-    <span class="n">PRINT</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>As discussed above, this implementation is very similar to its Java counterpart.
-One small <em>hack</em> that I found very useful in C’s macro system was the use of a ‘do/while’ loop to create multi-line definitions with the least compiler issues.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/Sorting/heapSort.htm">Heap Sort: Kent State University</a></li>
-  <li><a href="http://www.youtube.com/watch?v=WYII2Oau_VY">Heap Sort: Playing Cards Video</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+In this case, I decided against adding confusion to the resulting implementation with the introduction of void pointer generalisation, and instead focused only on integer input.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define COUNT(arr) (sizeof(arr) / sizeof(arr[0]))
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define SWAP(arr, a, b) \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  do { \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    int tmp = arr[a]; \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    arr[a] = arr[b]; \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    arr[b] = tmp; \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  } while (0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define PRINT(arr, size) \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  do { \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    for (int i = 0; i &lt; size; i++) printf(&#34;%d &#34;, arr[i]); \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    printf(&#34;\n&#34;); \
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  } while (0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> total;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>heapify</span>(<span style=color:#66d9ef>int</span> arr[], <span style=color:#66d9ef>int</span> i)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> lft <span style=color:#f92672>=</span> i <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> rgt <span style=color:#f92672>=</span> lft <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> grt <span style=color:#f92672>=</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (lft <span style=color:#f92672>&lt;=</span> total <span style=color:#f92672>&amp;&amp;</span> arr[lft] <span style=color:#f92672>&gt;</span> arr[grt]) grt <span style=color:#f92672>=</span> lft;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (rgt <span style=color:#f92672>&lt;=</span> total <span style=color:#f92672>&amp;&amp;</span> arr[rgt] <span style=color:#f92672>&gt;</span> arr[grt]) grt <span style=color:#f92672>=</span> rgt;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (grt <span style=color:#f92672>!=</span> i) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>SWAP</span>(arr, i, grt);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>heapify</span>(arr, grt);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sort</span>(<span style=color:#66d9ef>int</span> arr[], <span style=color:#66d9ef>int</span> size)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    total <span style=color:#f92672>=</span> size <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> total <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>; i <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>0</span>; i<span style=color:#f92672>--</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>heapify</span>(arr, i);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> total; i <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>; i<span style=color:#f92672>--</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>SWAP</span>(arr, <span style=color:#ae81ff>0</span>, i);
+</span></span><span style=display:flex><span>        total<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>heapify</span>(arr, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>int</span> argc, <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>argv[])
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> arr[] <span style=color:#f92672>=</span> { <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>2</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>5</span>, <span style=color:#ae81ff>4</span> };
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> size <span style=color:#f92672>=</span> <span style=color:#a6e22e>COUNT</span>(arr);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PRINT</span>(arr, size);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>sort</span>(arr, size);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PRINT</span>(arr, size);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As discussed above, this implementation is very similar to its Java counterpart.
+One small <em>hack</em> that I found very useful in C&rsquo;s macro system was the use of a &lsquo;do/while&rsquo; loop to create multi-line definitions with the least compiler issues.</p><h2 id=resources>Resources</h2><ul><li><a href=http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/Sorting/heapSort.htm rel="external noopener" target=_blank>Heap Sort: Kent State University</a></li><li><a href="http://www.youtube.com/watch?v=WYII2Oau_VY" rel="external noopener" target=_blank>Heap Sort: Playing Cards Video</a></li></ul></main><footer class=post__tags><a href=/archive/tag/java>java</a><a href=/archive/tag/c>c</a><a href=/archive/tag/algorithms>algorithms</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

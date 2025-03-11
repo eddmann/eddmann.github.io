@@ -1,197 +1,90 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore the Maybe type in JavaScript, including its implementation and practical examples for safe handling of null and undefined values.">
-
-    <title>
-        
-            Maybe in JavaScript &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Maybe in JavaScript</h1>
-    <time datetime="2016-06-08T00:00:00+00:00" class="post-date">08 Jun 2016</time>
-    <p>Recently, I have been delving into the concepts of <a href="http://learnyouahaskell.com/functors-applicative-functors-and-monoids">Functors</a> and <a href="http://learnyouahaskell.com/a-fistful-of-monads">Monads</a>.
-There are many good <a href="https://curiosity-driven.org/monads-in-javascript">resources</a> available online that will do a far better job of explaining these concepts than I could.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Maybe in JavaScript - Edd Mann</title>
+<meta name=description content="Explore the Maybe type in JavaScript, including its implementation and practical examples for safe handling of null and undefined values."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Maybe in JavaScript"><meta itemprop=description content="Recently, I have been delving into the concepts of Functors and Monads. There are many good resources available online that will do a far better job of explaining these concepts than I could. However, I do wish to document an example of a Maybe type I have implemented in JavaScript. Again, there are many excellent external resources that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more."><meta itemprop=datePublished content="2016-06-08T00:00:00+00:00"><meta itemprop=dateModified content="2016-06-08T00:00:00+00:00"><meta itemprop=wordCount content="758"><meta itemprop=keywords content="Javascript,Functional-Programming"><meta property="og:url" content="https://eddmann.com/posts/maybe-in-javascript/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Maybe in JavaScript"><meta property="og:description" content="Recently, I have been delving into the concepts of Functors and Monads. There are many good resources available online that will do a far better job of explaining these concepts than I could. However, I do wish to document an example of a Maybe type I have implemented in JavaScript. Again, there are many excellent external resources that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2016-06-08T00:00:00+00:00"><meta property="article:modified_time" content="2016-06-08T00:00:00+00:00"><meta property="article:tag" content="Javascript"><meta property="article:tag" content="Functional-Programming"><meta name=twitter:card content="summary"><meta name=twitter:title content="Maybe in JavaScript"><meta name=twitter:description content="Recently, I have been delving into the concepts of Functors and Monads. There are many good resources available online that will do a far better job of explaining these concepts than I could. However, I do wish to document an example of a Maybe type I have implemented in JavaScript. Again, there are many excellent external resources that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/maybe-in-javascript/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Maybe in JavaScript</h1><time class=post__time>Jun 8, 2016</time></header><main class=prose><p>Recently, I have been delving into the concepts of <a href=http://learnyouahaskell.com/functors-applicative-functors-and-monoids rel="external noopener" target=_blank>Functors</a> and <a href=http://learnyouahaskell.com/a-fistful-of-monads rel="external noopener" target=_blank>Monads</a>.
+There are many good <a href=https://curiosity-driven.org/monads-in-javascript rel="external noopener" target=_blank>resources</a> available online that will do a far better job of explaining these concepts than I could.
 However, I do wish to document an example of a Maybe type I have implemented in JavaScript.
-Again, there are many excellent external <a href="http://sean.voisen.org/blog/2013/10/intro-monads-maybe/">resources</a> that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more.</p>
-
-
-
-<h2 id="implementation">Implementation</h2>
-
-<p>The Maybe type encapsulates the concept of Some (contains a value) and None (no value present).
-With these two abstractions, we can safely handle cases where no value is present, avoiding NullPointerException errors and excessive null checks.</p>
-
-<!--prettier-ignore-->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">Maybe</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">Some</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">x</span> <span class="o">=</span> <span class="nx">x</span><span class="p">;</span> <span class="p">};</span>
-  <span class="nx">Some</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fmap</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">Maybe</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">));</span> <span class="p">};</span>
-  <span class="nx">Some</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">bind</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">fn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">);</span> <span class="p">};</span>
-  <span class="nx">Some</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">toString</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">`Some(</span><span class="p">${</span><span class="k">this</span><span class="p">.</span><span class="nx">x</span><span class="p">}</span><span class="s2">)`</span><span class="p">;</span> <span class="p">};</span>
-
-  <span class="kd">const</span> <span class="nx">None</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{};</span>
-  <span class="nx">None</span><span class="p">.</span><span class="nx">fmap</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">None</span><span class="p">;</span>
-  <span class="nx">None</span><span class="p">.</span><span class="nx">bind</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">None</span><span class="p">;</span>
-  <span class="nx">None</span><span class="p">.</span><span class="nx">toString</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">None</span><span class="dl">'</span><span class="p">;</span>
-
-  <span class="k">return</span> <span class="p">{</span>
-    <span class="na">of</span><span class="p">:</span> <span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">x</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">||</span> <span class="nx">x</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="p">?</span> <span class="nx">None</span> <span class="p">:</span> <span class="k">new</span> <span class="nx">Some</span><span class="p">(</span><span class="nx">x</span><span class="p">),</span>
-    <span class="na">lift</span><span class="p">:</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(...</span><span class="nx">args</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Maybe</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="nx">fn</span><span class="p">(...</span><span class="nx">args</span><span class="p">)),</span>
-    <span class="nx">Some</span><span class="p">,</span>
-    <span class="nx">None</span>
-  <span class="p">};</span>
-<span class="p">})();</span>
-</code></pre></div></div>
-
-<p>The implementation above uses two small prototypical class definitions to define Some and None.
-We then return the ability to take a value of a plain type and put it into a Maybe container, along with the capability to lift a function into the Maybe space.</p>
-
-<h2 id="division-by-zero-example">Division by Zero Example</h2>
-
-<p>The first example of using the Maybe type I will demonstrate is in the case of handling division by zero errors.
-If the denominator is zero, instead of throwing an exception or returning null (as shown in the basic <code class="language-plaintext highlighter-rouge">div</code> implementation), we lift the function into the Maybe type and return a Some or None.
-This may not seem like much of a win at this point, but when we later look at examples of composing these expressions together, you will see its full power.</p>
-
-<!--prettier-ignore-->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">div</span> <span class="o">=</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">b</span> <span class="o">===</span> <span class="mi">0</span> <span class="p">?</span> <span class="kc">null</span> <span class="p">:</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span><span class="p">;</span>
-<span class="kd">const</span> <span class="nx">mdiv</span> <span class="o">=</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">lift</span><span class="p">(</span><span class="nx">div</span><span class="p">);</span>
-
-<span class="nx">div</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// null</span>
-<span class="nx">mdiv</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// None</span>
-<span class="nx">mdiv</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span> <span class="c1">// Some(5)</span>
-</code></pre></div></div>
-
-<h2 id="property-retrieval-example">Property Retrieval Example</h2>
-
-<p>Another case where <code class="language-plaintext highlighter-rouge">undefined</code> values may appear in JavaScript is when retrieving properties from objects that may (or may not) be present.
-Again, we highlight how the basic <code class="language-plaintext highlighter-rouge">get</code> function returns the object property or undefined if not present, whereas lifting it into the Maybe type provides us with the Some and None abstractions.</p>
-
-<!--prettier-ignore-->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="kd">get</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">prop</span><span class="p">,</span> <span class="nx">obj</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">]);</span>
-<span class="kd">const</span> <span class="nx">mget</span> <span class="o">=</span> <span class="p">(</span><span class="nx">prop</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Maybe</span><span class="p">.</span><span class="nx">lift</span><span class="p">(</span><span class="kd">get</span><span class="p">(</span><span class="nx">prop</span><span class="p">));</span>
-
-<span class="kd">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Joe Bloggs</span><span class="dl">'</span><span class="p">,</span>
-  <span class="na">age</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
-  <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">street</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Cinder Drive</span><span class="dl">'</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="kd">get</span><span class="p">(</span><span class="dl">'</span><span class="s1">agez</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// undefined</span>
-<span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">agez</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// None</span>
-<span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">age</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(25)</span>
-</code></pre></div></div>
-
-<p>We can then compose multiple <code class="language-plaintext highlighter-rouge">mget</code> functions together, handling application on the Maybe containers using <code class="language-plaintext highlighter-rouge">fmap</code> and <code class="language-plaintext highlighter-rouge">bind</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">fmap</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">functor</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">functor</span><span class="p">.</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
-<span class="kd">const</span> <span class="nx">bind</span> <span class="o">=</span> <span class="nx">curry</span><span class="p">((</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">monad</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">monad</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="nx">fn</span><span class="p">));</span>
-</code></pre></div></div>
-
-<p>You will notice that <code class="language-plaintext highlighter-rouge">fmap</code> double-wraps the resulting value.
+Again, there are many excellent external <a href=http://sean.voisen.org/blog/2013/10/intro-monads-maybe/ rel="external noopener" target=_blank>resources</a> that highlight the characteristics and power of using such a type, so I will direct your attention to those if you wish to learn more.</p><h2 id=implementation>Implementation</h2><p>The Maybe type encapsulates the concept of Some (contains a value) and None (no value present).
+With these two abstractions, we can safely handle cases where no value is present, avoiding NullPointerException errors and excessive null checks.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>Maybe</span> <span style=color:#f92672>=</span> (<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>Some</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>x</span>) { <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>x</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>x</span>; };
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Some</span>.<span style=color:#a6e22e>prototype</span>.<span style=color:#a6e22e>fmap</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>fn</span>) { <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>Maybe</span>.<span style=color:#66d9ef>of</span>(<span style=color:#a6e22e>fn</span>(<span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>x</span>)); };
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Some</span>.<span style=color:#a6e22e>prototype</span>.<span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> (<span style=color:#a6e22e>fn</span>) { <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>fn</span>(<span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>x</span>); };
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Some</span>.<span style=color:#a6e22e>prototype</span>.<span style=color:#a6e22e>toString</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> () { <span style=color:#66d9ef>return</span> <span style=color:#e6db74>`Some(</span><span style=color:#e6db74>${</span><span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>x</span><span style=color:#e6db74>}</span><span style=color:#e6db74>)`</span>; };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>None</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> () {};
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>None</span>.<span style=color:#a6e22e>fmap</span> <span style=color:#f92672>=</span> () =&gt; <span style=color:#a6e22e>None</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>None</span>.<span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> () =&gt; <span style=color:#a6e22e>None</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>None</span>.<span style=color:#a6e22e>toString</span> <span style=color:#f92672>=</span> () =&gt; <span style=color:#e6db74>&#39;None&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>of</span><span style=color:#f92672>:</span> (<span style=color:#a6e22e>x</span>) =&gt; <span style=color:#a6e22e>x</span> <span style=color:#f92672>===</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>x</span> <span style=color:#f92672>===</span> <span style=color:#66d9ef>undefined</span> <span style=color:#f92672>?</span> <span style=color:#a6e22e>None</span> <span style=color:#f92672>:</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Some</span>(<span style=color:#a6e22e>x</span>),
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>lift</span><span style=color:#f92672>:</span> (<span style=color:#a6e22e>fn</span>) =&gt; (...<span style=color:#a6e22e>args</span>) =&gt; <span style=color:#a6e22e>Maybe</span>.<span style=color:#66d9ef>of</span>(<span style=color:#a6e22e>fn</span>(...<span style=color:#a6e22e>args</span>)),
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>Some</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>None</span>
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>})();
+</span></span></code></pre></div><p>The implementation above uses two small prototypical class definitions to define Some and None.
+We then return the ability to take a value of a plain type and put it into a Maybe container, along with the capability to lift a function into the Maybe space.</p><h2 id=division-by-zero-example>Division by Zero Example</h2><p>The first example of using the Maybe type I will demonstrate is in the case of handling division by zero errors.
+If the denominator is zero, instead of throwing an exception or returning null (as shown in the basic <code>div</code> implementation), we lift the function into the Maybe type and return a Some or None.
+This may not seem like much of a win at this point, but when we later look at examples of composing these expressions together, you will see its full power.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>div</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>a</span>, <span style=color:#a6e22e>b</span>) =&gt; <span style=color:#a6e22e>b</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>?</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>:</span> <span style=color:#a6e22e>a</span> <span style=color:#f92672>/</span> <span style=color:#a6e22e>b</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>mdiv</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>Maybe</span>.<span style=color:#a6e22e>lift</span>(<span style=color:#a6e22e>div</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>div</span>(<span style=color:#ae81ff>10</span>, <span style=color:#ae81ff>0</span>); <span style=color:#75715e>// null
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>mdiv</span>(<span style=color:#ae81ff>100</span>, <span style=color:#ae81ff>0</span>); <span style=color:#75715e>// None
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>mdiv</span>(<span style=color:#ae81ff>10</span>, <span style=color:#ae81ff>2</span>); <span style=color:#75715e>// Some(5)
+</span></span></span></code></pre></div><h2 id=property-retrieval-example>Property Retrieval Example</h2><p>Another case where <code>undefined</code> values may appear in JavaScript is when retrieving properties from objects that may (or may not) be present.
+Again, we highlight how the basic <code>get</code> function returns the object property or undefined if not present, whereas lifting it into the Maybe type provides us with the Some and None abstractions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>get</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>curry</span>((<span style=color:#a6e22e>prop</span>, <span style=color:#a6e22e>obj</span>) =&gt; <span style=color:#a6e22e>obj</span>[<span style=color:#a6e22e>prop</span>]);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>mget</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>prop</span>) =&gt; <span style=color:#a6e22e>Maybe</span>.<span style=color:#a6e22e>lift</span>(<span style=color:#a6e22e>get</span>(<span style=color:#a6e22e>prop</span>));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>user</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>name</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;Joe Bloggs&#39;</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>age</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>25</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>address</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>street</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;Cinder Drive&#39;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>get</span>(<span style=color:#e6db74>&#39;agez&#39;</span>)(<span style=color:#a6e22e>user</span>); <span style=color:#75715e>// undefined
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;agez&#39;</span>)(<span style=color:#a6e22e>user</span>); <span style=color:#75715e>// None
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;age&#39;</span>)(<span style=color:#a6e22e>user</span>); <span style=color:#75715e>// Some(25)
+</span></span></span></code></pre></div><p>We can then compose multiple <code>mget</code> functions together, handling application on the Maybe containers using <code>fmap</code> and <code>bind</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>fmap</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>curry</span>((<span style=color:#a6e22e>fn</span>, <span style=color:#a6e22e>functor</span>) =&gt; <span style=color:#a6e22e>functor</span>.<span style=color:#a6e22e>fmap</span>(<span style=color:#a6e22e>fn</span>));
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>bind</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>curry</span>((<span style=color:#a6e22e>fn</span>, <span style=color:#a6e22e>monad</span>) =&gt; <span style=color:#a6e22e>monad</span>.<span style=color:#a6e22e>bind</span>(<span style=color:#a6e22e>fn</span>));
+</span></span></code></pre></div><p>You will notice that <code>fmap</code> double-wraps the resulting value.
 This is because, as a Functor definition, its action is to wrap the resulting value (from our provided function) back into the given container.
-However, in the case of the <code class="language-plaintext highlighter-rouge">bind</code> Monad definition, it does not wrap the value back into the container upon completion but instead relies on the function itself to return the correctly typed value.</p>
-
-<!--prettier-ignore-->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">getStreet</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">fmap</span><span class="p">(</span><span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">street</span><span class="dl">'</span><span class="p">)),</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">address</span><span class="dl">'</span><span class="p">));</span>
-<span class="nx">getStreet</span><span class="p">({</span> <span class="na">address</span><span class="p">:</span> <span class="p">{}</span> <span class="p">});</span> <span class="c1">// Some(None)</span>
-<span class="nx">getStreet</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(Some(Cinder Drive))</span>
-
-<span class="kd">const</span> <span class="nx">getStreet</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">bind</span><span class="p">(</span><span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">street</span><span class="dl">'</span><span class="p">)),</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">address</span><span class="dl">'</span><span class="p">));</span>
-<span class="nx">getStreet</span><span class="p">({</span> <span class="na">address</span><span class="p">:</span> <span class="p">{}</span> <span class="p">});</span> <span class="c1">// None</span>
-<span class="nx">getStreet</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span> <span class="c1">// Some(Cinder Drive)</span>
-</code></pre></div></div>
-
-<h2 id="mimicking-do-notation-in-javascript">Mimicking Do Notation in JavaScript</h2>
-
-<p>When looking at Haskell examples, you will notice how succinct the do notation is at handling the containers used.
-We can take advantage of JavaScript’s ability to parse functions as strings to rewrite a language similar to this notation into one that can be executed.
-This allows us to clearly express the intent of the code rather than cluttering it with the plumbing required to make it work with the containers.</p>
-
-<!--prettier-ignore-->
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">doM</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">tokenize</span> <span class="o">=</span> <span class="p">(</span><span class="nx">exp</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">exp</span>
-    <span class="p">.</span><span class="nx">toString</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/</span><span class="se">[\n</span><span class="sr">;</span><span class="se">]</span><span class="sr">/</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">s</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">trim</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nb">Boolean</span><span class="p">);</span>
-
-  <span class="kd">const</span> <span class="nx">evaluate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="dl">''</span><span class="p">;</span>
-
-    <span class="kd">let</span> <span class="nx">token</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">shift</span><span class="p">(),</span> <span class="nx">match</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">match</span> <span class="o">=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^return </span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr">$/</span><span class="p">))</span>
-      <span class="k">return</span> <span class="s2">`return Maybe.of(</span><span class="p">${</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span><span class="s2">);`</span> <span class="o">+</span> <span class="nx">evaluate</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">match</span> <span class="o">=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^</span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr"> &lt;= </span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr">$/</span><span class="p">))</span>
-      <span class="k">return</span> <span class="s2">`return </span><span class="p">${</span><span class="nx">match</span><span class="p">[</span><span class="mi">2</span><span class="p">]}</span><span class="s2">.bind(function(</span><span class="p">${</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span><span class="s2">) { </span><span class="p">${</span><span class="nx">evaluate</span><span class="p">(</span><span class="nx">tokens</span><span class="p">)}</span><span class="s2"> });`</span><span class="p">;</span>
-
-    <span class="k">return</span> <span class="nx">evaluate</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
-  <span class="p">};</span>
-
-  <span class="k">return</span> <span class="nx">compose</span><span class="p">(</span><span class="nx">x</span> <span class="o">=&gt;</span> <span class="nx">x</span><span class="p">(),</span> <span class="nb">Function</span><span class="p">,</span> <span class="nx">evaluate</span><span class="p">,</span> <span class="nx">tokenize</span><span class="p">);</span>
-<span class="p">})();</span>
-
-<span class="nx">doM</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">address</span> <span class="o">&lt;=</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">address</span><span class="dl">'</span><span class="p">)(</span><span class="nx">user</span><span class="p">)</span>
-  <span class="nx">street</span> <span class="o">&lt;=</span> <span class="nx">mget</span><span class="p">(</span><span class="dl">'</span><span class="s1">street</span><span class="dl">'</span><span class="p">)(</span><span class="nx">address</span><span class="p">)</span>
-  <span class="k">return</span> <span class="nx">street</span>
-<span class="p">});</span> <span class="c1">// Some(Cinder Drive)</span>
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+However, in the case of the <code>bind</code> Monad definition, it does not wrap the value back into the container upon completion but instead relies on the function itself to return the correctly typed value.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>getStreet</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>compose</span>(<span style=color:#a6e22e>fmap</span>(<span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;street&#39;</span>)), <span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;address&#39;</span>));
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getStreet</span>({ <span style=color:#a6e22e>address</span><span style=color:#f92672>:</span> {} }); <span style=color:#75715e>// Some(None)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>getStreet</span>(<span style=color:#a6e22e>user</span>); <span style=color:#75715e>// Some(Some(Cinder Drive))
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>getStreet</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>compose</span>(<span style=color:#a6e22e>bind</span>(<span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;street&#39;</span>)), <span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;address&#39;</span>));
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getStreet</span>({ <span style=color:#a6e22e>address</span><span style=color:#f92672>:</span> {} }); <span style=color:#75715e>// None
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>getStreet</span>(<span style=color:#a6e22e>user</span>); <span style=color:#75715e>// Some(Cinder Drive)
+</span></span></span></code></pre></div><h2 id=mimicking-do-notation-in-javascript>Mimicking Do Notation in JavaScript</h2><p>When looking at Haskell examples, you will notice how succinct the do notation is at handling the containers used.
+We can take advantage of JavaScript&rsquo;s ability to parse functions as strings to rewrite a language similar to this notation into one that can be executed.
+This allows us to clearly express the intent of the code rather than cluttering it with the plumbing required to make it work with the containers.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>doM</span> <span style=color:#f92672>=</span> (<span style=color:#66d9ef>function</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>tokenize</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>exp</span>) =&gt; <span style=color:#a6e22e>exp</span>
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>toString</span>()
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>/[\n;]/</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>slice</span>(<span style=color:#ae81ff>1</span>, <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>map</span>((<span style=color:#a6e22e>s</span>) =&gt; <span style=color:#a6e22e>s</span>.<span style=color:#a6e22e>trim</span>())
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>filter</span>(Boolean);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>evaluate</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>tokens</span>) =&gt; {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>tokens</span>.<span style=color:#a6e22e>length</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>0</span>) <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>token</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>tokens</span>.<span style=color:#a6e22e>shift</span>(), <span style=color:#a6e22e>match</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>match</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>token</span>.<span style=color:#a6e22e>match</span>(<span style=color:#e6db74>/^return (.+)$/</span>))
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> <span style=color:#e6db74>`return Maybe.of(</span><span style=color:#e6db74>${</span><span style=color:#a6e22e>match</span>[<span style=color:#ae81ff>1</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>);`</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>evaluate</span>(<span style=color:#a6e22e>tokens</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>match</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>token</span>.<span style=color:#a6e22e>match</span>(<span style=color:#e6db74>/^(.+) &lt;= (.+)$/</span>))
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> <span style=color:#e6db74>`return </span><span style=color:#e6db74>${</span><span style=color:#a6e22e>match</span>[<span style=color:#ae81ff>2</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>.bind(function(</span><span style=color:#e6db74>${</span><span style=color:#a6e22e>match</span>[<span style=color:#ae81ff>1</span>]<span style=color:#e6db74>}</span><span style=color:#e6db74>) { </span><span style=color:#e6db74>${</span><span style=color:#a6e22e>evaluate</span>(<span style=color:#a6e22e>tokens</span>)<span style=color:#e6db74>}</span><span style=color:#e6db74> });`</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>evaluate</span>(<span style=color:#a6e22e>tokens</span>);
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>compose</span>(<span style=color:#a6e22e>x</span> =&gt; <span style=color:#a6e22e>x</span>(), Function, <span style=color:#a6e22e>evaluate</span>, <span style=color:#a6e22e>tokenize</span>);
+</span></span><span style=display:flex><span>})();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>doM</span>(() =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>address</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;address&#39;</span>)(<span style=color:#a6e22e>user</span>)
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>street</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>mget</span>(<span style=color:#e6db74>&#39;street&#39;</span>)(<span style=color:#a6e22e>address</span>)
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>street</span>
+</span></span><span style=display:flex><span>}); <span style=color:#75715e>// Some(Cinder Drive)
+</span></span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/javascript>javascript</a><a href=/archive/tag/functional-programming>functional-programming</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

@@ -1,154 +1,53 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An in-depth guide to implementing basic authentication in Pythons Flask using decorators and virtual environments.">
-
-    <title>
-        
-            Using Basic Auth. and Decorators in Python's Flask &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Using Basic Auth. and Decorators in Python's Flask</h1>
-    <time datetime="2014-02-10T00:00:00+00:00" class="post-date">10 Feb 2014</time>
-    <p>I have recently set aside some time to delve into the world of Python and all its Zen.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Using Basic Auth. and Decorators in Python's Flask - Edd Mann</title>
+<meta name=description content="An in-depth guide to implementing basic authentication in Pythons Flask using decorators and virtual environments."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Using Basic Auth. and Decorators in Python's Flask"><meta itemprop=description content="I have recently set aside some time to delve into the world of Python and all its Zen. Being a web developer at heart, I, of course, had to look at the current options available to me. In this post, I will guide you through creating a single-script web application using Flask and basic access authentication. For simplicity, I assume that you have a working installation of either Python 2.7/3.3 and virtualenv."><meta itemprop=datePublished content="2014-02-10T00:00:00+00:00"><meta itemprop=dateModified content="2014-02-10T00:00:00+00:00"><meta itemprop=wordCount content="487"><meta itemprop=keywords content="Flask,Python"><meta property="og:url" content="https://eddmann.com/posts/using-basic-auth-and-decorators-in-pythons-flask/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Using Basic Auth. and Decorators in Python's Flask"><meta property="og:description" content="I have recently set aside some time to delve into the world of Python and all its Zen. Being a web developer at heart, I, of course, had to look at the current options available to me. In this post, I will guide you through creating a single-script web application using Flask and basic access authentication. For simplicity, I assume that you have a working installation of either Python 2.7/3.3 and virtualenv."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-02-10T00:00:00+00:00"><meta property="article:modified_time" content="2014-02-10T00:00:00+00:00"><meta property="article:tag" content="Flask"><meta property="article:tag" content="Python"><meta name=twitter:card content="summary"><meta name=twitter:title content="Using Basic Auth. and Decorators in Python's Flask"><meta name=twitter:description content="I have recently set aside some time to delve into the world of Python and all its Zen. Being a web developer at heart, I, of course, had to look at the current options available to me. In this post, I will guide you through creating a single-script web application using Flask and basic access authentication. For simplicity, I assume that you have a working installation of either Python 2.7/3.3 and virtualenv."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/using-basic-auth-and-decorators-in-pythons-flask/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Using Basic Auth. and Decorators in Python's Flask</h1><time class=post__time>Feb 10, 2014</time></header><main class=prose><p>I have recently set aside some time to delve into the world of Python and all its Zen.
 Being a web developer at heart, I, of course, had to look at the current options available to me.
 In this post, I will guide you through creating a single-script web application using Flask and basic access authentication.
-For simplicity, I assume that you have a working installation of either Python 2.7/3.3 and <a href="http://www.virtualenv.org/en/latest/index.html">virtualenv</a>.</p>
-
-
-
-<h2 id="project-setup">Project Setup</h2>
-
-<p>We must first set up a new virtual environment to cleanly handle external dependencies, similar to <a href="https://getcomposer.org/">Composer</a> in the PHP ecosystem.
+For simplicity, I assume that you have a working installation of either Python 2.7/3.3 and <a href=http://www.virtualenv.org/en/latest/index.html rel="external noopener" target=_blank>virtualenv</a>.</p><h2 id=project-setup>Project Setup</h2><p>We must first set up a new virtual environment to cleanly handle external dependencies, similar to <a href=https://getcomposer.org/ rel="external noopener" target=_blank>Composer</a> in the PHP ecosystem.
 As Python libraries are shared at the system level by default, virtualenv provides projects with their own custom installation directories.
-This resolves the issue of different projects requiring different versions of the same package.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtualenv venv
-<span class="nv">$ </span><span class="nb">source </span>venv/bin/activate
-<span class="nv">$ </span>pip <span class="nb">install </span>Flask
-</code></pre></div></div>
-
-<p>Using the commands provided above, we first create a new virtual environment called ‘venv’ in the project’s root directory.
-To configure the Python, pip, etc. commands to take notice of the custom installation directories within the current shell instance, we must source the ‘activate’ script.
-Finally, we install Flask using the typical pip command.</p>
-
-<h2 id="the-application">The Application</h2>
-
-<p>We are now ready to implement the web application logic.
+This resolves the issue of different projects requiring different versions of the same package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ virtualenv venv
+</span></span><span style=display:flex><span>$ source venv/bin/activate
+</span></span><span style=display:flex><span>$ pip install Flask
+</span></span></code></pre></div><p>Using the commands provided above, we first create a new virtual environment called &lsquo;venv&rsquo; in the project&rsquo;s root directory.
+To configure the Python, pip, etc. commands to take notice of the custom installation directories within the current shell instance, we must source the &lsquo;activate&rsquo; script.
+Finally, we install Flask using the typical pip command.</p><h2 id=the-application>The Application</h2><p>We are now ready to implement the web application logic.
 A design decision I have made is to separate the login credentials into their own settings file.
-This is good practice, and with Python’s “everything is an object” philosophy, defining the file is easy.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">USER</span><span class="o">=</span><span class="s">'admin'</span>
-<span class="n">PASS</span><span class="o">=</span><span class="s">'password'</span>
-</code></pre></div></div>
-
-<p>As you can see, the file requires no boilerplate code and simply specifies the two desired variables.
-With the settings now defined, we can move on to implementing the web application itself.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">request</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
-
-<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-<span class="n">app</span><span class="p">.</span><span class="n">config</span><span class="p">.</span><span class="n">from_object</span><span class="p">(</span><span class="s">'settings'</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">valid_credentials</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">username</span> <span class="o">==</span> <span class="n">app</span><span class="p">.</span><span class="n">config</span><span class="p">[</span><span class="s">'USER'</span><span class="p">]</span> <span class="ow">and</span> <span class="n">password</span> <span class="o">==</span> <span class="n">app</span><span class="p">.</span><span class="n">config</span><span class="p">[</span><span class="s">'PASS'</span><span class="p">]</span>
-
-<span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-    <span class="o">@</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">auth</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">authorization</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">auth</span><span class="p">.</span><span class="n">username</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">auth</span><span class="p">.</span><span class="n">password</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">valid_credentials</span><span class="p">(</span><span class="n">auth</span><span class="p">.</span><span class="n">username</span><span class="p">,</span> <span class="n">auth</span><span class="p">.</span><span class="n">password</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s">'Login!'</span><span class="p">,</span> <span class="mi">401</span><span class="p">,</span> <span class="p">{</span><span class="s">'WWW-Authenticate'</span><span class="p">:</span> <span class="s">'Basic realm="Login!"'</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">wrapper</span>
-
-<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s">'Hello, world!'</span>
-
-<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/secure'</span><span class="p">)</span>
-<span class="o">@</span><span class="n">authenticate</span>
-<span class="k">def</span> <span class="nf">secure</span><span class="p">():</span>
-    <span class="k">return</span> <span class="s">'Secure!'</span>
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
-    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>Using Flask’s ability to import configuration options from external objects, we are able to access the specified credentials in the <code class="language-plaintext highlighter-rouge">valid_credentials</code> function.
-To provide the ‘secure’ route with the required basic authentication, I created a simple wrapper method which is used to decorate the route.
+This is good practice, and with Python&rsquo;s &ldquo;everything is an object&rdquo; philosophy, defining the file is easy.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span>USER<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;admin&#39;</span>
+</span></span><span style=display:flex><span>PASS<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;password&#39;</span>
+</span></span></code></pre></div><p>As you can see, the file requires no boilerplate code and simply specifies the two desired variables.
+With the settings now defined, we can move on to implementing the web application itself.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>from</span> flask <span style=color:#f92672>import</span> Flask, Response, request
+</span></span><span style=display:flex><span><span style=color:#f92672>from</span> functools <span style=color:#f92672>import</span> wraps
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>app <span style=color:#f92672>=</span> Flask(__name__)
+</span></span><span style=display:flex><span>app<span style=color:#f92672>.</span>config<span style=color:#f92672>.</span>from_object(<span style=color:#e6db74>&#39;settings&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>valid_credentials</span>(username, password):
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> username <span style=color:#f92672>==</span> app<span style=color:#f92672>.</span>config[<span style=color:#e6db74>&#39;USER&#39;</span>] <span style=color:#f92672>and</span> password <span style=color:#f92672>==</span> app<span style=color:#f92672>.</span>config[<span style=color:#e6db74>&#39;PASS&#39;</span>]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>authenticate</span>(f):
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>@wraps</span>(f)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> <span style=color:#a6e22e>wrapper</span>(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs):
+</span></span><span style=display:flex><span>        auth <span style=color:#f92672>=</span> request<span style=color:#f92672>.</span>authorization
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> <span style=color:#f92672>not</span> auth<span style=color:#f92672>.</span>username <span style=color:#f92672>or</span> <span style=color:#f92672>not</span> auth<span style=color:#f92672>.</span>password <span style=color:#f92672>or</span> <span style=color:#f92672>not</span> valid_credentials(auth<span style=color:#f92672>.</span>username, auth<span style=color:#f92672>.</span>password):
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> Response(<span style=color:#e6db74>&#39;Login!&#39;</span>, <span style=color:#ae81ff>401</span>, {<span style=color:#e6db74>&#39;WWW-Authenticate&#39;</span>: <span style=color:#e6db74>&#39;Basic realm=&#34;Login!&#34;&#39;</span>})
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> f(<span style=color:#f92672>*</span>args, <span style=color:#f92672>**</span>kwargs)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> wrapper
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.route</span>(<span style=color:#e6db74>&#39;/&#39;</span>)
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>index</span>():
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;Hello, world!&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@app.route</span>(<span style=color:#e6db74>&#39;/secure&#39;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>@authenticate</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>secure</span>():
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;Secure!&#39;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> __name__ <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;__main__&#39;</span>:
+</span></span><span style=display:flex><span>    app<span style=color:#f92672>.</span>run(debug<span style=color:#f92672>=</span><span style=color:#66d9ef>True</span>)
+</span></span></code></pre></div><p>Using Flask&rsquo;s ability to import configuration options from external objects, we are able to access the specified credentials in the <code>valid_credentials</code> function.
+To provide the &lsquo;secure&rsquo; route with the required basic authentication, I created a simple wrapper method which is used to decorate the route.
 Decorators are a super simple, yet increasingly powerful concept, allowing you to wrap function calls with other functions in a very succinct manner.
 As this is an experiment, I have specified that the application be run in debug mode, enabling auto-reloading of updated files within the local development server.
-Finally, we are ready to run the application.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python main.py
-<span class="nv">$ </span>pip freeze <span class="o">&gt;</span> requirements.txt
-</code></pre></div></div>
-
-<p>After checking to make sure that our handiwork has been successful, we can freeze the required dependencies so as to ease future development and deployment.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.virtualenv.org/en/latest/index.html">virtualenv</a></li>
-  <li><a href="https://pypi.python.org/pypi">PyPI</a></li>
-  <li><a href="http://flask.pocoo.org/">Flask</a></li>
-  <li><a href="http://flask.pocoo.org/snippets/8/">HTTP Basic Auth</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Finally, we are ready to run the application.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ python main.py
+</span></span><span style=display:flex><span>$ pip freeze &gt; requirements.txt
+</span></span></code></pre></div><p>After checking to make sure that our handiwork has been successful, we can freeze the required dependencies so as to ease future development and deployment.</p><h2 id=resources>Resources</h2><ul><li><a href=http://www.virtualenv.org/en/latest/index.html rel="external noopener" target=_blank>virtualenv</a></li><li><a href=https://pypi.python.org/pypi rel="external noopener" target=_blank>PyPI</a></li><li><a href=http://flask.pocoo.org/ rel="external noopener" target=_blank>Flask</a></li><li><a href=http://flask.pocoo.org/snippets/8/ rel="external noopener" target=_blank>HTTP Basic Auth</a></li></ul></main><footer class=post__tags><a href=/archive/tag/flask>flask</a><a href=/archive/tag/python>python</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

@@ -1,209 +1,111 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to implement a memory efficient XOR doubly linked-list in C for effective low-level memory management.">
-
-    <title>
-        
-            Implementing a XOR Doubly Linked-List in C &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Implementing a XOR Doubly Linked-List in C</h1>
-    <time datetime="2014-01-03T00:00:00+00:00" class="post-date">03 Jan 2014</time>
-    <p>This post examines the implementation of a XOR doubly linked-list in C.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Implementing a XOR Doubly Linked-List in C - Edd Mann</title>
+<meta name=description content="Learn how to implement a memory efficient XOR doubly linked-list in C for effective low-level memory management."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Implementing a XOR Doubly Linked-List in C"><meta itemprop=description content="This post examines the implementation of a XOR doubly linked-list in C. It provides a detailed explanation of how pointer arithmetic combined with the XOR operation can reduce memory usage in a linked list. The discussion covers both the benefits and the challenges of managing memory at a low level in C."><meta itemprop=datePublished content="2014-01-03T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-03T00:00:00+00:00"><meta itemprop=wordCount content="803"><meta itemprop=keywords content="C,Data-Structures"><meta property="og:url" content="https://eddmann.com/posts/implementing-a-xor-doubly-linked-list-in-c/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Implementing a XOR Doubly Linked-List in C"><meta property="og:description" content="This post examines the implementation of a XOR doubly linked-list in C. It provides a detailed explanation of how pointer arithmetic combined with the XOR operation can reduce memory usage in a linked list. The discussion covers both the benefits and the challenges of managing memory at a low level in C."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-03T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-03T00:00:00+00:00"><meta property="article:tag" content="C"><meta property="article:tag" content="Data-Structures"><meta name=twitter:card content="summary"><meta name=twitter:title content="Implementing a XOR Doubly Linked-List in C"><meta name=twitter:description content="This post examines the implementation of a XOR doubly linked-list in C. It provides a detailed explanation of how pointer arithmetic combined with the XOR operation can reduce memory usage in a linked list. The discussion covers both the benefits and the challenges of managing memory at a low level in C."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/implementing-a-xor-doubly-linked-list-in-c/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Implementing a XOR Doubly Linked-List in C</h1><time class=post__time>Jan 3, 2014</time></header><main class=prose><p>This post examines the implementation of a XOR doubly linked-list in C.
 It provides a detailed explanation of how pointer arithmetic combined with the XOR operation can reduce memory usage in a linked list.
-The discussion covers both the benefits and the challenges of managing memory at a low level in C.</p>
-
-
-
-<h2 id="what-about-java">What about Java?</h2>
-
-<p>After experimenting with the <a href="/posts/experimenting-with-the-xor-swap-method-in-java/">XOR swap method in Java</a> I had hoped to follow it up with an exploration of the XOR doubly linked-list.
+The discussion covers both the benefits and the challenges of managing memory at a low level in C.</p><h2 id=what-about-java>What about Java?</h2><p>After experimenting with the <a href=/posts/experimenting-with-the-xor-swap-method-in-java/>XOR swap method in Java</a> I had hoped to follow it up with an exploration of the XOR doubly linked-list.
 Java objects, however, are not directly accessible through pointer reference.
 This is by no means a limitation, as it allows the garbage collector to efficiently and safely handle memory allocation.
-Sometimes it is desired to have such access, and you can take advantage of <a href="http://en.wikipedia.org/wiki/Java_Native_Interface">JNI</a> to call assembly, or C/C++ code from within Java.
-Another option is to use the <a href="http://mishadoff.github.io/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/">sun.misc.Unsafe</a> class, which provides many <em>unsafe</em> operations, one of which is to retrieve object memory address locations.</p>
-
-<h2 id="time-for-some-c">Time for some C</h2>
-
-<p>Despite these alternatives, I felt compelled to continue my exploration of C.
+Sometimes it is desired to have such access, and you can take advantage of <a href=http://en.wikipedia.org/wiki/Java_Native_Interface rel="external noopener" target=_blank>JNI</a> to call assembly, or C/C++ code from within Java.
+Another option is to use the <a href=http://mishadoff.github.io/blog/java-magic-part-4-sun-dot-misc-dot-unsafe/ rel="external noopener" target=_blank>sun.misc.Unsafe</a> class, which provides many <em>unsafe</em> operations, one of which is to retrieve object memory address locations.</p><h2 id=time-for-some-c>Time for some C</h2><p>Despite these alternatives, I felt compelled to continue my exploration of C.
 I implemented this data structure using a language with robust (albeit scary) low-level memory-management support.
 From previous posts you are aware that a doubly linked list stores items with pointers in both directions.
 This allows for traversal both forwards and backwards, albeit at the expense of having to store two pointers per element.
-Through the magic of the bitwise XOR operation, however, we are able to store each node’s previous and next pointers in the memory allocated to just one.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdint.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdbool.h&gt;</span><span class="cp">
-</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">node</span> <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">item</span><span class="p">;</span>
-    <span class="k">struct</span> <span class="n">node</span> <span class="o">*</span><span class="n">np</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">node</span><span class="p">;</span>
-
-<span class="n">node</span> <span class="o">*</span><span class="n">head</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span><span class="p">;</span>
-
-<span class="n">node</span> <span class="o">*</span><span class="nf">xor</span><span class="p">(</span><span class="n">node</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="n">node</span> <span class="o">*</span><span class="n">b</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">node</span><span class="o">*</span><span class="p">)</span> <span class="p">((</span><span class="kt">uintptr_t</span><span class="p">)</span> <span class="n">a</span> <span class="o">^</span> <span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span> <span class="n">b</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">insert</span><span class="p">(</span><span class="kt">int</span> <span class="n">item</span><span class="p">,</span> <span class="n">bool</span> <span class="n">at_tail</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">node</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">node</span><span class="p">));</span>
-    <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">at_tail</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">tail</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-        <span class="n">tail</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">xor</span><span class="p">(</span><span class="n">tail</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
-        <span class="n">tail</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">head</span><span class="p">);</span>
-        <span class="n">head</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">xor</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">head</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">));</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">delete</span><span class="p">(</span><span class="n">bool</span> <span class="n">from_tail</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">head</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Empty list.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">from_tail</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">tail</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
-        <span class="n">node</span> <span class="o">*</span><span class="n">prev</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">ptr</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">prev</span><span class="p">)</span> <span class="n">head</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="k">else</span> <span class="n">prev</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">xor</span><span class="p">(</span><span class="n">prev</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">));</span>
-        <span class="n">tail</span> <span class="o">=</span> <span class="n">prev</span><span class="p">;</span>
-        <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
-        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="n">node</span> <span class="o">*</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-        <span class="kt">int</span> <span class="n">item</span> <span class="o">=</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">;</span>
-        <span class="n">node</span> <span class="o">*</span><span class="n">next</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">ptr</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="n">next</span><span class="p">)</span> <span class="n">tail</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="k">else</span> <span class="n">next</span><span class="o">-&gt;</span><span class="n">np</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">xor</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">next</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">));</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-        <span class="n">free</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
-        <span class="n">ptr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">item</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">list</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="n">node</span> <span class="o">*</span><span class="n">curr</span> <span class="o">=</span> <span class="n">head</span><span class="p">;</span>
-    <span class="n">node</span> <span class="o">*</span><span class="n">prev</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">*</span><span class="n">next</span><span class="p">;</span>
-
-    <span class="k">while</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">!=</span> <span class="n">curr</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"%d "</span><span class="p">,</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">item</span><span class="p">);</span>
-        <span class="n">next</span> <span class="o">=</span> <span class="n">xor</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">curr</span><span class="o">-&gt;</span><span class="n">np</span><span class="p">);</span>
-        <span class="n">prev</span> <span class="o">=</span> <span class="n">curr</span><span class="p">;</span>
-        <span class="n">curr</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
-<span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">);</span>
-
-    <span class="n">list</span><span class="p">();</span> <span class="c1">// 10 9 8 7 6 1 2 3 4 5</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">delete</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">);</span>
-
-    <span class="n">list</span><span class="p">();</span> <span class="c1">// 8 7 6 1 2 3</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Firstly, I would like to credit <a href="http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/">this</a> post and <a href="http://stackoverflow.com/a/3532455">this</a> StackOverflow answer, which helped shape my implementation.
-Since in C we are unable to perform XOR operations on pointers directly, we must first convert them to integers using the <code class="language-plaintext highlighter-rouge">uintptr_t</code> data type and then cast back, as can be seen in the ‘xor’ function.
+Through the magic of the bitwise XOR operation, however, we are able to store each node&rsquo;s previous and next pointers in the memory allocated to just one.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdlib.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdint.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdbool.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>typedef</span> <span style=color:#66d9ef>struct</span> node {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> item;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>struct</span> node <span style=color:#f92672>*</span>np;
+</span></span><span style=display:flex><span>} node;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>node <span style=color:#f92672>*</span>head, <span style=color:#f92672>*</span>tail;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>node <span style=color:#f92672>*</span><span style=color:#a6e22e>xor</span>(node <span style=color:#f92672>*</span>a, node <span style=color:#f92672>*</span>b)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> (node<span style=color:#f92672>*</span>) ((<span style=color:#66d9ef>uintptr_t</span>) a <span style=color:#f92672>^</span> (<span style=color:#66d9ef>uintptr_t</span>) b);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>insert</span>(<span style=color:#66d9ef>int</span> item, <span style=color:#66d9ef>bool</span> at_tail)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    node <span style=color:#f92672>*</span>ptr <span style=color:#f92672>=</span> (node<span style=color:#f92672>*</span>) <span style=color:#a6e22e>malloc</span>(<span style=color:#66d9ef>sizeof</span>(node));
+</span></span><span style=display:flex><span>    ptr<span style=color:#f92672>-&gt;</span>item <span style=color:#f92672>=</span> item;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (NULL <span style=color:#f92672>==</span> head) {
+</span></span><span style=display:flex><span>        ptr<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>        head <span style=color:#f92672>=</span> tail <span style=color:#f92672>=</span> ptr;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> (at_tail) {
+</span></span><span style=display:flex><span>        ptr<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(tail, NULL);
+</span></span><span style=display:flex><span>        tail<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(ptr, <span style=color:#a6e22e>xor</span>(tail<span style=color:#f92672>-&gt;</span>np, NULL));
+</span></span><span style=display:flex><span>        tail <span style=color:#f92672>=</span> ptr;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        ptr<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(NULL, head);
+</span></span><span style=display:flex><span>        head<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(ptr, <span style=color:#a6e22e>xor</span>(NULL, head<span style=color:#f92672>-&gt;</span>np));
+</span></span><span style=display:flex><span>        head <span style=color:#f92672>=</span> ptr;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>delete</span>(<span style=color:#66d9ef>bool</span> from_tail)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (NULL <span style=color:#f92672>==</span> head) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Empty list.</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>exit</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> (from_tail) {
+</span></span><span style=display:flex><span>        node <span style=color:#f92672>*</span>ptr <span style=color:#f92672>=</span> tail;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> item <span style=color:#f92672>=</span> ptr<span style=color:#f92672>-&gt;</span>item;
+</span></span><span style=display:flex><span>        node <span style=color:#f92672>*</span>prev <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(ptr<span style=color:#f92672>-&gt;</span>np, NULL);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (NULL <span style=color:#f92672>==</span> prev) head <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>else</span> prev<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(ptr, <span style=color:#a6e22e>xor</span>(prev<span style=color:#f92672>-&gt;</span>np, NULL));
+</span></span><span style=display:flex><span>        tail <span style=color:#f92672>=</span> prev;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>free</span>(ptr);
+</span></span><span style=display:flex><span>        ptr <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> item;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        node <span style=color:#f92672>*</span>ptr <span style=color:#f92672>=</span> head;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> item <span style=color:#f92672>=</span> ptr<span style=color:#f92672>-&gt;</span>item;
+</span></span><span style=display:flex><span>        node <span style=color:#f92672>*</span>next <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(NULL, ptr<span style=color:#f92672>-&gt;</span>np);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (NULL <span style=color:#f92672>==</span> next) tail <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>else</span> next<span style=color:#f92672>-&gt;</span>np <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(ptr, <span style=color:#a6e22e>xor</span>(NULL, next<span style=color:#f92672>-&gt;</span>np));
+</span></span><span style=display:flex><span>        head <span style=color:#f92672>=</span> next;
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>free</span>(ptr);
+</span></span><span style=display:flex><span>        ptr <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> item;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>list</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    node <span style=color:#f92672>*</span>curr <span style=color:#f92672>=</span> head;
+</span></span><span style=display:flex><span>    node <span style=color:#f92672>*</span>prev <span style=color:#f92672>=</span> NULL, <span style=color:#f92672>*</span>next;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (NULL <span style=color:#f92672>!=</span> curr) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;%d &#34;</span>, curr<span style=color:#f92672>-&gt;</span>item);
+</span></span><span style=display:flex><span>        next <span style=color:#f92672>=</span> <span style=color:#a6e22e>xor</span>(prev, curr<span style=color:#f92672>-&gt;</span>np);
+</span></span><span style=display:flex><span>        prev <span style=color:#f92672>=</span> curr;
+</span></span><span style=display:flex><span>        curr <span style=color:#f92672>=</span> next;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>int</span> argc, <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>argv[])
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>; i <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>10</span>; i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>insert</span>(i, i <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>6</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>list</span>(); <span style=color:#75715e>// 10 9 8 7 6 1 2 3 4 5
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>; i <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>4</span>; i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>delete</span>(i <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>3</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>list</span>(); <span style=color:#75715e>// 8 7 6 1 2 3
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span></code></pre></div><p>Firstly, I would like to credit <a href=http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/ rel="external noopener" target=_blank>this</a> post and <a href=http://stackoverflow.com/a/3532455 rel="external noopener" target=_blank>this</a> StackOverflow answer, which helped shape my implementation.
+Since in C we are unable to perform XOR operations on pointers directly, we must first convert them to integers using the <code>uintptr_t</code> data type and then cast back, as can be seen in the &lsquo;xor&rsquo; function.
 At its root, the implementation works by storing the resulting XOR value from the previous and next pointer locations for each node.
-From this value we are then able to ‘undo’ the operation using the supplied known pointer, returning the other pointer’s value.
-If the node appears at the head or tail of the list, the known pointer’s value is XORed with 0 (<code class="language-plaintext highlighter-rouge">NULL</code>), effectively doing nothing.
-Below are the different operations that are used to build up and then traverse the list:</p>
-
-<ul>
-  <li>previous ^ next = value (stored in node)</li>
-  <li>value ^ previous = next (forward)</li>
-  <li>value ^ next = previous (backward)</li>
-</ul>
-
-<p>Looking at the <code class="language-plaintext highlighter-rouge">list</code> method, you can see that we are able to traverse the list in either direction by calculating the next pointer using the current value and the previous node’s value (starting with NULL).
-An issue with this implementation is that it only works if you start traversal from the head or tail, as you are required to know the previous pointer’s value.
-This diminishes one of the main advantages of using a doubly linked list, which is the ability to remove any given node by its reference alone.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.params.me/2011/06/xor-linked-list-in-java.html">XOR Linked List in Java</a></li>
-  <li><a href="http://javapapers.com/core-java/address-of-a-java-object/">Address of a Java Object</a></li>
-  <li><a href="http://codethink.no-ip.org/wordpress/archives/712">Resurrecting sun.misc.Unsafe</a></li>
-  <li><a href="http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/">XOR Linked List - A Memory Efficient Doubly Linked List</a></li>
-  <li><a href="http://stackoverflow.com/questions/3531972/c-code-for-xor-linked-list">C code for XOR linked list</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+From this value we are then able to &lsquo;undo&rsquo; the operation using the supplied known pointer, returning the other pointer&rsquo;s value.
+If the node appears at the head or tail of the list, the known pointer&rsquo;s value is XORed with 0 (<code>NULL</code>), effectively doing nothing.
+Below are the different operations that are used to build up and then traverse the list:</p><ul><li>previous ^ next = value (stored in node)</li><li>value ^ previous = next (forward)</li><li>value ^ next = previous (backward)</li></ul><p>Looking at the <code>list</code> method, you can see that we are able to traverse the list in either direction by calculating the next pointer using the current value and the previous node&rsquo;s value (starting with NULL).
+An issue with this implementation is that it only works if you start traversal from the head or tail, as you are required to know the previous pointer&rsquo;s value.
+This diminishes one of the main advantages of using a doubly linked list, which is the ability to remove any given node by its reference alone.</p><h2 id=resources>Resources</h2><ul><li><a href=http://www.params.me/2011/06/xor-linked-list-in-java.html rel="external noopener" target=_blank>XOR Linked List in Java</a></li><li><a href=http://javapapers.com/core-java/address-of-a-java-object/ rel="external noopener" target=_blank>Address of a Java Object</a></li><li><a href=http://codethink.no-ip.org/wordpress/archives/712 rel="external noopener" target=_blank>Resurrecting sun.misc.Unsafe</a></li><li><a href=http://www.geeksforgeeks.org/xor-linked-list-a-memory-efficient-doubly-linked-list-set-2/ rel="external noopener" target=_blank>XOR Linked List - A Memory Efficient Doubly Linked List</a></li><li><a href=http://stackoverflow.com/questions/3531972/c-code-for-xor-linked-list rel="external noopener" target=_blank>C code for XOR linked list</a></li></ul></main><footer class=post__tags><a href=/archive/tag/c>c</a><a href=/archive/tag/data-structures>data-structures</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

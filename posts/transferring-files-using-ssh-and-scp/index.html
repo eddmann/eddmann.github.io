@@ -1,155 +1,29 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive guide on transferring files using SSH and SCP, featuring practical examples and tips for secure and efficient file management across multiple servers.">
-
-    <title>
-        
-            Transferring Files using SSH and SCP &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Transferring Files using SSH and SCP</h1>
-    <time datetime="2014-01-17T00:00:00+00:00" class="post-date">17 Jan 2014</time>
-    <p>When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker.
-Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP.</p>
-
-
-
-<h2 id="ssh">SSH</h2>
-
-<p>I am sure you are familiar with SSH (Secure Shell).
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Transferring Files using SSH and SCP - Edd Mann</title>
+<meta name=description content="A comprehensive guide on transferring files using SSH and SCP, featuring practical examples and tips for secure and efficient file management across multiple servers."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Transferring Files using SSH and SCP"><meta itemprop=description content="When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker. Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP."><meta itemprop=datePublished content="2014-01-17T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-17T00:00:00+00:00"><meta itemprop=wordCount content="635"><meta itemprop=keywords content="Ssh,Scp"><meta property="og:url" content="https://eddmann.com/posts/transferring-files-using-ssh-and-scp/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Transferring Files using SSH and SCP"><meta property="og:description" content="When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker. Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-17T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-17T00:00:00+00:00"><meta property="article:tag" content="Ssh"><meta property="article:tag" content="Scp"><meta name=twitter:card content="summary"><meta name=twitter:title content="Transferring Files using SSH and SCP"><meta name=twitter:description content="When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker. Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/transferring-files-using-ssh-and-scp/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Transferring Files using SSH and SCP</h1><time class=post__time>Jan 17, 2014</time></header><main class=prose><p>When you are managing multiple servers on a daily basis it pays off to invest some time in picking up a few techniques to get jobs finished quicker.
+Provided in this post are a couple of the commands I use frequently when handling files and directories via SSH and SCP.</p><h2 id=ssh>SSH</h2><p>I am sure you are familiar with SSH (Secure Shell).
 I spend most of my day-to-day work with a remote connection open.
-Thanks to the <a href="http://en.wikipedia.org/wiki/Unix_philosophy">Unix philosophy</a>, combined with other commands, you are able to expand the single focused functionality of SSH.</p>
-
-<h3 id="execute-remote-commands">Execute Remote Commands</h3>
-
-<p>Using SSH you are able to supply an arbitrary command you wish to execute on a remote server.
+Thanks to the <a href=http://en.wikipedia.org/wiki/Unix_philosophy rel="external noopener" target=_blank>Unix philosophy</a>, combined with other commands, you are able to expand the single focused functionality of SSH.</p><h3 id=execute-remote-commands>Execute Remote Commands</h3><p>Using SSH you are able to supply an arbitrary command you wish to execute on a remote server.
 Below are a couple of useful commands I use to monitor multiple facets of the server.
-Adding these commands via an alias in your dotfiles could shave off a couple more key-presses each day.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh user@host <span class="s1">'uptime'</span> <span class="c"># check uptime</span>
-<span class="nv">$ </span>ssh user@host <span class="s1">'df -h'</span>  <span class="c"># check disk usage</span>
-</code></pre></div></div>
-
-<h3 id="basic-file-transfers">Basic File Transfers</h3>
-
-<p>There are many ways of copying file contents to and from a remote server, the most basic of which is piping ‘cat’ commands.
+Adding these commands via an alias in your dotfiles could shave off a couple more key-presses each day.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ ssh user@host <span style=color:#e6db74>&#39;uptime&#39;</span> <span style=color:#75715e># check uptime</span>
+</span></span><span style=display:flex><span>$ ssh user@host <span style=color:#e6db74>&#39;df -h&#39;</span>  <span style=color:#75715e># check disk usage</span>
+</span></span></code></pre></div><h3 id=basic-file-transfers>Basic File Transfers</h3><p>There are many ways of copying file contents to and from a remote server, the most basic of which is piping &lsquo;cat&rsquo; commands.
 Below details an example of copying the contents of a local file to a remote location, taking advantage of the SSH capabilities highlighted in the first example.
-The second example completes the inverse operation, retrieving a file from a remote location.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /file/on/local | ssh user@host <span class="s1">'cat &gt; /file/on/remote'</span> <span class="c"># local to remote</span>
-<span class="nv">$ </span>ssh user@host <span class="s1">'cat /file/on/remote'</span> <span class="o">&gt;</span> /file/on/local       <span class="c"># remote to local</span>
-</code></pre></div></div>
-
-<p>If you do not desire to copy across the full contents of a file and only require a single line to be appended to a remote file, the example below will complete this action.
-The use of single quotes is deliberate; they are required for the supplied exclamation mark, preventing Bash string expansion.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">'Hello, world!'</span> | ssh user@host <span class="s1">'cat &gt;&gt; /file/on/remote'</span> <span class="c"># append line to remote</span>
-</code></pre></div></div>
-
-<h3 id="file-comparison">File Comparison</h3>
-
-<p>Even with the addition of a version control system like Git in my workflow, comparing deployed files with local copies is still a great tool to have.
-Below is a command which compares the contents of a remote file with a supplied local file.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh user@host <span class="s1">'cat /file/on/remote'</span> | diff /file/on/local -
-</code></pre></div></div>
-
-<h2 id="scp">SCP</h2>
-
-<p>Sometimes you need a little more control over how and what files you wish to transfer; this is when SCP (Secure Copy) can help.
-The tool can be abstractly considered as ‘cp’ with added SSH protocol support.</p>
-
-<h3 id="transferring-files">Transferring Files</h3>
-
-<p>Similar to the examples shown for basic SSH file transfers, you can use the following commands to copy between local and remote locations.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp /file/on/local user@host:/file/on/remote <span class="c"># local to remote</span>
-<span class="nv">$ </span>scp user@host:/file/on/remote /file/on/local <span class="c"># remote to local</span>
-</code></pre></div></div>
-
-<p>You also have the capability to transfer files between two different remote locations.
-I have found this useful in multi-server distributed setups.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp user@host1:/file/on/remote user@host2:/file/on/remote <span class="c"># copy between remotes</span>
-</code></pre></div></div>
-
-<h3 id="transferring-directories">Transferring Directories</h3>
-
-<p>Transferring directories between local and remote locations is similar to single file actions, differing only with the addition of the ‘-r’ (recursive) flag.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp <span class="nt">-r</span> /dir/on/local user@host:/dir/on/remote <span class="c"># local to remote</span>
-<span class="nv">$ </span>scp <span class="nt">-r</span> user@host:/dir/on/remote /dir/on/local <span class="c"># remote to local</span>
-</code></pre></div></div>
-
-<h3 id="limit-bandwidth-usage">Limit Bandwidth Usage</h3>
-
-<p>SCP also supports limiting the bandwidth available to the transfer.
-Similar to recursively transferring directory files, all that is required is the ‘-l’ flag followed by the limit value supplied in kbit/s.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp <span class="nt">-l</span> 56 user@host:/file/on/remote /file/on/local <span class="c"># remote to local @ 56kbps</span>
-</code></pre></div></div>
-
-<h3 id="change-transfer-encryption">Change Transfer Encryption</h3>
-
-<p>By default, SCP uses AES-128 to encrypt the data transferred, which, though secure, can result in slow transfers in large instances.
-Weighing up each transfer on a separate security basis, you are able to speed up a transfer by using an alternative, weaker encryption such as Blowfish or RC4.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp <span class="nt">-c</span> blowfish user@host:/file/on/remote /file/on/local
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+The second example completes the inverse operation, retrieving a file from a remote location.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ cat /file/on/local | ssh user@host <span style=color:#e6db74>&#39;cat &gt; /file/on/remote&#39;</span> <span style=color:#75715e># local to remote</span>
+</span></span><span style=display:flex><span>$ ssh user@host <span style=color:#e6db74>&#39;cat /file/on/remote&#39;</span> &gt; /file/on/local       <span style=color:#75715e># remote to local</span>
+</span></span></code></pre></div><p>If you do not desire to copy across the full contents of a file and only require a single line to be appended to a remote file, the example below will complete this action.
+The use of single quotes is deliberate; they are required for the supplied exclamation mark, preventing Bash string expansion.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ echo <span style=color:#e6db74>&#39;Hello, world!&#39;</span> | ssh user@host <span style=color:#e6db74>&#39;cat &gt;&gt; /file/on/remote&#39;</span> <span style=color:#75715e># append line to remote</span>
+</span></span></code></pre></div><h3 id=file-comparison>File Comparison</h3><p>Even with the addition of a version control system like Git in my workflow, comparing deployed files with local copies is still a great tool to have.
+Below is a command which compares the contents of a remote file with a supplied local file.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ ssh user@host <span style=color:#e6db74>&#39;cat /file/on/remote&#39;</span> | diff /file/on/local -
+</span></span></code></pre></div><h2 id=scp>SCP</h2><p>Sometimes you need a little more control over how and what files you wish to transfer; this is when SCP (Secure Copy) can help.
+The tool can be abstractly considered as &lsquo;cp&rsquo; with added SSH protocol support.</p><h3 id=transferring-files>Transferring Files</h3><p>Similar to the examples shown for basic SSH file transfers, you can use the following commands to copy between local and remote locations.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ scp /file/on/local user@host:/file/on/remote <span style=color:#75715e># local to remote</span>
+</span></span><span style=display:flex><span>$ scp user@host:/file/on/remote /file/on/local <span style=color:#75715e># remote to local</span>
+</span></span></code></pre></div><p>You also have the capability to transfer files between two different remote locations.
+I have found this useful in multi-server distributed setups.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ scp user@host1:/file/on/remote user@host2:/file/on/remote <span style=color:#75715e># copy between remotes</span>
+</span></span></code></pre></div><h3 id=transferring-directories>Transferring Directories</h3><p>Transferring directories between local and remote locations is similar to single file actions, differing only with the addition of the &lsquo;-r&rsquo; (recursive) flag.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ scp -r /dir/on/local user@host:/dir/on/remote <span style=color:#75715e># local to remote</span>
+</span></span><span style=display:flex><span>$ scp -r user@host:/dir/on/remote /dir/on/local <span style=color:#75715e># remote to local</span>
+</span></span></code></pre></div><h3 id=limit-bandwidth-usage>Limit Bandwidth Usage</h3><p>SCP also supports limiting the bandwidth available to the transfer.
+Similar to recursively transferring directory files, all that is required is the &lsquo;-l&rsquo; flag followed by the limit value supplied in kbit/s.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ scp -l <span style=color:#ae81ff>56</span> user@host:/file/on/remote /file/on/local <span style=color:#75715e># remote to local @ 56kbps</span>
+</span></span></code></pre></div><h3 id=change-transfer-encryption>Change Transfer Encryption</h3><p>By default, SCP uses AES-128 to encrypt the data transferred, which, though secure, can result in slow transfers in large instances.
+Weighing up each transfer on a separate security basis, you are able to speed up a transfer by using an alternative, weaker encryption such as Blowfish or RC4.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ scp -c blowfish user@host:/file/on/remote /file/on/local
+</span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/ssh>ssh</a><a href=/archive/tag/scp>scp</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

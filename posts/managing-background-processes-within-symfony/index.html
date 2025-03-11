@@ -1,253 +1,127 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to efficiently manage background processes within Symfony, leveraging Cron, Supervisor, and continuous process management techniques.">
-
-    <title>
-        
-            Managing Background Processes within Symfony &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Managing Background Processes within Symfony</h1>
-    <time datetime="2016-12-01T00:00:00+00:00" class="post-date">01 Dec 2016</time>
-    <p>When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Managing Background Processes within Symfony - Edd Mann</title>
+<meta name=description content="Discover how to efficiently manage background processes within Symfony, leveraging Cron, Supervisor, and continuous process management techniques."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Managing Background Processes within Symfony"><meta itemprop=description content="When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle. You may find yourself wishing to, for example, batch up and send queued emails at particular intervals or process payments asynchronously to the point in time when the user made the initial request. In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands."><meta itemprop=datePublished content="2016-12-01T00:00:00+00:00"><meta itemprop=dateModified content="2016-12-01T00:00:00+00:00"><meta itemprop=wordCount content="1489"><meta itemprop=keywords content="Symfony,Supervisor,Php"><meta property="og:url" content="https://eddmann.com/posts/managing-background-processes-within-symfony/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Managing Background Processes within Symfony"><meta property="og:description" content="When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle. You may find yourself wishing to, for example, batch up and send queued emails at particular intervals or process payments asynchronously to the point in time when the user made the initial request. In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2016-12-01T00:00:00+00:00"><meta property="article:modified_time" content="2016-12-01T00:00:00+00:00"><meta property="article:tag" content="Symfony"><meta property="article:tag" content="Supervisor"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Managing Background Processes within Symfony"><meta name=twitter:description content="When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle. You may find yourself wishing to, for example, batch up and send queued emails at particular intervals or process payments asynchronously to the point in time when the user made the initial request. In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/managing-background-processes-within-symfony/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Managing Background Processes within Symfony</h1><time class=post__time>Dec 1, 2016</time></header><main class=prose><p>When a web application reaches a sufficiently large size, it can become infeasible to perform all actions required within a single web request/response lifecycle.
 You may find yourself wishing to, for example, batch up and send queued emails at particular intervals or process payments asynchronously to the point in time when the user made the initial request.
-In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands.</p>
-
-
-
-<h2 id="using-cron">Using Cron</h2>
-
-<p>At MyBuilder, we have grown to rely heavily on background processes, helping manage the day-to-day activities of the business.
+In this post, I would like to discuss our evolving use of background processes (both time-dependent and continuous) due to increasing throughput demands.</p><h2 id=using-cron>Using Cron</h2><p>At MyBuilder, we have grown to rely heavily on background processes, helping manage the day-to-day activities of the business.
 For time-dependent tasks (i.e. run a specific command every 30 minutes), we use the Cron job scheduler to declare and execute the processes at desired intervals.
-We found ourselves using this so frequently, in fact, that we created <a href="https://github.com/mybuilder/cronos">Cronos</a> and the <a href="https://github.com/mybuilder/cronos-bundle">Cronos Symfony Bundle</a>, which allow us to decorate commands we wish to run using a PHP <code class="language-plaintext highlighter-rouge">@Cron</code> annotation.
-Using this system allows us to ‘dump’ the new <code class="language-plaintext highlighter-rouge">crontab</code> declaration upon each deployment cycle.
+We found ourselves using this so frequently, in fact, that we created <a href=https://github.com/mybuilder/cronos rel="external noopener" target=_blank>Cronos</a> and the <a href=https://github.com/mybuilder/cronos-bundle rel="external noopener" target=_blank>Cronos Symfony Bundle</a>, which allow us to decorate commands we wish to run using a PHP <code>@Cron</code> annotation.
+Using this system allows us to &lsquo;dump&rsquo; the new <code>crontab</code> declaration upon each deployment cycle.
 This ensures that our background processes remain in sync with the current released build.
 Upon reflection, this also proved to be a success in regard to codebase understandability.
-We have found that keeping the interval definition close to the code makes it easier to reason about when entering a piece of functionality.</p>
-
-<p>Below is an example use case of how we would use the <code class="language-plaintext highlighter-rouge">@Cron</code> annotation within a trivial Symfony command.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
- * @Cron(minute="/30")
- */</span>
-<span class="kd">class</span> <span class="nc">SendQueuedEmailsCommand</span> <span class="kd">extends</span> <span class="nc">Command</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="n">execute</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">fetchQueuedEmails</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$email</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">send</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Above, we are specifying that we would like to send out any queued emails every 30-minute interval.</p>
-
-<h2 id="the-need-for-more">The Need for More</h2>
-
-<p>However, over time, the demand on these commands and the required throughput has grown significantly.
+We have found that keeping the interval definition close to the code makes it easier to reason about when entering a piece of functionality.</p><p>Below is an example use case of how we would use the <code>@Cron</code> annotation within a trivial Symfony command.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @Cron(minute=&#34;/30&#34;)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SendQueuedEmailsCommand</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Command</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>execute</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>foreach</span> ($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>fetchQueuedEmails</span>() <span style=color:#66d9ef>as</span> $email) {
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>send</span>($email);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Above, we are specifying that we would like to send out any queued emails every 30-minute interval.</p><h2 id=the-need-for-more>The Need for More</h2><p>However, over time, the demand on these commands and the required throughput has grown significantly.
 Reducing the invocation times gave us short-term relief, but eventually, we needed always-running processes.
 We even found that, in some cases, a single instance would not suffice, and having multiple workers running would be a requirement too.
-To address this need, we created the concept of a <code class="language-plaintext highlighter-rouge">RunManager</code>, which allowed us to provide commands with a looping process construct.</p>
-
-<p>Looking at the problem of sending queued emails again as a concrete example, let’s say that to manage the load at which we now enqueue emails to be sent, we require an always-running instance of the sender command.
-Below, we have made some amendments that will now iteratively keep processing queued emails that are present.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">SendQueuedEmailsCommand</span> <span class="kd">extends</span> <span class="nc">Command</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="n">execute</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RunManager</span><span class="p">();</span>
-
-        <span class="k">while</span> <span class="p">(</span><span class="nv">$manager</span><span class="o">-&gt;</span><span class="nf">isOk</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">fetchSingleQueuedEmail</span><span class="p">())</span> <span class="p">{</span>
-                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">send</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h3 id="run-forever">Run Forever</h3>
-
-<p>In an ideal scenario, we would kick off a process and it would run ‘forever’.
+To address this need, we created the concept of a <code>RunManager</code>, which allowed us to provide commands with a looping process construct.</p><p>Looking at the problem of sending queued emails again as a concrete example, let&rsquo;s say that to manage the load at which we now enqueue emails to be sent, we require an always-running instance of the sender command.
+Below, we have made some amendments that will now iteratively keep processing queued emails that are present.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SendQueuedEmailsCommand</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Command</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>execute</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RunManager</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> ($manager<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isOk</span>()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> ($email <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>fetchSingleQueuedEmail</span>()) {
+</span></span><span style=display:flex><span>                $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>send</span>($email);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=run-forever>Run Forever</h3><p>In an ideal scenario, we would kick off a process and it would run &lsquo;forever&rsquo;.
 Unfortunately, certain events may occur throughout its life where the cheapest way of managing its state is to restart it (e.g. allocated memory exceeded).
-We got around this problem by first declaring (using the <code class="language-plaintext highlighter-rouge">RunManager</code>) how many of a process we wished to be present at a time.
+We got around this problem by first declaring (using the <code>RunManager</code>) how many of a process we wished to be present at a time.
 We then employed our initial Cron infrastructure to attempt to start the process at a given interval.
 This meant that if a process did die, the next Cron invocation would spawn a new instance.
-Guarding the command with a maximum process count ensured that only a certain number of instances would be running at a given time.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
- * @Cron(minute="/1")
- */</span>
-<span class="kd">class</span> <span class="nc">SendQueuedEmailsCommand</span> <span class="kd">extends</span> <span class="nc">Command</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="n">execute</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RunManager</span><span class="p">([</span><span class="s1">'maxDuration'</span> <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span> <span class="s1">'maxProcesses'</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">]);</span>
-
-        <span class="k">while</span> <span class="p">(</span><span class="nv">$manager</span><span class="o">-&gt;</span><span class="nf">isOk</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">fetchSingleQueuedEmail</span><span class="p">())</span> <span class="p">{</span>
-                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">send</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Although this solved the problem of spawning a capped number of new processes, it introduced a couple of issues.
+Guarding the command with a maximum process count ensured that only a certain number of instances would be running at a given time.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @Cron(minute=&#34;/1&#34;)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SendQueuedEmailsCommand</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Command</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>execute</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RunManager</span>([<span style=color:#e6db74>&#39;maxDuration&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>30</span>, <span style=color:#e6db74>&#39;maxProcesses&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>2</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> ($manager<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isOk</span>()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> ($email <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>fetchSingleQueuedEmail</span>()) {
+</span></span><span style=display:flex><span>                $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>send</span>($email);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Although this solved the problem of spawning a capped number of new processes, it introduced a couple of issues.
 One of these was when you desired multiple instances of a given process to accommodate a particular expected load.
 From a cold start, you would have to wait for multiple Cron invocation attempts before reaching the desired processing power.
-Another issue was the unnecessary work Cron would perform at every interval attempting to create a new ‘potential’ process.
+Another issue was the unnecessary work Cron would perform at every interval attempting to create a new &lsquo;potential&rsquo; process.
 More often than not, the processes created by the Cron invocation would end immediately due to the maximum process cap.
-Although a time-based approach could represent ‘almost’ continuous processes, we needed to take a step back and review our thinking.</p>
-
-<h2 id="enter-supervisor">Enter Supervisor</h2>
-
-<p>As the story above highlights, there was a gradual transition from a time-based approach (run every 30 minutes) to sometimes warranting a continuous approach (have two processes running at all times).
+Although a time-based approach could represent &lsquo;almost&rsquo; continuous processes, we needed to take a step back and review our thinking.</p><h2 id=enter-supervisor>Enter Supervisor</h2><p>As the story above highlights, there was a gradual transition from a time-based approach (run every 30 minutes) to sometimes warranting a continuous approach (have two processes running at all times).
 As demands increased, we slowly innovated on our existing solution to cater to the throughput.
 However, what we needed was a change in our way of thinking.
-We needed to explicitly separate the concept of a time-based task, which fitted well within the Cron philosophy, from a continuous task.</p>
-
-<h3 id="changing-our-thinking">Changing our Thinking</h3>
-
-<p>After some research, we decided that <a href="http://supervisord.org/">Supervisor</a> would be a worthwhile investment to incorporate into our stack.
+We needed to explicitly separate the concept of a time-based task, which fitted well within the Cron philosophy, from a continuous task.</p><h3 id=changing-our-thinking>Changing our Thinking</h3><p>After some research, we decided that <a href=http://supervisord.org/ rel="external noopener" target=_blank>Supervisor</a> would be a worthwhile investment to incorporate into our stack.
 Supervisor is a process control system written in Python, providing the infrastructure to achieve exactly the goals we desired for a continuous process.
 Spawning processes as children of the main Supervisor process allows the system to manage how many instances of a given process are currently running and their health.
-When a child process dies for whatever reason, the <code class="language-plaintext highlighter-rouge">SIGCHLD</code> signal is sent to Supervisor, which then decides what action to perform (e.g. restart the process).
-This shift in thinking, from “when do I need to attempt to begin running a process” to “I want this many processes running at all times,” was hugely beneficial.
-Following experimentation, it was time to incorporate this approach into our system and transition our ‘almost’ continuous processes into true continuous processes.</p>
-
-<h3 id="the-transition">The Transition</h3>
-
-<p>Transitioning from one system to another can be challenging, especially when it is critical to the business.
+When a child process dies for whatever reason, the <code>SIGCHLD</code> signal is sent to Supervisor, which then decides what action to perform (e.g. restart the process).
+This shift in thinking, from &ldquo;when do I need to attempt to begin running a process&rdquo; to &ldquo;I want this many processes running at all times,&rdquo; was hugely beneficial.
+Following experimentation, it was time to incorporate this approach into our system and transition our &lsquo;almost&rsquo; continuous processes into true continuous processes.</p><h3 id=the-transition>The Transition</h3><p>Transitioning from one system to another can be challenging, especially when it is critical to the business.
 With this in mind, we felt it would be ideal to avoid making significant code changes to existing continuous commands.
-As a result, we created the <a href="https://github.com/mybuilder/supervisor-bundle">Supervisor Symfony Bundle</a>.
-Similar to its Cronos counterpart, this bundle allows you to decorate commands with a PHP <code class="language-plaintext highlighter-rouge">@Supervisor</code> annotation.
-These annotations are then parsed during the ‘dump’ phase, generating Supervisor-specific configuration.
-Due to these similarities, the only required change was to replace the <code class="language-plaintext highlighter-rouge">@Cron</code> annotation with <code class="language-plaintext highlighter-rouge">@Supervisor</code>, as shown in the example below.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cd">/**
- * @Supervisor(processes=2)
- */</span>
-<span class="kd">class</span> <span class="nc">SendQueuedEmailsCommand</span> <span class="kd">extends</span> <span class="nc">Command</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">function</span> <span class="n">execute</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">RunManager</span><span class="p">([</span><span class="s1">'maxDuration'</span> <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">]);</span>
-
-        <span class="k">while</span> <span class="p">(</span><span class="nv">$manager</span><span class="o">-&gt;</span><span class="nf">isOk</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">fetchSingleQueuedEmail</span><span class="p">())</span> <span class="p">{</span>
-                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">send</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The transition of these processes from Cron to Supervisor was successfully spaced out over a couple of days. As we had become accustom to automatically dumping out the <code class="language-plaintext highlighter-rouge">crontab</code> upon each deploy, we were only required to do the same for the Supervisor configuration.</p>
-
-<h2 id="lets-be-safe">Let’s be Safe</h2>
-
-<p>One major omission from this story so far is how to safely handle the transition from one version of a process to another.
-At this time the <code class="language-plaintext highlighter-rouge">RunManager</code> was only able to safely exit activity based on memory, processor and duration limits.
+As a result, we created the <a href=https://github.com/mybuilder/supervisor-bundle rel="external noopener" target=_blank>Supervisor Symfony Bundle</a>.
+Similar to its Cronos counterpart, this bundle allows you to decorate commands with a PHP <code>@Supervisor</code> annotation.
+These annotations are then parsed during the &lsquo;dump&rsquo; phase, generating Supervisor-specific configuration.
+Due to these similarities, the only required change was to replace the <code>@Cron</code> annotation with <code>@Supervisor</code>, as shown in the example below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#e6db74>/**
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> * @Supervisor(processes=2)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74> */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SendQueuedEmailsCommand</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Command</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>execute</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $manager <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>RunManager</span>([<span style=color:#e6db74>&#39;maxDuration&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>30</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> ($manager<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isOk</span>()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> ($email <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>fetchSingleQueuedEmail</span>()) {
+</span></span><span style=display:flex><span>                $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>send</span>($email);
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The transition of these processes from Cron to Supervisor was successfully spaced out over a couple of days. As we had become accustom to automatically dumping out the <code>crontab</code> upon each deploy, we were only required to do the same for the Supervisor configuration.</p><h2 id=lets-be-safe>Let&rsquo;s be Safe</h2><p>One major omission from this story so far is how to safely handle the transition from one version of a process to another.
+At this time the <code>RunManager</code> was only able to safely exit activity based on memory, processor and duration limits.
 If we were to attempt to terminate a process mid-way through a critical activity we would not know of the lasting side-effects.
 This meant that we would have to wait for all process duration limits to be exceeded before we could be sure that processes were stopped, and new versions could be started.
-Ideally, what we desired was to be able to safely halt execution of all current processes, run the deploy and then bring back up the processes again with any changes that had been applied.</p>
-
-<h3 id="signaling">Signaling</h3>
-
-<p>Upon further research, and with Supervisor’s signal based approach in-mind, we decided to take advantage of Unix signaling.
-We did this by providing another <code class="language-plaintext highlighter-rouge">RunManager</code> predicate to safely exit the looping construct found in these processes.
-Upon an update request, Supervisor sends out a specified signal (i.e. <code class="language-plaintext highlighter-rouge">SIGTERM</code>) to each of the running processes.
-This meant that we could use the <a href="http://php.net/manual/en/book.pcntl.php">pcntl PHP extension</a> to listen out for these signals and react accordingly to safely stop the process.
-Below is an simplified implementation of how we incorporated Unix signaling into our <code class="language-plaintext highlighter-rouge">RunManager</code>.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">RunManager</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="nv">$ok</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="kt">array</span> <span class="nv">$options</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// ...</span>
-
-        <span class="nb">pcntl_signal</span><span class="p">(</span><span class="no">SIGTERM</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">ok</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">isOk</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nb">pcntl_signal_dispatch</span><span class="p">();</span>
-
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">ok</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>With this in-place we were now able to perform a Supervisor update upon each deployment.
+Ideally, what we desired was to be able to safely halt execution of all current processes, run the deploy and then bring back up the processes again with any changes that had been applied.</p><h3 id=signaling>Signaling</h3><p>Upon further research, and with Supervisor&rsquo;s signal based approach in-mind, we decided to take advantage of Unix signaling.
+We did this by providing another <code>RunManager</code> predicate to safely exit the looping construct found in these processes.
+Upon an update request, Supervisor sends out a specified signal (i.e. <code>SIGTERM</code>) to each of the running processes.
+This meant that we could use the <a href=http://php.net/manual/en/book.pcntl.php rel="external noopener" target=_blank>pcntl PHP extension</a> to listen out for these signals and react accordingly to safely stop the process.
+Below is an simplified implementation of how we incorporated Unix signaling into our <code>RunManager</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>RunManager</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $ok <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __construct(<span style=color:#66d9ef>array</span> $options)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>pcntl_signal</span>(<span style=color:#a6e22e>SIGTERM</span>, <span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>ok</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isOk</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>pcntl_signal_dispatch</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>ok</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With this in-place we were now able to perform a Supervisor update upon each deployment.
 This would safely finish any work the process was doing (i.e. finish sending the current email) before shutting down and allowing a new version to be spawned.
-Unlike the duration-based limits we relied upon in the past, we could now be sure that a new deployment meant that only newly deployed processes were being run.</p>
-
-<h2 id="sigstop">SIGSTOP</h2>
-
-<p>This transition has been a significant improvement to our stack.
+Unlike the duration-based limits we relied upon in the past, we could now be sure that a new deployment meant that only newly deployed processes were being run.</p><h2 id=sigstop>SIGSTOP</h2><p>This transition has been a significant improvement to our stack.
 We can now clearly differentiate between time-based commands and continuous processes.
-Although the inclusion of Supervisor adds complexity, using the right tool for the job has paid off greatly.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Although the inclusion of Supervisor adds complexity, using the right tool for the job has paid off greatly.</p></main><footer class=post__tags><a href=/archive/tag/symfony>symfony</a><a href=/archive/tag/supervisor>supervisor</a><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

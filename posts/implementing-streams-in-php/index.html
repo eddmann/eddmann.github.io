@@ -1,284 +1,189 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive guide to implementing streams in PHP using class-based and generator approaches for efficient lazy evaluation and infinite list generation.">
-
-    <title>
-        
-            Implementing Streams in PHP &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Implementing Streams in PHP</h1>
-    <time datetime="2015-01-16T00:00:00+00:00" class="post-date">16 Jan 2015</time>
-    <p>Typically, when we think about a list of elements we assume there is both a start and a finite end.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Implementing Streams in PHP - Edd Mann</title>
+<meta name=description content="A comprehensive guide to implementing streams in PHP using class-based and generator approaches for efficient lazy evaluation and infinite list generation."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Implementing Streams in PHP"><meta itemprop=description content="Typically, when we think about a list of elements we assume there is both a start and a finite end. In this example the list has been precomputed and stored for subsequent traversal and transformation. If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists."><meta itemprop=datePublished content="2015-01-16T00:00:00+00:00"><meta itemprop=dateModified content="2015-01-16T00:00:00+00:00"><meta itemprop=wordCount content="1033"><meta itemprop=keywords content="Php,Data-Structures"><meta property="og:url" content="https://eddmann.com/posts/implementing-streams-in-php/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Implementing Streams in PHP"><meta property="og:description" content="Typically, when we think about a list of elements we assume there is both a start and a finite end. In this example the list has been precomputed and stored for subsequent traversal and transformation. If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2015-01-16T00:00:00+00:00"><meta property="article:modified_time" content="2015-01-16T00:00:00+00:00"><meta property="article:tag" content="Php"><meta property="article:tag" content="Data-Structures"><meta name=twitter:card content="summary"><meta name=twitter:title content="Implementing Streams in PHP"><meta name=twitter:description content="Typically, when we think about a list of elements we assume there is both a start and a finite end. In this example the list has been precomputed and stored for subsequent traversal and transformation. If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/implementing-streams-in-php/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Implementing Streams in PHP</h1><time class=post__time>Jan 16, 2015</time></header><main class=prose><p>Typically, when we think about a list of elements we assume there is both a start and a finite end.
 In this example the list has been precomputed and stored for subsequent traversal and transformation.
-If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists. 
-Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
-This concept is called a <a href="http://en.wikipedia.org/wiki/Stream_(computing)">Stream</a> and is commonly also referred to as a lazy list.
+If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.</p><p>Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
+This concept is called a <a href=http://en.wikipedia.org/wiki/Stream_%28computing%29 rel="external noopener" target=_blank>Stream</a> and is commonly also referred to as a lazy list.
 It is a foundational concept in languages such as Haskell.
 Streams are not interacted with in the same manner as finite lists, as they cannot be operated on as a whole.
-Instead, they should be thought of as ‘codata’ (infinite) or an object-oriented <a href="http://en.wikipedia.org/wiki/Iterator">Iterable</a>, as opposed to simply ‘data’ (finite).
-As well as being able to create a Stream based on a supplied promise, we are also able to compose new Streams using ‘map’ and ‘filter’ methods.
-In this article, I will discuss two examples of implementing the Stream data-structure, using both class-based and generator approaches in PHP.</p>
-
-<h2 id="class-based-approach">Class-based Approach</h2>
-
-<p>The first implementation I will discuss uses a ‘classical’ approach, relying on a tail-promise function to return the next element in the Stream.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Stream</span> <span class="kd">implements</span> <span class="nc">Iterator</span>
-<span class="p">{</span>
-    <span class="k">const</span> <span class="no">NIL_SENTINEL</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-
-    <span class="k">private</span> <span class="nv">$head</span><span class="p">,</span> <span class="nv">$tail</span><span class="p">;</span>
-    <span class="k">private</span> <span class="nv">$current</span><span class="p">,</span> <span class="nv">$key</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$head</span><span class="p">,</span> <span class="nv">$tail</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">=</span> <span class="nv">$head</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span> <span class="o">=</span> <span class="nv">$tail</span> <span class="o">?:</span> <span class="k">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nf">nil</span><span class="p">();</span> <span class="p">};</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">())</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">),</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">map</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">())</span> <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
-            <span class="p">});</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$f</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">take</span><span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nf">nil</span><span class="p">();</span>
-
-        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$n</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="nv">$n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">range</span><span class="p">(</span><span class="nv">$start</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span> <span class="o">=</span> <span class="no">INF</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$start</span> <span class="o">==</span> <span class="nv">$end</span><span class="p">)</span> <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$start</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="nv">$end</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="k">self</span><span class="o">::</span><span class="nb">range</span><span class="p">(</span><span class="nv">$start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span><span class="p">);</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">current</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">next</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="nf">tail</span><span class="p">();</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="o">++</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">key</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">valid</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="o">!</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span><span class="o">-&gt;</span><span class="nf">isNil</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">rewind</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">current</span> <span class="o">=</span> <span class="nv">$this</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">function</span> <span class="n">isNil</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">===</span> <span class="k">self</span><span class="o">::</span><span class="no">NIL_SENTINEL</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">function</span> <span class="n">tail</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">static</span> <span class="k">function</span> <span class="n">nil</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">return</span> <span class="k">new</span> <span class="nc">self</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">NIL_SENTINEL</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Looking at the above implementation, you can see how much boilerplate code is required to make the Stream iterable.
+Instead, they should be thought of as &lsquo;codata&rsquo; (infinite) or an object-oriented <a href=http://en.wikipedia.org/wiki/Iterator rel="external noopener" target=_blank>Iterable</a>, as opposed to simply &lsquo;data&rsquo; (finite).
+As well as being able to create a Stream based on a supplied promise, we are also able to compose new Streams using &lsquo;map&rsquo; and &lsquo;filter&rsquo; methods.
+In this article, I will discuss two examples of implementing the Stream data-structure, using both class-based and generator approaches in PHP.</p><h2 id=class-based-approach>Class-based Approach</h2><p>The first implementation I will discuss uses a &lsquo;classical&rsquo; approach, relying on a tail-promise function to return the next element in the Stream.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Stream</span> <span style=color:#66d9ef>implements</span> <span style=color:#a6e22e>Iterator</span>
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>NIL_SENTINEL</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $head, $tail;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> $current, $key;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __construct($head, $tail <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span> <span style=color:#f92672>=</span> $head;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span> <span style=color:#f92672>=</span> $tail <span style=color:#f92672>?:</span> <span style=color:#66d9ef>function</span> () { <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>nil</span>(); };
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>callable</span> $f)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isNil</span>()) <span style=color:#66d9ef>return</span> $this;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>(<span style=color:#a6e22e>call_user_func</span>($f, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>), <span style=color:#66d9ef>function</span> () <span style=color:#66d9ef>use</span> ($f) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>map</span>($f);
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>callable</span> $f)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isNil</span>()) <span style=color:#66d9ef>return</span> $this;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>call_user_func</span>($f, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>)) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>, <span style=color:#66d9ef>function</span> () <span style=color:#66d9ef>use</span> ($f) {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>filter</span>($f);
+</span></span><span style=display:flex><span>            });
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>filter</span>($f);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>take</span>($n)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isNil</span>() <span style=color:#f92672>||</span> $n <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>nil</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>, <span style=color:#66d9ef>function</span> () <span style=color:#66d9ef>use</span> ($n) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>take</span>($n <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>range</span>($start <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>, $end <span style=color:#f92672>=</span> <span style=color:#a6e22e>INF</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($start <span style=color:#f92672>==</span> $end) <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>($start);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>($start, <span style=color:#66d9ef>function</span> () <span style=color:#66d9ef>use</span> ($start, $end) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>range</span>($start <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>, $end);
+</span></span><span style=display:flex><span>        });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>current</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>next</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span> <span style=color:#f92672>=</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>();
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span><span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>key</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>valid</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#f92672>!</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span><span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isNil</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>rewind</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span> <span style=color:#f92672>=</span> $this;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isNil</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>NIL_SENTINEL</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>tail</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>call_user_func</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>tail</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>head</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>nil</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>self</span>(<span style=color:#a6e22e>self</span><span style=color:#f92672>::</span><span style=color:#a6e22e>NIL_SENTINEL</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the above implementation, you can see how much boilerplate code is required to make the Stream iterable.
 Through the use of the tail promise, we are able to defer execution of calculating the next element in the Stream until absolutely required.
-The inclusion of a ‘nil’ sentinel simplifies the design, as we are not required to use polymorphism and separate Nil and Cons implementations.
-So as not to detract from the following example’s intent, we will be using the following function to display the returned iterators.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">sprint</span><span class="p">(</span><span class="nv">$xs</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">'['</span> <span class="mf">.</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span><span class="p">,</span> <span class="nb">iterator_to_array</span><span class="p">(</span><span class="nv">$xs</span><span class="p">))</span> <span class="mf">.</span> <span class="s2">"]</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Using this helper function, we are now able to experiment with this initial implementation.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
-
-<span class="nf">sprint</span><span class="p">(</span><span class="nc">Stream</span><span class="o">::</span><span class="nb">range</span><span class="p">()</span><span class="o">-&gt;</span><span class="nf">filter</span><span class="p">(</span><span class="nv">$isEven</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="c1">// [2, 4, 6, 8, 10]</span>
-
-<span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nv">$y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-
-    <span class="k">return</span> <span class="nv">$f</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$f</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$z</span> <span class="o">=</span> <span class="nv">$y</span><span class="p">;</span>
-        <span class="nv">$y</span> <span class="o">+=</span> <span class="nv">$x</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="k">new</span> <span class="nc">Stream</span><span class="p">(</span><span class="nv">$z</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$f</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$f</span><span class="p">(</span><span class="nv">$x</span><span class="p">);</span> <span class="p">});</span>
-    <span class="p">};</span>
-<span class="p">});</span>
-
-<span class="nf">sprint</span><span class="p">((</span><span class="k">new</span> <span class="nc">Stream</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$fibonacci</span><span class="p">))</span><span class="o">-&gt;</span><span class="nf">take</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span> <span class="c1">// [0, 1, 1, 2, 3]</span>
-</code></pre></div></div>
-
-<p>To implement the Fibonacci sequence stream using this approach, we are required to use a self-invoked function to wrap the previous value state required.
+The inclusion of a &rsquo;nil&rsquo; sentinel simplifies the design, as we are not required to use polymorphism and separate Nil and Cons implementations.
+So as not to detract from the following example&rsquo;s intent, we will be using the following function to display the returned iterators.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>sprint</span>($xs)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>echo</span> <span style=color:#e6db74>&#39;[&#39;</span> <span style=color:#f92672>.</span> <span style=color:#a6e22e>implode</span>(<span style=color:#e6db74>&#39;, &#39;</span>, <span style=color:#a6e22e>iterator_to_array</span>($xs)) <span style=color:#f92672>.</span> <span style=color:#e6db74>&#34;]</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Using this helper function, we are now able to experiment with this initial implementation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$isEven <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> ($x) { <span style=color:#66d9ef>return</span> $x <span style=color:#f92672>%</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>; };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sprint</span>(<span style=color:#a6e22e>Stream</span><span style=color:#f92672>::</span><span style=color:#a6e22e>range</span>()<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>filter</span>($isEven)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>take</span>(<span style=color:#ae81ff>5</span>)); <span style=color:#75715e>// [2, 4, 6, 8, 10]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>$fibonacci <span style=color:#f92672>=</span> <span style=color:#a6e22e>call_user_func</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>    $y <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $f <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> ($x) <span style=color:#66d9ef>use</span> (<span style=color:#f92672>&amp;</span>$f, <span style=color:#f92672>&amp;</span>$y) {
+</span></span><span style=display:flex><span>        $z <span style=color:#f92672>=</span> $y;
+</span></span><span style=display:flex><span>        $y <span style=color:#f92672>+=</span> $x;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Stream</span>($z, <span style=color:#66d9ef>function</span> ($x) <span style=color:#66d9ef>use</span> (<span style=color:#f92672>&amp;</span>$f) { <span style=color:#66d9ef>return</span> $f($x); });
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sprint</span>((<span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Stream</span>(<span style=color:#ae81ff>0</span>, $fibonacci))<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>take</span>(<span style=color:#ae81ff>5</span>)); <span style=color:#75715e>// [0, 1, 1, 2, 3]
+</span></span></span></code></pre></div><p>To implement the Fibonacci sequence stream using this approach, we are required to use a self-invoked function to wrap the previous value state required.
 Along with this, we also need to provide a reference to the returned function itself, so as to invoke it again as the tail promise.
-These details, coupled with the requirement to return a new Stream instance in the tail-promise, seem to unnecessarily cloud the solution’s intent.</p>
-
-<h2 id="generator-approach">Generator Approach</h2>
-
-<p>Fortunately, as of PHP 5.5 we are able to take advantage of generators and create a more succinct implementation which easily describes its purpose.
-Generators allow us to implement the Stream without the need to handle the deferred tail execution and implement the class-based Iterator interface.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">stream</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$f</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">yield</span> <span class="nv">$x</span><span class="p">;</span>
-        <span class="nv">$x</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$x</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">map</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="nv">$g</span><span class="o">-&gt;</span><span class="nf">valid</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">yield</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">());</span>
-        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">filter</span><span class="p">(</span><span class="kt">callable</span> <span class="nv">$f</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="nv">$g</span><span class="o">-&gt;</span><span class="nf">valid</span><span class="p">())</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">call_user_func</span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">()))</span> <span class="k">yield</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">();</span>
-        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">take</span><span class="p">(</span><span class="nv">$n</span><span class="p">,</span> <span class="kt">Generator</span> <span class="nv">$g</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">while</span> <span class="p">(</span><span class="nv">$n</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">yield</span> <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">current</span><span class="p">();</span>
-        <span class="nv">$g</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">srange</span><span class="p">(</span><span class="nv">$start</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">$end</span> <span class="o">=</span> <span class="no">INF</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="nf">take</span><span class="p">(</span><span class="nv">$end</span> <span class="o">-</span> <span class="nv">$start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">stream</span><span class="p">(</span><span class="nv">$start</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="p">}));</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>As you can see, we have been able to flatten the class-based approach into top-level functions.
+These details, coupled with the requirement to return a new Stream instance in the tail-promise, seem to unnecessarily cloud the solution&rsquo;s intent.</p><h2 id=generator-approach>Generator Approach</h2><p>Fortunately, as of PHP 5.5 we are able to take advantage of generators and create a more succinct implementation which easily describes its purpose.
+Generators allow us to implement the Stream without the need to handle the deferred tail execution and implement the class-based Iterator interface.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>stream</span>($x, <span style=color:#a6e22e>callable</span> $f)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (<span style=color:#66d9ef>true</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> $x;
+</span></span><span style=display:flex><span>        $x <span style=color:#f92672>=</span> <span style=color:#a6e22e>call_user_func</span>($f, $x);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>callable</span> $f, <span style=color:#a6e22e>Generator</span> $g)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> ($g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>valid</span>()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> <span style=color:#a6e22e>call_user_func</span>($f, $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span>());
+</span></span><span style=display:flex><span>        $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>next</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>callable</span> $f, <span style=color:#a6e22e>Generator</span> $g)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> ($g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>valid</span>()) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>call_user_func</span>($f, $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span>())) <span style=color:#66d9ef>yield</span> $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span>();
+</span></span><span style=display:flex><span>        $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>next</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>take</span>($n, <span style=color:#a6e22e>Generator</span> $g)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> ($n<span style=color:#f92672>--</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>yield</span> $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>current</span>();
+</span></span><span style=display:flex><span>        $g<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>next</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>srange</span>($start <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>, $end <span style=color:#f92672>=</span> <span style=color:#a6e22e>INF</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>take</span>($end <span style=color:#f92672>-</span> $start <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>, <span style=color:#a6e22e>stream</span>($start, <span style=color:#66d9ef>function</span> ($x) { <span style=color:#66d9ef>return</span> $x <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>; }));
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As you can see, we have been able to flatten the class-based approach into top-level functions.
 Each function is aided by type-hints, describing what it is tasked to do far more clearly.
-Using the generator’s <code class="language-plaintext highlighter-rouge">valid</code> method, we are able to implement all but the <code class="language-plaintext highlighter-rouge">take</code> method using imperative while loops.
-This implementation is able to compute the previous examples, as shown below.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$isEven</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="p">};</span>
-
-<span class="nf">sprint</span><span class="p">(</span><span class="nf">take</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nf">filter</span><span class="p">(</span><span class="nv">$isEven</span><span class="p">,</span> <span class="nf">srange</span><span class="p">())));</span> <span class="c1">// [2, 4, 6, 8, 10]</span>
-
-<span class="nv">$fibonacci</span> <span class="o">=</span> <span class="nb">call_user_func</span><span class="p">(</span><span class="k">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="nv">$y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-
-    <span class="k">return</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$x</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="o">&amp;</span><span class="nv">$y</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$z</span> <span class="o">=</span> <span class="nv">$y</span><span class="p">;</span>
-        <span class="nv">$y</span> <span class="o">+=</span> <span class="nv">$x</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nv">$z</span><span class="p">;</span>
-    <span class="p">};</span>
-<span class="p">});</span>
-
-<span class="nf">sprint</span><span class="p">(</span><span class="nf">take</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nf">stream</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">$fibonacci</span><span class="p">)));</span> <span class="c1">// [0, 1, 1, 2, 3]</span>
-</code></pre></div></div>
-
-<p>As you can see by looking at the above examples, the Fibonacci sequence code has been simplified greatly.
+Using the generator&rsquo;s <code>valid</code> method, we are able to implement all but the <code>take</code> method using imperative while loops.
+This implementation is able to compute the previous examples, as shown below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$isEven <span style=color:#f92672>=</span> <span style=color:#66d9ef>function</span> ($x) { <span style=color:#66d9ef>return</span> $x <span style=color:#f92672>%</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>; };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sprint</span>(<span style=color:#a6e22e>take</span>(<span style=color:#ae81ff>10</span>, <span style=color:#a6e22e>filter</span>($isEven, <span style=color:#a6e22e>srange</span>()))); <span style=color:#75715e>// [2, 4, 6, 8, 10]
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>$fibonacci <span style=color:#f92672>=</span> <span style=color:#a6e22e>call_user_func</span>(<span style=color:#66d9ef>function</span> () {
+</span></span><span style=display:flex><span>    $y <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>function</span> ($x) <span style=color:#66d9ef>use</span> (<span style=color:#f92672>&amp;</span>$y) {
+</span></span><span style=display:flex><span>        $z <span style=color:#f92672>=</span> $y;
+</span></span><span style=display:flex><span>        $y <span style=color:#f92672>+=</span> $x;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $z;
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sprint</span>(<span style=color:#a6e22e>take</span>(<span style=color:#ae81ff>10</span>, <span style=color:#a6e22e>stream</span>(<span style=color:#ae81ff>0</span>, $fibonacci))); <span style=color:#75715e>// [0, 1, 1, 2, 3]
+</span></span></span></code></pre></div><p>As you can see by looking at the above examples, the Fibonacci sequence code has been simplified greatly.
 We have been able to remove the need to return a new Stream instance each time, and instead focus solely on the generation of the next value.
 Although both implementations solve the problem at hand, by now you will certainly see the stronger case put forth by the generator approach.
-Not only is it less code, but it also provides us with a clearer and more expressive way to compose the functions together.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Not only is it less code, but it also provides us with a clearer and more expressive way to compose the functions together.</p></main><footer class=post__tags><a href=/archive/tag/php>php</a><a href=/archive/tag/data-structures>data-structures</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

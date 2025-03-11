@@ -1,186 +1,109 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to implement parallel summation in Java using threads for enhanced performance and speed optimisation.">
-
-    <title>
-        
-            Parallel Summation in Java &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Parallel Summation in Java</h1>
-    <time datetime="2014-03-14T00:00:00+00:00" class="post-date">14 Mar 2014</time>
-    <p>Summation is the common operation of adding a sequence of numbers together, resulting in their total.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Parallel Summation in Java - Edd Mann</title>
+<meta name=description content="Learn how to implement parallel summation in Java using threads for enhanced performance and speed optimisation."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Parallel Summation in Java"><meta itemprop=description content="Summation is the common operation of adding a sequence of numbers together, resulting in their total. The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress. For small sequences, a single-threaded implementation will suffice. However, when the size increases, the use of other available CPU cores helps to provide the necessary speed optimisations. As addition is an associative operation, it makes no difference to the end result in which order we process the collection. This behaviour works well for our implementation design."><meta itemprop=datePublished content="2014-03-14T00:00:00+00:00"><meta itemprop=dateModified content="2014-03-14T00:00:00+00:00"><meta itemprop=wordCount content="555"><meta itemprop=keywords content="Java,Algorithms"><meta property="og:url" content="https://eddmann.com/posts/parallel-summation-in-java/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Parallel Summation in Java"><meta property="og:description" content="Summation is the common operation of adding a sequence of numbers together, resulting in their total. The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress. For small sequences, a single-threaded implementation will suffice. However, when the size increases, the use of other available CPU cores helps to provide the necessary speed optimisations. As addition is an associative operation, it makes no difference to the end result in which order we process the collection. This behaviour works well for our implementation design."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-03-14T00:00:00+00:00"><meta property="article:modified_time" content="2014-03-14T00:00:00+00:00"><meta property="article:tag" content="Java"><meta property="article:tag" content="Algorithms"><meta name=twitter:card content="summary"><meta name=twitter:title content="Parallel Summation in Java"><meta name=twitter:description content="Summation is the common operation of adding a sequence of numbers together, resulting in their total. The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress. For small sequences, a single-threaded implementation will suffice. However, when the size increases, the use of other available CPU cores helps to provide the necessary speed optimisations. As addition is an associative operation, it makes no difference to the end result in which order we process the collection. This behaviour works well for our implementation design."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/parallel-summation-in-java/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Parallel Summation in Java</h1><time class=post__time>Mar 14, 2014</time></header><main class=prose><p>Summation is the common operation of adding a sequence of numbers together, resulting in their total.
 The trivial implementation is to iterate over the full collection of numbers, keeping a running total as you progress.
 For small sequences, a single-threaded implementation will suffice.
 However, when the size increases, the use of other available CPU cores helps to provide the necessary speed optimisations.
 As addition is an associative operation, it makes no difference to the end result in which order we process the collection.
-This behaviour works well for our implementation design. 
-Below is an example implementation which splits the summation of a sequence of numbers into (close to) equal collections.
-Each collection is processed in parallel within its own thread.</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Summation</span> <span class="kd">extends</span> <span class="nc">Thread</span> <span class="o">{</span>
-
-    <span class="kd">private</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">;</span>
-
-    <span class="kd">private</span> <span class="kt">int</span> <span class="n">low</span><span class="o">,</span> <span class="n">high</span><span class="o">,</span> <span class="n">partial</span><span class="o">;</span>
-
-    <span class="kd">public</span> <span class="nf">Summation</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">low</span><span class="o">,</span> <span class="kt">int</span> <span class="n">high</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">low</span> <span class="o">=</span> <span class="n">low</span><span class="o">;</span>
-        <span class="k">this</span><span class="o">.</span><span class="na">high</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="n">high</span><span class="o">,</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">getPartialSum</span><span class="o">()</span>
-    <span class="o">{</span>
-        <span class="k">return</span> <span class="n">partial</span><span class="o">;</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">()</span>
-    <span class="o">{</span>
-        <span class="n">partial</span> <span class="o">=</span> <span class="n">sum</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">low</span><span class="o">,</span> <span class="n">high</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">sum</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="k">return</span> <span class="nf">sum</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">sum</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">low</span><span class="o">,</span> <span class="kt">int</span> <span class="n">high</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">low</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">high</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span>
-        <span class="o">}</span>
-
-        <span class="k">return</span> <span class="n">total</span><span class="o">;</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">parallelSum</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="k">return</span> <span class="nf">parallelSum</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="nc">Runtime</span><span class="o">.</span><span class="na">getRuntime</span><span class="o">().</span><span class="na">availableProcessors</span><span class="o">());</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">int</span> <span class="nf">parallelSum</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="kt">int</span> <span class="n">threads</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="kt">int</span> <span class="n">size</span> <span class="o">=</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="nc">Math</span><span class="o">.</span><span class="na">ceil</span><span class="o">(</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">*</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">threads</span><span class="o">);</span>
-
-        <span class="nc">Summation</span><span class="o">[]</span> <span class="n">sums</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Summation</span><span class="o">[</span><span class="n">threads</span><span class="o">];</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">threads</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-            <span class="n">sums</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Summation</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">i</span> <span class="o">*</span> <span class="n">size</span><span class="o">,</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">*</span> <span class="n">size</span><span class="o">);</span>
-            <span class="n">sums</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">start</span><span class="o">();</span>
-        <span class="o">}</span>
-
-        <span class="k">try</span> <span class="o">{</span>
-            <span class="k">for</span> <span class="o">(</span><span class="nc">Summation</span> <span class="n">sum</span> <span class="o">:</span> <span class="n">sums</span><span class="o">)</span> <span class="o">{</span>
-                <span class="n">sum</span><span class="o">.</span><span class="na">join</span><span class="o">();</span>
-            <span class="o">}</span>
-        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> <span class="o">}</span>
-
-        <span class="kt">int</span> <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="nc">Summation</span> <span class="n">sum</span> <span class="o">:</span> <span class="n">sums</span><span class="o">)</span> <span class="o">{</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">sum</span><span class="o">.</span><span class="na">getPartialSum</span><span class="o">();</span>
-        <span class="o">}</span>
-
-        <span class="k">return</span> <span class="n">total</span><span class="o">;</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>Looking at the implementation above, you will notice that I have taken advantage of static functionality to combine both the sum and thread instances required to complete the task.
-Calling ‘parallelSum’ with a single argument (being the specified array), the system is queried on how many available processing cores are present.
-We then create ‘Summation’ instances that are supplied with the low and high range of indexes within the subject array they are required to process.
-These are then started and subsequently joined into the main thread for the final round of partial sum addition to complete the process.</p>
-
-<p>So as to see the benefits of parallelising such an operation, an example benchmark has been provided below.
-The implementation is provided in this case with 100,000,000 random integers between 1 and 100, and timed on its performance to run as both a single and parallel operation.</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
-
-<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span>
-<span class="o">{</span>
-    <span class="nc">Random</span> <span class="n">rand</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Random</span><span class="o">();</span>
-
-    <span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">int</span><span class="o">[</span><span class="mi">100000000</span><span class="o">];</span>
-
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-        <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">rand</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="mi">101</span><span class="o">)</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 1..100</span>
-    <span class="o">}</span>
-
-    <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
-
-    <span class="nc">Summation</span><span class="o">.</span><span class="na">sum</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
-
-    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Single: "</span> <span class="o">+</span> <span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">));</span> <span class="c1">// Single: 44</span>
-
-    <span class="n">start</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
-
-    <span class="nc">Summation</span><span class="o">.</span><span class="na">parallelSum</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
-
-    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Parallel: "</span> <span class="o">+</span> <span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">));</span> <span class="c1">// Parallel: 25</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>Looking at the results above, you will see that using the parallelised approach provides us with noticeable speed gains.
-An interesting observation I made when running the benchmark was that increasing the number of threads to two did not significantly improve the speed.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+This behaviour works well for our implementation design.</p><p>Below is an example implementation which splits the summation of a sequence of numbers into (close to) equal collections.
+Each collection is processed in parallel within its own thread.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Summation</span> <span style=color:#66d9ef>extends</span> Thread {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>int</span> low, high, partial;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#a6e22e>Summation</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr, <span style=color:#66d9ef>int</span> low, <span style=color:#66d9ef>int</span> high)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>arr</span> <span style=color:#f92672>=</span> arr;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>low</span> <span style=color:#f92672>=</span> low;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>this</span>.<span style=color:#a6e22e>high</span> <span style=color:#f92672>=</span> Math.<span style=color:#a6e22e>min</span>(high, arr.<span style=color:#a6e22e>length</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>getPartialSum</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> partial;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>run</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        partial <span style=color:#f92672>=</span> sum(arr, low, high);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>sum</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> sum(arr, 0, arr.<span style=color:#a6e22e>length</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>sum</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr, <span style=color:#66d9ef>int</span> low, <span style=color:#66d9ef>int</span> high)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> total <span style=color:#f92672>=</span> 0;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> low; i <span style=color:#f92672>&lt;</span> high; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>            total <span style=color:#f92672>+=</span> arr<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> total;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>parallelSum</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> parallelSum(arr, Runtime.<span style=color:#a6e22e>getRuntime</span>().<span style=color:#a6e22e>availableProcessors</span>());
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>parallelSum</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr, <span style=color:#66d9ef>int</span> threads)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> size <span style=color:#f92672>=</span> (<span style=color:#66d9ef>int</span>) Math.<span style=color:#a6e22e>ceil</span>(arr.<span style=color:#a6e22e>length</span> <span style=color:#f92672>*</span> 1.<span style=color:#a6e22e>0</span> <span style=color:#f92672>/</span> threads);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        Summation<span style=color:#f92672>[]</span> sums <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Summation<span style=color:#f92672>[</span>threads<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> 0; i <span style=color:#f92672>&lt;</span> threads; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>            sums<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Summation(arr, i <span style=color:#f92672>*</span> size, (i <span style=color:#f92672>+</span> 1) <span style=color:#f92672>*</span> size);
+</span></span><span style=display:flex><span>            sums<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span>.<span style=color:#a6e22e>start</span>();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>try</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>for</span> (Summation sum : sums) {
+</span></span><span style=display:flex><span>                sum.<span style=color:#a6e22e>join</span>();
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>catch</span> (InterruptedException e) { }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> total <span style=color:#f92672>=</span> 0;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (Summation sum : sums) {
+</span></span><span style=display:flex><span>            total <span style=color:#f92672>+=</span> sum.<span style=color:#a6e22e>getPartialSum</span>();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> total;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the implementation above, you will notice that I have taken advantage of static functionality to combine both the sum and thread instances required to complete the task.
+Calling &lsquo;parallelSum&rsquo; with a single argument (being the specified array), the system is queried on how many available processing cores are present.
+We then create &lsquo;Summation&rsquo; instances that are supplied with the low and high range of indexes within the subject array they are required to process.
+These are then started and subsequently joined into the main thread for the final round of partial sum addition to complete the process.</p><p>So as to see the benefits of parallelising such an operation, an example benchmark has been provided below.
+The implementation is provided in this case with 100,000,000 random integers between 1 and 100, and timed on its performance to run as both a single and parallel operation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#f92672>import</span> java.util.Random;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span>(String<span style=color:#f92672>[]</span> args)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Random rand <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Random();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#66d9ef>int</span><span style=color:#f92672>[</span>100000000<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> 0; i <span style=color:#f92672>&lt;</span> arr.<span style=color:#a6e22e>length</span>; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        arr<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> rand.<span style=color:#a6e22e>nextInt</span>(101) <span style=color:#f92672>+</span> 1; <span style=color:#75715e>// 1..100</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>long</span> start <span style=color:#f92672>=</span> System.<span style=color:#a6e22e>currentTimeMillis</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Summation.<span style=color:#a6e22e>sum</span>(arr);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    System.<span style=color:#a6e22e>out</span>.<span style=color:#a6e22e>println</span>(<span style=color:#e6db74>&#34;Single: &#34;</span> <span style=color:#f92672>+</span> (System.<span style=color:#a6e22e>currentTimeMillis</span>() <span style=color:#f92672>-</span> start)); <span style=color:#75715e>// Single: 44</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    start <span style=color:#f92672>=</span> System.<span style=color:#a6e22e>currentTimeMillis</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    Summation.<span style=color:#a6e22e>parallelSum</span>(arr);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    System.<span style=color:#a6e22e>out</span>.<span style=color:#a6e22e>println</span>(<span style=color:#e6db74>&#34;Parallel: &#34;</span> <span style=color:#f92672>+</span> (System.<span style=color:#a6e22e>currentTimeMillis</span>() <span style=color:#f92672>-</span> start)); <span style=color:#75715e>// Parallel: 25</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the results above, you will see that using the parallelised approach provides us with noticeable speed gains.
+An interesting observation I made when running the benchmark was that increasing the number of threads to two did not significantly improve the speed.</p></main><footer class=post__tags><a href=/archive/tag/java>java</a><a href=/archive/tag/algorithms>algorithms</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

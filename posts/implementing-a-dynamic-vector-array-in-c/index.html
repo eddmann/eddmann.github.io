@@ -1,335 +1,220 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to implement a dynamic, resizable vector (array) in C using efficient memory management techniques and simplified macros.">
-
-    <title>
-        
-            Implementing a Dynamic Vector (Array) in C &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Implementing a Dynamic Vector (Array) in C</h1>
-    <time datetime="2014-01-20T00:00:00+00:00" class="post-date">20 Jan 2014</time>
-    <p>An array (vector) is a commonplace data type, used to hold and describe a collection of elements.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Implementing a Dynamic Vector (Array) in C - Edd Mann</title>
+<meta name=description content="Learn how to implement a dynamic, resizable vector (array) in C using efficient memory management techniques and simplified macros."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Implementing a Dynamic Vector (Array) in C"><meta itemprop=description content="An array (vector) is a commonplace data type, used to hold and describe a collection of elements. These elements can be fetched at runtime by one or more indices (identifying keys). A distinguishing feature of an array compared to a list is that arrays allow constant-time random access, unlike lists which provide sequential access. Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists."><meta itemprop=datePublished content="2014-01-20T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-20T00:00:00+00:00"><meta itemprop=wordCount content="1249"><meta itemprop=keywords content="C,Data-Structures"><meta property="og:url" content="https://eddmann.com/posts/implementing-a-dynamic-vector-array-in-c/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Implementing a Dynamic Vector (Array) in C"><meta property="og:description" content="An array (vector) is a commonplace data type, used to hold and describe a collection of elements. These elements can be fetched at runtime by one or more indices (identifying keys). A distinguishing feature of an array compared to a list is that arrays allow constant-time random access, unlike lists which provide sequential access. Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-20T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-20T00:00:00+00:00"><meta property="article:tag" content="C"><meta property="article:tag" content="Data-Structures"><meta name=twitter:card content="summary"><meta name=twitter:title content="Implementing a Dynamic Vector (Array) in C"><meta name=twitter:description content="An array (vector) is a commonplace data type, used to hold and describe a collection of elements. These elements can be fetched at runtime by one or more indices (identifying keys). A distinguishing feature of an array compared to a list is that arrays allow constant-time random access, unlike lists which provide sequential access. Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/implementing-a-dynamic-vector-array-in-c/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Implementing a Dynamic Vector (Array) in C</h1><time class=post__time>Jan 20, 2014</time></header><main class=prose><p>An array (vector) is a commonplace data type, used to hold and describe a collection of elements.
 These elements can be fetched at runtime by one or more indices (identifying keys).
 A distinguishing feature of an array compared to a list is that arrays allow constant-time random access, unlike lists which provide sequential access.
-Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists.</p>
-
-
-
-<p>Dynamic arrays are more complicated and less commonly used compared to their counterpart, the list, which is dynamic by nature.
+Resizable arrays allow for an unspecified upper bound of collection elements at runtime, and are conceptually similar to lists.</p><p>Dynamic arrays are more complicated and less commonly used compared to their counterpart, the list, which is dynamic by nature.
 Using C as the language of implementation, this post will guide you through building a simple vector data structure.
 The structure will take advantage of a fixed-size array, with a counter invariant that keeps track of how many elements are currently present.
-If the underlying array becomes exhausted, the addition operation will reallocate the contents to a larger size by means of a copy.</p>
-
-<h2 id="the-make-file">The Make File</h2>
-
-<p>‘Make’ is a popular utility used throughout software development to build executable artefacts (programmes and libraries) from provided source code.
+If the underlying array becomes exhausted, the addition operation will reallocate the contents to a larger size by means of a copy.</p><h2 id=the-make-file>The Make File</h2><p>&lsquo;Make&rsquo; is a popular utility used throughout software development to build executable artefacts (programmes and libraries) from provided source code.
 Through a simple DSL, associations from descriptive short names (targets) and a series of related commands to execute are made.
-Running the ‘make’ command executes the first target found, so this must be carefully considered when designing the file.
-Below is a sample Makefile which provides the vector project with simple build, debug and clean targets.</p>
-
-<div class="language-make highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">CC</span><span class="o">=</span>gcc
-<span class="nv">CFLAGS</span><span class="o">=</span>
-<span class="nv">RM</span><span class="o">=</span><span class="nb">rm</span> <span class="nt">-rf</span>
-<span class="nv">OUT</span><span class="o">=</span>vector
-
-<span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
-
-<span class="nl">build</span><span class="o">:</span> <span class="nf">main.o vector.o</span>
-    <span class="err">$(CC)</span> <span class="err">$(CFLAGS)</span> <span class="err">-o</span> <span class="err">$(OUT)</span> <span class="err">main.c</span> <span class="err">vector.c</span>
-    <span class="err">$(RM)</span> <span class="err">*.o</span>
-
-<span class="nl">debug</span><span class="o">:</span> <span class="nf">CFLAGS+=-DDEBUG_ON</span>
-<span class="nl">debug</span><span class="o">:</span> <span class="nf">build</span>
-
-<span class="nl">main.o</span><span class="o">:</span> <span class="nf">main.c vector.h</span>
-    <span class="err">$(CC)</span> <span class="err">$(CFLAGS)</span> <span class="err">-c</span> <span class="err">main.c</span>
-
-<span class="nl">vector.o</span><span class="o">:</span> <span class="nf">vector.c vector.h</span>
-    <span class="err">$(CC)</span> <span class="err">$(CFLAGS)</span> <span class="err">-c</span> <span class="err">vector.c</span>
-
-<span class="nl">clean</span><span class="o">:</span>
-    <span class="err">$(RM)</span> <span class="err">*.o</span> <span class="err">$(OUT)</span>
-</code></pre></div></div>
-
-<p>Looking at the code example above, you will notice a few variables that are used to define specific aspects when running the targets (such as the compiler command and flags used).
-To keep things modular, the compilation of the ‘main’ and ‘vector’ source-code files has been split, with file dependencies specific to each target specified after the short name.
-The ‘debug’ target appends a macro definition flag which is used to include any debug information present in the source code.</p>
-
-<h2 id="the-header-file">The Header File</h2>
-
-<p>Defining a header file allows the programmer to separate specific aspects of the programme’s source code into reusable files.
+Running the &lsquo;make&rsquo; command executes the first target found, so this must be carefully considered when designing the file.
+Below is a sample Makefile which provides the vector project with simple build, debug and clean targets.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-make data-lang=make><span style=display:flex><span>CC<span style=color:#f92672>=</span>gcc
+</span></span><span style=display:flex><span>CFLAGS<span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>RM<span style=color:#f92672>=</span>rm -rf
+</span></span><span style=display:flex><span>OUT<span style=color:#f92672>=</span>vector
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>all</span><span style=color:#f92672>:</span> build
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>build</span><span style=color:#f92672>:</span> main.o vector.o
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>$(</span>CC<span style=color:#66d9ef>)</span> <span style=color:#66d9ef>$(</span>CFLAGS<span style=color:#66d9ef>)</span> -o <span style=color:#66d9ef>$(</span>OUT<span style=color:#66d9ef>)</span> main.c vector.c
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>$(</span>RM<span style=color:#66d9ef>)</span> *.o
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>debug</span><span style=color:#f92672>:</span> CFLAGS+=-DDEBUG_ON
+</span></span><span style=display:flex><span><span style=color:#a6e22e>debug</span><span style=color:#f92672>:</span> build
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>main.o</span><span style=color:#f92672>:</span> main.c vector.h
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>$(</span>CC<span style=color:#66d9ef>)</span> <span style=color:#66d9ef>$(</span>CFLAGS<span style=color:#66d9ef>)</span> -c main.c
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>vector.o</span><span style=color:#f92672>:</span> vector.c vector.h
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>$(</span>CC<span style=color:#66d9ef>)</span> <span style=color:#66d9ef>$(</span>CFLAGS<span style=color:#66d9ef>)</span> -c vector.c
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>clean</span><span style=color:#f92672>:</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>$(</span>RM<span style=color:#66d9ef>)</span> *.o <span style=color:#66d9ef>$(</span>OUT<span style=color:#66d9ef>)</span>
+</span></span></code></pre></div><p>Looking at the code example above, you will notice a few variables that are used to define specific aspects when running the targets (such as the compiler command and flags used).
+To keep things modular, the compilation of the &lsquo;main&rsquo; and &lsquo;vector&rsquo; source-code files has been split, with file dependencies specific to each target specified after the short name.
+The &lsquo;debug&rsquo; target appends a macro definition flag which is used to include any debug information present in the source code.</p><h2 id=the-header-file>The Header File</h2><p>Defining a header file allows the programmer to separate specific aspects of the programme&rsquo;s source code into reusable files.
 These files commonly contain forward declarations of identifiers and functions.
-This allows a user to include the code’s header file in their own work, thereby separating the definition from the implementation.
-Including a header file produces the same results as copying the full contents into the caller’s file.
-Below shows the header file implemented for the vector example.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef VECTOR_H
-#define VECTOR_H
-</span>
-<span class="cp">#define VECTOR_INIT_CAPACITY 4
-</span>
-<span class="cp">#define VECTOR_INIT(vec) vector vec; vector_init(&amp;vec)
-#define VECTOR_ADD(vec, item) vector_add(&amp;vec, (void *) item)
-#define VECTOR_SET(vec, id, item) vector_set(&amp;vec, id, (void *) item)
-#define VECTOR_GET(vec, type, id) (type) vector_get(&amp;vec, id)
-#define VECTOR_DELETE(vec, id) vector_delete(&amp;vec, id)
-#define VECTOR_TOTAL(vec) vector_total(&amp;vec)
-#define VECTOR_FREE(vec) vector_free(&amp;vec)
-</span>
-<span class="k">typedef</span> <span class="k">struct</span> <span class="n">vector</span> <span class="p">{</span>
-    <span class="kt">void</span> <span class="o">**</span><span class="n">items</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">capacity</span><span class="p">;</span>
-    <span class="kt">int</span> <span class="n">total</span><span class="p">;</span>
-<span class="p">}</span> <span class="n">vector</span><span class="p">;</span>
-
-<span class="kt">void</span> <span class="nf">vector_init</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">);</span>
-<span class="kt">int</span> <span class="nf">vector_total</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">);</span>
-<span class="k">static</span> <span class="kt">void</span> <span class="nf">vector_resize</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
-<span class="kt">void</span> <span class="nf">vector_add</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
-<span class="kt">void</span> <span class="nf">vector_set</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
-<span class="kt">void</span> <span class="o">*</span><span class="nf">vector_get</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
-<span class="kt">void</span> <span class="nf">vector_delete</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">,</span> <span class="kt">int</span><span class="p">);</span>
-<span class="kt">void</span> <span class="nf">vector_free</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="p">);</span>
-
-<span class="cp">#endif
-</span></code></pre></div></div>
-
-<p>We wrap the contents of this file in an <em>include</em> guard to ensure that, even when included in multiple source files, it is processed only once.
-A ‘vector’ type is defined which provides access to the capacity and the current total number of elements in the collection.
-Along with this, an ‘items’ variable is declared, which is a pointer to void pointers, allowing us to store a heterogeneous collection of elements in the vector.
-The ‘vector_resize’ function is defined as static, ensuring that it is only accessible within the file in which it is defined.</p>
-
-<h2 id="the-implementation-file">The Implementation File</h2>
-
-<p>Using the header file definition, the following file is used to implement these methods.
+This allows a user to include the code&rsquo;s header file in their own work, thereby separating the definition from the implementation.
+Including a header file produces the same results as copying the full contents into the caller&rsquo;s file.
+Below shows the header file implemented for the vector example.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#ifndef VECTOR_H
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_H
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_INIT_CAPACITY 4
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_INIT(vec) vector vec; vector_init(&amp;vec)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_ADD(vec, item) vector_add(&amp;vec, (void *) item)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_SET(vec, id, item) vector_set(&amp;vec, id, (void *) item)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_GET(vec, type, id) (type) vector_get(&amp;vec, id)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_DELETE(vec, id) vector_delete(&amp;vec, id)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_TOTAL(vec) vector_total(&amp;vec)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define VECTOR_FREE(vec) vector_free(&amp;vec)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>typedef</span> <span style=color:#66d9ef>struct</span> vector {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>void</span> <span style=color:#f92672>**</span>items;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> capacity;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> total;
+</span></span><span style=display:flex><span>} vector;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_init</span>(vector <span style=color:#f92672>*</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>vector_total</span>(vector <span style=color:#f92672>*</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_resize</span>(vector <span style=color:#f92672>*</span>, <span style=color:#66d9ef>int</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_add</span>(vector <span style=color:#f92672>*</span>, <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_set</span>(vector <span style=color:#f92672>*</span>, <span style=color:#66d9ef>int</span>, <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>vector_get</span>(vector <span style=color:#f92672>*</span>, <span style=color:#66d9ef>int</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_delete</span>(vector <span style=color:#f92672>*</span>, <span style=color:#66d9ef>int</span>);
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_free</span>(vector <span style=color:#f92672>*</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span></code></pre></div><p>We wrap the contents of this file in an <em>include</em> guard to ensure that, even when included in multiple source files, it is processed only once.
+A &lsquo;vector&rsquo; type is defined which provides access to the capacity and the current total number of elements in the collection.
+Along with this, an &lsquo;items&rsquo; variable is declared, which is a pointer to void pointers, allowing us to store a heterogeneous collection of elements in the vector.
+The &lsquo;vector_resize&rsquo; function is defined as static, ensuring that it is only accessible within the file in which it is defined.</p><h2 id=the-implementation-file>The Implementation File</h2><p>Using the header file definition, the following file is used to implement these methods.
 As discussed in the previous section, void pointers are used to reference the collection elements.
 Void pointers are pointers that point to arbitrary data with no specific type.
-As a consequence, you are unable to directly dereference a pointer of this type and must first cast it to the appropriate type.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
-</span>
-<span class="cp">#include</span> <span class="cpf">"vector.h"</span><span class="cp">
-</span>
-<span class="kt">void</span> <span class="nf">vector_init</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">VECTOR_INIT_CAPACITY</span><span class="p">;</span>
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="o">*</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">int</span> <span class="nf">vector_total</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">static</span> <span class="kt">void</span> <span class="nf">vector_resize</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">capacity</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="cp">#ifdef DEBUG_ON
-</span>    <span class="n">printf</span><span class="p">(</span><span class="s">"vector_resize: %d to %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span><span class="p">,</span> <span class="n">capacity</span><span class="p">);</span>
-    <span class="cp">#endif
-</span>
-    <span class="kt">void</span> <span class="o">**</span><span class="n">items</span> <span class="o">=</span> <span class="n">realloc</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="o">*</span> <span class="n">capacity</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span> <span class="o">=</span> <span class="n">items</span><span class="p">;</span>
-        <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">capacity</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vector_add</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">item</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">==</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="p">)</span>
-        <span class="n">vector_resize</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="o">++</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vector_set</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">item</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="p">)</span>
-        <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="o">*</span><span class="nf">vector_get</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
-    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vector_delete</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">,</span> <span class="kt">int</span> <span class="n">index</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="p">)</span>
-        <span class="k">return</span><span class="p">;</span>
-
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">index</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">];</span>
-        <span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span><span class="o">--</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">total</span> <span class="o">==</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
-        <span class="n">vector_resize</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">capacity</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="kt">void</span> <span class="nf">vector_free</span><span class="p">(</span><span class="n">vector</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">free</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">items</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Looking at the code example above, you will notice that the ‘vector_resize’ function is called when certain conditions are met during addition or deletion.
+As a consequence, you are unable to directly dereference a pointer of this type and must first cast it to the appropriate type.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdlib.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;vector.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_init</span>(vector <span style=color:#f92672>*</span>v)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>=</span> VECTOR_INIT_CAPACITY;
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>total <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>items <span style=color:#f92672>=</span> <span style=color:#a6e22e>malloc</span>(<span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>) <span style=color:#f92672>*</span> v<span style=color:#f92672>-&gt;</span>capacity);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>vector_total</span>(vector <span style=color:#f92672>*</span>v)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> v<span style=color:#f92672>-&gt;</span>total;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_resize</span>(vector <span style=color:#f92672>*</span>v, <span style=color:#66d9ef>int</span> capacity)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#ifdef DEBUG_ON
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;vector_resize: %d to %d</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, v<span style=color:#f92672>-&gt;</span>capacity, capacity);
+</span></span><span style=display:flex><span>    <span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>void</span> <span style=color:#f92672>**</span>items <span style=color:#f92672>=</span> <span style=color:#a6e22e>realloc</span>(v<span style=color:#f92672>-&gt;</span>items, <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>) <span style=color:#f92672>*</span> capacity);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (items) {
+</span></span><span style=display:flex><span>        v<span style=color:#f92672>-&gt;</span>items <span style=color:#f92672>=</span> items;
+</span></span><span style=display:flex><span>        v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>=</span> capacity;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_add</span>(vector <span style=color:#f92672>*</span>v, <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>item)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>==</span> v<span style=color:#f92672>-&gt;</span>total)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>vector_resize</span>(v, v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span>);
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>items[v<span style=color:#f92672>-&gt;</span>total<span style=color:#f92672>++</span>] <span style=color:#f92672>=</span> item;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_set</span>(vector <span style=color:#f92672>*</span>v, <span style=color:#66d9ef>int</span> index, <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span>item)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (index <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> index <span style=color:#f92672>&lt;</span> v<span style=color:#f92672>-&gt;</span>total)
+</span></span><span style=display:flex><span>        v<span style=color:#f92672>-&gt;</span>items[index] <span style=color:#f92672>=</span> item;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span><span style=color:#a6e22e>vector_get</span>(vector <span style=color:#f92672>*</span>v, <span style=color:#66d9ef>int</span> index)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (index <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> index <span style=color:#f92672>&lt;</span> v<span style=color:#f92672>-&gt;</span>total)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> v<span style=color:#f92672>-&gt;</span>items[index];
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> NULL;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_delete</span>(vector <span style=color:#f92672>*</span>v, <span style=color:#66d9ef>int</span> index)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (index <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>||</span> index <span style=color:#f92672>&gt;=</span> v<span style=color:#f92672>-&gt;</span>total)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>items[index] <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> index; i <span style=color:#f92672>&lt;</span> v<span style=color:#f92672>-&gt;</span>total <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        v<span style=color:#f92672>-&gt;</span>items[i] <span style=color:#f92672>=</span> v<span style=color:#f92672>-&gt;</span>items[i <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>];
+</span></span><span style=display:flex><span>        v<span style=color:#f92672>-&gt;</span>items[i <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>] <span style=color:#f92672>=</span> NULL;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    v<span style=color:#f92672>-&gt;</span>total<span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (v<span style=color:#f92672>-&gt;</span>total <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> v<span style=color:#f92672>-&gt;</span>total <span style=color:#f92672>==</span> v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>/</span> <span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>vector_resize</span>(v, v<span style=color:#f92672>-&gt;</span>capacity <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> <span style=color:#a6e22e>vector_free</span>(vector <span style=color:#f92672>*</span>v)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>free</span>(v<span style=color:#f92672>-&gt;</span>items);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the code example above, you will notice that the &lsquo;vector_resize&rsquo; function is called when certain conditions are met during addition or deletion.
 If the current vector capacity is exhausted when an addition is requested, the size is doubled and the vector contents reallocated.
 Similarly, upon deletion, if the vector is a quarter full, the contents are reallocated to a vector of half the current size.
-These conditions for resizing work well in practice to balance memory capacity and the computation time required to fulfil each resize.</p>
-
-<h2 id="the-test-case">The Test Case</h2>
-
-<p>With all the pieces in place, we are now able to test the implementation.
+These conditions for resizing work well in practice to balance memory capacity and the computation time required to fulfil each resize.</p><h2 id=the-test-case>The Test Case</h2><p>With all the pieces in place, we are now able to test the implementation.
 Below is an example using the direct functions: adding a few strings (character sequences) to a collection, printing the contents, modifying the contents, and then printing it out again.
-One unfortunate detail that cannot be avoided when using void pointers is the necessary cast.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
-</span>
-<span class="cp">#include</span> <span class="cpf">"vector.h"</span><span class="cp">
-</span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-
-    <span class="n">vector</span> <span class="n">v</span><span class="p">;</span>
-    <span class="n">vector_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">);</span>
-
-    <span class="n">vector_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="s">"Bonjour"</span><span class="p">);</span>
-    <span class="n">vector_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="s">"tout"</span><span class="p">);</span>
-    <span class="n">vector_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="s">"le"</span><span class="p">);</span>
-    <span class="n">vector_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="s">"monde"</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vector_total</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"%s "</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">vector_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-
-    <span class="n">vector_delete</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-    <span class="n">vector_delete</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="n">vector_delete</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-
-    <span class="n">vector_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Hello"</span><span class="p">);</span>
-    <span class="n">vector_add</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="s">"World"</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">vector_total</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"%s "</span><span class="p">,</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">vector_get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-
-    <span class="n">vector_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">v</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>To simplify the use of the vector implementation, the header file defines a few macro functions which can be used in place of the base function calls.
-Below is an example that highlights these definitions in practice, reducing some of the verbosity present in the previous example.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
-#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp">
-</span>
-<span class="cp">#include</span> <span class="cpf">"vector.h"</span><span class="cp">
-</span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-
-    <span class="n">VECTOR_INIT</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
-
-    <span class="n">VECTOR_ADD</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s">"Bonjour"</span><span class="p">);</span>
-    <span class="n">VECTOR_ADD</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s">"tout"</span><span class="p">);</span>
-    <span class="n">VECTOR_ADD</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s">"le"</span><span class="p">);</span>
-    <span class="n">VECTOR_ADD</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s">"monde"</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">VECTOR_TOTAL</span><span class="p">(</span><span class="n">v</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"%s "</span><span class="p">,</span> <span class="n">VECTOR_GET</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-
-    <span class="n">VECTOR_DELETE</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-    <span class="n">VECTOR_DELETE</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="n">VECTOR_DELETE</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-
-    <span class="n">VECTOR_SET</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Hello"</span><span class="p">);</span>
-    <span class="n">VECTOR_ADD</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s">"World"</span><span class="p">);</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">VECTOR_TOTAL</span><span class="p">(</span><span class="n">v</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"%s "</span><span class="p">,</span> <span class="n">VECTOR_GET</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-
-    <span class="n">VECTOR_FREE</span><span class="p">(</span><span class="n">v</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Despite still having to provide a casting data type when retrieving a collection element, the macros clean-up and simplify the process a great deal.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.sparknotes.com/cs/pointers/whyusepointers/section3.rhtml">Why use Pointers? Dynamic Memory Allocation</a></li>
-  <li><a href="http://www.circuitstoday.com/void-pointers-in-c">Void Pointers in C</a></li>
-  <li><a href="http://codingrecipes.com/implementation-of-a-vector-data-structure-in-c">Implementation of a Vector data structure in C</a></li>
-  <li><a href="http://stackoverflow.com/questions/572547/what-does-static-mean-in-a-c-program">What does “static” mean in a C program?</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+One unfortunate detail that cannot be avoided when using void pointers is the necessary cast.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdlib.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;vector.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>void</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    vector v;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_init</span>(<span style=color:#f92672>&amp;</span>v);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_add</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#e6db74>&#34;Bonjour&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_add</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#e6db74>&#34;tout&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_add</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#e6db74>&#34;le&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_add</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#e6db74>&#34;monde&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#a6e22e>vector_total</span>(<span style=color:#f92672>&amp;</span>v); i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;%s &#34;</span>, (<span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>) <span style=color:#a6e22e>vector_get</span>(<span style=color:#f92672>&amp;</span>v, i));
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_delete</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#ae81ff>3</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_delete</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#ae81ff>2</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_delete</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_set</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Hello&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_add</span>(<span style=color:#f92672>&amp;</span>v, <span style=color:#e6db74>&#34;World&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#a6e22e>vector_total</span>(<span style=color:#f92672>&amp;</span>v); i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;%s &#34;</span>, (<span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>) <span style=color:#a6e22e>vector_get</span>(<span style=color:#f92672>&amp;</span>v, i));
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>vector_free</span>(<span style=color:#f92672>&amp;</span>v);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>To simplify the use of the vector implementation, the header file defines a few macro functions which can be used in place of the base function calls.
+Below is an example that highlights these definitions in practice, reducing some of the verbosity present in the previous example.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdlib.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;vector.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>void</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> i;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_INIT</span>(v);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_ADD</span>(v, <span style=color:#e6db74>&#34;Bonjour&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_ADD</span>(v, <span style=color:#e6db74>&#34;tout&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_ADD</span>(v, <span style=color:#e6db74>&#34;le&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_ADD</span>(v, <span style=color:#e6db74>&#34;monde&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#a6e22e>VECTOR_TOTAL</span>(v); i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;%s &#34;</span>, <span style=color:#a6e22e>VECTOR_GET</span>(v, <span style=color:#66d9ef>char</span><span style=color:#f92672>*</span>, i));
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_DELETE</span>(v, <span style=color:#ae81ff>3</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_DELETE</span>(v, <span style=color:#ae81ff>2</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_DELETE</span>(v, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_SET</span>(v, <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Hello&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_ADD</span>(v, <span style=color:#e6db74>&#34;World&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#a6e22e>VECTOR_TOTAL</span>(v); i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;%s &#34;</span>, <span style=color:#a6e22e>VECTOR_GET</span>(v, <span style=color:#66d9ef>char</span><span style=color:#f92672>*</span>, i));
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>VECTOR_FREE</span>(v);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Despite still having to provide a casting data type when retrieving a collection element, the macros clean-up and simplify the process a great deal.</p><h2 id=resources>Resources</h2><ul><li><a href=http://www.sparknotes.com/cs/pointers/whyusepointers/section3.rhtml rel="external noopener" target=_blank>Why use Pointers? Dynamic Memory Allocation</a></li><li><a href=http://www.circuitstoday.com/void-pointers-in-c rel="external noopener" target=_blank>Void Pointers in C</a></li><li><a href=http://codingrecipes.com/implementation-of-a-vector-data-structure-in-c rel="external noopener" target=_blank>Implementation of a Vector data structure in C</a></li><li><a href=http://stackoverflow.com/questions/572547/what-does-static-mean-in-a-c-program rel="external noopener" target=_blank>What does &ldquo;static&rdquo; mean in a C program?</a></li></ul></main><footer class=post__tags><a href=/archive/tag/c>c</a><a href=/archive/tag/data-structures>data-structures</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

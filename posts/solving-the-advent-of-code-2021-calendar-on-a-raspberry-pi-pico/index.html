@@ -1,139 +1,46 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring how many Advent of Code 2021 solutions can run on a Raspberry Pi Pico using C and C++.">
-
-    <title>
-        
-            Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico</h1>
-    <time datetime="2022-06-03T00:00:00+00:00" class="post-date">03 Jun 2022</time>
-    <p>Over the past year or so, I have been interested in microcontrollers and finding ways I can look to <a href="https://eddmann.com/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/">use them</a> within personal projects.
-Having just completed the <a href="https://eddmann.com/posts/solving-the-advent-of-code-2021-calendar-using-c-in-under-half-a-second/">Advent of Code 2021</a> calendar in C, I thought it would be interesting to see how many of these solutions I could get to run on the constrained hardware of a Raspberry Pi Pico.
-In this article, I will discuss how I went about achieving this, presenting the solutions’ answers on a <a href="https://shop.pimoroni.com/products/pico-display-pack?variant=32368664215635">Pimoroni Display</a> via an interactive menu (with paging).</p>
-
-
-
-<p><img src="/uploads/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo.jpg" alt="AoC 2021 on a Raspberry Pi Pico" /></p>
-
-<h2 id="proof-of-concept">Proof of Concept</h2>
-
-<p>Along with the MicroPython support, which I have <a href="https://eddmann.com/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/">documented my experiences</a> with in the past, the Raspberry Pi Pico has an <a href="https://github.com/raspberrypi/pico-sdk">official SDK</a> providing support to compile and target the RP2040 in C, C++, and Assembly.
-I decided to use a pre-built <a href="https://github.com/xingrz/rpi-pico-builder">Docker image</a> that included all the required dependencies to provide a deterministic environment to achieve this (regardless of host operating system).
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico - Edd Mann</title>
+<meta name=description content="Exploring how many Advent of Code 2021 solutions can run on a Raspberry Pi Pico using C and C++."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico"><meta itemprop=description content="Over the past year or so, I have been interested in microcontrollers and finding ways I can look to use them within personal projects. Having just completed the Advent of Code 2021 calendar in C, I thought it would be interesting to see how many of these solutions I could get to run on the constrained hardware of a Raspberry Pi Pico. In this article, I will discuss how I went about achieving this, presenting the solutions’ answers on a Pimoroni Display via an interactive menu (with paging)."><meta itemprop=datePublished content="2022-06-03T00:00:00+00:00"><meta itemprop=dateModified content="2022-06-03T00:00:00+00:00"><meta itemprop=wordCount content="576"><meta itemprop=keywords content="C,Advent-of-Code,Pico"><meta property="og:url" content="https://eddmann.com/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico"><meta property="og:description" content="Over the past year or so, I have been interested in microcontrollers and finding ways I can look to use them within personal projects. Having just completed the Advent of Code 2021 calendar in C, I thought it would be interesting to see how many of these solutions I could get to run on the constrained hardware of a Raspberry Pi Pico. In this article, I will discuss how I went about achieving this, presenting the solutions’ answers on a Pimoroni Display via an interactive menu (with paging)."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-06-03T00:00:00+00:00"><meta property="article:modified_time" content="2022-06-03T00:00:00+00:00"><meta property="article:tag" content="C"><meta property="article:tag" content="Advent-of-Code"><meta property="article:tag" content="Pico"><meta name=twitter:card content="summary"><meta name=twitter:title content="Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico"><meta name=twitter:description content="Over the past year or so, I have been interested in microcontrollers and finding ways I can look to use them within personal projects. Having just completed the Advent of Code 2021 calendar in C, I thought it would be interesting to see how many of these solutions I could get to run on the constrained hardware of a Raspberry Pi Pico. In this article, I will discuss how I went about achieving this, presenting the solutions’ answers on a Pimoroni Display via an interactive menu (with paging)."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Solving the Advent of Code 2021 calendar on a Raspberry Pi Pico</h1><time class=post__time>Jun 3, 2022</time></header><main class=prose><p>Over the past year or so, I have been interested in microcontrollers and finding ways I can look to <a href=/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/>use them</a> within personal projects.
+Having just completed the <a href=/posts/solving-the-advent-of-code-2021-calendar-using-c-in-under-half-a-second/>Advent of Code 2021</a> calendar in C, I thought it would be interesting to see how many of these solutions I could get to run on the constrained hardware of a Raspberry Pi Pico.
+In this article, I will discuss how I went about achieving this, presenting the solutions&rsquo; answers on a <a href="https://shop.pimoroni.com/products/pico-display-pack?variant=32368664215635" rel="external noopener" target=_blank>Pimoroni Display</a> via an interactive menu (with paging).</p><p><picture><source type=image/webp srcset=/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo_hu_bcd66f8cbc2da36f.webp><source type=image/jpeg srcset=/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo_hu_fbc2deda7afb1d20.jpg><img src=/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo_hu_fbc2deda7afb1d20.jpg alt="AoC 2021 on a Raspberry Pi Pico" loading=lazy></picture></p><h2 id=proof-of-concept>Proof of Concept</h2><p>Along with the MicroPython support, which I have <a href=/posts/building-a-2fa-totp-generator-using-a-raspberry-pi-pico-and-micropython/>documented my experiences</a> with in the past, the Raspberry Pi Pico has an <a href=https://github.com/raspberrypi/pico-sdk rel="external noopener" target=_blank>official SDK</a> providing support to compile and target the RP2040 in C, C++, and Assembly.
+I decided to use a pre-built <a href=https://github.com/xingrz/rpi-pico-builder rel="external noopener" target=_blank>Docker image</a> that included all the required dependencies to provide a deterministic environment to achieve this (regardless of host operating system).
 With the build environment in place, I could now begin work on how I was going to compile each solution for execution on the microcontroller.
 I initially used the SDK (in C) to compile several individual solutions (to the required UF2 format), printing the results via the serial interface.
-This provided me with confidence that at least some of the solutions would work!</p>
-
-<h2 id="putting-it-all-together">Putting it all together</h2>
-
-<p>From here, I explored how I could interact with the Pimoroni Display within C.
-It looked as though the <a href="https://github.com/pimoroni/pimoroni-pico/tree/main/libraries/pico_display">library</a> was written in C++, and as such, I opted to write the delivery application, which handled the paged menu and displayed the solutions’ answers in C++.
-To link the library with this delivery application, I tweaked the CMake configuration.</p>
-
-<p>After building out the menu functionality, I used C++’s ability to interoperate with C to begin including the solutions (and inputs).
+This provided me with confidence that at least some of the solutions would work!</p><h2 id=putting-it-all-together>Putting it all together</h2><p>From here, I explored how I could interact with the Pimoroni Display within C.
+It looked as though the <a href=https://github.com/pimoroni/pimoroni-pico/tree/main/libraries/pico_display rel="external noopener" target=_blank>library</a> was written in C++, and as such, I opted to write the delivery application, which handled the paged menu and displayed the solutions&rsquo; answers in C++.
+To link the library with this delivery application, I tweaked the CMake configuration.</p><p>After building out the menu functionality, I used C++&rsquo;s ability to interoperate with C to begin including the solutions (and inputs).
 I built a macro that removed some of the repetitive code required to execute and present each solution on the display.
 Within the CMake configuration, I added the custom C compilation options (targeting C11 and optimisation flags) that I had used within the CLI variant.
-Below is the CMake configuration used within the project, highlighting how the solutions and display library are linked into the deliverable:</p>
-
-<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cmake_minimum_required</span><span class="p">(</span>VERSION 3.12<span class="p">)</span>
-
-<span class="nb">include</span><span class="p">(</span>pico_sdk_import.cmake<span class="p">)</span>
-
-<span class="nb">project</span><span class="p">(</span>aoc2021<span class="p">)</span>
-
-<span class="nb">set</span><span class="p">(</span>c_flags -std=gnu11 -O2 -Wall<span class="p">)</span>
-<span class="nb">add_compile_options</span><span class="p">(</span><span class="s2">"$&lt;$&lt;COMPILE_LANGUAGE:C&gt;:</span><span class="si">${</span><span class="nv">c_flags</span><span class="si">}</span><span class="s2">&gt;"</span><span class="p">)</span>
-<span class="nb">add_compile_definitions</span><span class="p">(</span>AOC_PICO<span class="p">)</span>
-
-<span class="nf">pico_sdk_init</span><span class="p">()</span>
-
-<span class="nb">file</span><span class="p">(</span>GLOB_RECURSE SOLUTIONS RELATIVE <span class="si">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="si">}</span> <span class="s2">"../day*/solution.c"</span> <span class="s2">"../shared/dynarray.c"</span><span class="p">)</span>
-<span class="nb">add_executable</span><span class="p">(</span>
-  aoc2021
-  aoc2021.cpp
-  <span class="si">${</span><span class="nv">SOLUTIONS</span><span class="si">}</span>
-  display/pico_display.cpp
-  display/pico_graphics.cpp
-  display/st7789.cpp
-  display/types.cpp
-<span class="p">)</span>
-
-<span class="nb">target_link_libraries</span><span class="p">(</span>aoc2021 pico_stdlib hardware_spi hardware_pwm hardware_dma<span class="p">)</span>
-<span class="nf">pico_add_extra_outputs</span><span class="p">(</span>aoc2021<span class="p">)</span>
-</code></pre></div></div>
-
-<p>With all this in place, I compiled the calendar’s solutions into a single UF2 and flashed it onto the Raspberry Pi Pico for testing.
+Below is the CMake configuration used within the project, highlighting how the solutions and display library are linked into the deliverable:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-cmake data-lang=cmake><span style=display:flex><span>cmake_minimum_required(<span style=color:#e6db74>VERSION</span> <span style=color:#e6db74>3.12</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>include(<span style=color:#e6db74>pico_sdk_import.cmake</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>project(<span style=color:#e6db74>aoc2021</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>set(<span style=color:#e6db74>c_flags</span> <span style=color:#e6db74>-std=gnu11</span> <span style=color:#e6db74>-O2</span> <span style=color:#e6db74>-Wall</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>add_compile_options(<span style=color:#e6db74>&#34;$&lt;$&lt;COMPILE_LANGUAGE:C&gt;:${c_flags}&gt;&#34;</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>add_compile_definitions(<span style=color:#e6db74>AOC_PICO</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>pico_sdk_init()<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>file(<span style=color:#e6db74>GLOB_RECURSE</span> <span style=color:#e6db74>SOLUTIONS</span> <span style=color:#e6db74>RELATIVE</span> <span style=color:#f92672>${</span>CMAKE_SOURCE_DIR<span style=color:#f92672>}</span> <span style=color:#e6db74>&#34;../day*/solution.c&#34;</span> <span style=color:#e6db74>&#34;../shared/dynarray.c&#34;</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>add_executable(
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>aoc2021</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>aoc2021.cpp</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>${</span>SOLUTIONS<span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>display/pico_display.cpp</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>display/pico_graphics.cpp</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>display/st7789.cpp</span>
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>display/types.cpp</span>
+</span></span><span style=display:flex><span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>target_link_libraries(<span style=color:#e6db74>aoc2021</span> <span style=color:#e6db74>pico_stdlib</span> <span style=color:#e6db74>hardware_spi</span> <span style=color:#e6db74>hardware_pwm</span> <span style=color:#e6db74>hardware_dma</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>pico_add_extra_outputs(<span style=color:#e6db74>aoc2021</span>)<span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><p>With all this in place, I compiled the calendar&rsquo;s solutions into a single UF2 and flashed it onto the Raspberry Pi Pico for testing.
 I was surprised to find that 12 out of the 25 original solutions worked with no modification!
 This was a lot more than I was expecting, as I had optimised these solutions for speed and not memory usage, of which the microcontroller was far more constrained.
-Below, you can see a video demonstrating how the paged menu system works, along with executing several solutions:</p>
-
-<div>
-  <video style="width:100%" controls="" muted="">
-    <source src="/uploads/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo.mp4" type="video/mp4" />
-  </video>
-</div>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>I was pleasantly surprised to find out how many of the solutions worked with no changes.
+Below, you can see a video demonstrating how the paged menu system works, along with executing several solutions:</p><video style=width:100% preload=metadata controls muted>
+<source src=/posts/solving-the-advent-of-code-2021-calendar-on-a-raspberry-pi-pico/demo.mp4 type=video/mp4>Your browser does not support the video element.</video><h2 id=conclusion>Conclusion</h2><p>I was pleasantly surprised to find out how many of the solutions worked with no changes.
 I also enjoyed experimenting with compiling programs for the RP2040 using a combination of C and C++.
 However, I do find it to be a more lengthy setup process than my experience developing for the ESP32 using the Arduino IDE.
-Now that I have built out this deliverable, I would like to explore attempting to optimise more of the solutions and get them working.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Now that I have built out this deliverable, I would like to explore attempting to optimise more of the solutions and get them working.</p></main><footer class=post__tags><a href=/archive/tag/c>c</a><a href=/archive/tag/advent-of-code>advent-of-code</a><a href=/archive/tag/pico>pico</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

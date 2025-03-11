@@ -1,428 +1,272 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A detailed guide on setting up a secure Caddy Server within AWS using Packer and Terraform, with step-by-step instructions for HTTPS configuration and Infrastructure-as-Code implementation.">
-
-    <title>
-        
-            Setting up Caddy Server within AWS using Packer and Terraform &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Setting up Caddy Server within AWS using Packer and Terraform</h1>
-    <time datetime="2018-08-03T00:00:00+00:00" class="post-date">03 Aug 2018</time>
-    <p>With the <a href="https://security.googleblog.com/2018/02/a-secure-web-is-here-to-stay.html">recent update</a> to Google Chrome helping shape a more secure Web by marking all HTTP sites as “not secure”.
-I thought it was time that I make the necessary changes to how we host audio files for the <a href="https://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast.
-In this post I would like to discuss setting up <a href="https://caddyserver.com/">Caddy Server</a> (which provides HTTPS out of the box!) as a static-hosting platform on AWS.
-I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform.</p>
-
-
-
-<p>The goal of this guide is to document a process in which we can deploy the resulting service using an Infrastructure-as-Code philosophy.</p>
-
-<h2 id="architecting-the-service">Architecting the Service</h2>
-
-<p>We will be storing all statically hosted files and Let’s Encrypt generated SSL certificates within a dedicated EBS volume which has already been created.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Setting up Caddy Server within AWS using Packer and Terraform - Edd Mann</title>
+<meta name=description content="A detailed guide on setting up a secure Caddy Server within AWS using Packer and Terraform, with step-by-step instructions for HTTPS configuration and Infrastructure-as-Code implementation."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Setting up Caddy Server within AWS using Packer and Terraform"><meta itemprop=description content="With the recent update to Google Chrome helping shape a more secure Web by marking all HTTP sites as “not secure”. I thought it was time that I make the necessary changes to how we host audio files for the Three Devs and a Maybe podcast. In this post I would like to discuss setting up Caddy Server (which provides HTTPS out of the box!) as a static-hosting platform on AWS. I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform."><meta itemprop=datePublished content="2018-08-03T00:00:00+00:00"><meta itemprop=dateModified content="2018-08-03T00:00:00+00:00"><meta itemprop=wordCount content="1803"><meta itemprop=keywords content="Aws,Packer,Terraform,Caddy"><meta property="og:url" content="https://eddmann.com/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Setting up Caddy Server within AWS using Packer and Terraform"><meta property="og:description" content="With the recent update to Google Chrome helping shape a more secure Web by marking all HTTP sites as “not secure”. I thought it was time that I make the necessary changes to how we host audio files for the Three Devs and a Maybe podcast. In this post I would like to discuss setting up Caddy Server (which provides HTTPS out of the box!) as a static-hosting platform on AWS. I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-08-03T00:00:00+00:00"><meta property="article:modified_time" content="2018-08-03T00:00:00+00:00"><meta property="article:tag" content="Aws"><meta property="article:tag" content="Packer"><meta property="article:tag" content="Terraform"><meta property="article:tag" content="Caddy"><meta name=twitter:card content="summary"><meta name=twitter:title content="Setting up Caddy Server within AWS using Packer and Terraform"><meta name=twitter:description content="With the recent update to Google Chrome helping shape a more secure Web by marking all HTTP sites as “not secure”. I thought it was time that I make the necessary changes to how we host audio files for the Three Devs and a Maybe podcast. In this post I would like to discuss setting up Caddy Server (which provides HTTPS out of the box!) as a static-hosting platform on AWS. I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Setting up Caddy Server within AWS using Packer and Terraform</h1><time class=post__time>Aug 3, 2018</time></header><main class=prose><p>With the <a href=https://security.googleblog.com/2018/02/a-secure-web-is-here-to-stay.html rel="external noopener" target=_blank>recent update</a> to Google Chrome helping shape a more secure Web by marking all HTTP sites as &ldquo;not secure&rdquo;.
+I thought it was time that I make the necessary changes to how we host audio files for the <a href=https://threedevsandamaybe.com/ rel="external noopener" target=_blank>Three Devs and a Maybe</a> podcast.
+In this post I would like to discuss setting up <a href=https://caddyserver.com/ rel="external noopener" target=_blank>Caddy Server</a> (which provides HTTPS out of the box!) as a static-hosting platform on AWS.
+I will detail how to provision the instance with Packer and the surrounding infrastructure using Terraform.</p><p>The goal of this guide is to document a process in which we can deploy the resulting service using an Infrastructure-as-Code philosophy.</p><h2 id=architecting-the-service>Architecting the Service</h2><p>We will be storing all statically hosted files and Let&rsquo;s Encrypt generated SSL certificates within a dedicated EBS volume which has already been created.
 This will allow us to bring up and tear down the service as desired whilst keeping the required persistent state.
-It is good practise to retain the certificates that are generated within Caddy Server, as Let’s Encrypt has particular <a href="https://letsencrypt.org/docs/rate-limits/">rate-limits</a> that could cause issues.
+It is good practise to retain the certificates that are generated within Caddy Server, as Let&rsquo;s Encrypt has particular <a href=https://letsencrypt.org/docs/rate-limits/ rel="external noopener" target=_blank>rate-limits</a> that could cause issues.
 Following this, we will be using an Elastic IP which has also already been allocated.
-As the <code class="language-plaintext highlighter-rouge">threedevsandamaybe.com</code> domain is not currently managed by Amazon Route 53, it is easier to use an expected IP address that we can manually update the DNS records to beforehand.</p>
-
-<p>With these two prerequisite resources in place, we can look at how the service will be constructed, as shown in the following diagram.</p>
-
-<p><img src="/uploads/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure.png" alt="Caddy Server" /></p>
-
-<h2 id="provisioning-the-machine-with-packer">Provisioning the Machine with Packer</h2>
-
-<p>Built by HashiCorp, <a href="https://www.packer.io/">Packer</a> provides a clean abstraction around creating identical machine images for multiple platforms, using a single source configuration.
-Packer clearly defines the meaning of a ‘machine image’ within their documentation.</p>
-
-<blockquote>
-  <p>A machine image is a single static unit that contains a pre-configured operating system and installed software which is used to quickly create new running machines.</p>
-</blockquote>
-
-<p>This allows us to define how we wish the image to look within code (using Provisioners) and then build the associated artifacts (AMIs, VirtualBox OVF exports) based on our environment needs.</p>
-
-<p>Now that we are familiar with what Packer provides us with, we must first <a href="https://www.packer.io/downloads.html">download</a> the relevant package based on your host system.
+As the <code>threedevsandamaybe.com</code> domain is not currently managed by Amazon Route 53, it is easier to use an expected IP address that we can manually update the DNS records to beforehand.</p><p>With these two prerequisite resources in place, we can look at how the service will be constructed, as shown in the following diagram.</p><p><picture><source type=image/webp srcset=/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure_hu_c3db4dad2dee6ad6.webp><source type=image/jpeg srcset=/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure_hu_9f26623e72eed5d.jpg><img src=/posts/setting-up-caddy-server-within-aws-using-packer-and-terraform/infrastructure_hu_9f26623e72eed5d.jpg alt="Caddy Server" loading=lazy></picture></p><h2 id=provisioning-the-machine-with-packer>Provisioning the Machine with Packer</h2><p>Built by HashiCorp, <a href=https://www.packer.io/ rel="external noopener" target=_blank>Packer</a> provides a clean abstraction around creating identical machine images for multiple platforms, using a single source configuration.
+Packer clearly defines the meaning of a &lsquo;machine image&rsquo; within their documentation.</p><blockquote><p>A machine image is a single static unit that contains a pre-configured operating system and installed software which is used to quickly create new running machines.</p></blockquote><p>This allows us to define how we wish the image to look within code (using Provisioners) and then build the associated artifacts (AMIs, VirtualBox OVF exports) based on our environment needs.</p><p>Now that we are familiar with what Packer provides us with, we must first <a href=https://www.packer.io/downloads.html rel="external noopener" target=_blank>download</a> the relevant package based on your host system.
 Alternatively, you can do away with installing packages on your host system and containerise the dependency using Docker 💪.
-This can be simply achieved by adding the following alias into your terminal session.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">alias </span><span class="nv">packer</span><span class="o">=</span><span class="s1">'docker run -it --rm -v $(pwd):/app/ -w /app/ eddmann/packer-cli'</span>
-</code></pre></div></div>
-
-<p>With this set up we can define our Caddy Server image within a file called <code class="language-plaintext highlighter-rouge">caddy.json</code>, which will be used to shape the resulting AWS artifact.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"builders"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"amazon-ebs"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"access_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{{ </span><span class="se">\"</span><span class="s2">{{user `aws_access_key`}}</span><span class="se">\"</span><span class="s2"> }}"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"secret_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{{ </span><span class="se">\"</span><span class="s2">{{user `aws_secret_key`}}</span><span class="se">\"</span><span class="s2"> }}"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{{ </span><span class="se">\"</span><span class="s2">{{user `aws_region`}}</span><span class="se">\"</span><span class="s2"> }}"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"source_ami_filter"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nl">"filters"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-          </span><span class="nl">"virtualization-type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hvm"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*"</span><span class="p">,</span><span class="w">
-          </span><span class="nl">"root-device-type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ebs"</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="nl">"owners"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"099720109477"</span><span class="p">],</span><span class="w">
-        </span><span class="nl">"most_recent"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-      </span><span class="p">},</span><span class="w">
-      </span><span class="nl">"instance_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"m3.medium"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"ssh_username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ubuntu"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"ami_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Caddy-Server-{{ </span><span class="se">\"</span><span class="s2">{{timestamp}}</span><span class="se">\"</span><span class="s2"> }}"</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">],</span><span class="w">
-  </span><span class="nl">"provisioners"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"shell"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"expect_disconnect"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"inline"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="s2">"sudo apt-get -y update"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo apt-get -y dist-upgrade"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo apt-get -y autoremove"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo reboot"</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-    </span><span class="p">},</span><span class="w">
-    </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"pause_before"</span><span class="p">:</span><span class="w"> </span><span class="s2">"30s"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"shell"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"inline"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-        </span><span class="s2">"curl https://getcaddy.com | bash -s personal"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo chown root:root /usr/local/bin/caddy"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo chmod 755 /usr/local/bin/caddy"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo setcap 'cap_net_bind_service=+ep' /usr/local/bin/caddy"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo mkdir /etc/caddy"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo chown root:root /etc/caddy"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"ulimit -n 8192"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"wget https://raw.githubusercontent.com/mholt/caddy/master/dist/init/linux-systemd/caddy.service"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo mv caddy.service /etc/systemd/system/"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo chown root:root /etc/systemd/system/caddy.service"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo chmod 644 /etc/systemd/system/caddy.service"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"sudo systemctl daemon-reload"</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-  </span><span class="p">]</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<p>You can see that we first define the builder that we wish to use for this machine image.
-We have opted for a single <a href="https://www.packer.io/docs/builders/amazon-ebs.html"><code class="language-plaintext highlighter-rouge">amazon-ebs</code></a>, which will boot up a temporary <code class="language-plaintext highlighter-rouge">m3.medium</code> EC2 instance with a base AMI (the latest Ubuntu 16.04), and create a new AMI using the supplied name template once the instance has been provisioned.
+This can be simply achieved by adding the following alias into your terminal session.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>alias packer<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;docker run -it --rm -v $(pwd):/app/ -w /app/ eddmann/packer-cli&#39;</span>
+</span></span></code></pre></div><p>With this set up we can define our Caddy Server image within a file called <code>caddy.json</code>, which will be used to shape the resulting AWS artifact.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;builders&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;type&#34;</span>: <span style=color:#e6db74>&#34;amazon-ebs&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;access_key&#34;</span>: <span style=color:#e6db74>&#34;{{ \&#34;{{user `aws_access_key`}}\&#34; }}&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;secret_key&#34;</span>: <span style=color:#e6db74>&#34;{{ \&#34;{{user `aws_secret_key`}}\&#34; }}&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;region&#34;</span>: <span style=color:#e6db74>&#34;{{ \&#34;{{user `aws_region`}}\&#34; }}&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;source_ami_filter&#34;</span>: {
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;filters&#34;</span>: {
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;virtualization-type&#34;</span>: <span style=color:#e6db74>&#34;hvm&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*&#34;</span>,
+</span></span><span style=display:flex><span>          <span style=color:#f92672>&#34;root-device-type&#34;</span>: <span style=color:#e6db74>&#34;ebs&#34;</span>
+</span></span><span style=display:flex><span>        },
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;owners&#34;</span>: [<span style=color:#e6db74>&#34;099720109477&#34;</span>],
+</span></span><span style=display:flex><span>        <span style=color:#f92672>&#34;most_recent&#34;</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;instance_type&#34;</span>: <span style=color:#e6db74>&#34;m3.medium&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;ssh_username&#34;</span>: <span style=color:#e6db74>&#34;ubuntu&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;ami_name&#34;</span>: <span style=color:#e6db74>&#34;Caddy-Server-{{ \&#34;{{timestamp}}\&#34; }}&#34;</span>
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ],
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;provisioners&#34;</span>: [
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;type&#34;</span>: <span style=color:#e6db74>&#34;shell&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;expect_disconnect&#34;</span>: <span style=color:#66d9ef>true</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;inline&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo apt-get -y update&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo apt-get -y dist-upgrade&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo apt-get -y autoremove&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo reboot&#34;</span>
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;pause_before&#34;</span>: <span style=color:#e6db74>&#34;30s&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;type&#34;</span>: <span style=color:#e6db74>&#34;shell&#34;</span>,
+</span></span><span style=display:flex><span>      <span style=color:#f92672>&#34;inline&#34;</span>: [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;curl https://getcaddy.com | bash -s personal&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo chown root:root /usr/local/bin/caddy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo chmod 755 /usr/local/bin/caddy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo setcap &#39;cap_net_bind_service=+ep&#39; /usr/local/bin/caddy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo mkdir /etc/caddy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo chown root:root /etc/caddy&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;ulimit -n 8192&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;wget https://raw.githubusercontent.com/mholt/caddy/master/dist/init/linux-systemd/caddy.service&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo mv caddy.service /etc/systemd/system/&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo chown root:root /etc/systemd/system/caddy.service&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo chmod 644 /etc/systemd/system/caddy.service&#34;</span>,
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;sudo systemctl daemon-reload&#34;</span>
+</span></span><span style=display:flex><span>      ]
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  ]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>You can see that we first define the builder that we wish to use for this machine image.
+We have opted for a single <a href=https://www.packer.io/docs/builders/amazon-ebs.html rel="external noopener" target=_blank><code>amazon-ebs</code></a>, which will boot up a temporary <code>m3.medium</code> EC2 instance with a base AMI (the latest Ubuntu 16.04), and create a new AMI using the supplied name template once the instance has been provisioned.
 We require that the user externally supply the relevant AWS credentials and desired region in which the AMI is to be created.
-These variables will be stored in an accompanying file called <code class="language-plaintext highlighter-rouge">variables.json</code>.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"variables"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"aws_access_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"aws_secret_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-    </span><span class="nl">"aws_region"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<p>With the base AWS EC2 instance running we will provision the machine using simple shell commands.
-Packer has support for many different provisioners (such as Puppet and Chef), but the easiest and best suited for our use-case is <a href="https://www.packer.io/docs/provisioners/shell.html"><code class="language-plaintext highlighter-rouge">shell</code></a>.
-At this stage we ensure that the instance is fully up-to-date (with a reboot to ensure any required changes take effect), and then download and configure the latest Caddy Server package.</p>
-
-<p>With this configuration now defined, we can run <code class="language-plaintext highlighter-rouge">packer build -var-file=variables.json caddy.json</code>.
+These variables will be stored in an accompanying file called <code>variables.json</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;variables&#34;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;aws_access_key&#34;</span>: <span style=color:#e6db74>&#34;&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;aws_secret_key&#34;</span>: <span style=color:#e6db74>&#34;&#34;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;aws_region&#34;</span>: <span style=color:#e6db74>&#34;&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With the base AWS EC2 instance running we will provision the machine using simple shell commands.
+Packer has support for many different provisioners (such as Puppet and Chef), but the easiest and best suited for our use-case is <a href=https://www.packer.io/docs/provisioners/shell.html rel="external noopener" target=_blank><code>shell</code></a>.
+At this stage we ensure that the instance is fully up-to-date (with a reboot to ensure any required changes take effect), and then download and configure the latest Caddy Server package.</p><p>With this configuration now defined, we can run <code>packer build -var-file=variables.json caddy.json</code>.
 Once the AMI has been successfully created, you will be shown its unique identifier.
-Keep hold of this identifier as it will be required in the next step!</p>
-
-<h2 id="provisioning-the-infrastructure-with-terraform">Provisioning the Infrastructure with Terraform</h2>
-
-<p>Now that we have the bespoke Caddy Server AMI in place, we can move on to creating the associated AWS infrastructure that is required to get this EC2-backed service running.
-Like Packer, <a href="https://www.terraform.io/">Terraform</a> is built by HashiCorp, providing you with the ability to define your desired infrastructure through code.
+Keep hold of this identifier as it will be required in the next step!</p><h2 id=provisioning-the-infrastructure-with-terraform>Provisioning the Infrastructure with Terraform</h2><p>Now that we have the bespoke Caddy Server AMI in place, we can move on to creating the associated AWS infrastructure that is required to get this EC2-backed service running.
+Like Packer, <a href=https://www.terraform.io/ rel="external noopener" target=_blank>Terraform</a> is built by HashiCorp, providing you with the ability to define your desired infrastructure through code.
 Once you have specified your intended goal state, Terraform will compute a plan of imperative steps to reach the desired state.
-Terraform is able to interact with many different third-party providers, as stated in their documentation.</p>
-
-<blockquote>
-  <p>Terraform is used to create, manage, and update infrastructure resources such as physical machines, VMs, network switches, containers, and more.
-Almost any infrastructure type can be represented as a resource in Terraform.</p>
-</blockquote>
-
-<p>We must first <a href="https://www.terraform.io/downloads.html">download</a> the relevant package based on your host system.
-Similar to how we can containerise Packer using Docker, we can also alternatively access this dependency by using a terminal alias.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">alias </span><span class="nv">terraform</span><span class="o">=</span><span class="s1">'docker run -it --rm -v ${HOME}:/root -v $(pwd):/app/ -w /app/ eddmann/terraform-cli'</span>
-</code></pre></div></div>
-
-<p>Next, we shall start off by defining the <a href="https://www.terraform.io/docs/providers/aws/index.html">AWS provider</a> within <code class="language-plaintext highlighter-rouge">provider.tf</code> like so.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>provider "aws" {
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret_key}"
-  region     = "${var.aws_region}"
+Terraform is able to interact with many different third-party providers, as stated in their documentation.</p><blockquote><p>Terraform is used to create, manage, and update infrastructure resources such as physical machines, VMs, network switches, containers, and more.
+Almost any infrastructure type can be represented as a resource in Terraform.</p></blockquote><p>We must first <a href=https://www.terraform.io/downloads.html rel="external noopener" target=_blank>download</a> the relevant package based on your host system.
+Similar to how we can containerise Packer using Docker, we can also alternatively access this dependency by using a terminal alias.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>alias terraform<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;docker run -it --rm -v ${HOME}:/root -v $(pwd):/app/ -w /app/ eddmann/terraform-cli&#39;</span>
+</span></span></code></pre></div><p>Next, we shall start off by defining the <a href=https://www.terraform.io/docs/providers/aws/index.html rel="external noopener" target=_blank>AWS provider</a> within <code>provider.tf</code> like so.</p><pre tabindex=0><code>provider &#34;aws&#34; {
+  access_key = &#34;${var.aws_access_key}&#34;
+  secret_key = &#34;${var.aws_secret_key}&#34;
+  region     = &#34;${var.aws_region}&#34;
 }
-</code></pre></div></div>
-
-<p>This configures the AWS provider using the desired credentials which are declared in a file called <code class="language-plaintext highlighter-rouge">variables.tf</code>, and defined in a file called <code class="language-plaintext highlighter-rouge">terraform.tfvars</code>.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variable "aws_access_key" {}
-variable "aws_secret_key" {}
-variable "aws_region" {}
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws_access_key = ""
-aws_secret_key = ""
-aws_region = ""
-</code></pre></div></div>
-
-<p>With the provider now configured we can move on to setting up the surrounding network infrastructure required to host the service, specified in a file called <code class="language-plaintext highlighter-rouge">network.tf</code>.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>data "http" "ip" {
-  url = "http://icanhazip.com"
+</code></pre><p>This configures the AWS provider using the desired credentials which are declared in a file called <code>variables.tf</code>, and defined in a file called <code>terraform.tfvars</code>.</p><pre tabindex=0><code>variable &#34;aws_access_key&#34; {}
+variable &#34;aws_secret_key&#34; {}
+variable &#34;aws_region&#34; {}
+</code></pre><pre tabindex=0><code>aws_access_key = &#34;&#34;
+aws_secret_key = &#34;&#34;
+aws_region = &#34;&#34;
+</code></pre><p>With the provider now configured we can move on to setting up the surrounding network infrastructure required to host the service, specified in a file called <code>network.tf</code>.</p><pre tabindex=0><code>data &#34;http&#34; &#34;ip&#34; {
+  url = &#34;http://icanhazip.com&#34;
 }
 
-resource "aws_vpc" "caddy" {
-  cidr_block = "10.0.0.0/16"
+resource &#34;aws_vpc&#34; &#34;caddy&#34; {
+  cidr_block = &#34;10.0.0.0/16&#34;
 
   tags {
-    Name      = "Caddy-VPC"
-    Terraform = "Yes"
+    Name      = &#34;Caddy-VPC&#34;
+    Terraform = &#34;Yes&#34;
   }
 }
 
-resource "aws_subnet" "caddy" {
-  vpc_id                  = "${aws_vpc.caddy.id}"
-  cidr_block              = "10.0.0.0/24"
-  availability_zone       = "${var.caddy_availability_zone}"
+resource &#34;aws_subnet&#34; &#34;caddy&#34; {
+  vpc_id                  = &#34;${aws_vpc.caddy.id}&#34;
+  cidr_block              = &#34;10.0.0.0/24&#34;
+  availability_zone       = &#34;${var.caddy_availability_zone}&#34;
   map_public_ip_on_launch = false
 
   tags {
-    Name      = "Caddy-Subnet"
-    Terraform = "Yes"
+    Name      = &#34;Caddy-Subnet&#34;
+    Terraform = &#34;Yes&#34;
   }
 }
 
-resource "aws_security_group" "caddy" {
-  name        = "Caddy-Security-Group"
-  description = "Security Group for Caddy"
-  vpc_id      = "${aws_vpc.caddy.id}"
+resource &#34;aws_security_group&#34; &#34;caddy&#34; {
+  name        = &#34;Caddy-Security-Group&#34;
+  description = &#34;Security Group for Caddy&#34;
+  vpc_id      = &#34;${aws_vpc.caddy.id}&#34;
 
   tags {
-    Name      = "Caddy-Security-Group"
-    Terraform = "Yes"
+    Name      = &#34;Caddy-Security-Group&#34;
+    Terraform = &#34;Yes&#34;
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${chomp(data.http.ip.body)}/32"]
+    protocol    = &#34;tcp&#34;
+    cidr_blocks = [&#34;${chomp(data.http.ip.body)}/32&#34;]
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = &#34;tcp&#34;
+    cidr_blocks = [&#34;0.0.0.0/0&#34;]
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = &#34;tcp&#34;
+    cidr_blocks = [&#34;0.0.0.0/0&#34;]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = &#34;-1&#34;
+    cidr_blocks = [&#34;0.0.0.0/0&#34;]
   }
 }
 
-resource "aws_internet_gateway" "caddy" {
-  vpc_id = "${aws_vpc.caddy.id}"
+resource &#34;aws_internet_gateway&#34; &#34;caddy&#34; {
+  vpc_id = &#34;${aws_vpc.caddy.id}&#34;
 
   tags {
-    Name      = "Caddy-Internet-Gateway"
-    Terraform = "Yes"
+    Name      = &#34;Caddy-Internet-Gateway&#34;
+    Terraform = &#34;Yes&#34;
   }
 }
 
-resource "aws_route" "caddy" {
-  route_table_id         = "${aws_vpc.caddy.main_route_table_id}"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.caddy.id}"
+resource &#34;aws_route&#34; &#34;caddy&#34; {
+  route_table_id         = &#34;${aws_vpc.caddy.main_route_table_id}&#34;
+  destination_cidr_block = &#34;0.0.0.0/0&#34;
+  gateway_id             = &#34;${aws_internet_gateway.caddy.id}&#34;
 }
-</code></pre></div></div>
-
-<p>This file defines the desired AWS VPC, Subnet and Internet Gateway.
-It also creates the Security Group which allows HTTP(S) access to and from the instance, along with restricted SSH access to the IP address found when accessing <code class="language-plaintext highlighter-rouge">http://icanhazip.com</code>.
-The subnet specifies which Availability Zone we wish to place our service in, and as such is defined using another variable which needs to be added to <code class="language-plaintext highlighter-rouge">variables.tf</code> and <code class="language-plaintext highlighter-rouge">terraform.tfvars</code>.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variable "caddy_availability_zone" {}
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>caddy_availability_zone = ""
-</code></pre></div></div>
-
-<p>With the base infrastructure configured we can specify how we wish the instance itself to look.
-This definition is supplied within a file called <code class="language-plaintext highlighter-rouge">instance.tf</code>.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>data "template_file" "caddy" {
-  template = "${file("./provision.tpl")}"
+</code></pre><p>This file defines the desired AWS VPC, Subnet and Internet Gateway.
+It also creates the Security Group which allows HTTP(S) access to and from the instance, along with restricted SSH access to the IP address found when accessing <code>http://icanhazip.com</code>.
+The subnet specifies which Availability Zone we wish to place our service in, and as such is defined using another variable which needs to be added to <code>variables.tf</code> and <code>terraform.tfvars</code>.</p><pre tabindex=0><code>variable &#34;caddy_availability_zone&#34; {}
+</code></pre><pre tabindex=0><code>caddy_availability_zone = &#34;&#34;
+</code></pre><p>With the base infrastructure configured we can specify how we wish the instance itself to look.
+This definition is supplied within a file called <code>instance.tf</code>.</p><pre tabindex=0><code>data &#34;template_file&#34; &#34;caddy&#34; {
+  template = &#34;${file(&#34;./provision.tpl&#34;)}&#34;
 
   vars {
-    domain = "${var.caddy_domain}"
-    email  = "${var.caddy_email}"
+    domain = &#34;${var.caddy_domain}&#34;
+    email  = &#34;${var.caddy_email}&#34;
   }
 }
 
-resource "aws_key_pair" "caddy" {
-  key_name   = "caddy"
-  public_key = "${var.caddy_ssh_key}"
+resource &#34;aws_key_pair&#34; &#34;caddy&#34; {
+  key_name   = &#34;caddy&#34;
+  public_key = &#34;${var.caddy_ssh_key}&#34;
 }
 
-resource "aws_instance" "caddy" {
-  ami                    = "${var.caddy_ami_id}"
-  instance_type          = "t2.nano"
-  availability_zone      = "${var.caddy_availability_zone}"
-  key_name               = "${aws_key_pair.caddy.key_name}"
-  vpc_security_group_ids = ["${aws_security_group.caddy.id}"]
-  subnet_id              = "${aws_subnet.caddy.id}"
-  user_data              = "${data.template_file.caddy.rendered}"
+resource &#34;aws_instance&#34; &#34;caddy&#34; {
+  ami                    = &#34;${var.caddy_ami_id}&#34;
+  instance_type          = &#34;t2.nano&#34;
+  availability_zone      = &#34;${var.caddy_availability_zone}&#34;
+  key_name               = &#34;${aws_key_pair.caddy.key_name}&#34;
+  vpc_security_group_ids = [&#34;${aws_security_group.caddy.id}&#34;]
+  subnet_id              = &#34;${aws_subnet.caddy.id}&#34;
+  user_data              = &#34;${data.template_file.caddy.rendered}&#34;
 
   tags {
-    Name      = "Caddy-Server"
-    Terraform = "Yes"
+    Name      = &#34;Caddy-Server&#34;
+    Terraform = &#34;Yes&#34;
   }
 }
 
-resource "aws_eip_association" "caddy" {
-  instance_id   = "${aws_instance.caddy.id}"
-  allocation_id = "${var.caddy_eip_id}"
+resource &#34;aws_eip_association&#34; &#34;caddy&#34; {
+  instance_id   = &#34;${aws_instance.caddy.id}&#34;
+  allocation_id = &#34;${var.caddy_eip_id}&#34;
 }
 
-resource "aws_volume_attachment" "caddy" {
-  device_name = "/dev/xvdg"
-  volume_id   = "${var.caddy_volume_id}"
-  instance_id = "${aws_instance.caddy.id}"
+resource &#34;aws_volume_attachment&#34; &#34;caddy&#34; {
+  device_name = &#34;/dev/xvdg&#34;
+  volume_id   = &#34;${var.caddy_volume_id}&#34;
+  instance_id = &#34;${aws_instance.caddy.id}&#34;
 }
-</code></pre></div></div>
-
-<p>We define the instance running the supplied AMI (created with Packer) using the newly created Subnet and Security Group.
+</code></pre><p>We define the instance running the supplied AMI (created with Packer) using the newly created Subnet and Security Group.
 To access the instance via SSH (and upload web assets) we supply a public key.
 We then associate the instance with the supplied Elastic IP and attach the externally persistent EBS volume.
-As before, these values are provided externally by the user, and as such need to be declared within <code class="language-plaintext highlighter-rouge">variables.tf</code> and <code class="language-plaintext highlighter-rouge">terraform.tfvars</code>.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variable "caddy_ami_id" {}
-variable "caddy_eip_id" {}
-variable "caddy_volume_id" {}
-variable "caddy_ssh_key" {}
-variable "caddy_domain" {}
-variable "caddy_email" {}
-</code></pre></div></div>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>caddy_ami_id = ""
-caddy_eip_id = ""
-caddy_volume_id = ""
-caddy_ssh_key = ""
-caddy_domain = ""
-caddy_email = ""
-</code></pre></div></div>
-
-<p>When the instance is first booted up we ensure that the external volume is mounted and the required Caddyfile (based on the supplied domain) is defined before finally starting up Caddy Server.
-This is achieved within EC2 using supplied <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html">User Data</a>.
-This script is generated using a template (stored in <code class="language-plaintext highlighter-rouge">provision.tpl</code>), which allows us to supply dynamic content that is written out before invocation.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
-
-<span class="nb">cat</span> <span class="o">&gt;</span> Caddyfile <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
-</span><span class="k">${</span><span class="nv">domain</span><span class="k">}</span><span class="sh"> {
-  root /var/www/</span><span class="k">${</span><span class="nv">domain</span><span class="k">}</span><span class="sh">
-  tls </span><span class="k">${</span><span class="nv">email</span><span class="k">}</span><span class="sh">
-}
-</span><span class="no">EOF
-</span><span class="nb">sudo mv </span>Caddyfile /etc/caddy/Caddyfile
-<span class="nb">sudo chown </span>root:root /etc/caddy/Caddyfile
-<span class="nb">sudo chmod </span>644 /etc/caddy/Caddyfile
-
-<span class="k">while</span> <span class="o">[</span> <span class="o">!</span> <span class="nt">-e</span> <span class="s2">"/dev/xvdg"</span> <span class="o">]</span><span class="p">;</span> <span class="k">do </span><span class="nb">sleep </span>1<span class="p">;</span> <span class="k">done
-if</span> <span class="o">[</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">sudo </span>file <span class="nt">-b</span> <span class="nt">-s</span> /dev/xvdg<span class="si">)</span><span class="s2">"</span> <span class="o">==</span> <span class="s2">"data"</span> <span class="o">]</span><span class="p">;</span> <span class="k">then
-  </span><span class="nb">sudo </span>mkfs <span class="nt">-t</span> ext4 /dev/xvdg
-<span class="k">fi
-</span><span class="nb">echo</span> <span class="s1">'/dev/xvdg /data ext4 defaults,nofail 0 2'</span> <span class="o">&gt;&gt;</span> /etc/fstab
-<span class="nb">sudo mkdir</span> /data
-<span class="nb">sudo </span>mount /dev/xvdg /data
-<span class="nb">sudo mkdir</span> /data/www /data/ssl
-
-<span class="nb">sudo ln</span> <span class="nt">-s</span> /data/ssl /etc/ssl/caddy
-<span class="nb">sudo chown</span> <span class="nt">-R</span> root:www-data /etc/ssl/caddy /data/ssl
-<span class="nb">sudo chmod </span>770 /etc/ssl/caddy /data/ssl
-
-<span class="nb">sudo ln</span> <span class="nt">-s</span> /data/www /var/www
-<span class="nb">sudo chown</span> <span class="nt">-R</span> www-data:www-data /var/www /data/www
-<span class="nb">sudo chmod </span>555 /var/www /data/www
-
-<span class="nb">sudo mkdir</span> <span class="nt">-p</span> /var/www/<span class="k">${</span><span class="nv">domain</span><span class="k">}</span>
-<span class="nb">sudo chown</span> <span class="nt">-R</span> www-data:www-data /var/www/<span class="k">${</span><span class="nv">domain</span><span class="k">}</span>
-<span class="nb">sudo chmod </span>555 /var/www/<span class="k">${</span><span class="nv">domain</span><span class="k">}</span>
-
-<span class="nb">sudo </span>systemctl <span class="nb">enable </span>caddy.service
-<span class="nb">sudo </span>systemctl start caddy.service
-</code></pre></div></div>
-
-<p>Supplying the desired domain and associated email address for automatic Let’s Encrypt certificate generation allows us to be sure that the service is self-reliant upon boot.</p>
-
-<p>Finally, we can run <code class="language-plaintext highlighter-rouge">terraform apply</code> to create the underlying infrastructure and Caddy Server instance which is accessible from the supplied Elastic IP.
-If for any reason we wish to make changes to this service, we can do so safe in the knowledge that the statically hosted content (and SSL certificates) are persisted, and the service will remain running as stated within the code.</p>
-
-<p>If you are interested in experimenting with this service, you can find all the source code within the <a href="https://github.com/eddmann/aws-caddy-server">associated GitHub repository</a>.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+As before, these values are provided externally by the user, and as such need to be declared within <code>variables.tf</code> and <code>terraform.tfvars</code>.</p><pre tabindex=0><code>variable &#34;caddy_ami_id&#34; {}
+variable &#34;caddy_eip_id&#34; {}
+variable &#34;caddy_volume_id&#34; {}
+variable &#34;caddy_ssh_key&#34; {}
+variable &#34;caddy_domain&#34; {}
+variable &#34;caddy_email&#34; {}
+</code></pre><pre tabindex=0><code>caddy_ami_id = &#34;&#34;
+caddy_eip_id = &#34;&#34;
+caddy_volume_id = &#34;&#34;
+caddy_ssh_key = &#34;&#34;
+caddy_domain = &#34;&#34;
+caddy_email = &#34;&#34;
+</code></pre><p>When the instance is first booted up we ensure that the external volume is mounted and the required Caddyfile (based on the supplied domain) is defined before finally starting up Caddy Server.
+This is achieved within EC2 using supplied <a href=https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html rel="external noopener" target=_blank>User Data</a>.
+This script is generated using a template (stored in <code>provision.tpl</code>), which allows us to supply dynamic content that is written out before invocation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span><span style=color:#75715e>#!/bin/bash
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>cat &gt; Caddyfile <span style=color:#e6db74>&lt;&lt;EOF
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>${domain} {
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  root /var/www/${domain}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>  tls ${email}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>}
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>EOF</span>
+</span></span><span style=display:flex><span>sudo mv Caddyfile /etc/caddy/Caddyfile
+</span></span><span style=display:flex><span>sudo chown root:root /etc/caddy/Caddyfile
+</span></span><span style=display:flex><span>sudo chmod <span style=color:#ae81ff>644</span> /etc/caddy/Caddyfile
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>while</span> <span style=color:#f92672>[</span> ! -e <span style=color:#e6db74>&#34;/dev/xvdg&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>do</span> sleep 1; <span style=color:#66d9ef>done</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#66d9ef>$(</span>sudo file -b -s /dev/xvdg<span style=color:#66d9ef>)</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;data&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>  sudo mkfs -t ext4 /dev/xvdg
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fi</span>
+</span></span><span style=display:flex><span>echo <span style=color:#e6db74>&#39;/dev/xvdg /data ext4 defaults,nofail 0 2&#39;</span> &gt;&gt; /etc/fstab
+</span></span><span style=display:flex><span>sudo mkdir /data
+</span></span><span style=display:flex><span>sudo mount /dev/xvdg /data
+</span></span><span style=display:flex><span>sudo mkdir /data/www /data/ssl
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo ln -s /data/ssl /etc/ssl/caddy
+</span></span><span style=display:flex><span>sudo chown -R root:www-data /etc/ssl/caddy /data/ssl
+</span></span><span style=display:flex><span>sudo chmod <span style=color:#ae81ff>770</span> /etc/ssl/caddy /data/ssl
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo ln -s /data/www /var/www
+</span></span><span style=display:flex><span>sudo chown -R www-data:www-data /var/www /data/www
+</span></span><span style=display:flex><span>sudo chmod <span style=color:#ae81ff>555</span> /var/www /data/www
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo mkdir -p /var/www/<span style=color:#e6db74>${</span>domain<span style=color:#e6db74>}</span>
+</span></span><span style=display:flex><span>sudo chown -R www-data:www-data /var/www/<span style=color:#e6db74>${</span>domain<span style=color:#e6db74>}</span>
+</span></span><span style=display:flex><span>sudo chmod <span style=color:#ae81ff>555</span> /var/www/<span style=color:#e6db74>${</span>domain<span style=color:#e6db74>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sudo systemctl enable caddy.service
+</span></span><span style=display:flex><span>sudo systemctl start caddy.service
+</span></span></code></pre></div><p>Supplying the desired domain and associated email address for automatic Let&rsquo;s Encrypt certificate generation allows us to be sure that the service is self-reliant upon boot.</p><p>Finally, we can run <code>terraform apply</code> to create the underlying infrastructure and Caddy Server instance which is accessible from the supplied Elastic IP.
+If for any reason we wish to make changes to this service, we can do so safe in the knowledge that the statically hosted content (and SSL certificates) are persisted, and the service will remain running as stated within the code.</p><p>If you are interested in experimenting with this service, you can find all the source code within the <a href=https://github.com/eddmann/aws-caddy-server rel="external noopener" target=_blank>associated GitHub repository</a>.</p></main><footer class=post__tags><a href=/archive/tag/aws>aws</a><a href=/archive/tag/packer>packer</a><a href=/archive/tag/terraform>terraform</a><a href=/archive/tag/caddy>caddy</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

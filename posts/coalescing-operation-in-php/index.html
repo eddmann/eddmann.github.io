@@ -1,94 +1,16 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to utilise the coalescing operation in PHP for default values to write cleaner, more efficient code.">
-
-    <title>
-        
-            Coalescing Operation in PHP (for Default Values) &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Coalescing Operation in PHP (for Default Values)</h1>
-    <time datetime="2013-11-28T00:00:00+00:00" class="post-date">28 Nov 2013</time>
-    <p>Over the past week or so, I have been reading discussions on the <a href="http://news.php.net/php.internals">PHP internals</a> mailing list about proposed updates to what the ?: operator currently does.
-If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator.</p>
-
-
-
-<p>It, however, is a simple example of syntactic sugar to reduce code noise, allowing you to specify an alternative (default) value if the supplied variable is <a href="http://php.net/manual/en/language.types.boolean.php">falsey</a>.
-In effect, assuming that the variable ‘$a’ is defined as null, the examples below will all equate to the same result: ‘b’.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="nv">$a</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
-<span class="nv">$a</span> <span class="o">||</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
-<span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>However, issues arise when the variable has not already been declared, and in such a case, notice messages will be displayed.
-This occurs due to attempting to use the non-existent variable outright, without first checking with the ‘isset’ or ‘empty’ functions.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Coalescing Operation in PHP (for Default Values) - Edd Mann</title>
+<meta name=description content="Learn how to utilise the coalescing operation in PHP for default values to write cleaner, more efficient code."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Coalescing Operation in PHP (for Default Values)"><meta itemprop=description content="Over the past week or so, I have been reading discussions on the PHP internals mailing list about proposed updates to what the ?: operator currently does. If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator."><meta itemprop=datePublished content="2013-11-28T00:00:00+00:00"><meta itemprop=dateModified content="2013-11-28T00:00:00+00:00"><meta itemprop=wordCount content="267"><meta itemprop=keywords content="Php"><meta property="og:url" content="https://eddmann.com/posts/coalescing-operation-in-php/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Coalescing Operation in PHP (for Default Values)"><meta property="og:description" content="Over the past week or so, I have been reading discussions on the PHP internals mailing list about proposed updates to what the ?: operator currently does. If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2013-11-28T00:00:00+00:00"><meta property="article:modified_time" content="2013-11-28T00:00:00+00:00"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Coalescing Operation in PHP (for Default Values)"><meta name=twitter:description content="Over the past week or so, I have been reading discussions on the PHP internals mailing list about proposed updates to what the ?: operator currently does. If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/coalescing-operation-in-php/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Coalescing Operation in PHP (for Default Values)</h1><time class=post__time>Nov 28, 2013</time></header><main class=prose><p>Over the past week or so, I have been reading discussions on the <a href=http://news.php.net/php.internals rel="external noopener" target=_blank>PHP internals</a> mailing list about proposed updates to what the ?: operator currently does.
+If you are like me, you may not have even known that you could use the ternary operator (since 5.3) as a coalescing operator.</p><p>It, however, is a simple example of syntactic sugar to reduce code noise, allowing you to specify an alternative (default) value if the supplied variable is <a href=http://php.net/manual/en/language.types.boolean.php rel="external noopener" target=_blank>falsey</a>.
+In effect, assuming that the variable &lsquo;$a&rsquo; is defined as null, the examples below will all equate to the same result: &lsquo;b&rsquo;.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$a <span style=color:#f92672>=</span> $a <span style=color:#f92672>?:</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> $a) $a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span>$a <span style=color:#f92672>||</span> $a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span>$a <span style=color:#66d9ef>or</span> $a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span></code></pre></div><p>However, issues arise when the variable has not already been declared, and in such a case, notice messages will be displayed.
+This occurs due to attempting to use the non-existent variable outright, without first checking with the &lsquo;isset&rsquo; or &rsquo;empty&rsquo; functions.
 This is one of the key areas being addressed in the proposed update.
-The examples below, more verbose than desired, address this issue at present.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$a</span> <span class="o">=</span> <span class="k">empty</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">?:</span> <span class="s1">'b'</span><span class="p">;</span>
-<span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span> <span class="k">or</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
-<span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span> <span class="nv">$a</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$a</span> <span class="o">=</span> <span class="s1">'b'</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>Regarding the middle example, we are taking advantage of the lower <a href="http://php.net/manual/en/language.operators.precedence.php">operator precedence</a> of OR/AND, thereby removing the need for brackets (as seen in the last example).
-I should point out, however, that mixing the two can be a recipe for debugging difficulties, and it would be best practice to continue expressing such statements using &amp;&amp; and ||.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+The examples below, more verbose than desired, address this issue at present.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$a <span style=color:#f92672>=</span> <span style=color:#66d9ef>empty</span>($a) <span style=color:#f92672>?:</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#a6e22e>isset</span>($a) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span> $a <span style=color:#66d9ef>or</span> $a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span>(<span style=color:#a6e22e>isset</span>($a) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span> $a) <span style=color:#f92672>||</span> $a <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span></code></pre></div><p>Regarding the middle example, we are taking advantage of the lower <a href=http://php.net/manual/en/language.operators.precedence.php rel="external noopener" target=_blank>operator precedence</a> of OR/AND, thereby removing the need for brackets (as seen in the last example).
+I should point out, however, that mixing the two can be a recipe for debugging difficulties, and it would be best practice to continue expressing such statements using && and ||.</p></main><footer class=post__tags><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

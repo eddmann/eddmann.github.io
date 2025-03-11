@@ -1,200 +1,88 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 14 puzzle using TypeScript.">
-
-    <title>
-        
-            Advent of Code 2015 - Day 14 - Reindeer Olympics &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Advent of Code 2015 - Day 14 - Reindeer Olympics</h1>
-    <time datetime="2021-02-07T00:00:00+00:00" class="post-date">07 Feb 2021</time>
-    <p>On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer.</p>
-
-
-
-<h2 id="part-1">Part 1</h2>
-
-<p>We are provided with a listing of all the nine reindeer, stating how fast they can travel per second, how many seconds they can fly for at the given speed, and how many seconds they require subsequently to rest.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Advent of Code 2015 - Day 14 - Reindeer Olympics - Edd Mann</title>
+<meta name=description content="Solving the Advent of Code 2015 Day 14 puzzle using TypeScript."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Advent of Code 2015 - Day 14 - Reindeer Olympics"><meta itemprop=description content="On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer."><meta itemprop=datePublished content="2021-02-07T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-07T00:00:00+00:00"><meta itemprop=wordCount content="748"><meta itemprop=keywords content="Advent-of-Code,Advent-of-Code-2015,Typescript"><meta property="og:url" content="https://eddmann.com/posts/advent-of-code-2015-day-14-reindeer-olympics/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Advent of Code 2015 - Day 14 - Reindeer Olympics"><meta property="og:description" content="On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-02-07T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-07T00:00:00+00:00"><meta property="article:tag" content="Advent-of-Code"><meta property="article:tag" content="Advent-of-Code-2015"><meta property="article:tag" content="Typescript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Advent of Code 2015 - Day 14 - Reindeer Olympics"><meta name=twitter:description content="On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/advent-of-code-2015-day-14-reindeer-olympics/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Advent of Code 2015 - Day 14 - Reindeer Olympics</h1><time class=post__time>Feb 7, 2021</time></header><main class=prose><p>On the fourteenth day of Advent of Code 2015, Santa wants to find out who is the fastest reindeer.</p><h2 id=part-1>Part 1</h2><p>We are provided with a listing of all the nine reindeer, stating how fast they can travel per second, how many seconds they can fly for at the given speed, and how many seconds they require subsequently to rest.
 We are tasked with first determining the distance of the reindeer who would travel the furthest in <em>2503 seconds</em>.
-To begin, we parse the reindeer input we have been supplied.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Reindeer</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">speed</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
-  <span class="nl">fly</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
-  <span class="nl">rest</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="kd">const</span> <span class="nx">parseReindeer</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Reindeer</span><span class="p">[]</span> <span class="o">=&gt;</span>
-  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="p">[</span><span class="nx">speed</span><span class="p">,</span> <span class="nx">fly</span><span class="p">,</span> <span class="nx">rest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/g</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">toInt</span><span class="p">);</span>
-    <span class="k">return</span> <span class="p">{</span> <span class="nx">speed</span><span class="p">,</span> <span class="nx">fly</span><span class="p">,</span> <span class="nx">rest</span> <span class="p">};</span>
-  <span class="p">});</span>
-</code></pre></div></div>
-
-<p>As we are not required to provide the name of the reindeer, we can omit this from the parsed representation.
-For our initial solution, we are going to create a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a> which will yield the current distance travelled every second that has elapsed.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span><span class="o">*</span> <span class="nx">simulate</span><span class="p">({</span>
-  <span class="nx">speed</span><span class="p">,</span>
-  <span class="nx">fly</span><span class="p">,</span>
-  <span class="nx">rest</span><span class="p">,</span>
-<span class="p">}:</span> <span class="nx">Reindeer</span><span class="p">):</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="kr">number</span><span class="o">&gt;</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">elapsed</span> <span class="o">=</span> <span class="nx">fly</span><span class="p">;</span>
-  <span class="kd">let</span> <span class="nx">isFlying</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-  <span class="kd">let</span> <span class="nx">distance</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-  <span class="k">while</span> <span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">elapsed</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">isFlying</span> <span class="o">=</span> <span class="o">!</span><span class="nx">isFlying</span><span class="p">;</span>
-      <span class="nx">elapsed</span> <span class="o">=</span> <span class="nx">isFlying</span> <span class="p">?</span> <span class="nx">fly</span> <span class="p">:</span> <span class="nx">rest</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">isFlying</span><span class="p">)</span> <span class="nx">distance</span> <span class="o">+=</span> <span class="nx">speed</span><span class="p">;</span>
-    <span class="nx">elapsed</span><span class="o">--</span><span class="p">;</span>
-
-    <span class="k">yield</span> <span class="nx">distance</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>With this iterative approach, we simulate the logic around alternating between flying and resting states.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">nth</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">g</span><span class="p">:</span> <span class="nx">Generator</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">n</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="nx">T</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">v</span> <span class="k">of</span> <span class="nx">g</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">--</span><span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="nx">v</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>To produce a more succinct solution, I have decided to include a small utility function that iterates through the generator, returning the <code class="language-plaintext highlighter-rouge">nth</code> value.
-With the building blocks now in place, we can proceed to answer the question for part one 🌟.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
-  <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">parseReindeer</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">nth</span><span class="p">(</span><span class="nx">simulate</span><span class="p">(</span><span class="nx">r</span><span class="p">),</span> <span class="mi">2503</span><span class="p">)));</span>
-</code></pre></div></div>
-
-<h2 id="part-2">Part 2</h2>
-
-<p>For part two, we are again asked to simulate the distance travelled for <em>2503 seconds</em>.
+To begin, we parse the reindeer input we have been supplied.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Reindeer</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>speed</span>: <span style=color:#66d9ef>number</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fly</span>: <span style=color:#66d9ef>number</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>rest</span>: <span style=color:#66d9ef>number</span>;
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>parseReindeer</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Reindeer</span>[] <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>input</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;\n&#39;</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>line</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>speed</span>, <span style=color:#a6e22e>fly</span>, <span style=color:#a6e22e>rest</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>line</span>.<span style=color:#a6e22e>match</span>(<span style=color:#e6db74>/(\d+)/g</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>toInt</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> { <span style=color:#a6e22e>speed</span>, <span style=color:#a6e22e>fly</span>, <span style=color:#a6e22e>rest</span> };
+</span></span><span style=display:flex><span>  });
+</span></span></code></pre></div><p>As we are not required to provide the name of the reindeer, we can omit this from the parsed representation.
+For our initial solution, we are going to create a <a href=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator rel="external noopener" target=_blank>Generator</a> which will yield the current distance travelled every second that has elapsed.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>function</span><span style=color:#f92672>*</span> <span style=color:#a6e22e>simulate</span>({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>speed</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fly</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>rest</span>,
+</span></span><span style=display:flex><span>}<span style=color:#f92672>:</span> <span style=color:#a6e22e>Reindeer</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Generator</span>&lt;<span style=color:#f92672>number</span>&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>elapsed</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>fly</span>;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>isFlying</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>distance</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>while</span> (<span style=color:#66d9ef>true</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>elapsed</span> <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>isFlying</span> <span style=color:#f92672>=</span> <span style=color:#f92672>!</span><span style=color:#a6e22e>isFlying</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>elapsed</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>isFlying</span> <span style=color:#f92672>?</span> <span style=color:#a6e22e>fly</span> : <span style=color:#66d9ef>rest</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isFlying</span>) <span style=color:#a6e22e>distance</span> <span style=color:#f92672>+=</span> <span style=color:#a6e22e>speed</span>;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>elapsed</span><span style=color:#f92672>--</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>yield</span> <span style=color:#a6e22e>distance</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With this iterative approach, we simulate the logic around alternating between flying and resting states.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>nth</span> <span style=color:#f92672>=</span> &lt;<span style=color:#f92672>T</span>&gt;(<span style=color:#a6e22e>g</span>: <span style=color:#66d9ef>Generator</span>&lt;<span style=color:#f92672>T</span>&gt;, <span style=color:#a6e22e>n</span>: <span style=color:#66d9ef>number</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>T</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> <span style=color:#a6e22e>v</span> <span style=color:#66d9ef>of</span> <span style=color:#a6e22e>g</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>--</span><span style=color:#a6e22e>n</span> <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>1</span>) <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>v</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>To produce a more succinct solution, I have decided to include a small utility function that iterates through the generator, returning the <code>nth</code> value.
+With the building blocks now in place, we can proceed to answer the question for part one 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part1</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>parseReindeer</span>(<span style=color:#a6e22e>input</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>r</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>nth</span>(<span style=color:#a6e22e>simulate</span>(<span style=color:#a6e22e>r</span>), <span style=color:#ae81ff>2503</span>)));
+</span></span></code></pre></div><h2 id=part-2>Part 2</h2><p>For part two, we are again asked to simulate the distance travelled for <em>2503 seconds</em>.
 However, a point is now awarded each second to the reindeer that has travelled the furthest distance at that time.
-Once all reindeer points have been awarded, we are asked to return the winning reindeer’s total points.</p>
-
-<p>Like in part one, we can reuse the <code class="language-plaintext highlighter-rouge">simulate</code> Generator function, except now per iteration, we record all the total distances travelled and award the winning reindeer with a point.
-From here, we return the highest recorded reindeer’s points to answer the question 🌟.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">reindeer</span> <span class="o">=</span> <span class="nx">parseReindeer</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">simulate</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">points</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="kr">number</span><span class="p">,</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">();</span>
-
-  <span class="nx">repeat</span><span class="p">(</span><span class="mi">2503</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">distances</span> <span class="o">=</span> <span class="nx">reindeer</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">g</span> <span class="o">=&gt;</span> <span class="nx">g</span><span class="p">.</span><span class="nx">next</span><span class="p">().</span><span class="nx">value</span><span class="p">);</span>
-    <span class="kd">const</span> <span class="nx">winner</span> <span class="o">=</span> <span class="nx">distances</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">distances</span><span class="p">));</span>
-    <span class="nx">points</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">winner</span><span class="p">,</span> <span class="p">(</span><span class="nx">points</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">winner</span><span class="p">)</span> <span class="o">||</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="p">});</span>
-
-  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">points</span><span class="p">.</span><span class="nx">values</span><span class="p">());</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>For this solution, I was able to harness the <code class="language-plaintext highlighter-rouge">repeat</code> function we created for <a href="https://eddmann.com/posts/advent-of-code-2015-day-10-elves-look-elves-say/">Day 10</a>.
+Once all reindeer points have been awarded, we are asked to return the winning reindeer&rsquo;s total points.</p><p>Like in part one, we can reuse the <code>simulate</code> Generator function, except now per iteration, we record all the total distances travelled and award the winning reindeer with a point.
+From here, we return the highest recorded reindeer&rsquo;s points to answer the question 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part2</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>reindeer</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>parseReindeer</span>(<span style=color:#a6e22e>input</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>simulate</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>points</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Map</span>&lt;<span style=color:#f92672>number</span>, <span style=color:#a6e22e>number</span>&gt;();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>repeat</span>(<span style=color:#ae81ff>2503</span>, () <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>distances</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>reindeer</span>.<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>g</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>g</span>.<span style=color:#a6e22e>next</span>().<span style=color:#a6e22e>value</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>winner</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>distances</span>.<span style=color:#a6e22e>indexOf</span>(Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>distances</span>));
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>points</span>.<span style=color:#66d9ef>set</span>(<span style=color:#a6e22e>winner</span>, (<span style=color:#a6e22e>points</span>.<span style=color:#66d9ef>get</span>(<span style=color:#a6e22e>winner</span>) <span style=color:#f92672>||</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>points</span>.<span style=color:#a6e22e>values</span>());
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>For this solution, I was able to harness the <code>repeat</code> function we created for <a href=/posts/advent-of-code-2015-day-10-elves-look-elves-say/>Day 10</a>.
 This abstracts away the need to implement a stateful loop and focuses on the problem at hand.
-I have also decided to omit the reindeers’ names and identify each reindeer based on their position within the listing.</p>
-
-<h2 id="alternative-solution">Alternative Solution</h2>
-
-<p>Since implementing the above solution, I have been exploring how we could skip the iterative simulation step altogether and apply a little maths to produce the answer.
-As such, we can replace the <code class="language-plaintext highlighter-rouge">simulate</code> Generator with a function that takes in the reindeer details and seconds elapsed like so:</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">simulate</span> <span class="o">=</span> <span class="p">(</span>
-  <span class="p">{</span> <span class="nx">speed</span><span class="p">,</span> <span class="nx">fly</span><span class="p">,</span> <span class="nx">rest</span> <span class="p">}:</span> <span class="nx">Reindeer</span><span class="p">,</span>
-  <span class="nx">seconds</span><span class="p">:</span> <span class="kr">number</span>
-<span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">quotient</span><span class="p">,</span> <span class="nx">remainder</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">seconds</span> <span class="o">/</span> <span class="p">(</span><span class="nx">fly</span> <span class="o">+</span> <span class="nx">rest</span><span class="p">)),</span>
-    <span class="nx">seconds</span> <span class="o">%</span> <span class="p">(</span><span class="nx">fly</span> <span class="o">+</span> <span class="nx">rest</span><span class="p">),</span>
-  <span class="p">];</span>
-  <span class="k">return</span> <span class="p">(</span><span class="nx">quotient</span> <span class="o">*</span> <span class="nx">fly</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="nx">remainder</span><span class="p">,</span> <span class="nx">fly</span><span class="p">))</span> <span class="o">*</span> <span class="nx">speed</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Within the function above, we deduce the total seconds flown (taking into consideration required rest) and multiply that by the speed per second to return the total distance covered.
-We can then answer part one in a similar fashion to how we did in the original solution, except this time, we can omit the need to compute each iteration.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span>
-  <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">parseReindeer</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">simulate</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="mi">2503</span><span class="p">)));</span>
-</code></pre></div></div>
-
-<p>To answer part two, we can reduce over each second elapsed and, upon each step, update the points mapping according to the winner.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">reindeer</span> <span class="o">=</span> <span class="nx">parseReindeer</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
-
-  <span class="kd">const</span> <span class="nx">points</span> <span class="o">=</span> <span class="p">[...</span><span class="nb">Array</span><span class="p">(</span><span class="mi">2503</span><span class="p">).</span><span class="nx">keys</span><span class="p">()].</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">points</span><span class="p">,</span> <span class="nx">seconds</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">distances</span> <span class="o">=</span> <span class="nx">reindeer</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">simulate</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">seconds</span> <span class="o">+</span> <span class="mi">1</span><span class="p">));</span>
-    <span class="kd">const</span> <span class="nx">winner</span> <span class="o">=</span> <span class="nx">distances</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">distances</span><span class="p">));</span>
-    <span class="k">return</span> <span class="nx">points</span><span class="p">.</span><span class="kd">set</span><span class="p">(</span><span class="nx">winner</span><span class="p">,</span> <span class="p">(</span><span class="nx">points</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">winner</span><span class="p">)</span> <span class="o">||</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="p">},</span> <span class="k">new</span> <span class="nb">Map</span><span class="o">&lt;</span><span class="kr">number</span><span class="p">,</span> <span class="kr">number</span><span class="o">&gt;</span><span class="p">());</span>
-
-  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(...</span><span class="nx">points</span><span class="p">.</span><span class="nx">values</span><span class="p">());</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>This solution again leverages the position of the reindeer in the listing for identity.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+I have also decided to omit the reindeers&rsquo; names and identify each reindeer based on their position within the listing.</p><h2 id=alternative-solution>Alternative Solution</h2><p>Since implementing the above solution, I have been exploring how we could skip the iterative simulation step altogether and apply a little maths to produce the answer.
+As such, we can replace the <code>simulate</code> Generator with a function that takes in the reindeer details and seconds elapsed like so:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>simulate</span> <span style=color:#f92672>=</span> (
+</span></span><span style=display:flex><span>  { <span style=color:#a6e22e>speed</span>, <span style=color:#a6e22e>fly</span>, <span style=color:#a6e22e>rest</span> }<span style=color:#f92672>:</span> <span style=color:#a6e22e>Reindeer</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>seconds</span>: <span style=color:#66d9ef>number</span>
+</span></span><span style=display:flex><span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>quotient</span>, <span style=color:#a6e22e>remainder</span>] <span style=color:#f92672>=</span> [
+</span></span><span style=display:flex><span>    Math.<span style=color:#a6e22e>floor</span>(<span style=color:#a6e22e>seconds</span> <span style=color:#f92672>/</span> (<span style=color:#a6e22e>fly</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>rest</span>)),
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>seconds</span> <span style=color:#f92672>%</span> (<span style=color:#a6e22e>fly</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>rest</span>),
+</span></span><span style=display:flex><span>  ];
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> (<span style=color:#a6e22e>quotient</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>fly</span> <span style=color:#f92672>+</span> Math.<span style=color:#a6e22e>min</span>(<span style=color:#a6e22e>remainder</span>, <span style=color:#a6e22e>fly</span>)) <span style=color:#f92672>*</span> <span style=color:#a6e22e>speed</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Within the function above, we deduce the total seconds flown (taking into consideration required rest) and multiply that by the speed per second to return the total distance covered.
+We can then answer part one in a similar fashion to how we did in the original solution, except this time, we can omit the need to compute each iteration.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part1</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>parseReindeer</span>(<span style=color:#a6e22e>input</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>r</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>simulate</span>(<span style=color:#a6e22e>r</span>, <span style=color:#ae81ff>2503</span>)));
+</span></span></code></pre></div><p>To answer part two, we can reduce over each second elapsed and, upon each step, update the points mapping according to the winner.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part2</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>reindeer</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>parseReindeer</span>(<span style=color:#a6e22e>input</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>points</span> <span style=color:#f92672>=</span> [...Array(<span style=color:#ae81ff>2503</span>).<span style=color:#a6e22e>keys</span>()].<span style=color:#a6e22e>reduce</span>((<span style=color:#a6e22e>points</span>, <span style=color:#a6e22e>seconds</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>distances</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>reindeer</span>.<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>r</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>simulate</span>(<span style=color:#a6e22e>r</span>, <span style=color:#a6e22e>seconds</span> <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>));
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>winner</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>distances</span>.<span style=color:#a6e22e>indexOf</span>(Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>distances</span>));
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>points</span>.<span style=color:#66d9ef>set</span>(<span style=color:#a6e22e>winner</span>, (<span style=color:#a6e22e>points</span>.<span style=color:#66d9ef>get</span>(<span style=color:#a6e22e>winner</span>) <span style=color:#f92672>||</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>  }, <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Map</span>&lt;<span style=color:#f92672>number</span>, <span style=color:#a6e22e>number</span>&gt;());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> Math.<span style=color:#a6e22e>max</span>(...<span style=color:#a6e22e>points</span>.<span style=color:#a6e22e>values</span>());
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>This solution again leverages the position of the reindeer in the listing for identity.</p></main><footer class=post__tags><a href=/archive/tag/advent-of-code>advent-of-code</a><a href=/archive/tag/advent-of-code-2015>advent-of-code-2015</a><a href=/archive/tag/typescript>typescript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

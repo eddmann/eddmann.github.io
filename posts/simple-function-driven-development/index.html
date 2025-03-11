@@ -1,190 +1,90 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover the power of simplicity in PHP with function driven development techniques, optimised caching, and templating for efficient backend design.">
-
-    <title>
-        
-            Simple Function Driven-Development &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Simple Function Driven-Development</h1>
-    <time datetime="2013-12-09T00:00:00+00:00" class="post-date">09 Dec 2013</time>
-    <p>I recently had the chance to rewrite the backend of my <a href="http://github.com/eddmann/eddmann">personal website</a>.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Simple Function Driven-Development - Edd Mann</title>
+<meta name=description content="Discover the power of simplicity in PHP with function driven development techniques, optimised caching, and templating for efficient backend design."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Simple Function Driven-Development"><meta itemprop=description content="I recently had the chance to rewrite the backend of my personal website. I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite. As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read. I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple. Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate. In this post I wish to discuss a couple of the functions that I created to keep the file so simple."><meta itemprop=datePublished content="2013-12-09T00:00:00+00:00"><meta itemprop=dateModified content="2013-12-09T00:00:00+00:00"><meta itemprop=wordCount content="672"><meta itemprop=keywords content="Php"><meta property="og:url" content="https://eddmann.com/posts/simple-function-driven-development/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Simple Function Driven-Development"><meta property="og:description" content="I recently had the chance to rewrite the backend of my personal website. I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite. As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read. I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple. Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate. In this post I wish to discuss a couple of the functions that I created to keep the file so simple."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2013-12-09T00:00:00+00:00"><meta property="article:modified_time" content="2013-12-09T00:00:00+00:00"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Simple Function Driven-Development"><meta name=twitter:description content="I recently had the chance to rewrite the backend of my personal website. I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite. As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read. I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple. Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate. In this post I wish to discuss a couple of the functions that I created to keep the file so simple."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/simple-function-driven-development/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Simple Function Driven-Development</h1><time class=post__time>Dec 9, 2013</time></header><main class=prose><p>I recently had the chance to rewrite the backend of my <a href=http://github.com/eddmann/eddmann rel="external noopener" target=_blank>personal website</a>.
 I was surprised at how accustomed I had become to using heavy-weight web frameworks (with plenty of accompanying dependencies) in larger projects I am involved in, that I instead decided to do the complete opposite.
 As a result, I built a very simple single-page Markdown file-based blogging platform (inc. pagination, caching) that only takes a few moments to read.
 I find myself sometimes being blinded by the need to abstract everything with the object-oriented philosophy, never taking the time to consider that in many cases it pays off to keep things simple.
 Simple, single-purpose functions that can be used for multiple use-cases within your application are a very good mind-set to try and incorporate.
-In this post I wish to discuss a couple of the functions that I created to keep the file so simple.</p>
-
-
-
-<h2 id="configuration">Configuration</h2>
-
-<p>This function was inspired by Laravel’s ability to parse associative arrays using dot notation i.e. (‘foo.bar’ -&gt; $arr[‘foo’][‘bar’]).
+In this post I wish to discuss a couple of the functions that I created to keep the file so simple.</p><h2 id=configuration>Configuration</h2><p>This function was inspired by Laravel&rsquo;s ability to parse associative arrays using dot notation i.e. (&lsquo;foo.bar&rsquo; -> $arr[&lsquo;foo&rsquo;][&lsquo;bar&rsquo;]).
 As you can see this is an extremely easy to read function that simply requires the supplied configuration file once (using a static variable).
-It then attempts to split up the supplied key, traversing through the configuration array to end at the result.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">config</span><span class="p">(</span><span class="nv">$key</span> <span class="o">=</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$file</span> <span class="o">=</span> <span class="s1">'config.php'</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">static</span> <span class="nv">$config</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$config</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$config</span> <span class="o">=</span> <span class="k">require</span> <span class="nv">$file</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nv">$parsed</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="nv">$key</span><span class="p">);</span>
-
-    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
-
-    <span class="k">while</span> <span class="p">(</span><span class="nv">$parsed</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$result</span><span class="p">[</span><span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">)];</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="cache">Cache</h2>
-
-<p>Being a file-based blogging platform with meta-data and Markdown content to parse, caching the results is a very desired process to include.
+It then attempts to split up the supplied key, traversing through the configuration array to end at the result.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>config</span>($key <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;&#39;</span>, $file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;config.php&#39;</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>static</span> $config <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ($config <span style=color:#f92672>===</span> <span style=color:#66d9ef>null</span>) {
+</span></span><span style=display:flex><span>        $config <span style=color:#f92672>=</span> <span style=color:#66d9ef>require</span> $file;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $parsed <span style=color:#f92672>=</span> <span style=color:#a6e22e>explode</span>(<span style=color:#e6db74>&#39;.&#39;</span>, $key);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $result <span style=color:#f92672>=</span> $config;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> ($parsed) {
+</span></span><span style=display:flex><span>        $result <span style=color:#f92672>=</span> $result[<span style=color:#a6e22e>array_shift</span>($parsed)];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $result;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=cache>Cache</h2><p>Being a file-based blogging platform with meta-data and Markdown content to parse, caching the results is a very desired process to include.
 Again, a very general implementation has been implemented for greater flexibility.
 The key is hashed and its value stored in a file of that name.
 If there is a cache miss (i.e. first time accessing that key) the value closure will be executed and the result stored in the described file.
-Provided is also a check to make sure a false boolean was not returned, allowing us to have control within the closure of whether to cache the result or not.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">cache</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="kt">callable</span> <span class="nv">$value</span><span class="p">,</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./cache/'</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="o">!</span> <span class="nb">is_dir</span><span class="p">(</span><span class="nv">$directory</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">mkdir</span><span class="p">(</span><span class="nv">$directory</span><span class="p">);</span>
-
-    <span class="nv">$path</span> <span class="o">=</span> <span class="nv">$directory</span> <span class="mf">.</span> <span class="s1">'/'</span> <span class="mf">.</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">file_exists</span><span class="p">(</span><span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">();</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span> <span class="o">!==</span> <span class="kc">false</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="template">Template</h2>
-
-<p>This simple function allows you to easily parse template files with the provided available variables.
+Provided is also a check to make sure a false boolean was not returned, allowing us to have control within the closure of whether to cache the result or not.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>cache</span>($key, <span style=color:#a6e22e>callable</span> $value, $directory <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;./cache/&#39;</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#f92672>!</span> <span style=color:#a6e22e>is_dir</span>($directory) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>mkdir</span>($directory);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $path <span style=color:#f92672>=</span> $directory <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;/&#39;</span> <span style=color:#f92672>.</span> <span style=color:#a6e22e>md5</span>($key);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> <span style=color:#a6e22e>file_exists</span>($path)) {
+</span></span><span style=display:flex><span>        $result <span style=color:#f92672>=</span> $value();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($result <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>file_put_contents</span>($path, $result);
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>file_get_contents</span>($path);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=template>Template</h2><p>This simple function allows you to easily parse template files with the provided available variables.
 I have found this to be very useful in splitting up business logic from complex presentations (separation of concerns) in multiple examples.
-I have been a little relaxed with my use of the dreaded <code class="language-plaintext highlighter-rouge">eval</code> function, but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">tmpl</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$vars</span> <span class="o">=</span> <span class="p">[],</span> <span class="nv">$directory</span> <span class="o">=</span> <span class="s1">'./templates/'</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nb">ob_start</span><span class="p">();</span>
-
-    <span class="nb">extract</span><span class="p">(</span><span class="nv">$vars</span><span class="p">);</span>
-
-    <span class="k">eval</span><span class="p">(</span><span class="s1">'?&gt;'</span> <span class="mf">.</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$directory</span> <span class="mf">.</span> <span class="nv">$file</span><span class="p">));</span>
-
-    <span class="k">return</span> <span class="nb">ob_get_clean</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="example">Example</h2>
-
-<p>To piece all these functions together into a collective example I have decided to demonstrate with a cached Fibonacci calculation, the desired number being stored in a configuration file.
-Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th Fibonacci number.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># config.php</span>
-
-<span class="k">return</span> <span class="p">[</span>
-    <span class="s1">'fibonacci'</span> <span class="o">=&gt;</span> <span class="p">[</span>
-        <span class="s1">'calculate'</span> <span class="o">=&gt;</span> <span class="mi">50</span>
-    <span class="p">]</span>
-<span class="p">];</span>
-</code></pre></div></div>
-
-<p>The below template is a simple example of splitting the presentation from code logic.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fibonacci.tmpl.php</span>
-
-<span class="k">echo</span> <span class="s2">"The </span><span class="nv">$n</span><span class="s2"> fibonacci number is: </span><span class="nv">$result</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>Finally, to piece it all together we fetch the desired number from the configuration file and return the result from the cache (calling the value closure on the initial cache miss).
-The last step is to simply pass the template the two variables for displaying.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$n</span> <span class="o">=</span> <span class="nf">config</span><span class="p">(</span><span class="s1">'fibonacci.calculate'</span><span class="p">);</span>
-
-<span class="nv">$result</span> <span class="o">=</span> <span class="nf">cache</span><span class="p">(</span><span class="s1">'fibonacci_'</span> <span class="mf">.</span> <span class="nv">$n</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$n</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$result</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-
-    <span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;=</span> <span class="nv">$n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">;</span> <span class="nv">$i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$a</span> <span class="o">+</span> <span class="nv">$b</span><span class="p">;</span>
-        <span class="nv">$b</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
-        <span class="nv">$a</span> <span class="o">=</span> <span class="nv">$result</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="k">echo</span> <span class="nf">tmpl</span><span class="p">(</span><span class="s1">'fibonacci.tmpl.php'</span><span class="p">,</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">'n'</span><span class="p">,</span> <span class="s1">'result'</span><span class="p">));</span>
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+I have been a little relaxed with my use of the dreaded <code>eval</code> function, but as we are the only ones who will be working with the templates (no user-input), I feel this can be omitted.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>tmpl</span>($file, $vars <span style=color:#f92672>=</span> [], $directory <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;./templates/&#39;</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ob_start</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>extract</span>($vars);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>eval</span>(<span style=color:#e6db74>&#39;?&gt;&#39;</span> <span style=color:#f92672>.</span> <span style=color:#a6e22e>file_get_contents</span>($directory <span style=color:#f92672>.</span> $file));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>ob_get_clean</span>();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=example>Example</h2><p>To piece all these functions together into a collective example I have decided to demonstrate with a cached Fibonacci calculation, the desired number being stored in a configuration file.
+Below is the example multi-level configuration file we will be using, defining that we wish to calculate the 50th Fibonacci number.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#75715e># config.php
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;fibonacci&#39;</span> <span style=color:#f92672>=&gt;</span> [
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#39;calculate&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>50</span>
+</span></span><span style=display:flex><span>    ]
+</span></span><span style=display:flex><span>];
+</span></span></code></pre></div><p>The below template is a simple example of splitting the presentation from code logic.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#75715e># fibonacci.tmpl.php
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#e6db74>&#34;The </span><span style=color:#e6db74>$n</span><span style=color:#e6db74> fibonacci number is: </span><span style=color:#e6db74>$result\n</span><span style=color:#e6db74>&#34;</span>;
+</span></span></code></pre></div><p>Finally, to piece it all together we fetch the desired number from the configuration file and return the result from the cache (calling the value closure on the initial cache miss).
+The last step is to simply pass the template the two variables for displaying.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$n <span style=color:#f92672>=</span> <span style=color:#a6e22e>config</span>(<span style=color:#e6db74>&#39;fibonacci.calculate&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$result <span style=color:#f92672>=</span> <span style=color:#a6e22e>cache</span>(<span style=color:#e6db74>&#39;fibonacci_&#39;</span> <span style=color:#f92672>.</span> $n, <span style=color:#66d9ef>function</span>() <span style=color:#66d9ef>use</span> ($n)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $a <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>; $b <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>; $result <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> ($i <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>; $i <span style=color:#f92672>&lt;=</span> $n <span style=color:#f92672>-</span> <span style=color:#ae81ff>2</span>; $i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        $result <span style=color:#f92672>=</span> $a <span style=color:#f92672>+</span> $b;
+</span></span><span style=display:flex><span>        $b <span style=color:#f92672>=</span> $a;
+</span></span><span style=display:flex><span>        $a <span style=color:#f92672>=</span> $result;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $result;
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>tmpl</span>(<span style=color:#e6db74>&#39;fibonacci.tmpl.php&#39;</span>, <span style=color:#a6e22e>compact</span>(<span style=color:#e6db74>&#39;n&#39;</span>, <span style=color:#e6db74>&#39;result&#39;</span>));
+</span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

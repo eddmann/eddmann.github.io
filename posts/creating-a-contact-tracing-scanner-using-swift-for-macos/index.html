@@ -1,119 +1,37 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to build a contact tracing scanner for macOS using Swift, Interface Builder, and Core Bluetooth with detailed instructions and code examples.">
-
-    <title>
-        
-            Creating a Contact Tracing Scanner using Swift for macOS &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Creating a Contact Tracing Scanner using Swift for macOS</h1>
-    <time datetime="2020-10-20T00:00:00+00:00" class="post-date">20 Oct 2020</time>
-    <p>Following on from my <a href="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/">previous experiment</a> which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.</p>
-
-
-
-<p>The latest <a href="https://github.com/eddmann/contact-tracing-scanner-macos">application release</a> can be downloaded from GitHub, and simply unzipped/executed without any additional dependencies.</p>
-
-<p><a href="https://github.com/eddmann/contact-tracing-scanner-macos"><img src="/uploads/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner.png" alt="Contact Tracing Scanner using Swift for macOS" /></a></p>
-
-<p>Using <a href="https://developer.apple.com/documentation/corebluetooth">Core Bluetooth</a> I was able to scan for devices which were advertising the registered service UUID <code class="language-plaintext highlighter-rouge">0xfd6f</code> and in-turn parse the service data.
-The process overall was very similar to the one used when building the Web Bluetooth solution.</p>
-
-<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ...</span>
-
-<span class="k">let</span> <span class="nv">exposureNotificationServiceUuid</span> <span class="o">=</span> <span class="kt">CBUUID</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"FD6F"</span><span class="p">)</span>
-
-<span class="kd">open</span> <span class="kd">func</span> <span class="nf">centralManagerDidUpdateState</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">switch</span> <span class="n">central</span><span class="o">.</span><span class="n">state</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nv">poweredOn</span><span class="p">:</span>
-      <span class="n">central</span><span class="o">.</span><span class="nf">scanForPeripherals</span><span class="p">(</span><span class="nv">withServices</span><span class="p">:</span> <span class="p">[</span><span class="n">exposureNotificationServiceUuid</span><span class="p">],</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[</span><span class="kt">CBCentralManagerScanOptionAllowDuplicatesKey</span><span class="p">:</span> <span class="kc">true</span><span class="p">])</span>
-    <span class="k">case</span> <span class="o">.</span><span class="nv">poweredOff</span><span class="p">:</span>
-      <span class="n">central</span><span class="o">.</span><span class="nf">stopScan</span><span class="p">()</span>
-    <span class="k">default</span><span class="p">:</span>
-      <span class="k">break</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">public</span> <span class="kd">func</span> <span class="nf">centralManager</span><span class="p">(</span><span class="n">_</span> <span class="nv">central</span><span class="p">:</span> <span class="kt">CBCentralManager</span><span class="p">,</span> <span class="n">didDiscover</span> <span class="nv">peripheral</span><span class="p">:</span> <span class="kt">CBPeripheral</span><span class="p">,</span> <span class="nv">advertisementData</span><span class="p">:</span> <span class="p">[</span><span class="kt">String</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">],</span> <span class="n">rssi</span> <span class="kt">RSSI</span><span class="p">:</span> <span class="kt">NSNumber</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="k">let</span> <span class="nv">serviceAdvertisementData</span> <span class="o">=</span> <span class="n">advertisementData</span><span class="p">[</span><span class="kt">CBAdvertisementDataServiceDataKey</span><span class="p">]</span> <span class="k">as?</span> <span class="kt">NSDictionary</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="k">let</span> <span class="nv">exposureNotificationServiceData</span> <span class="o">=</span> <span class="n">serviceAdvertisementData</span><span class="o">.</span><span class="nf">object</span><span class="p">(</span><span class="nv">forKey</span><span class="p">:</span> <span class="n">exposureNotificationServiceUuid</span><span class="p">)</span> <span class="k">as?</span> <span class="kt">Data</span> <span class="p">{</span>
-      <span class="k">let</span> <span class="nv">hex</span> <span class="o">=</span> <span class="n">exposureNotificationServiceData</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="kt">String</span><span class="p">(</span><span class="nv">format</span><span class="p">:</span> <span class="s">"%02hhx"</span><span class="p">,</span> <span class="nv">$0</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="nf">joined</span><span class="p">()</span>
-      <span class="nf">updateDevice</span><span class="p">(</span><span class="kt">Device</span><span class="p">(</span><span class="nv">uuid</span><span class="p">:</span> <span class="n">peripheral</span><span class="o">.</span><span class="n">identifier</span><span class="o">.</span><span class="n">uuidString</span><span class="p">,</span> <span class="nv">rollingProximityId</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="n">hex</span><span class="o">.</span><span class="nf">prefix</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">metadata</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="n">hex</span><span class="o">.</span><span class="nf">suffix</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">rssi</span><span class="p">:</span> <span class="s">"</span><span class="se">\(</span><span class="kt">RSSI</span><span class="se">)</span><span class="s">"</span><span class="p">,</span> <span class="nv">lastSeen</span><span class="p">:</span> <span class="kt">Date</span><span class="p">()))</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// ...</span>
-</code></pre></div></div>
-
-<p>To clean up the listing and ensure that only active devices were present, I used a scheduled timer which would remove any old devices every 5 seconds.</p>
-
-<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">Timer</span><span class="o">.</span><span class="nf">scheduledTimer</span><span class="p">(</span><span class="nv">withTimeInterval</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nv">repeats</span><span class="p">:</span> <span class="kc">true</span><span class="p">)</span> <span class="p">{</span> <span class="n">timer</span> <span class="k">in</span>
-  <span class="k">self</span><span class="o">.</span><span class="nf">removeDevicesNotSeenInLastSeconds</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-  <span class="k">self</span><span class="o">.</span><span class="n">tableView</span><span class="p">?</span><span class="o">.</span><span class="nf">reloadData</span><span class="p">()</span>
-<span class="p">}</span>
-
-<span class="kd">private</span> <span class="kd">func</span> <span class="nf">removeDevicesNotSeenInLastSeconds</span><span class="p">(</span><span class="n">_</span> <span class="nv">seconds</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">devices</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="nf">filter</span><span class="p">({</span> <span class="kt">Date</span><span class="p">()</span><span class="o">.</span><span class="n">timeIntervalSince1970</span> <span class="o">-</span> <span class="nv">$0</span><span class="o">.</span><span class="n">lastSeen</span><span class="o">.</span><span class="n">timeIntervalSince1970</span> <span class="o">&lt;</span> <span class="n">seconds</span> <span class="p">})</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>For a deeper understanding of how the Exposure Notification system works, please visit my <a href="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/#how-it-works">previous post</a>.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Creating a Contact Tracing Scanner using Swift for macOS - Edd Mann</title>
+<meta name=description content="Learn how to build a contact tracing scanner for macOS using Swift, Interface Builder, and Core Bluetooth with detailed instructions and code examples."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Creating a Contact Tracing Scanner using Swift for macOS"><meta itemprop=description content="Following on from my previous experiment which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS."><meta itemprop=datePublished content="2020-10-20T00:00:00+00:00"><meta itemprop=dateModified content="2020-10-20T00:00:00+00:00"><meta itemprop=wordCount content="247"><meta itemprop=keywords content="Swift,Macos,Contact-Tracing"><meta property="og:url" content="https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-swift-for-macos/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Creating a Contact Tracing Scanner using Swift for macOS"><meta property="og:description" content="Following on from my previous experiment which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-10-20T00:00:00+00:00"><meta property="article:modified_time" content="2020-10-20T00:00:00+00:00"><meta property="article:tag" content="Swift"><meta property="article:tag" content="Macos"><meta property="article:tag" content="Contact-Tracing"><meta name=twitter:card content="summary"><meta name=twitter:title content="Creating a Contact Tracing Scanner using Swift for macOS"><meta name=twitter:description content="Following on from my previous experiment which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/creating-a-contact-tracing-scanner-using-swift-for-macos/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Creating a Contact Tracing Scanner using Swift for macOS</h1><time class=post__time>Oct 20, 2020</time></header><main class=prose><p>Following on from my <a href=/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/>previous experiment</a> which highlighted what an Exposure Notification-enabled device actually emits using Web Bluetooth, I decided to explore how I could do the same using Swift and Interface Builder for macOS.</p><p>The latest <a href=https://github.com/eddmann/contact-tracing-scanner-macos rel="external noopener" target=_blank>application release</a> can be downloaded from GitHub, and simply unzipped/executed without any additional dependencies.</p><p><a href=https://github.com/eddmann/contact-tracing-scanner-macos rel="external noopener" target=_blank><picture><source type=image/webp srcset=/posts/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner_hu_c24e555cd12c9d7c.webp><source type=image/jpeg srcset=/posts/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner_hu_af180c40d1bc0fba.jpg><img src=/posts/creating-a-contact-tracing-scanner-using-swift-for-macos/contact-tracing-scanner_hu_af180c40d1bc0fba.jpg alt="Contact Tracing Scanner using Swift for macOS" loading=lazy></picture></a></p><p>Using <a href=https://developer.apple.com/documentation/corebluetooth rel="external noopener" target=_blank>Core Bluetooth</a> I was able to scan for devices which were advertising the registered service UUID <code>0xfd6f</code> and in-turn parse the service data.
+The process overall was very similar to the one used when building the Web Bluetooth solution.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=display:flex><span><span style=color:#75715e>// ...</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>let</span> exposureNotificationServiceUuid = CBUUID(string: <span style=color:#e6db74>&#34;FD6F&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>open <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>centralManagerDidUpdateState</span>(<span style=color:#66d9ef>_</span> central: CBCentralManager) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>switch</span> central.state {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>case</span> .poweredOn:
+</span></span><span style=display:flex><span>      central.scanForPeripherals(withServices: [exposureNotificationServiceUuid], options: [CBCentralManagerScanOptionAllowDuplicatesKey: <span style=color:#66d9ef>true</span>])
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>case</span> .poweredOff:
+</span></span><span style=display:flex><span>      central.stopScan()
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>default</span>:
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>break</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>centralManager</span>(<span style=color:#66d9ef>_</span> central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> serviceAdvertisementData = advertisementData[CBAdvertisementDataServiceDataKey] <span style=color:#66d9ef>as</span>? NSDictionary {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#66d9ef>let</span> exposureNotificationServiceData = serviceAdvertisementData.object(forKey: exposureNotificationServiceUuid) <span style=color:#66d9ef>as</span>? Data {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>let</span> hex = exposureNotificationServiceData.map { String(format: <span style=color:#e6db74>&#34;%02hhx&#34;</span>, $0) }.joined()
+</span></span><span style=display:flex><span>      updateDevice(Device(uuid: peripheral.identifier.uuidString, rollingProximityId: <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>\(</span>hex.<span style=color:#66d9ef>prefix</span><span style=color:#e6db74>(</span><span style=color:#ae81ff>32</span><span style=color:#e6db74>))</span><span style=color:#e6db74>&#34;</span>, metadata: <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>\(</span>hex.suffix<span style=color:#e6db74>(</span><span style=color:#ae81ff>8</span><span style=color:#e6db74>))</span><span style=color:#e6db74>&#34;</span>, rssi: <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>\(</span>RSSI<span style=color:#e6db74>)</span><span style=color:#e6db74>&#34;</span>, lastSeen: Date()))
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// ...</span>
+</span></span></code></pre></div><p>To clean up the listing and ensure that only active devices were present, I used a scheduled timer which would remove any old devices every 5 seconds.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-swift data-lang=swift><span style=display:flex><span>Timer.scheduledTimer(withTimeInterval: <span style=color:#ae81ff>5</span>, repeats: <span style=color:#66d9ef>true</span>) { timer <span style=color:#66d9ef>in</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>self</span>.removeDevicesNotSeenInLastSeconds(<span style=color:#ae81ff>10</span>)
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>self</span>.tableView?.reloadData()
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>private</span> <span style=color:#66d9ef>func</span> <span style=color:#a6e22e>removeDevicesNotSeenInLastSeconds</span>(<span style=color:#66d9ef>_</span> seconds: Double) {
+</span></span><span style=display:flex><span>  devices = devices.filter({ Date().timeIntervalSince1970 <span style=color:#f92672>-</span> $0.lastSeen.timeIntervalSince1970 <span style=color:#f92672>&lt;</span> seconds })
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>For a deeper understanding of how the Exposure Notification system works, please visit my <a href=/posts/creating-a-contact-tracing-scanner-using-web-bluetooth/#how-it-works>previous post</a>.</p></main><footer class=post__tags><a href=/archive/tag/swift>swift</a><a href=/archive/tag/macos>macos</a><a href=/archive/tag/contact-tracing>contact-tracing</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

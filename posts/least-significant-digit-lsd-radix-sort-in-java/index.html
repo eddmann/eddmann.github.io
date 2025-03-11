@@ -1,134 +1,50 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover how to implement a queue-based Least Significant Digit (LSD) Radix Sort in Java with detailed code examples and explanations.">
-
-    <title>
-        
-            Least Significant Digit (LSD) Radix Sort in Java &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Least Significant Digit (LSD) Radix Sort in Java</h1>
-    <time datetime="2013-12-28T00:00:00+00:00" class="post-date">28 Dec 2013</time>
-    <p>Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Least Significant Digit (LSD) Radix Sort in Java - Edd Mann</title>
+<meta name=description content="Discover how to implement a queue-based Least Significant Digit (LSD) Radix Sort in Java with detailed code examples and explanations."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Least Significant Digit (LSD) Radix Sort in Java"><meta itemprop=description content="Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset. Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm. Sorting occurs by comparing digits in the same position of the items. Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction. In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position. This implementation results in a stable sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability. In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result."><meta itemprop=datePublished content="2013-12-28T00:00:00+00:00"><meta itemprop=dateModified content="2013-12-28T00:00:00+00:00"><meta itemprop=wordCount content="376"><meta itemprop=keywords content="Java,Algorithms"><meta property="og:url" content="https://eddmann.com/posts/least-significant-digit-lsd-radix-sort-in-java/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Least Significant Digit (LSD) Radix Sort in Java"><meta property="og:description" content="Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset. Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm. Sorting occurs by comparing digits in the same position of the items. Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction. In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position. This implementation results in a stable sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability. In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2013-12-28T00:00:00+00:00"><meta property="article:modified_time" content="2013-12-28T00:00:00+00:00"><meta property="article:tag" content="Java"><meta property="article:tag" content="Algorithms"><meta name=twitter:card content="summary"><meta name=twitter:title content="Least Significant Digit (LSD) Radix Sort in Java"><meta name=twitter:description content="Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset. Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm. Sorting occurs by comparing digits in the same position of the items. Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction. In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position. This implementation results in a stable sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability. In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/least-significant-digit-lsd-radix-sort-in-java/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Least Significant Digit (LSD) Radix Sort in Java</h1><time class=post__time>Dec 28, 2013</time></header><main class=prose><p>Radix sort is an O(digits·keys) sorting algorithm that relies on grouping integer keys to efficiently process and naturally order the specified dataset.
 Based on structure and positional notation, many other data types that can be represented in integer form (e.g. ASCII characters) can benefit from the algorithm.
 Sorting occurs by comparing digits in the same position of the items.
 Two alternative versions of the algorithm exist, each tackling the problem from the opposite direction.
 In this post, I will describe an iterative least significant digit implementation which, as the name suggests, begins processing from the right-most digit position.
-This implementation results in a <a href="http://en.wikipedia.org/wiki/Stable_sort#Stability">stable</a> sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability.
-In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result.</p>
-
-
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">radixSort</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-<span class="o">{</span>
-    <span class="nc">Queue</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;[]</span> <span class="n">buckets</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Queue</span><span class="o">[</span><span class="mi">10</span><span class="o">];</span>
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
-        <span class="n">buckets</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LinkedList</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;();</span>
-
-    <span class="kt">boolean</span> <span class="n">sorted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-    <span class="kt">int</span> <span class="n">expo</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
-
-    <span class="k">while</span> <span class="o">(!</span><span class="n">sorted</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">sorted</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">item</span> <span class="o">:</span> <span class="n">arr</span><span class="o">)</span> <span class="o">{</span>
-            <span class="kt">int</span> <span class="n">bucket</span> <span class="o">=</span> <span class="o">(</span><span class="n">item</span> <span class="o">/</span> <span class="n">expo</span><span class="o">)</span> <span class="o">%</span> <span class="mi">10</span><span class="o">;</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">bucket</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span> <span class="n">sorted</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-            <span class="n">buckets</span><span class="o">[</span><span class="n">bucket</span><span class="o">].</span><span class="na">add</span><span class="o">(</span><span class="n">item</span><span class="o">);</span>
-        <span class="o">}</span>
-
-        <span class="n">expo</span> <span class="o">*=</span> <span class="mi">10</span><span class="o">;</span>
-        <span class="kt">int</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
-
-        <span class="k">for</span> <span class="o">(</span><span class="nc">Queue</span><span class="o">&lt;</span><span class="nc">Integer</span><span class="o">&gt;</span> <span class="n">bucket</span> <span class="o">:</span> <span class="n">buckets</span><span class="o">)</span>
-            <span class="k">while</span> <span class="o">(!</span><span class="n">bucket</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span>
-                <span class="n">arr</span><span class="o">[</span><span class="n">index</span><span class="o">++]</span> <span class="o">=</span> <span class="n">bucket</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
-    <span class="o">}</span>
-
-    <span class="k">assert</span> <span class="nf">isSorted</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>The above code shows an example of a queue-based least significant digit radix sort implementation.
+This implementation results in a <a href=http://en.wikipedia.org/wiki/Stable_sort#Stability rel="external noopener" target=_blank>stable</a> sort, whereas the other implementation, which tackles the most significant digit first, cannot guarantee stability.
+In a stable sorting algorithm, the initial ordering of equal keys remains unchanged in the result.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>radixSort</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    Queue<span style=color:#f92672>&lt;</span>Integer<span style=color:#f92672>&gt;[]</span> buckets <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Queue<span style=color:#f92672>[</span>10<span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> 0; i <span style=color:#f92672>&lt;</span> 10; i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        buckets<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> LinkedList<span style=color:#f92672>&lt;</span>Integer<span style=color:#f92672>&gt;</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>boolean</span> sorted <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>int</span> expo <span style=color:#f92672>=</span> 1;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (<span style=color:#f92672>!</span>sorted) {
+</span></span><span style=display:flex><span>        sorted <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> item : arr) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>int</span> bucket <span style=color:#f92672>=</span> (item <span style=color:#f92672>/</span> expo) <span style=color:#f92672>%</span> 10;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (bucket <span style=color:#f92672>&gt;</span> 0) sorted <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>            buckets<span style=color:#f92672>[</span>bucket<span style=color:#f92672>]</span>.<span style=color:#a6e22e>add</span>(item);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        expo <span style=color:#f92672>*=</span> 10;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> index <span style=color:#f92672>=</span> 0;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (Queue<span style=color:#f92672>&lt;</span>Integer<span style=color:#f92672>&gt;</span> bucket : buckets)
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>while</span> (<span style=color:#f92672>!</span>bucket.<span style=color:#a6e22e>isEmpty</span>())
+</span></span><span style=display:flex><span>                arr<span style=color:#f92672>[</span>index<span style=color:#f92672>++]</span> <span style=color:#f92672>=</span> bucket.<span style=color:#a6e22e>remove</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>assert</span> isSorted(arr);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The above code shows an example of a queue-based least significant digit radix sort implementation.
 Starting from the right-most digit, the process occurs over multiple passes, distributing each item into calculated buckets based on its positional key.
 After each pass through the collection, the items are retrieved in order from each bucket.
-This process is repeated up to and including the pass corresponding to the length of the longest key.</p>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isSorted</span><span class="o">(</span><span class="kt">int</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-<span class="o">{</span>
-    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">arr</span><span class="o">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="o">]</span> <span class="o">&gt;</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">])</span>
-            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
-
-    <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>To ensure that the resulting dataset is correctly sorted, an assertion is included.
+This process is repeated up to and including the pass corresponding to the length of the longest key.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>boolean</span> <span style=color:#a6e22e>isSorted</span>(<span style=color:#66d9ef>int</span><span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> 1; i <span style=color:#f92672>&lt;</span> arr.<span style=color:#a6e22e>length</span>; i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (arr<span style=color:#f92672>[</span>i <span style=color:#f92672>-</span> 1<span style=color:#f92672>]</span> <span style=color:#f92672>&gt;</span> arr<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span>)
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>To ensure that the resulting dataset is correctly sorted, an assertion is included.
 This feature is particularly useful in development, as it allows you to verify the correctness of a specific invariant.
-This assertion can be activated at runtime by including the ‘-ea’ option in the ‘java’ command.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.dcs.gla.ac.uk/~pat/52233/slides/RadixSort1x1.pdf">Radix Sort</a></li>
-  <li><a href="http://xlinux.nist.gov/dads/HTML/radixsort.html">NIST: Radix Sort</a></li>
-  <li><a href="http://stackoverflow.com/questions/5167928/what-is-natural-ordering-when-we-talk-about-sorting">What is natural ordering when we talk about sorting?</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+This assertion can be activated at runtime by including the &lsquo;-ea&rsquo; option in the &lsquo;java&rsquo; command.</p><h2 id=resources>Resources</h2><ul><li><a href=http://www.dcs.gla.ac.uk/~pat/52233/slides/RadixSort1x1.pdf rel="external noopener" target=_blank>Radix Sort</a></li><li><a href=http://xlinux.nist.gov/dads/HTML/radixsort.html rel="external noopener" target=_blank>NIST: Radix Sort</a></li><li><a href=http://stackoverflow.com/questions/5167928/what-is-natural-ordering-when-we-talk-about-sorting rel="external noopener" target=_blank>What is natural ordering when we talk about sorting?</a></li></ul></main><footer class=post__tags><a href=/archive/tag/java>java</a><a href=/archive/tag/algorithms>algorithms</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

@@ -1,153 +1,49 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An in-depth exploration of PHPass as the leading password hashing library, detailing best practices for password storage and security in PHP applications.">
-
-    <title>
-        
-            PHPass, the go-to password hashing library &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">PHPass, the go-to password hashing library</h1>
-    <time datetime="2012-06-28T00:00:00+00:00" class="post-date">28 Jun 2012</time>
-    <p>It is becoming a scarily common occurrence to read about <a href="http://www.guardian.co.uk/technology/us-news-blog/2012/jun/07/blogpost-eharmony-linkedin-hacked-leaked">yet</a> <a href="http://www.bbc.co.uk/news/technology-18338956">another</a> <a href="http://www.pcworld.com/article/257178/music_site_lastfm_joins_the_passwordleak_parade.html">batch</a> of high-profile websites’ users’ passwords being leaked online - for everyone’s cracking pleasure.
-What’s even more shocking is how poorly these sites are storing them.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>PHPass, the go-to password hashing library - Edd Mann</title>
+<meta name=description content="An in-depth exploration of PHPass as the leading password hashing library, detailing best practices for password storage and security in PHP applications."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="PHPass, the go-to password hashing library"><meta itemprop=description content="It is becoming a scarily common occurrence to read about yet another batch of high-profile websites’ users’ passwords being leaked online - for everyone’s cracking pleasure. What’s even more shocking is how poorly these sites are storing them. In the case of LinkedIn, it turned out that they had stored them as unsalted, plain MD5 hashes, which any Joe Bloggs could easily crack using a rainbow table. The tried and tested means of storing passwords in today’s web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value. The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available."><meta itemprop=datePublished content="2012-06-28T00:00:00+00:00"><meta itemprop=dateModified content="2012-06-28T00:00:00+00:00"><meta itemprop=wordCount content="904"><meta itemprop=keywords content="Php,Security,Hashing"><meta property="og:url" content="https://eddmann.com/posts/phpass-the-go-to-password-hashing-library/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="PHPass, the go-to password hashing library"><meta property="og:description" content="It is becoming a scarily common occurrence to read about yet another batch of high-profile websites’ users’ passwords being leaked online - for everyone’s cracking pleasure. What’s even more shocking is how poorly these sites are storing them. In the case of LinkedIn, it turned out that they had stored them as unsalted, plain MD5 hashes, which any Joe Bloggs could easily crack using a rainbow table. The tried and tested means of storing passwords in today’s web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value. The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2012-06-28T00:00:00+00:00"><meta property="article:modified_time" content="2012-06-28T00:00:00+00:00"><meta property="article:tag" content="Php"><meta property="article:tag" content="Security"><meta property="article:tag" content="Hashing"><meta name=twitter:card content="summary"><meta name=twitter:title content="PHPass, the go-to password hashing library"><meta name=twitter:description content="It is becoming a scarily common occurrence to read about yet another batch of high-profile websites’ users’ passwords being leaked online - for everyone’s cracking pleasure. What’s even more shocking is how poorly these sites are storing them. In the case of LinkedIn, it turned out that they had stored them as unsalted, plain MD5 hashes, which any Joe Bloggs could easily crack using a rainbow table. The tried and tested means of storing passwords in today’s web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value. The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/phpass-the-go-to-password-hashing-library/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>PHPass, the go-to password hashing library</h1><time class=post__time>Jun 28, 2012</time></header><main class=prose><p>It is becoming a scarily common occurrence to read about <a href=http://www.guardian.co.uk/technology/us-news-blog/2012/jun/07/blogpost-eharmony-linkedin-hacked-leaked rel="external noopener" target=_blank>yet</a> <a href=http://www.bbc.co.uk/news/technology-18338956 rel="external noopener" target=_blank>another</a> <a href=http://www.pcworld.com/article/257178/music_site_lastfm_joins_the_passwordleak_parade.html rel="external noopener" target=_blank>batch</a> of high-profile websites&rsquo; users&rsquo; passwords being leaked online - for everyone&rsquo;s cracking pleasure.
+What&rsquo;s even more shocking is how poorly these sites are storing them.
 In the case of LinkedIn, it turned out that they had stored them as unsalted, plain MD5 hashes, which any Joe Bloggs could easily crack using a rainbow table.
-The tried and tested means of storing passwords in today’s web applications is to create a hash from the user’s input, and then compare any attempted authentication with this stored value.
-The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available.</p>
-
-
-
-<h2 id="how-should-you-be-storing-passwords-then">How should you be storing passwords then?</h2>
-
-<p>After reading through countless articles and experimenting with many implementations, I have arrived at the conclusion that, as the title of this post clearly states, <a href="http://www.openwall.com/phpass/">PHPass</a> is the way to go – provided that you are programming in PHP.
-PHPass provides you with the latest and most effective strategies to deter malicious third parties from successfully cracking your users’ passwords.
-I say deter, as nothing is unbreakable, and your main aim as a developer is to make it as hard as possible for the attacker (after all, they love a challenge).</p>
-
-<h2 id="what-phpass-gives-you">What PHPass gives you</h2>
-
-<p>PHPass provides the lethal combination of salting, key stretching, and Bcrypt.</p>
-
-<h3 id="salting">Salting</h3>
-
-<p>Salting is a relatively common method used to make the process of cracking your stored hashes more difficult.
-Salts are most commonly unique (technically called a <a href="http://en.wikipedia.org/wiki/Cryptographic_nonce">nonce</a>), although they can be global.
+The tried and tested means of storing passwords in today&rsquo;s web applications is to create a hash from the user&rsquo;s input, and then compare any attempted authentication with this stored value.
+The trouble and confusion arise, however, in how to actually achieve this, as there are so many incorrect methods available.</p><h2 id=how-should-you-be-storing-passwords-then>How should you be storing passwords then?</h2><p>After reading through countless articles and experimenting with many implementations, I have arrived at the conclusion that, as the title of this post clearly states, <a href=http://www.openwall.com/phpass/ rel="external noopener" target=_blank>PHPass</a> is the way to go – provided that you are programming in PHP.
+PHPass provides you with the latest and most effective strategies to deter malicious third parties from successfully cracking your users&rsquo; passwords.
+I say deter, as nothing is unbreakable, and your main aim as a developer is to make it as hard as possible for the attacker (after all, they love a challenge).</p><h2 id=what-phpass-gives-you>What PHPass gives you</h2><p>PHPass provides the lethal combination of salting, key stretching, and Bcrypt.</p><h3 id=salting>Salting</h3><p>Salting is a relatively common method used to make the process of cracking your stored hashes more difficult.
+Salts are most commonly unique (technically called a <a href=http://en.wikipedia.org/wiki/Cryptographic_nonce rel="external noopener" target=_blank>nonce</a>), although they can be global.
 They are appended or prepended to the given value, making the produced output unique regardless of the input.
 The randomness for these salts is generated from multiple factors, depending on the host system.
-For example, on a UNIX system, ‘/dev/urandom’ can be used.
-Salting prevents some of the most widely exploited weaknesses in today’s hashing functions.
-These threats include the ability to use a pre-hashed list (such as a rainbow table) on the subject, as well as the ability to reuse a cracked hash’s password on another record with the same hash sequence.
+For example, on a UNIX system, &lsquo;/dev/urandom&rsquo; can be used.
+Salting prevents some of the most widely exploited weaknesses in today&rsquo;s hashing functions.
+These threats include the ability to use a pre-hashed list (such as a rainbow table) on the subject, as well as the ability to reuse a cracked hash&rsquo;s password on another record with the same hash sequence.
 I have spent many years implementing this method, both on a per-application and per-record basis.
-In recent developments, I have introduced the concept of combining the two, as documented by Steve Gibson on the excellent Security Now podcast (<a href="http://www.grc.com/sn/sn-358.htm">episode 358</a>).</p>
-
-<h3 id="key-stretching">Key Stretching</h3>
-
-<p>Key stretching was a new concept to me before I started to seriously research this subject.
+In recent developments, I have introduced the concept of combining the two, as documented by Steve Gibson on the excellent Security Now podcast (<a href=http://www.grc.com/sn/sn-358.htm rel="external noopener" target=_blank>episode 358</a>).</p><h3 id=key-stretching>Key Stretching</h3><p>Key stretching was a new concept to me before I started to seriously research this subject.
 In its most basic form, key stretching is the process of re-running a given cryptographic function a certain number of times before returning the output.
 Commonly used cryptographic hashing functions, such as MD5, SHA1, and SHA2, were not designed for password hashing but for speed.
-What seemed like a complicated algorithm 10 years ago has now become an outdated concept due to <a href="http://en.wikipedia.org/wiki/Moore's_law">Moore’s law</a> working its magic.
+What seemed like a complicated algorithm 10 years ago has now become an outdated concept due to <a href=http://en.wikipedia.org/wiki/Moore%27s_law rel="external noopener" target=_blank>Moore&rsquo;s law</a> working its magic.
 These algorithms, by themselves, are simply too easy for current hardware to crack (even with a salt).
-Check out <a href="http://www.troyhunt.com/2012/06/our-password-hashing-has-no-clothes.html">this</a> blog post to read more.
+Check out <a href=http://www.troyhunt.com/2012/06/our-password-hashing-has-no-clothes.html rel="external noopener" target=_blank>this</a> blog post to read more.
 The way we solve this issue is by performing multiple iterations (known as key stretching) of the cryptographic function on the input before returning the output.
 This slows down and adds complexity to the calculation process, which is our goal as a password hashing function.
 In a typical web application, hashes are computed only at login and signup.
-Adding a few microseconds to this process will not affect user experience, but it increases the time required for an attacker to crack the hash exponentially.</p>
-
-<h3 id="bcrypt">Bcrypt</h3>
-
-<p>The final piece of the PHPass puzzle is <a href="http://en.wikipedia.org/wiki/Bcrypt">Bcrypt</a>.
+Adding a few microseconds to this process will not affect user experience, but it increases the time required for an attacker to crack the hash exponentially.</p><h3 id=bcrypt>Bcrypt</h3><p>The final piece of the PHPass puzzle is <a href=http://en.wikipedia.org/wiki/Bcrypt rel="external noopener" target=_blank>Bcrypt</a>.
 Created in 1999 by Niels Provos and David Mazieres, it was designed from the ground up to be a password-specific cryptographic hash function.
-This means that it was designed to be technically slow and memory-expensive, making a brute-force attack extremely labourious – helping to put Moore’s law in its place.
+This means that it was designed to be technically slow and memory-expensive, making a brute-force attack extremely labourious – helping to put Moore&rsquo;s law in its place.
 To help future-proof the implementation, it is adaptive and supports the use of key stretching.
-This allows you to set the number of iterations per hash, as the count is stored within the output.</p>
-
-<h2 id="a-simple-example">A simple example</h2>
-
-<p>There are many good examples of how to use PHPass online (such as <a href="http://sunnyis.me/blog/secure-passwords/">this one</a>), so I will keep mine short and sweet.
-You can simply hash a password with PHPass using the code snippet below.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">require_once</span><span class="p">(</span><span class="s1">'PasswordHash.php'</span><span class="p">);</span>
-
-<span class="c1">// a new phpass instance, providing the iteration count</span>
-<span class="c1">// and if to use the in-built MD5 crypto or not</span>
-<span class="nv">$phpass</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PasswordHash</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="kc">FALSE</span><span class="p">);</span>
-
-<span class="nv">$password</span> <span class="o">=</span> <span class="s1">'password1234'</span><span class="p">;</span>
-
-<span class="nv">$hash</span> <span class="o">=</span> <span class="nv">$phpass</span><span class="o">-&gt;</span><span class="nf">HashPassword</span><span class="p">(</span><span class="nv">$password</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>It’s even easier to compare hashes, using the following code snippet.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$hash</span> <span class="o">=</span> <span class="s1">'$2a$08$ezQB7LWGLPs3RtJLS9os5...'</span><span class="p">;</span>
-
-<span class="nv">$password</span> <span class="o">=</span> <span class="s1">'password1234'</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="nv">$phpass</span><span class="o">-&gt;</span><span class="nf">CheckPassword</span><span class="p">(</span><span class="nv">$password</span><span class="p">,</span> <span class="nv">$hash</span><span class="p">))</span>
-  <span class="k">echo</span> <span class="s1">'We have found a match!'</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>I am an avid CodeIgniter user at present, and I was happy to discover that a quick search on GitHub returned a very cool PHPass wrapper library (I love the use of the <code class="language-plaintext highlighter-rouge">_call</code> function).
-The library can be found <a href="http://github.com/segersjens/CodeIgniter-Phpass-Library">here</a>.
-The one and only point I hope you take away from this post is that if you are using PHP, you should use PHPass as your password hashing library!</p>
-
-<h2 id="update">Update</h2>
-
-<p>Since the release of PHP 5.5, an even simpler set of functions has been added to the core (documentation found <a href="http://php.net/manual/en/function.password-hash.php">here</a>), and it is recommended that you take advantage of these instead.
-<a href="http://blog.ircmaxell.com/">Anthony Ferrara</a>, the creator of the update, has also provided a library for backwards compatibility (&gt;= PHP 5.3.7) <a href="http://github.com/ircmaxell/password_compat">here</a>.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+This allows you to set the number of iterations per hash, as the count is stored within the output.</p><h2 id=a-simple-example>A simple example</h2><p>There are many good examples of how to use PHPass online (such as <a href=http://sunnyis.me/blog/secure-passwords/ rel="external noopener" target=_blank>this one</a>), so I will keep mine short and sweet.
+You can simply hash a password with PHPass using the code snippet below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>require_once</span>(<span style=color:#e6db74>&#39;PasswordHash.php&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// a new phpass instance, providing the iteration count
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// and if to use the in-built MD5 crypto or not
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>$phpass <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>PasswordHash</span>(<span style=color:#ae81ff>8</span>, <span style=color:#66d9ef>FALSE</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$password <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;password1234&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$hash <span style=color:#f92672>=</span> $phpass<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>HashPassword</span>($password);
+</span></span></code></pre></div><p>It&rsquo;s even easier to compare hashes, using the following code snippet.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$hash <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;$2a$08$ezQB7LWGLPs3RtJLS9os5...&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$password <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;password1234&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> ($phpass<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>CheckPassword</span>($password, $hash))
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>echo</span> <span style=color:#e6db74>&#39;We have found a match!&#39;</span>;
+</span></span></code></pre></div><p>I am an avid CodeIgniter user at present, and I was happy to discover that a quick search on GitHub returned a very cool PHPass wrapper library (I love the use of the <code>_call</code> function).
+The library can be found <a href=http://github.com/segersjens/CodeIgniter-Phpass-Library rel="external noopener" target=_blank>here</a>.
+The one and only point I hope you take away from this post is that if you are using PHP, you should use PHPass as your password hashing library!</p><h2 id=update>Update</h2><p>Since the release of PHP 5.5, an even simpler set of functions has been added to the core (documentation found <a href=http://php.net/manual/en/function.password-hash.php rel="external noopener" target=_blank>here</a>), and it is recommended that you take advantage of these instead.
+<a href=http://blog.ircmaxell.com/ rel="external noopener" target=_blank>Anthony Ferrara</a>, the creator of the update, has also provided a library for backwards compatibility (>= PHP 5.3.7) <a href=http://github.com/ircmaxell/password_compat rel="external noopener" target=_blank>here</a>.</p></main><footer class=post__tags><a href=/archive/tag/php>php</a><a href=/archive/tag/security>security</a><a href=/archive/tag/hashing>hashing</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

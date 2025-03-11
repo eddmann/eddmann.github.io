@@ -1,169 +1,71 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore multiple efficient methods to solve anagrams using Clojure, including Hash-Map, Trie, and Prime Number approaches.">
-
-    <title>
-        
-            Anagram Solver in Clojure &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Anagram Solver in Clojure</h1>
-    <time datetime="2016-08-15T00:00:00+00:00" class="post-date">15 Aug 2016</time>
-    <p>This past week, a discussion around solving anagrams was brought up.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Anagram Solver in Clojure - Edd Mann</title>
+<meta name=description content="Explore multiple efficient methods to solve anagrams using Clojure, including Hash-Map, Trie, and Prime Number approaches."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Anagram Solver in Clojure"><meta itemprop=description content="This past week, a discussion around solving anagrams was brought up. I thought it would be interesting to devise a couple of methods for computationally achieving such a task. Providing an anagram string and a dictionary file, I wished to return all possible matching words from the dictionary."><meta itemprop=datePublished content="2016-08-15T00:00:00+00:00"><meta itemprop=dateModified content="2016-08-15T00:00:00+00:00"><meta itemprop=wordCount content="648"><meta itemprop=keywords content="Clojure,Functional-Programming,Algorithms"><meta property="og:url" content="https://eddmann.com/posts/anagram-solver-in-clojure/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Anagram Solver in Clojure"><meta property="og:description" content="This past week, a discussion around solving anagrams was brought up. I thought it would be interesting to devise a couple of methods for computationally achieving such a task. Providing an anagram string and a dictionary file, I wished to return all possible matching words from the dictionary."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2016-08-15T00:00:00+00:00"><meta property="article:modified_time" content="2016-08-15T00:00:00+00:00"><meta property="article:tag" content="Clojure"><meta property="article:tag" content="Functional-Programming"><meta property="article:tag" content="Algorithms"><meta name=twitter:card content="summary"><meta name=twitter:title content="Anagram Solver in Clojure"><meta name=twitter:description content="This past week, a discussion around solving anagrams was brought up. I thought it would be interesting to devise a couple of methods for computationally achieving such a task. Providing an anagram string and a dictionary file, I wished to return all possible matching words from the dictionary."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/anagram-solver-in-clojure/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Anagram Solver in Clojure</h1><time class=post__time>Aug 15, 2016</time></header><main class=prose><p>This past week, a discussion around solving anagrams was brought up.
 I thought it would be interesting to devise a couple of methods for computationally achieving such a task.
-Providing an anagram string and a dictionary file, I wished to return all possible matching words from the dictionary.</p>
-
-
-
-<p>I decided this experimental exercise was a great opportunity to use Clojure.
+Providing an anagram string and a dictionary file, I wished to return all possible matching words from the dictionary.</p><p>I decided this experimental exercise was a great opportunity to use Clojure.
 Whilst thinking of ways to tackle this problem, I initially knew of two different means of storing an effective dictionary for anagram lookup.
-I was able to generalise into a higher-order function the process of taking each word within the supplied dictionary file and adding it into the initial <code class="language-plaintext highlighter-rouge">dictionary</code> data structure using the <code class="language-plaintext highlighter-rouge">add-word</code> function.
-To avoid generation performance penalties each time this function was invoked, I decided to memoize the function.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">reader-&gt;words</span><span class="w"> </span><span class="p">[</span><span class="n">rdr</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">single-word?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">nil?</span><span class="w"> </span><span class="p">(</span><span class="nb">re-find</span><span class="w"> </span><span class="o">#</span><span class="s">"[^a-z]"</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
-        </span><span class="n">max-five-letters?</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">&lt;</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="mi">6</span><span class="p">)]</span><span class="w">
-    </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">line-seq</span><span class="w"> </span><span class="n">rdr</span><span class="p">)</span><span class="w">
-         </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="n">clojure.string/lower-case</span><span class="p">)</span><span class="w">
-         </span><span class="p">(</span><span class="nb">filter</span><span class="w"> </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="n">single-word?</span><span class="w"> </span><span class="n">max-five-letters?</span><span class="p">)))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="o">^</span><span class="no">:private</span><span class="w"> </span><span class="n">generate-dictionary</span><span class="w">
-  </span><span class="p">(</span><span class="nf">memoize</span><span class="w"> </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">dictionary</span><span class="w"> </span><span class="n">add-word</span><span class="w"> </span><span class="n">filename</span><span class="p">]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">with-open</span><span class="w"> </span><span class="p">[</span><span class="n">rdr</span><span class="w"> </span><span class="p">(</span><span class="nf">clojure.java.io/reader</span><span class="w"> </span><span class="n">filename</span><span class="p">)]</span><span class="w">
-      </span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">add-word</span><span class="w"> </span><span class="n">dictionary</span><span class="w"> </span><span class="p">(</span><span class="nf">reader-&gt;words</span><span class="w"> </span><span class="n">rdr</span><span class="p">))))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>You will notice that I added some constraints upon the words we wished to include from the supplied dictionary.
-This was to simplify the large English dictionary provided with Unix platforms such as Mac OS <code class="language-plaintext highlighter-rouge">/usr/share/dict/words</code>.</p>
-
-<h2 id="hash-map">Hash-Map</h2>
-
-<p>The first solution used a simple hash-map, devising the key based on the alphabetical sorting of the supplied word.
-This meant that each matching anagram would generate the same unique key and then be stored within the hash-map’s Set value.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">word-&gt;key</span><span class="w"> </span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">clojure.string/join</span><span class="w"> </span><span class="p">(</span><span class="nb">sort</span><span class="w"> </span><span class="n">word</span><span class="p">)))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">add-to-map</span><span class="w"> </span><span class="p">[</span><span class="n">hmap</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="nb">key</span><span class="w"> </span><span class="p">(</span><span class="nf">word-&gt;key</span><span class="w"> </span><span class="n">word</span><span class="p">)</span><span class="w">
-        </span><span class="n">words</span><span class="w"> </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="n">hmap</span><span class="w"> </span><span class="nb">key</span><span class="w"> </span><span class="o">#</span><span class="p">{})]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">assoc</span><span class="w"> </span><span class="n">hmap</span><span class="w"> </span><span class="nb">key</span><span class="w"> </span><span class="p">(</span><span class="nb">conj</span><span class="w"> </span><span class="n">words</span><span class="w"> </span><span class="n">word</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">map-anagrams</span><span class="w"> </span><span class="p">[</span><span class="n">filename</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="p">(</span><span class="nf">generate-dictionary</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="n">add-to-map</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">word-&gt;key</span><span class="w"> </span><span class="n">word</span><span class="p">)</span><span class="w"> </span><span class="o">#</span><span class="p">{}))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="trie">Trie</h2>
-
-<p>The above solution provided a simple design, along with quick lookup times.
+I was able to generalise into a higher-order function the process of taking each word within the supplied dictionary file and adding it into the initial <code>dictionary</code> data structure using the <code>add-word</code> function.
+To avoid generation performance penalties each time this function was invoked, I decided to memoize the function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>reader-&gt;words [rdr]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[single-word? <span style=color:#f92672>#</span>(nil? (re-find <span style=color:#f92672>#</span><span style=color:#e6db74>&#34;[^a-z]&#34;</span> %))
+</span></span><span style=display:flex><span>        max-five-letters? <span style=color:#f92672>#</span>(&lt; (count %) <span style=color:#ae81ff>6</span>)]
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>-&gt;&gt;</span> (line-seq rdr)
+</span></span><span style=display:flex><span>         (map clojure.string/lower-case)
+</span></span><span style=display:flex><span>         (filter (and single-word? max-five-letters?)))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> generate-dictionary
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>memoize</span> (<span style=color:#66d9ef>fn </span>[dictionary add-word filename]
+</span></span><span style=display:flex><span>    (with-open [rdr (<span style=color:#a6e22e>clojure.java.io/reader</span> filename)]
+</span></span><span style=display:flex><span>      (reduce add-word dictionary (<span style=color:#a6e22e>reader-&gt;words</span> rdr))))))
+</span></span></code></pre></div><p>You will notice that I added some constraints upon the words we wished to include from the supplied dictionary.
+This was to simplify the large English dictionary provided with Unix platforms such as Mac OS <code>/usr/share/dict/words</code>.</p><h2 id=hash-map>Hash-Map</h2><p>The first solution used a simple hash-map, devising the key based on the alphabetical sorting of the supplied word.
+This meant that each matching anagram would generate the same unique key and then be stored within the hash-map&rsquo;s Set value.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>word-&gt;key [word]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>clojure.string/join</span> (sort word)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>add-to-map [hmap word]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[key (<span style=color:#a6e22e>word-&gt;key</span> word)
+</span></span><span style=display:flex><span>        words (get hmap key <span style=color:#f92672>#</span>{})]
+</span></span><span style=display:flex><span>    (assoc hmap key (conj words word))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>map-anagrams [filename word]
+</span></span><span style=display:flex><span>  (get (<span style=color:#a6e22e>generate-dictionary</span> {} add-to-map filename) (<span style=color:#a6e22e>word-&gt;key</span> word) <span style=color:#f92672>#</span>{}))
+</span></span></code></pre></div><h2 id=trie>Trie</h2><p>The above solution provided a simple design, along with quick lookup times.
 However, I felt that a better-suited data structure could help ease memory requirements.
-Using a <a href="https://en.wikipedia.org/wiki/Trie">Trie</a> data structure allowed us to more effectively store the computed keys for the lookup dictionary.
+Using a <a href=https://en.wikipedia.org/wiki/Trie rel="external noopener" target=_blank>Trie</a> data structure allowed us to more effectively store the computed keys for the lookup dictionary.
 Clojure provides an efficient way to interact with nested associated data structures using the familiar hash-map.
-Instead of the key being converted back into a sorted string, it was maintained as a vector and used as a sequence of keys, forming the path to the matching anagram words.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">word-&gt;key</span><span class="w"> </span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">conj</span><span class="w"> </span><span class="p">(</span><span class="nf">vec</span><span class="w"> </span><span class="p">(</span><span class="nb">sort</span><span class="w"> </span><span class="n">word</span><span class="p">))</span><span class="w"> </span><span class="no">:words</span><span class="p">))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">add-to-trie</span><span class="w"> </span><span class="p">[</span><span class="n">trie</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="nb">key</span><span class="w"> </span><span class="p">(</span><span class="nf">word-&gt;key</span><span class="w"> </span><span class="n">word</span><span class="p">)</span><span class="w">
-        </span><span class="n">words</span><span class="w"> </span><span class="p">(</span><span class="nf">get-in</span><span class="w"> </span><span class="n">trie</span><span class="w"> </span><span class="nb">key</span><span class="w"> </span><span class="o">#</span><span class="p">{})]</span><span class="w">
-    </span><span class="p">(</span><span class="nf">assoc-in</span><span class="w"> </span><span class="n">trie</span><span class="w"> </span><span class="nb">key</span><span class="w"> </span><span class="p">(</span><span class="nb">conj</span><span class="w"> </span><span class="n">words</span><span class="w"> </span><span class="n">word</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">trie-anagrams</span><span class="w"> </span><span class="p">[</span><span class="n">filename</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">get-in</span><span class="w"> </span><span class="p">(</span><span class="nf">generate-dictionary</span><span class="w"> </span><span class="p">{}</span><span class="w"> </span><span class="n">add-to-trie</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">word-&gt;key</span><span class="w"> </span><span class="n">word</span><span class="p">)</span><span class="w"> </span><span class="o">#</span><span class="p">{}))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="hash-map-using-prime-numbers">Hash-Map using Prime Numbers</h2>
-
-<p>After some <a href="http://stackoverflow.com/a/28948975">internet research</a>, I noticed a different way to generate unique word keys regardless of character ordering.
-Taking advantage of the fact that prime numbers are ‘multiplicatively unique’, I created a character-to-prime number lookup function.
-The product of each character’s corresponding prime number resulted in a unique integer value being generated.
-I was then able to use a more efficient <code class="language-plaintext highlighter-rouge">int-map</code> dictionary data structure, providing better lookup and storage costs than the initial implementation.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">sieve</span><span class="w"> </span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">cons</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w">
-        </span><span class="p">(</span><span class="nf">lazy-seq</span><span class="w"> </span><span class="p">(</span><span class="nf">sieve</span><span class="w"> </span><span class="p">(</span><span class="nb">filter</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">not=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">(</span><span class="nf">mod</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="n">s</span><span class="p">)))</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="n">s</span><span class="p">))))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="o">^</span><span class="no">:private</span><span class="w"> </span><span class="n">alpha-&gt;prime</span><span class="w">
-  </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">hash-map</span><span class="w">
-    </span><span class="p">(</span><span class="nb">interleave</span><span class="w"> </span><span class="s">"abcdefghijklmnopqrstuvwxyz"</span><span class="w"> </span><span class="p">(</span><span class="nf">sieve</span><span class="w"> </span><span class="p">(</span><span class="nb">iterate</span><span class="w"> </span><span class="nb">inc</span><span class="w"> </span><span class="mi">2</span><span class="p">)))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">word-&gt;key</span><span class="w"> </span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="n">%1</span><span class="w"> </span><span class="p">(</span><span class="nf">alpha-&gt;prime</span><span class="w"> </span><span class="n">%2</span><span class="p">))</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">word</span><span class="p">))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">prime-map-anagrams</span><span class="w"> </span><span class="p">[</span><span class="n">filename</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="p">(</span><span class="nf">generate-dictionary</span><span class="w"> </span><span class="p">(</span><span class="nf">clojure.data.int-map/int-map</span><span class="p">)</span><span class="w"> </span><span class="n">add-to-map</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w">
-       </span><span class="p">(</span><span class="nf">word-&gt;key</span><span class="w"> </span><span class="n">word</span><span class="p">)</span><span class="w">
-       </span><span class="o">#</span><span class="p">{}))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="sub-string-anagrams">Sub-string Anagrams</h2>
-
-<p>Finally, I wished to extend the initial problem and provide the ability to include sub-string anagrams in the result.
+Instead of the key being converted back into a sorted string, it was maintained as a vector and used as a sequence of keys, forming the path to the matching anagram words.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>word-&gt;key [word]
+</span></span><span style=display:flex><span>  (conj (<span style=color:#a6e22e>vec</span> (sort word)) <span style=color:#e6db74>:words</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>add-to-trie [trie word]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[key (<span style=color:#a6e22e>word-&gt;key</span> word)
+</span></span><span style=display:flex><span>        words (<span style=color:#a6e22e>get-in</span> trie key <span style=color:#f92672>#</span>{})]
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>assoc-in</span> trie key (conj words word))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>trie-anagrams [filename word]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>get-in</span> (<span style=color:#a6e22e>generate-dictionary</span> {} add-to-trie filename) (<span style=color:#a6e22e>word-&gt;key</span> word) <span style=color:#f92672>#</span>{}))
+</span></span></code></pre></div><h2 id=hash-map-using-prime-numbers>Hash-Map using Prime Numbers</h2><p>After some <a href=http://stackoverflow.com/a/28948975 rel="external noopener" target=_blank>internet research</a>, I noticed a different way to generate unique word keys regardless of character ordering.
+Taking advantage of the fact that prime numbers are &lsquo;multiplicatively unique&rsquo;, I created a character-to-prime number lookup function.
+The product of each character&rsquo;s corresponding prime number resulted in a unique integer value being generated.
+I was then able to use a more efficient <code>int-map</code> dictionary data structure, providing better lookup and storage costs than the initial implementation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>sieve [s]
+</span></span><span style=display:flex><span>  (cons (first s)
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>lazy-seq</span> (<span style=color:#a6e22e>sieve</span> (filter <span style=color:#f92672>#</span>(not= <span style=color:#ae81ff>0</span> (<span style=color:#a6e22e>mod</span> % (first s))) (rest s))))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> alpha-&gt;prime
+</span></span><span style=display:flex><span>  (apply hash-map
+</span></span><span style=display:flex><span>    (interleave <span style=color:#e6db74>&#34;abcdefghijklmnopqrstuvwxyz&#34;</span> (<span style=color:#a6e22e>sieve</span> (iterate inc <span style=color:#ae81ff>2</span>)))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>word-&gt;key [word]
+</span></span><span style=display:flex><span>  (reduce <span style=color:#f92672>#</span>(* %1 (<span style=color:#a6e22e>alpha-&gt;prime</span> %2)) <span style=color:#ae81ff>1</span> word))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>prime-map-anagrams [filename word]
+</span></span><span style=display:flex><span>  (get (<span style=color:#a6e22e>generate-dictionary</span> (<span style=color:#a6e22e>clojure.data.int-map/int-map</span>) add-to-map filename)
+</span></span><span style=display:flex><span>       (<span style=color:#a6e22e>word-&gt;key</span> word)
+</span></span><span style=display:flex><span>       <span style=color:#f92672>#</span>{}))
+</span></span></code></pre></div><h2 id=sub-string-anagrams>Sub-string Anagrams</h2><p>Finally, I wished to extend the initial problem and provide the ability to include sub-string anagrams in the result.
 I achieved this by creating a small function that took a word and created its power set (set of all possible subsets).
-With this implementation, I was then able to create a higher-order function that took the desired finder implementation and fetched both full and sub-string anagrams from the lookup dictionary.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">power-set</span><span class="w"> </span><span class="p">[</span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">add-char-seqs</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">clojure.set/union</span><span class="w"> </span><span class="n">%1</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="nb">str</span><span class="w"> </span><span class="n">%2</span><span class="p">)</span><span class="w"> </span><span class="n">%1</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">reduce</span><span class="w"> </span><span class="n">add-char-seqs</span><span class="w"> </span><span class="o">#</span><span class="p">{</span><span class="s">""</span><span class="p">}</span><span class="w"> </span><span class="n">word</span><span class="p">)))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">sub-anagrams</span><span class="w"> </span><span class="p">[</span><span class="n">finder</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="n">word</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="n">clojure.set/union</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="n">finder</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">power-set</span><span class="w"> </span><span class="n">word</span><span class="p">))))</span><span class="w">
-</span></code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+With this implementation, I was then able to create a higher-order function that took the desired finder implementation and fetched both full and sub-string anagrams from the lookup dictionary.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>power-set [word]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[add-char-seqs <span style=color:#f92672>#</span>(<span style=color:#a6e22e>clojure.set/union</span> %1 (map (partial str %2) %1))]
+</span></span><span style=display:flex><span>    (reduce add-char-seqs <span style=color:#f92672>#</span>{<span style=color:#e6db74>&#34;&#34;</span>} word)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>sub-anagrams [finder filename word]
+</span></span><span style=display:flex><span>  (apply clojure.set/union (map (partial finder filename) (<span style=color:#a6e22e>power-set</span> word))))
+</span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/clojure>clojure</a><a href=/archive/tag/functional-programming>functional-programming</a><a href=/archive/tag/algorithms>algorithms</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

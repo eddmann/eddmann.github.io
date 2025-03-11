@@ -1,66 +1,9 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to allocate Secret Santas using a substitution cipher in Clojure. Discover a step-by-step guide to grouping participants and concealing pairings with ROT13 for a secure and fun gift exchange.">
-
-    <title>
-        
-            Allocating Secret Santas with a Substitution Cipher using Clojure &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Allocating Secret Santas with a Substitution Cipher using Clojure</h1>
-    <time datetime="2019-02-09T00:00:00+00:00" class="post-date">09 Feb 2019</time>
-    <p>Over Christmas I found myself delving back into a bit of Clojure.
-One such problem I stumbled upon solving was allocating <a href="https://en.wikipedia.org/wiki/Secret_Santa">Secret Santas</a>.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Allocating Secret Santas with a Substitution Cipher using Clojure - Edd Mann</title>
+<meta name=description content="Learn how to allocate Secret Santas using a substitution cipher in Clojure. Discover a step-by-step guide to grouping participants and concealing pairings with ROT13 for a secure and fun gift exchange."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Allocating Secret Santas with a Substitution Cipher using Clojure"><meta itemprop=description content="Over Christmas I found myself delving back into a bit of Clojure. One such problem I stumbled upon solving was allocating Secret Santas. In this post I will discuss how I went about grouping a given list of names based on certain criteria, and then correctly pairing up each person. From here, I will highlight how I expanded upon the solution to allow these allocations to be distributed and hidden from prying eyes using a simple ROT13 substitution cipher."><meta itemprop=datePublished content="2019-02-09T00:00:00+00:00"><meta itemprop=dateModified content="2019-02-09T00:00:00+00:00"><meta itemprop=wordCount content="643"><meta itemprop=keywords content="Clojure,Secret-Santa"><meta property="og:url" content="https://eddmann.com/posts/allocating-secret-santas-with-a-substitution-cipher-using-clojure/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Allocating Secret Santas with a Substitution Cipher using Clojure"><meta property="og:description" content="Over Christmas I found myself delving back into a bit of Clojure. One such problem I stumbled upon solving was allocating Secret Santas. In this post I will discuss how I went about grouping a given list of names based on certain criteria, and then correctly pairing up each person. From here, I will highlight how I expanded upon the solution to allow these allocations to be distributed and hidden from prying eyes using a simple ROT13 substitution cipher."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2019-02-09T00:00:00+00:00"><meta property="article:modified_time" content="2019-02-09T00:00:00+00:00"><meta property="article:tag" content="Clojure"><meta property="article:tag" content="Secret-Santa"><meta name=twitter:card content="summary"><meta name=twitter:title content="Allocating Secret Santas with a Substitution Cipher using Clojure"><meta name=twitter:description content="Over Christmas I found myself delving back into a bit of Clojure. One such problem I stumbled upon solving was allocating Secret Santas. In this post I will discuss how I went about grouping a given list of names based on certain criteria, and then correctly pairing up each person. From here, I will highlight how I expanded upon the solution to allow these allocations to be distributed and hidden from prying eyes using a simple ROT13 substitution cipher."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/allocating-secret-santas-with-a-substitution-cipher-using-clojure/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Allocating Secret Santas with a Substitution Cipher using Clojure</h1><time class=post__time>Feb 9, 2019</time></header><main class=prose><p>Over Christmas I found myself delving back into a bit of Clojure.
+One such problem I stumbled upon solving was allocating <a href=https://en.wikipedia.org/wiki/Secret_Santa rel="external noopener" target=_blank>Secret Santas</a>.
 In this post I will discuss how I went about grouping a given list of names based on certain criteria, and then correctly pairing up each person.
-From here, I will highlight how I expanded upon the solution to allow these allocations to be distributed and hidden from prying eyes using a simple <a href="https://en.wikipedia.org/wiki/ROT13">ROT13</a> substitution cipher.</p>
-
-
-
-<h2 id="allocating-secret-santas">Allocating Secret Santas</h2>
-
-<p>The first problem that I had to tackle was loading in a given text file which contained all the participants and their gender in CSV form.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>james,m
+From here, I will highlight how I expanded upon the solution to allow these allocations to be distributed and hidden from prying eyes using a simple <a href=https://en.wikipedia.org/wiki/ROT13 rel="external noopener" target=_blank>ROT13</a> substitution cipher.</p><h2 id=allocating-secret-santas>Allocating Secret Santas</h2><p>The first problem that I had to tackle was loading in a given text file which contained all the participants and their gender in CSV form.</p><pre tabindex=0><code>james,m
 robert,m
 david,m
 michael,m
@@ -68,99 +11,48 @@ mary,f
 sally,f
 jane,f,
 anne,f
-</code></pre></div></div>
-
-<p>The solution I wanted to develop catered for the use-case where certain criteria had to be met to make participants eligible to pair with each other.
-In this case, the invariant was that participants could only buy gifts for the same gender.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">use</span><span class="w"> </span><span class="o">'</span><span class="p">[</span><span class="n">clojure.string</span><span class="w"> </span><span class="no">:only</span><span class="w"> </span><span class="p">[</span><span class="n">split</span><span class="w"> </span><span class="n">split-lines</span><span class="p">]])</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">participants</span><span class="w"> </span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">split</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="o">#</span><span class="s">","</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">split-lines</span><span class="w"> </span><span class="p">(</span><span class="nb">slurp</span><span class="w"> </span><span class="n">file</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="p">[</span><span class="n">participants</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="nb">map</span><span class="w"> </span><span class="nb">first</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">partition-by</span><span class="w"> </span><span class="nb">second</span><span class="w"> </span><span class="n">participants</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>To achieve this I first <a href="https://clojuredocs.org/clojure.core/slurp"><code class="language-plaintext highlighter-rouge">slurped</code></a> in the file contents, treating each given line as a new participant.
+</code></pre><p>The solution I wanted to develop catered for the use-case where certain criteria had to be met to make participants eligible to pair with each other.
+In this case, the invariant was that participants could only buy gifts for the same gender.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#a6e22e>use</span> <span style=color:#f92672>&#39;</span>[clojure.string <span style=color:#e6db74>:only</span> [split split-lines]])
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>participants [file]
+</span></span><span style=display:flex><span>  (map <span style=color:#f92672>#</span>(<span style=color:#a6e22e>split</span> % <span style=color:#f92672>#</span><span style=color:#e6db74>&#34;,&#34;</span>) (<span style=color:#a6e22e>split-lines</span> (slurp file))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>group [participants]
+</span></span><span style=display:flex><span>  (map (partial map first) (<span style=color:#a6e22e>partition-by</span> second participants)))
+</span></span></code></pre></div><p>To achieve this I first <a href=https://clojuredocs.org/clojure.core/slurp rel="external noopener" target=_blank><code>slurped</code></a> in the file contents, treating each given line as a new participant.
 I then broke each entry into its name and gender.
-This, in turn, allowed me to group the given list based on gender using the <a href="https://clojuredocs.org/clojure.core/second"><code class="language-plaintext highlighter-rouge">second</code></a> function, and finally return only the grouped participant names.</p>
-
-<p>Now that we had the grouped names, we could begin pairing up each participant.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">allocate</span><span class="w"> </span><span class="p">[</span><span class="n">buyers</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">receivers</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="nb">vector</span><span class="w"> </span><span class="n">buyers</span><span class="w"> </span><span class="p">(</span><span class="nf">shuffle</span><span class="w"> </span><span class="n">buyers</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">every?</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="nb">apply</span><span class="w"> </span><span class="n">distinct?</span><span class="p">)</span><span class="w"> </span><span class="n">receivers</span><span class="p">)</span><span class="w">
-      </span><span class="n">receivers</span><span class="w">
-      </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="n">buyers</span><span class="p">))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>I solved this with a recursive approach which simply zipped the buyers with another randomly shuffled buyer.
-In the event that a buyer was paired with themselves, the action would be repeated.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">secret-santa</span><span class="w"> </span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">mapcat</span><span class="w"> </span><span class="n">allocate</span><span class="w"> </span><span class="p">(</span><span class="nf">group</span><span class="w"> </span><span class="p">(</span><span class="nf">participants</span><span class="w"> </span><span class="n">file</span><span class="p">))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>Once complete, I was able to compose these building blocks together.
-As participants were allocated within groups, I used <a href="https://clojuredocs.org/clojure.core/mapcat"><code class="language-plaintext highlighter-rouge">mapcat</code></a> to ensure that the result was a flat listing of all the pairings.</p>
-
-<h2 id="hiding-the-pairings-using-a-substitution-cipher">Hiding the Pairings using a Substitution Cipher</h2>
-
-<p>Now that I could pair up a given list of grouped participants, I thought about how these pairings could be easily distributed via a print-out without anyone else knowing each other’s picks.
-I decided that a simple <a href="https://en.wikipedia.org/wiki/Substitution_cipher">substitution cipher</a> such as ROT13 would do the trick.
-I felt it would provide just enough friction to make it hard to work out based on a quick glance.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="o">^</span><span class="no">:private</span><span class="w"> </span><span class="n">lower-case</span><span class="w">
-  </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"abcdefghijklmnopqrstuvwxyz"</span><span class="p">))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">rot13</span><span class="w"> </span><span class="p">[</span><span class="n">text</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">cipher</span><span class="w"> </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">cycle</span><span class="w"> </span><span class="n">lower-case</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">drop</span><span class="w"> </span><span class="mi">13</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">take</span><span class="w"> </span><span class="mi">26</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">lower-case</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">str</span><span class="w"> </span><span class="p">(</span><span class="nb">replace</span><span class="w"> </span><span class="n">cipher</span><span class="w"> </span><span class="n">text</span><span class="p">))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>To achieve this I first created a simple ROT13 implementation which catered for lower-case alphabet substitutions.
+This, in turn, allowed me to group the given list based on gender using the <a href=https://clojuredocs.org/clojure.core/second rel="external noopener" target=_blank><code>second</code></a> function, and finally return only the grouped participant names.</p><p>Now that we had the grouped names, we could begin pairing up each participant.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>allocate [buyers]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[receivers (map vector buyers (<span style=color:#a6e22e>shuffle</span> buyers))]
+</span></span><span style=display:flex><span>    (<span style=color:#66d9ef>if </span>(every? (partial apply distinct?) receivers)
+</span></span><span style=display:flex><span>      receivers
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>recur</span> buyers))))
+</span></span></code></pre></div><p>I solved this with a recursive approach which simply zipped the buyers with another randomly shuffled buyer.
+In the event that a buyer was paired with themselves, the action would be repeated.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>secret-santa [file]
+</span></span><span style=display:flex><span>  (mapcat allocate (<span style=color:#a6e22e>group</span> (<span style=color:#a6e22e>participants</span> file))))
+</span></span></code></pre></div><p>Once complete, I was able to compose these building blocks together.
+As participants were allocated within groups, I used <a href=https://clojuredocs.org/clojure.core/mapcat rel="external noopener" target=_blank><code>mapcat</code></a> to ensure that the result was a flat listing of all the pairings.</p><h2 id=hiding-the-pairings-using-a-substitution-cipher>Hiding the Pairings using a Substitution Cipher</h2><p>Now that I could pair up a given list of grouped participants, I thought about how these pairings could be easily distributed via a print-out without anyone else knowing each other&rsquo;s picks.
+I decided that a simple <a href=https://en.wikipedia.org/wiki/Substitution_cipher rel="external noopener" target=_blank>substitution cipher</a> such as ROT13 would do the trick.
+I felt it would provide just enough friction to make it hard to work out based on a quick glance.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> lower-case
+</span></span><span style=display:flex><span>  (seq <span style=color:#e6db74>&#34;abcdefghijklmnopqrstuvwxyz&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>rot13 [text]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[cipher (<span style=color:#a6e22e>-&gt;&gt;</span> (cycle lower-case) (drop <span style=color:#ae81ff>13</span>) (take <span style=color:#ae81ff>26</span>) (zipmap lower-case))]
+</span></span><span style=display:flex><span>    (apply str (replace cipher text))))
+</span></span></code></pre></div><p>To achieve this I first created a simple ROT13 implementation which catered for lower-case alphabet substitutions.
 This led me to think that although the value would be a cipher, the length did not change.
-Based on the provided names, this could possibly disclose a pairing.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">rand-str</span><span class="w"> </span><span class="p">[</span><span class="n">length</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">str</span><span class="w"> </span><span class="p">(</span><span class="nb">take</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="p">(</span><span class="nf">repeatedly</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">rand-nth</span><span class="w"> </span><span class="n">lower-case</span><span class="p">)))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">padded-rot13</span><span class="w"> </span><span class="p">[</span><span class="n">length</span><span class="w"> </span><span class="n">text</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">padding</span><span class="w"> </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="p">(</span><span class="nb">-</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">text</span><span class="p">))</span><span class="w"> </span><span class="mi">2</span><span class="p">)]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">str</span><span class="w"> </span><span class="p">(</span><span class="nf">rand-str</span><span class="w"> </span><span class="p">(</span><span class="nf">Math/ceil</span><span class="w"> </span><span class="n">padding</span><span class="p">))</span><span class="w">
-         </span><span class="p">(</span><span class="nf">rot13</span><span class="w"> </span><span class="n">text</span><span class="p">)</span><span class="w">
-         </span><span class="p">(</span><span class="nf">rand-str</span><span class="w"> </span><span class="p">(</span><span class="nf">Math/floor</span><span class="w"> </span><span class="n">padding</span><span class="p">)))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>To resolve this issue I decided to pad each given name with equal amounts of random alphabet values based on the maximum participant name length.
-This padding was applied to both the beginning and the end of the cipher, enclosing the real name in the middle.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">secret-santa-cipher</span><span class="w"> </span><span class="p">[</span><span class="n">file</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">santas</span><span class="w"> </span><span class="p">(</span><span class="nf">secret-santa</span><span class="w"> </span><span class="n">file</span><span class="p">)</span><span class="w">
-        </span><span class="n">max-name</span><span class="w"> </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">max</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="nb">first</span><span class="w"> </span><span class="n">santas</span><span class="p">)))</span><span class="w">
-        </span><span class="n">cipher</span><span class="w"> </span><span class="p">(</span><span class="nb">partial</span><span class="w"> </span><span class="n">padded-rot13</span><span class="w"> </span><span class="n">max-name</span><span class="p">)]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[[</span><span class="n">buyer</span><span class="w"> </span><span class="n">receiver</span><span class="p">]]</span><span class="w"> </span><span class="p">[</span><span class="n">buyer</span><span class="w"> </span><span class="p">(</span><span class="nf">cipher</span><span class="w"> </span><span class="n">receiver</span><span class="p">)])</span><span class="w"> </span><span class="n">santas</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>Finally, I was able to enhance the <code class="language-plaintext highlighter-rouge">secret-santa</code> function with the ability to return cipher text.
-This ensured that all paired-up receivers were hidden and required a little effort to uncover.</p>
-
-<p>I envision being able to use the solution this coming December, printing and cutting out each of the pairings to distribute to the participants.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Based on the provided names, this could possibly disclose a pairing.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>rand-str [length]
+</span></span><span style=display:flex><span>  (apply str (take length (<span style=color:#a6e22e>repeatedly</span> <span style=color:#f92672>#</span>(<span style=color:#a6e22e>rand-nth</span> lower-case)))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>padded-rot13 [length text]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[padding (/ (- length (count text)) <span style=color:#ae81ff>2</span>)]
+</span></span><span style=display:flex><span>    (str (<span style=color:#a6e22e>rand-str</span> (<span style=color:#a6e22e>Math/ceil</span> padding))
+</span></span><span style=display:flex><span>         (<span style=color:#a6e22e>rot13</span> text)
+</span></span><span style=display:flex><span>         (<span style=color:#a6e22e>rand-str</span> (<span style=color:#a6e22e>Math/floor</span> padding)))))
+</span></span></code></pre></div><p>To resolve this issue I decided to pad each given name with equal amounts of random alphabet values based on the maximum participant name length.
+This padding was applied to both the beginning and the end of the cipher, enclosing the real name in the middle.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>secret-santa-cipher [file]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[santas (<span style=color:#a6e22e>secret-santa</span> file)
+</span></span><span style=display:flex><span>        max-name (apply max (map count (map first santas)))
+</span></span><span style=display:flex><span>        cipher (partial padded-rot13 max-name)]
+</span></span><span style=display:flex><span>    (map (<span style=color:#66d9ef>fn </span>[[buyer receiver]] [buyer (<span style=color:#a6e22e>cipher</span> receiver)]) santas)))
+</span></span></code></pre></div><p>Finally, I was able to enhance the <code>secret-santa</code> function with the ability to return cipher text.
+This ensured that all paired-up receivers were hidden and required a little effort to uncover.</p><p>I envision being able to use the solution this coming December, printing and cutting out each of the pairings to distribute to the participants.</p></main><footer class=post__tags><a href=/archive/tag/clojure>clojure</a><a href=/archive/tag/secret-santa>secret-santa</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

@@ -1,188 +1,76 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore the internals of Git and learn how its efficient, low-level commands and object storage mechanisms power modern version control.">
-
-    <title>
-        
-            The Internals of Git &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">The Internals of Git</h1>
-    <time datetime="2014-12-27T00:00:00+00:00" class="post-date">27 Dec 2014</time>
-    <p>I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow.
-Throughout the past couple of months, thanks to a couple of <a href="http://ftp.newartisans.com/pub/git.from.bottom.up.pdf">well</a> <a href="http://mrchlblng.me/2014/09/practical-git-introduction/">timed</a> <a href="http://episodes.gitminutes.com/">findings</a>, I have gained an interest in how Git works internally.
-In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis.</p>
-
-
-
-<p>At its core, a Git repository is a key-value object store, where each SHA-1 key is generated based on multiple factors.
-This file-based store is used to represent a functional <a href="http://en.wikipedia.org/wiki/Directed_acyclic_graph">Directed Acyclic Graph</a>, which, through the use of commit, tree and blob objects, represents the project’s history.</p>
-
-<h2 id="an-example">An Example</h2>
-
-<p>To better understand how history is represented within Git, let’s first commit a plain-text file entitled ‘foo.txt’ with the contents ‘Hello, world’.
-The only catch is that instead of using high-level commands such as <a href="http://git-scm.com/docs/git-add">git-add</a> and <a href="http://git-scm.com/docs/git-commit">git-commit</a>, we will go through the process of manually indexing and committing the file.</p>
-
-<p>The first step is to store a blob object containing the contents of the ‘foo.txt’ file in the datastore, the hash of which is generated based on the contents and size of the file (or std-in) supplied.
-In the case of this example, we will use std-in, and not only query Git for the generated hash, but also persist the blob into the object graph.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">'Hello, world'</span> | git hash-object <span class="nt">--stdin</span> <span class="nt">-w</span>
-a5c19667710254f835085b99726e523457150e03
-</code></pre></div></div>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tree .git/objects/
-.git/objects/
-| |____
-| | |____a5
-| | | |____c19667710254f835085b99726e523457150e03
-</code></pre></div></div>
-
-<p>You will notice, if you are following along, that the resulting hash for this blob will be identical to the one above.
-That is one of Git’s ingenious strengths, as identical files are only ever stored once, regardless of where they appear in the history graph.</p>
-
-<p>The next step is to add the blob (via its hash key) to the index (staging area), specifying the file permissions and directory/name you wish to associate it with.
-We can then write this tree object out to the filestore, which returns its computed hash.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git update-index <span class="nt">--add</span> <span class="nt">--cacheinfo</span> 100644 a5c19667710254f835085b99726e523457150e03 foo.txt
-<span class="nv">$ </span>git write-tree
-0906930f06d75609ca186359a6cee2c9623bf99a
-<span class="nv">$ </span>git cat-file <span class="nt">-p</span> 0906930f06d75609ca186359a6cee2c9623bf99a
-100644 blob a5c19667710254f835085b99726e523457150e03    foo.txt
-</code></pre></div></div>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tree .git/objects/
-.git/objects/
-| |____
-| | |____09
-| | | |____06930f06d75609ca186359a6cee2c9623bf99a
-| | |____a5
-| | | |____c19667710254f835085b99726e523457150e03
-</code></pre></div></div>
-
-<p>The pending index is stored in a file called ‘index’ until it is then persisted into the store.
-Tree objects store a combination of blob objects with file attributes such as the ‘foo.txt’ filename, along with other tree objects for subsequent directories.
-We are now ready to associate this generated tree with a commit object.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit-tree 0906930f06d75609ca186359a6cee2c9623bf99a <span class="nt">-m</span> <span class="s2">"First commit"</span>
-e5446fb51f77fd526f56b7f58ac328c5db954dc6
-<span class="nv">$ </span>git cat-file <span class="nt">-p</span> e5446fb51f77fd526f56b7f58ac328c5db954dc6
-tree 0906930f06d75609ca186359a6cee2c9623bf99a
-author Edd Mann &lt;the@eddmann.com&gt; 1419674305 +0000
-committer Edd Mann &lt;the@eddmann.com&gt; 1419674305 +0000
-
-First commit
-</code></pre></div></div>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tree .git/objects/
-.git/objects/
-| |____
-| | |____09
-| | | |____06930f06d75609ca186359a6cee2c9623bf99a
-| | |____a5
-| | | |____c19667710254f835085b99726e523457150e03
-| | |____e5
-| | | |____446fb51f77fd526f56b7f58ac328c5db954dc6
-</code></pre></div></div>
-
-<p>This commit hash will differ from the one you generate, as factors such as name/email and the current timestamp play a role in its generation.
-With this commit now persisted in the store, we can update the repository’s ‘HEAD’ reference to point to the generated commit hash.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git update-ref HEAD e5446fb51f77fd526f56b7f58ac328c5db954dc6
-<span class="nv">$ </span>git checkout <span class="nt">-f</span>
-<span class="nv">$ </span><span class="nb">cat </span>foo.txt
-Hello, world
-</code></pre></div></div>
-
-<p>As you can see, it only takes three persisted object files to represent a one-file commit history.
-Finally, let’s generate a new file ‘baz.txt’ which is stored in a directory called ‘bar’.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">'Bonjour'</span> | git hash-object <span class="nt">--stdin</span> <span class="nt">-w</span>
-632e4fe73c3da8c9018008dbda117fc6b00e3e83
-</code></pre></div></div>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git update-index <span class="nt">--add</span> <span class="nt">--cacheinfo</span> 100644 632e4fe73c3da8c9018008dbda117fc6b00e3e83 bar/baz.txt
-<span class="nv">$ </span>git write-tree
-84483aa54b5cd02e76298c097831c51914c53821
-<span class="nv">$ </span>git cat-file <span class="nt">-p</span> 84483aa54b5cd02e76298c097831c51914c53821
-040000 tree 8ee16db87ef1f040f79a0e4cb843668369e96f70    bar
-100644 blob a5c19667710254f835085b99726e523457150e03    foo.txt
-</code></pre></div></div>
-
-<p>In a similar manner to the first example, we persist both the file-contents blob and tree objects.
-The difference arises when we wish to generate the second commit; we must now supply the parent commit’s hash (in our case, the first commit) which will be used to calculate the history of the graph when required.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit-tree 84483aa54b5cd02e76298c097831c51914c53821 <span class="nt">-m</span> <span class="s2">"Second commit"</span> <span class="nt">-p</span> HEAD
-18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
-<span class="nv">$ </span>git cat-file <span class="nt">-p</span> 18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
-tree 84483aa54b5cd02e76298c097831c51914c53821
-parent e5446fb51f77fd526f56b7f58ac328c5db954dc6
-author Edd Mann &lt;the@eddmann.com&gt; 1419674876 +0000
-committer Edd Mann &lt;the@eddmann.com&gt; 1419674876 +0000
-
-Second commit
-</code></pre></div></div>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git update-ref HEAD 18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
-<span class="nv">$ </span>git checkout <span class="nt">-f</span>
-<span class="nv">$ </span><span class="nb">cat </span>bar/baz.txt
-Bonjour
-</code></pre></div></div>
-
-<p>I hope this quick introduction to the internals of Git has helped you realise how simple, yet powerful, the system has been modelled.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>The Internals of Git - Edd Mann</title>
+<meta name=description content="Explore the internals of Git and learn how its efficient, low-level commands and object storage mechanisms power modern version control."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="The Internals of Git"><meta itemprop=description content="I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow. Throughout the past couple of months, thanks to a couple of well timed findings, I have gained an interest in how Git works internally. In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis."><meta itemprop=datePublished content="2014-12-27T00:00:00+00:00"><meta itemprop=dateModified content="2014-12-27T00:00:00+00:00"><meta itemprop=wordCount content="756"><meta itemprop=keywords content="Git"><meta property="og:url" content="https://eddmann.com/posts/the-internals-of-git/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="The Internals of Git"><meta property="og:description" content="I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow. Throughout the past couple of months, thanks to a couple of well timed findings, I have gained an interest in how Git works internally. In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-12-27T00:00:00+00:00"><meta property="article:modified_time" content="2014-12-27T00:00:00+00:00"><meta property="article:tag" content="Git"><meta name=twitter:card content="summary"><meta name=twitter:title content="The Internals of Git"><meta name=twitter:description content="I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow. Throughout the past couple of months, thanks to a couple of well timed findings, I have gained an interest in how Git works internally. In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/the-internals-of-git/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>The Internals of Git</h1><time class=post__time>Dec 27, 2014</time></header><main class=prose><p>I have been using Git for the past couple of years, and I remember how long it took me to get my head around the workflow.
+Throughout the past couple of months, thanks to a couple of <a href=http://ftp.newartisans.com/pub/git.from.bottom.up.pdf rel="external noopener" target=_blank>well</a> <a href=http://mrchlblng.me/2014/09/practical-git-introduction/ rel="external noopener" target=_blank>timed</a> <a href=http://episodes.gitminutes.com/ rel="external noopener" target=_blank>findings</a>, I have gained an interest in how Git works internally.
+In this post I hope to explain how Git uses well-designed, composed low-level commands to create the high-level actions we use on a day-to-day basis.</p><p>At its core, a Git repository is a key-value object store, where each SHA-1 key is generated based on multiple factors.
+This file-based store is used to represent a functional <a href=http://en.wikipedia.org/wiki/Directed_acyclic_graph rel="external noopener" target=_blank>Directed Acyclic Graph</a>, which, through the use of commit, tree and blob objects, represents the project&rsquo;s history.</p><h2 id=an-example>An Example</h2><p>To better understand how history is represented within Git, let&rsquo;s first commit a plain-text file entitled &lsquo;foo.txt&rsquo; with the contents &lsquo;Hello, world&rsquo;.
+The only catch is that instead of using high-level commands such as <a href=http://git-scm.com/docs/git-add rel="external noopener" target=_blank>git-add</a> and <a href=http://git-scm.com/docs/git-commit rel="external noopener" target=_blank>git-commit</a>, we will go through the process of manually indexing and committing the file.</p><p>The first step is to store a blob object containing the contents of the &lsquo;foo.txt&rsquo; file in the datastore, the hash of which is generated based on the contents and size of the file (or std-in) supplied.
+In the case of this example, we will use std-in, and not only query Git for the generated hash, but also persist the blob into the object graph.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ echo <span style=color:#e6db74>&#39;Hello, world&#39;</span> | git hash-object --stdin -w
+</span></span><span style=display:flex><span>a5c19667710254f835085b99726e523457150e03
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ tree .git/objects/
+</span></span><span style=display:flex><span>.git/objects/
+</span></span><span style=display:flex><span>| |____
+</span></span><span style=display:flex><span>| | |____a5
+</span></span><span style=display:flex><span>| | | |____c19667710254f835085b99726e523457150e03
+</span></span></code></pre></div><p>You will notice, if you are following along, that the resulting hash for this blob will be identical to the one above.
+That is one of Git&rsquo;s ingenious strengths, as identical files are only ever stored once, regardless of where they appear in the history graph.</p><p>The next step is to add the blob (via its hash key) to the index (staging area), specifying the file permissions and directory/name you wish to associate it with.
+We can then write this tree object out to the filestore, which returns its computed hash.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git update-index --add --cacheinfo <span style=color:#ae81ff>100644</span> a5c19667710254f835085b99726e523457150e03 foo.txt
+</span></span><span style=display:flex><span>$ git write-tree
+</span></span><span style=display:flex><span>0906930f06d75609ca186359a6cee2c9623bf99a
+</span></span><span style=display:flex><span>$ git cat-file -p 0906930f06d75609ca186359a6cee2c9623bf99a
+</span></span><span style=display:flex><span><span style=color:#ae81ff>100644</span> blob a5c19667710254f835085b99726e523457150e03    foo.txt
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ tree .git/objects/
+</span></span><span style=display:flex><span>.git/objects/
+</span></span><span style=display:flex><span>| |____
+</span></span><span style=display:flex><span>| | |____09
+</span></span><span style=display:flex><span>| | | |____06930f06d75609ca186359a6cee2c9623bf99a
+</span></span><span style=display:flex><span>| | |____a5
+</span></span><span style=display:flex><span>| | | |____c19667710254f835085b99726e523457150e03
+</span></span></code></pre></div><p>The pending index is stored in a file called &lsquo;index&rsquo; until it is then persisted into the store.
+Tree objects store a combination of blob objects with file attributes such as the &lsquo;foo.txt&rsquo; filename, along with other tree objects for subsequent directories.
+We are now ready to associate this generated tree with a commit object.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git commit-tree 0906930f06d75609ca186359a6cee2c9623bf99a -m <span style=color:#e6db74>&#34;First commit&#34;</span>
+</span></span><span style=display:flex><span>e5446fb51f77fd526f56b7f58ac328c5db954dc6
+</span></span><span style=display:flex><span>$ git cat-file -p e5446fb51f77fd526f56b7f58ac328c5db954dc6
+</span></span><span style=display:flex><span>tree 0906930f06d75609ca186359a6cee2c9623bf99a
+</span></span><span style=display:flex><span>author Edd Mann &lt;the@eddmann.com&gt; <span style=color:#ae81ff>1419674305</span> +0000
+</span></span><span style=display:flex><span>committer Edd Mann &lt;the@eddmann.com&gt; <span style=color:#ae81ff>1419674305</span> +0000
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>First commit
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ tree .git/objects/
+</span></span><span style=display:flex><span>.git/objects/
+</span></span><span style=display:flex><span>| |____
+</span></span><span style=display:flex><span>| | |____09
+</span></span><span style=display:flex><span>| | | |____06930f06d75609ca186359a6cee2c9623bf99a
+</span></span><span style=display:flex><span>| | |____a5
+</span></span><span style=display:flex><span>| | | |____c19667710254f835085b99726e523457150e03
+</span></span><span style=display:flex><span>| | |____e5
+</span></span><span style=display:flex><span>| | | |____446fb51f77fd526f56b7f58ac328c5db954dc6
+</span></span></code></pre></div><p>This commit hash will differ from the one you generate, as factors such as name/email and the current timestamp play a role in its generation.
+With this commit now persisted in the store, we can update the repository&rsquo;s &lsquo;HEAD&rsquo; reference to point to the generated commit hash.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git update-ref HEAD e5446fb51f77fd526f56b7f58ac328c5db954dc6
+</span></span><span style=display:flex><span>$ git checkout -f
+</span></span><span style=display:flex><span>$ cat foo.txt
+</span></span><span style=display:flex><span>Hello, world
+</span></span></code></pre></div><p>As you can see, it only takes three persisted object files to represent a one-file commit history.
+Finally, let&rsquo;s generate a new file &lsquo;baz.txt&rsquo; which is stored in a directory called &lsquo;bar&rsquo;.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ echo <span style=color:#e6db74>&#39;Bonjour&#39;</span> | git hash-object --stdin -w
+</span></span><span style=display:flex><span>632e4fe73c3da8c9018008dbda117fc6b00e3e83
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git update-index --add --cacheinfo <span style=color:#ae81ff>100644</span> 632e4fe73c3da8c9018008dbda117fc6b00e3e83 bar/baz.txt
+</span></span><span style=display:flex><span>$ git write-tree
+</span></span><span style=display:flex><span>84483aa54b5cd02e76298c097831c51914c53821
+</span></span><span style=display:flex><span>$ git cat-file -p 84483aa54b5cd02e76298c097831c51914c53821
+</span></span><span style=display:flex><span><span style=color:#ae81ff>040000</span> tree 8ee16db87ef1f040f79a0e4cb843668369e96f70    bar
+</span></span><span style=display:flex><span><span style=color:#ae81ff>100644</span> blob a5c19667710254f835085b99726e523457150e03    foo.txt
+</span></span></code></pre></div><p>In a similar manner to the first example, we persist both the file-contents blob and tree objects.
+The difference arises when we wish to generate the second commit; we must now supply the parent commit&rsquo;s hash (in our case, the first commit) which will be used to calculate the history of the graph when required.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git commit-tree 84483aa54b5cd02e76298c097831c51914c53821 -m <span style=color:#e6db74>&#34;Second commit&#34;</span> -p HEAD
+</span></span><span style=display:flex><span>18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
+</span></span><span style=display:flex><span>$ git cat-file -p 18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
+</span></span><span style=display:flex><span>tree 84483aa54b5cd02e76298c097831c51914c53821
+</span></span><span style=display:flex><span>parent e5446fb51f77fd526f56b7f58ac328c5db954dc6
+</span></span><span style=display:flex><span>author Edd Mann &lt;the@eddmann.com&gt; <span style=color:#ae81ff>1419674876</span> +0000
+</span></span><span style=display:flex><span>committer Edd Mann &lt;the@eddmann.com&gt; <span style=color:#ae81ff>1419674876</span> +0000
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>Second commit
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git update-ref HEAD 18f4f9e35fe5d521f12c5a5b7bc7b969b472d4dd
+</span></span><span style=display:flex><span>$ git checkout -f
+</span></span><span style=display:flex><span>$ cat bar/baz.txt
+</span></span><span style=display:flex><span>Bonjour
+</span></span></code></pre></div><p>I hope this quick introduction to the internals of Git has helped you realise how simple, yet powerful, the system has been modelled.</p></main><footer class=post__tags><a href=/archive/tag/git>git</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

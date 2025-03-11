@@ -1,196 +1,87 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 18 puzzle using TypeScript.">
-
-    <title>
-        
-            Advent of Code 2015 - Day 18 - Like a GIF For Your Yard &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Advent of Code 2015 - Day 18 - Like a GIF For Your Yard</h1>
-    <time datetime="2021-02-11T00:00:00+00:00" class="post-date">11 Feb 2021</time>
-    <p>On the eighteenth day of Advent of Code 2015, we are asked to re-arrange the light show we created on <a href="https://eddmann.com/posts/advent-of-code-2015-day-6-probably-a-fire-hazard/">a previous day</a>.</p>
-
-
-
-<h2 id="part-1">Part 1</h2>
-
-<p>We are supplied with an initial 100x100 grid of light states (on or off) and told that Santa has provided us with rules to follow to produce this new light show.
-These rules follow <a href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life">Conway’s Game of Life</a>, as follows:</p>
-
-<ul>
-  <li>A light that is on stays on when 2 or 3 neighbours are on and turns off otherwise.</li>
-  <li>A light that is off turns on if exactly 3 neighbours are on and stays off otherwise.</li>
-</ul>
-
-<p>We begin by parsing the provided initial light state grid into a form we can process.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Light</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">y</span><span class="p">:</span> <span class="kr">number</span><span class="p">];</span>
-<span class="kd">type</span> <span class="nx">OnLights</span> <span class="o">=</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Light</span><span class="o">&gt;</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">parseGrid</span> <span class="o">=</span> <span class="p">(</span>
-  <span class="nx">input</span><span class="p">:</span> <span class="kr">string</span>
-<span class="p">):</span> <span class="p">[</span><span class="nx">upperBounds</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">lights</span><span class="p">:</span> <span class="nx">OnLights</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">rows</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">);</span>
-  <span class="k">return</span> <span class="p">[</span>
-    <span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
-    <span class="nx">rows</span><span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">on</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="p">[...</span><span class="nx">line</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span>
-        <span class="p">(</span><span class="nx">on</span><span class="p">,</span> <span class="nx">light</span><span class="p">,</span> <span class="nx">y</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">light</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">#</span><span class="dl">'</span> <span class="p">?</span> <span class="nx">on</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">])</span> <span class="p">:</span> <span class="nx">on</span><span class="p">),</span>
-        <span class="nx">on</span>
-      <span class="p">);</span>
-    <span class="p">},</span> <span class="k">new</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Light</span><span class="o">&gt;</span><span class="p">()),</span>
-  <span class="p">];</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>We iterate through the initial grid, building up a <a href="https://eddmann.com/posts/implementing-a-compound-set-in-typescript/">CompoundSet</a> of all the lights that are currently on (identified by their x and y coordinates).
-To manage the bounds within future calculations, we return the upper-bounds value of the grid (in this case, 100) to the caller as well.</p>
-
-<p>From here, we create a function that, when supplied with the upper-bounds and the current light coordinates, returns all the possible neighbouring light positions.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Neighbours</span> <span class="o">=</span> <span class="p">(</span><span class="nx">l</span><span class="p">:</span> <span class="nx">Light</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Light</span><span class="p">[];</span>
-
-<span class="kd">const</span> <span class="nx">neighboursFor</span> <span class="o">=</span> <span class="p">(</span><span class="nx">upperBounds</span><span class="p">:</span> <span class="kr">number</span><span class="p">):</span> <span class="nx">Neighbours</span> <span class="o">=&gt;</span> <span class="p">([</span>
-  <span class="nx">x</span><span class="p">,</span>
-  <span class="nx">y</span><span class="p">,</span>
-<span class="p">]:</span> <span class="nx">Light</span><span class="p">):</span> <span class="nx">Light</span><span class="p">[]</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="na">neighbours</span><span class="p">:</span> <span class="nx">Light</span><span class="p">[]</span> <span class="o">=</span> <span class="p">[];</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">dx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="nx">dx</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">dx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">dy</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="nx">dy</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">dy</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">const</span> <span class="p">[</span><span class="nx">nx</span><span class="p">,</span> <span class="nx">ny</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">dx</span><span class="p">,</span> <span class="nx">y</span> <span class="o">+</span> <span class="nx">dy</span><span class="p">];</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">dx</span> <span class="o">===</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">dy</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">nx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">ny</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">nx</span> <span class="o">&gt;=</span> <span class="nx">upperBounds</span> <span class="o">||</span> <span class="nx">ny</span> <span class="o">&gt;=</span> <span class="nx">upperBounds</span><span class="p">)</span> <span class="k">continue</span><span class="p">;</span>
-      <span class="nx">neighbours</span><span class="p">.</span><span class="nx">push</span><span class="p">([</span><span class="nx">nx</span><span class="p">,</span> <span class="nx">ny</span><span class="p">]);</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="nx">neighbours</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>There is a little guard logic above to ensure that any adjacent subject light is within the bounds of the grid.
-By partially applying this function with the desired upper-bounds, we can begin codifying the animation state transitions.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">animate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">neighboursFor</span><span class="p">:</span> <span class="nx">Neighbours</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
-  <span class="nx">lights</span><span class="p">:</span> <span class="nx">OnLights</span>
-<span class="p">):</span> <span class="nx">OnLights</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">onWithNeighbours</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Light</span><span class="o">&gt;</span><span class="p">(</span>
-    <span class="p">[...</span><span class="nx">lights</span><span class="p">].</span><span class="nx">reduce</span><span class="p">(</span>
-      <span class="p">(</span><span class="nx">lights</span><span class="p">,</span> <span class="nx">light</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">[...</span><span class="nx">lights</span><span class="p">,</span> <span class="nx">light</span><span class="p">,</span> <span class="p">...</span><span class="nx">neighboursFor</span><span class="p">(</span><span class="nx">light</span><span class="p">)],</span>
-      <span class="p">[]</span>
-    <span class="p">)</span>
-  <span class="p">);</span>
-
-  <span class="k">return</span> <span class="k">new</span> <span class="nx">CompoundSet</span><span class="o">&lt;</span><span class="nx">Light</span><span class="o">&gt;</span><span class="p">(</span>
-    <span class="p">[...</span><span class="nx">onWithNeighbours</span><span class="p">].</span><span class="nx">filter</span><span class="p">(</span><span class="nx">light</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="kd">const</span> <span class="nx">active</span> <span class="o">=</span> <span class="nx">neighboursFor</span><span class="p">(</span><span class="nx">light</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">l</span> <span class="o">=&gt;</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">l</span><span class="p">))</span>
-        <span class="p">.</span><span class="nx">length</span><span class="p">;</span>
-      <span class="k">return</span> <span class="nx">active</span> <span class="o">===</span> <span class="mi">3</span> <span class="o">||</span> <span class="p">(</span><span class="nx">active</span> <span class="o">===</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">light</span><span class="p">));</span>
-    <span class="p">})</span>
-  <span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Based on the provided set of lights that are currently <em>on</em>, we determine the listing of all these lights, including any valid neighbouring light positions.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Advent of Code 2015 - Day 18 - Like a GIF For Your Yard - Edd Mann</title>
+<meta name=description content="Solving the Advent of Code 2015 Day 18 puzzle using TypeScript."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Advent of Code 2015 - Day 18 - Like a GIF For Your Yard"><meta itemprop=description content="On the eighteenth day of Advent of Code 2015, we are asked to re-arrange the light show we created on a previous day."><meta itemprop=datePublished content="2021-02-11T00:00:00+00:00"><meta itemprop=dateModified content="2021-02-11T00:00:00+00:00"><meta itemprop=wordCount content="738"><meta itemprop=keywords content="Advent-of-Code,Advent-of-Code-2015,Typescript"><meta property="og:url" content="https://eddmann.com/posts/advent-of-code-2015-day-18-like-a-gif-for-your-yard/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Advent of Code 2015 - Day 18 - Like a GIF For Your Yard"><meta property="og:description" content="On the eighteenth day of Advent of Code 2015, we are asked to re-arrange the light show we created on a previous day."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-02-11T00:00:00+00:00"><meta property="article:modified_time" content="2021-02-11T00:00:00+00:00"><meta property="article:tag" content="Advent-of-Code"><meta property="article:tag" content="Advent-of-Code-2015"><meta property="article:tag" content="Typescript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Advent of Code 2015 - Day 18 - Like a GIF For Your Yard"><meta name=twitter:description content="On the eighteenth day of Advent of Code 2015, we are asked to re-arrange the light show we created on a previous day."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/advent-of-code-2015-day-18-like-a-gif-for-your-yard/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Advent of Code 2015 - Day 18 - Like a GIF For Your Yard</h1><time class=post__time>Feb 11, 2021</time></header><main class=prose><p>On the eighteenth day of Advent of Code 2015, we are asked to re-arrange the light show we created on <a href=/posts/advent-of-code-2015-day-6-probably-a-fire-hazard/>a previous day</a>.</p><h2 id=part-1>Part 1</h2><p>We are supplied with an initial 100x100 grid of light states (on or off) and told that Santa has provided us with rules to follow to produce this new light show.
+These rules follow <a href=https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life rel="external noopener" target=_blank>Conway&rsquo;s Game of Life</a>, as follows:</p><ul><li>A light that is on stays on when 2 or 3 neighbours are on and turns off otherwise.</li><li>A light that is off turns on if exactly 3 neighbours are on and stays off otherwise.</li></ul><p>We begin by parsing the provided initial light state grid into a form we can process.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Light</span> <span style=color:#f92672>=</span> [<span style=color:#a6e22e>x</span>: <span style=color:#66d9ef>number</span>, <span style=color:#a6e22e>y</span>: <span style=color:#66d9ef>number</span>];
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>OnLights</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>CompoundSet</span>&lt;<span style=color:#f92672>Light</span>&gt;;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>parseGrid</span> <span style=color:#f92672>=</span> (
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>
+</span></span><span style=display:flex><span>)<span style=color:#f92672>:</span> [<span style=color:#a6e22e>upperBounds</span>: <span style=color:#66d9ef>number</span>, <span style=color:#a6e22e>lights</span>: <span style=color:#66d9ef>OnLights</span>] <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>rows</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>input</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;\n&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>rows</span>.<span style=color:#a6e22e>length</span>,
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>rows</span>.<span style=color:#a6e22e>reduce</span>((<span style=color:#a6e22e>on</span>, <span style=color:#a6e22e>line</span>, <span style=color:#a6e22e>x</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> [...<span style=color:#a6e22e>line</span>].<span style=color:#a6e22e>reduce</span>(
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>on</span>, <span style=color:#a6e22e>light</span>, <span style=color:#a6e22e>y</span>) <span style=color:#f92672>=&gt;</span> (<span style=color:#a6e22e>light</span> <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;#&#39;</span> <span style=color:#f92672>?</span> <span style=color:#a6e22e>on</span>.<span style=color:#a6e22e>add</span>([<span style=color:#a6e22e>x</span>, <span style=color:#a6e22e>y</span>]) <span style=color:#f92672>:</span> <span style=color:#a6e22e>on</span>),
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>on</span>
+</span></span><span style=display:flex><span>      );
+</span></span><span style=display:flex><span>    }, <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>CompoundSet</span>&lt;<span style=color:#f92672>Light</span>&gt;()),
+</span></span><span style=display:flex><span>  ];
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>We iterate through the initial grid, building up a <a href=/posts/implementing-a-compound-set-in-typescript/>CompoundSet</a> of all the lights that are currently on (identified by their x and y coordinates).
+To manage the bounds within future calculations, we return the upper-bounds value of the grid (in this case, 100) to the caller as well.</p><p>From here, we create a function that, when supplied with the upper-bounds and the current light coordinates, returns all the possible neighbouring light positions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Neighbours</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>l</span>: <span style=color:#66d9ef>Light</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Light</span>[];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>neighboursFor</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>upperBounds</span>: <span style=color:#66d9ef>number</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Neighbours</span> <span style=color:#f92672>=&gt;</span> ([
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>x</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>y</span>,
+</span></span><span style=display:flex><span>]<span style=color:#f92672>:</span> <span style=color:#a6e22e>Light</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Light</span>[] <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>neighbours</span>: <span style=color:#66d9ef>Light</span>[] <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>dx</span> <span style=color:#f92672>=</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>; <span style=color:#a6e22e>dx</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>1</span>; <span style=color:#a6e22e>dx</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>dy</span> <span style=color:#f92672>=</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>; <span style=color:#a6e22e>dy</span> <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>1</span>; <span style=color:#a6e22e>dy</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>nx</span>, <span style=color:#a6e22e>ny</span>] <span style=color:#f92672>=</span> [<span style=color:#a6e22e>x</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>dx</span>, <span style=color:#a6e22e>y</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>dy</span>];
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>dx</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>dy</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>0</span>) <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>nx</span> <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>ny</span> <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0</span>) <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>nx</span> <span style=color:#f92672>&gt;=</span> <span style=color:#a6e22e>upperBounds</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>ny</span> <span style=color:#f92672>&gt;=</span> <span style=color:#a6e22e>upperBounds</span>) <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>neighbours</span>.<span style=color:#a6e22e>push</span>([<span style=color:#a6e22e>nx</span>, <span style=color:#a6e22e>ny</span>]);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>neighbours</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>There is a little guard logic above to ensure that any adjacent subject light is within the bounds of the grid.
+By partially applying this function with the desired upper-bounds, we can begin codifying the animation state transitions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>animate</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>neighboursFor</span>: <span style=color:#66d9ef>Neighbours</span>) <span style=color:#f92672>=&gt;</span> (
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lights</span>: <span style=color:#66d9ef>OnLights</span>
+</span></span><span style=display:flex><span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>OnLights</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>onWithNeighbours</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>CompoundSet</span>&lt;<span style=color:#f92672>Light</span>&gt;(
+</span></span><span style=display:flex><span>    [...<span style=color:#a6e22e>lights</span>].<span style=color:#a6e22e>reduce</span>(
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>lights</span>, <span style=color:#a6e22e>light</span>) <span style=color:#f92672>=&gt;</span> [...<span style=color:#a6e22e>lights</span>, <span style=color:#a6e22e>light</span>, ...<span style=color:#a6e22e>neighboursFor</span>(<span style=color:#a6e22e>light</span>)],
+</span></span><span style=display:flex><span>      []
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>CompoundSet</span>&lt;<span style=color:#f92672>Light</span>&gt;(
+</span></span><span style=display:flex><span>    [...<span style=color:#a6e22e>onWithNeighbours</span>].<span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>light</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>active</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>neighboursFor</span>(<span style=color:#a6e22e>light</span>).<span style=color:#a6e22e>filter</span>(<span style=color:#a6e22e>l</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>has</span>(<span style=color:#a6e22e>l</span>))
+</span></span><span style=display:flex><span>        .<span style=color:#a6e22e>length</span>;
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>active</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>3</span> <span style=color:#f92672>||</span> (<span style=color:#a6e22e>active</span> <span style=color:#f92672>===</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>has</span>(<span style=color:#a6e22e>light</span>));
+</span></span><span style=display:flex><span>    })
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Based on the provided set of lights that are currently <em>on</em>, we determine the listing of all these lights, including any valid neighbouring light positions.
 Combined, these are all the possible lights that could be returned from this state transition as on.
-From here, we filter down to only include lights that meet the rules explained above.</p>
-
-<p>Combining all this functionality together (and with the help of the <code class="language-plaintext highlighter-rouge">repeat</code> function we created on a previous day), we can iterate over this animation for 100 transitions and return the desired count of the lights that are on 🌟.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">upperBounds</span><span class="p">,</span> <span class="nx">lights</span><span class="p">]</span> <span class="o">=</span> <span class="nx">parseGrid</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">repeat</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">neighboursFor</span><span class="p">(</span><span class="nx">upperBounds</span><span class="p">)),</span> <span class="nx">lights</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">size</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<h2 id="part-2">Part 2</h2>
-
-<p>For part two, we are told that it appears the lights we bought have <em>stuck corners</em>, whereby these lights are always left on.
-We are told to apply this new characteristic and repeat the 100 iterations from the initial grid state again.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">cornersStuckOn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">upperBounds</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span>
-  <span class="nx">lights</span><span class="p">:</span> <span class="nx">OnLights</span>
-<span class="p">):</span> <span class="nx">OnLights</span> <span class="o">=&gt;</span>
-  <span class="nx">lights</span>
-    <span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">upperBounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">upperBounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="nx">upperBounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">upperBounds</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]);</span>
-</code></pre></div></div>
-
-<p>In a similar fashion to how we partially applied the <code class="language-plaintext highlighter-rouge">neighboursFor</code> function above, we do the same to ensure that the supplied lights that are on maintain the <em>stuck corners</em>.
-With this new functionality, we can compose all the building blocks together, returning the desired new count of lights that are on 🌟.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">upperBounds</span><span class="p">,</span> <span class="nx">lights</span><span class="p">]</span> <span class="o">=</span> <span class="nx">parseGrid</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">stuck</span> <span class="o">=</span> <span class="nx">cornersStuckOn</span><span class="p">(</span><span class="nx">upperBounds</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">animate</span><span class="p">(</span><span class="nx">neighboursFor</span><span class="p">(</span><span class="nx">upperBounds</span><span class="p">));</span>
-  <span class="k">return</span> <span class="nx">repeat</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="p">(</span><span class="na">l</span><span class="p">:</span> <span class="nx">OnLights</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">stuck</span><span class="p">(</span><span class="nx">action</span><span class="p">(</span><span class="nx">l</span><span class="p">)),</span> <span class="nx">stuck</span><span class="p">(</span><span class="nx">lights</span><span class="p">))</span>
-    <span class="p">.</span><span class="nx">size</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Upon reflection, I found this solution to be rather slow.
+From here, we filter down to only include lights that meet the rules explained above.</p><p>Combining all this functionality together (and with the help of the <code>repeat</code> function we created on a previous day), we can iterate over this animation for 100 transitions and return the desired count of the lights that are on 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part1</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>upperBounds</span>, <span style=color:#a6e22e>lights</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>parseGrid</span>(<span style=color:#a6e22e>input</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>repeat</span>(<span style=color:#ae81ff>100</span>, <span style=color:#a6e22e>animate</span>(<span style=color:#a6e22e>neighboursFor</span>(<span style=color:#a6e22e>upperBounds</span>)), <span style=color:#a6e22e>lights</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>size</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><h2 id=part-2>Part 2</h2><p>For part two, we are told that it appears the lights we bought have <em>stuck corners</em>, whereby these lights are always left on.
+We are told to apply this new characteristic and repeat the 100 iterations from the initial grid state again.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>cornersStuckOn</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>upperBounds</span>: <span style=color:#66d9ef>number</span>) <span style=color:#f92672>=&gt;</span> (
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lights</span>: <span style=color:#66d9ef>OnLights</span>
+</span></span><span style=display:flex><span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>OnLights</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lights</span>
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>add</span>([<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>])
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>add</span>([<span style=color:#ae81ff>0</span>, <span style=color:#a6e22e>upperBounds</span> <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>])
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>add</span>([<span style=color:#a6e22e>upperBounds</span> <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>0</span>])
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>add</span>([<span style=color:#a6e22e>upperBounds</span> <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>, <span style=color:#a6e22e>upperBounds</span> <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>]);
+</span></span></code></pre></div><p>In a similar fashion to how we partially applied the <code>neighboursFor</code> function above, we do the same to ensure that the supplied lights that are on maintain the <em>stuck corners</em>.
+With this new functionality, we can compose all the building blocks together, returning the desired new count of lights that are on 🌟.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part2</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>upperBounds</span>, <span style=color:#a6e22e>lights</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>parseGrid</span>(<span style=color:#a6e22e>input</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>stuck</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>cornersStuckOn</span>(<span style=color:#a6e22e>upperBounds</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>action</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>animate</span>(<span style=color:#a6e22e>neighboursFor</span>(<span style=color:#a6e22e>upperBounds</span>));
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>repeat</span>(<span style=color:#ae81ff>100</span>, (<span style=color:#a6e22e>l</span>: <span style=color:#66d9ef>OnLights</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>stuck</span>(<span style=color:#a6e22e>action</span>(<span style=color:#a6e22e>l</span>)), <span style=color:#a6e22e>stuck</span>(<span style=color:#a6e22e>lights</span>))
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>size</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Upon reflection, I found this solution to be rather slow.
 I opted for readability and clear problem-solving over an optimised answer response.
-In the future, I hope to explore this problem further and improve its performance characteristics.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+In the future, I hope to explore this problem further and improve its performance characteristics.</p></main><footer class=post__tags><a href=/archive/tag/advent-of-code>advent-of-code</a><a href=/archive/tag/advent-of-code-2015>advent-of-code-2015</a><a href=/archive/tag/typescript>typescript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

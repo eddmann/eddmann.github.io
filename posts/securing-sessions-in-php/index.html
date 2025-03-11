@@ -1,310 +1,192 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive guide to creating a secure PHP session handler class using best practices for session management and encryption.">
-
-    <title>
-        
-            Securing Sessions in PHP &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Securing Sessions in PHP</h1>
-    <time datetime="2014-04-09T00:00:00+00:00" class="post-date">09 Apr 2014</time>
-    <p>Following on from my previous post on <a href="/posts/self-signed-ssl-certificates-with-nginx-and-apache/">Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Broken Authentication and Session Management</a>).
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Securing Sessions in PHP - Edd Mann</title>
+<meta name=description content="A comprehensive guide to creating a secure PHP session handler class using best practices for session management and encryption."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Securing Sessions in PHP"><meta itemprop=description content="Following on from my previous post on Self-signed SSL certificates, I would now like to address the second most common Web application vulnerability (Broken Authentication and Session Management). When delving into the subject I was unable to find a definitive resource for a PHP implementation. Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors. Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default SessionHandler class."><meta itemprop=datePublished content="2014-04-09T00:00:00+00:00"><meta itemprop=dateModified content="2014-04-09T00:00:00+00:00"><meta itemprop=wordCount content="1093"><meta itemprop=keywords content="Php,Security"><meta property="og:url" content="https://eddmann.com/posts/securing-sessions-in-php/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Securing Sessions in PHP"><meta property="og:description" content="Following on from my previous post on Self-signed SSL certificates, I would now like to address the second most common Web application vulnerability (Broken Authentication and Session Management). When delving into the subject I was unable to find a definitive resource for a PHP implementation. Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors. Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default SessionHandler class."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-04-09T00:00:00+00:00"><meta property="article:modified_time" content="2014-04-09T00:00:00+00:00"><meta property="article:tag" content="Php"><meta property="article:tag" content="Security"><meta name=twitter:card content="summary"><meta name=twitter:title content="Securing Sessions in PHP"><meta name=twitter:description content="Following on from my previous post on Self-signed SSL certificates, I would now like to address the second most common Web application vulnerability (Broken Authentication and Session Management). When delving into the subject I was unable to find a definitive resource for a PHP implementation. Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors. Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default SessionHandler class."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/securing-sessions-in-php/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Securing Sessions in PHP</h1><time class=post__time>Apr 9, 2014</time></header><main class=prose><p>Following on from my previous post on <a href=/posts/self-signed-ssl-certificates-with-nginx-and-apache/>Self-signed SSL certificates</a>, I would now like to address the second most common Web application vulnerability (<a href=https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management rel="external noopener" target=_blank>Broken Authentication and Session Management</a>).
 When delving into the subject I was unable to find a definitive resource for a PHP implementation.
 Due to this, I set out to combine all the best practice I could find into a single session handler, to help protect against the common attack vectors.
-Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default <code class="language-plaintext highlighter-rouge">SessionHandler</code> class.</p>
-
-
-
-<p>In my initial research I found multiple commonly mis-configured options that should be addressed, and these are presented below in the <code class="language-plaintext highlighter-rouge">setup</code> method.
+Since PHP 5.4, you are able to set the session handler based on a class instance that extends the default <code>SessionHandler</code> class.</p><p>In my initial research I found multiple commonly mis-configured options that should be addressed, and these are presented below in the <code>setup</code> method.
 Here we specify that sessions should only be passed via cookies, removing the possibility of the session identifier being sent as a <em>GET</em> parameter.
 We then alter the session name (from the default) to a specified application-specific name, which is good practice.
 Finally, we set the cookie parameters of the session identifier.
 These parameters can be overridden when initialising the session handler.
 However, recommended defaults are to only allow it to be sent over HTTPS (if present) and to restrict HTTP access (no client-side script access).
-It is recommended that you override the path and domain based on the application instance (abiding by the principle of least privilege).</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">SecureSessionHandler</span> <span class="kd">extends</span> <span class="nc">SessionHandler</span> <span class="p">{</span>
-
-    <span class="k">protected</span> <span class="nv">$key</span><span class="p">,</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$cookie</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">__construct</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">'MY_SESSION'</span><span class="p">,</span> <span class="nv">$cookie</span> <span class="o">=</span> <span class="p">[])</span>
-    <span class="p">{</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span> <span class="o">=</span> <span class="nv">$key</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span> <span class="o">=</span> <span class="nv">$cookie</span><span class="p">;</span>
-
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span> <span class="o">+=</span> <span class="p">[</span>
-            <span class="s1">'lifetime'</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s1">'path'</span>     <span class="o">=&gt;</span> <span class="nb">ini_get</span><span class="p">(</span><span class="s1">'session.cookie_path'</span><span class="p">),</span>
-            <span class="s1">'domain'</span>   <span class="o">=&gt;</span> <span class="nb">ini_get</span><span class="p">(</span><span class="s1">'session.cookie_domain'</span><span class="p">),</span>
-            <span class="s1">'secure'</span>   <span class="o">=&gt;</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTPS'</span><span class="p">]),</span>
-            <span class="s1">'httponly'</span> <span class="o">=&gt;</span> <span class="kc">true</span>
-        <span class="p">];</span>
-
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">setup</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">protected</span> <span class="k">function</span> <span class="n">setup</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="nb">ini_set</span><span class="p">(</span><span class="s1">'session.use_cookies'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="nb">ini_set</span><span class="p">(</span><span class="s1">'session.use_only_cookies'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-
-        <span class="nb">session_name</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">);</span>
-
-        <span class="nb">session_set_cookie_params</span><span class="p">(</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'lifetime'</span><span class="p">],</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'path'</span><span class="p">],</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'domain'</span><span class="p">],</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'secure'</span><span class="p">],</span>
-            <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'httponly'</span><span class="p">]</span>
-        <span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="c1">// ...</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="session-management">Session Management</h2>
-
-<p>With the environment successfully configured we are now able to safely start, destroy and regenerate the current session using the provided methods below.
-The <code class="language-plaintext highlighter-rouge">start</code> method in principle wraps the <code class="language-plaintext highlighter-rouge">session_start</code> function; however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
-The <code class="language-plaintext highlighter-rouge">forget</code> method removes the contents of the <code class="language-plaintext highlighter-rouge">$_SESSION</code> array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
-Finally, the <code class="language-plaintext highlighter-rouge">refresh</code> method replaces the current session identifier with a new one.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">function</span> <span class="n">start</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">session_id</span><span class="p">()</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">session_start</span><span class="p">())</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="p">(</span><span class="nb">mt_rand</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">refresh</span><span class="p">()</span> <span class="o">:</span> <span class="kc">true</span><span class="p">;</span> <span class="c1">// 1/5</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">forget</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">session_id</span><span class="p">()</span> <span class="o">===</span> <span class="s1">''</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nv">$_SESSION</span> <span class="o">=</span> <span class="p">[];</span>
-
-    <span class="nb">setcookie</span><span class="p">(</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="mi">42000</span><span class="p">,</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'path'</span><span class="p">],</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'domain'</span><span class="p">],</span>
-        <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'secure'</span><span class="p">],</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">cookie</span><span class="p">[</span><span class="s1">'httponly'</span><span class="p">]</span>
-    <span class="p">);</span>
-
-    <span class="k">return</span> <span class="nb">session_destroy</span><span class="p">();</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">refresh</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="nb">session_regenerate_id</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="session-content-encryption">Session Content Encryption</h2>
-
-<p>There are many different ways to persist the contents of a user’s session, dependent on your business requirements.
+It is recommended that you override the path and domain based on the application instance (abiding by the principle of least privilege).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>SecureSessionHandler</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>SessionHandler</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> $key, $name, $cookie;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> __construct($key, $name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;MY_SESSION&#39;</span>, $cookie <span style=color:#f92672>=</span> [])
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span> <span style=color:#f92672>=</span> $key;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> $name;
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span> <span style=color:#f92672>=</span> $cookie;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span> <span style=color:#f92672>+=</span> [
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;lifetime&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#ae81ff>0</span>,
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;path&#39;</span>     <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>ini_get</span>(<span style=color:#e6db74>&#39;session.cookie_path&#39;</span>),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;domain&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>ini_get</span>(<span style=color:#e6db74>&#39;session.cookie_domain&#39;</span>),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;secure&#39;</span>   <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>isset</span>($_SERVER[<span style=color:#e6db74>&#39;HTTPS&#39;</span>]),
+</span></span><span style=display:flex><span>            <span style=color:#e6db74>&#39;httponly&#39;</span> <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>        ];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>setup</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>setup</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ini_set</span>(<span style=color:#e6db74>&#39;session.use_cookies&#39;</span>, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ini_set</span>(<span style=color:#e6db74>&#39;session.use_only_cookies&#39;</span>, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>session_name</span>($this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>session_set_cookie_params</span>(
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;lifetime&#39;</span>], $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;path&#39;</span>],
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;domain&#39;</span>], $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;secure&#39;</span>],
+</span></span><span style=display:flex><span>            $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;httponly&#39;</span>]
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// ...
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=session-management>Session Management</h2><p>With the environment successfully configured we are now able to safely start, destroy and regenerate the current session using the provided methods below.
+The <code>start</code> method in principle wraps the <code>session_start</code> function; however, as a precaution there is a one-in-five chance that the session identifier is regenerated (to address session fixation).
+The <code>forget</code> method removes the contents of the <code>$_SESSION</code> array (for access during the remainder of the current request), expires the session cookie and then destroys the session itself.
+Finally, the <code>refresh</code> method replaces the current session identifier with a new one.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>start</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>session_id</span>() <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;&#39;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>session_start</span>()) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> (<span style=color:#a6e22e>mt_rand</span>(<span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>4</span>) <span style=color:#f92672>===</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>?</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>refresh</span>() <span style=color:#f92672>:</span> <span style=color:#66d9ef>true</span>; <span style=color:#75715e>// 1/5
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>forget</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>session_id</span>() <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;&#39;</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $_SESSION <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setcookie</span>(
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>name</span>, <span style=color:#e6db74>&#39;&#39;</span>, <span style=color:#a6e22e>time</span>() <span style=color:#f92672>-</span> <span style=color:#ae81ff>42000</span>,
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;path&#39;</span>], $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;domain&#39;</span>],
+</span></span><span style=display:flex><span>        $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;secure&#39;</span>], $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>cookie</span>[<span style=color:#e6db74>&#39;httponly&#39;</span>]
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>session_destroy</span>();
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>refresh</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>session_regenerate_id</span>(<span style=color:#66d9ef>true</span>);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=session-content-encryption>Session Content Encryption</h2><p>There are many different ways to persist the contents of a user&rsquo;s session, dependent on your business requirements.
 Extending the default SessionHandler allows us to rewrite how sessions are read and written.
 In this case I have decided to encrypt/decrypt (using mcrypt) the serialised contents using a specified key, before calling the original read/write methods.
 Typically the session contents are written to plain-text files, and if not correctly configured (file permissions, directory location) they are stored in the global PHP session directory.
-This may not be an issue if you have sole access to the server (or are using a security patch such as <a href="http://www.hardened-php.net/suhosin/">Suhosin</a>), but in a shared-hosting environment it could result in a major security breach.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">function</span> <span class="n">read</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="nb">mcrypt_decrypt</span><span class="p">(</span><span class="no">MCRYPT_3DES</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">,</span> <span class="k">parent</span><span class="o">::</span><span class="nf">read</span><span class="p">(</span><span class="nv">$id</span><span class="p">),</span> <span class="no">MCRYPT_MODE_ECB</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">write</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nv">$data</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="nf">write</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nb">mcrypt_encrypt</span><span class="p">(</span><span class="no">MCRYPT_3DES</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="n">key</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="no">MCRYPT_MODE_ECB</span><span class="p">));</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="session-expiration-and-validation">Session Expiration and Validation</h2>
-
-<p>With the session contents now encrypted we can move on to ensure that the current session times out (expires) after a defined idle period, and that the user is as expected (to counter session hijacking).
+This may not be an issue if you have sole access to the server (or are using a security patch such as <a href=http://www.hardened-php.net/suhosin/ rel="external noopener" target=_blank>Suhosin</a>), but in a shared-hosting environment it could result in a major security breach.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>read</span>($id)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>mcrypt_decrypt</span>(<span style=color:#a6e22e>MCRYPT_3DES</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span>, <span style=color:#66d9ef>parent</span><span style=color:#f92672>::</span><span style=color:#a6e22e>read</span>($id), <span style=color:#a6e22e>MCRYPT_MODE_ECB</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>write</span>($id, $data)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>parent</span><span style=color:#f92672>::</span><span style=color:#a6e22e>write</span>($id, <span style=color:#a6e22e>mcrypt_encrypt</span>(<span style=color:#a6e22e>MCRYPT_3DES</span>, $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>key</span>, $data, <span style=color:#a6e22e>MCRYPT_MODE_ECB</span>));
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=session-expiration-and-validation>Session Expiration and Validation</h2><p>With the session contents now encrypted we can move on to ensure that the current session times out (expires) after a defined idle period, and that the user is as expected (to counter session hijacking).
 Sessions are garbage collected based on a configured time; however, it is good practice to check and expire idle sessions in the application-land per request.
-The example below stores the time of the last activity in the user’s session, checking against the current time to validate if it has exceeded the specified duration (in minutes).
-Fingerprinting the current session with the user’s user-agent and IP address allows us to provide another layer of security against session hijacking.
-To address network proxy issues (which could cause false positives), only the first two IP blocks are used in the calculation of the fingerprint hash.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">function</span> <span class="n">isExpired</span><span class="p">(</span><span class="nv">$ttl</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$activity</span> <span class="o">=</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_last_activity'</span><span class="p">])</span>
-        <span class="o">?</span> <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_last_activity'</span><span class="p">]</span>
-        <span class="o">:</span> <span class="kc">false</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$activity</span> <span class="o">!==</span> <span class="kc">false</span> <span class="o">&amp;&amp;</span> <span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="nv">$activity</span> <span class="o">&gt;</span> <span class="nv">$ttl</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_last_activity'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>
-
-    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">isFingerprint</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="nv">$hash</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span>
-        <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'HTTP_USER_AGENT'</span><span class="p">]</span> <span class="mf">.</span>
-        <span class="p">(</span><span class="nb">ip2long</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REMOTE_ADDR'</span><span class="p">])</span> <span class="o">&amp;</span> <span class="nb">ip2long</span><span class="p">(</span><span class="s1">'255.255.0.0'</span><span class="p">))</span>
-    <span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_fingerprint'</span><span class="p">]))</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_fingerprint'</span><span class="p">]</span> <span class="o">===</span> <span class="nv">$hash</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'_fingerprint'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$hash</span><span class="p">;</span>
-
-    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">isValid</span><span class="p">(</span><span class="nv">$ttl</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="o">!</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isExpired</span><span class="p">(</span><span class="nv">$ttl</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">isFingerprint</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="session-access">Session Access</h2>
-
-<p>This section is not exactly security related, but as we are creating a session wrapper it is worthwhile to provide the ability to add and retrieve session values based on dot notation.
-Doing so increases the readability when accessing large array-based data structures.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">function</span> <span class="n">get</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$parsed</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="nv">$name</span><span class="p">);</span>
-
-    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$_SESSION</span><span class="p">;</span>
-
-    <span class="k">while</span> <span class="p">(</span><span class="nv">$parsed</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$next</span> <span class="o">=</span> <span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="k">isset</span><span class="p">(</span><span class="nv">$result</span><span class="p">[</span><span class="nv">$next</span><span class="p">]))</span> <span class="p">{</span>
-            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$result</span><span class="p">[</span><span class="nv">$next</span><span class="p">];</span>
-        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">function</span> <span class="n">put</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$parsed</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'.'</span><span class="p">,</span> <span class="nv">$name</span><span class="p">);</span>
-
-    <span class="nv">$session</span> <span class="o">=&amp;</span> <span class="nv">$_SESSION</span><span class="p">;</span>
-
-    <span class="k">while</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$next</span> <span class="o">=</span> <span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="k">isset</span><span class="p">(</span><span class="nv">$session</span><span class="p">[</span><span class="nv">$next</span><span class="p">])</span> <span class="o">||</span> <span class="o">!</span> <span class="nb">is_array</span><span class="p">(</span><span class="nv">$session</span><span class="p">[</span><span class="nv">$next</span><span class="p">]))</span> <span class="p">{</span>
-            <span class="nv">$session</span><span class="p">[</span><span class="nv">$next</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
-        <span class="p">}</span>
-
-        <span class="nv">$session</span> <span class="o">=&amp;</span> <span class="nv">$session</span><span class="p">[</span><span class="nv">$next</span><span class="p">];</span>
-    <span class="p">}</span>
-
-    <span class="nv">$session</span><span class="p">[</span><span class="nb">array_shift</span><span class="p">(</span><span class="nv">$parsed</span><span class="p">)]</span> <span class="o">=</span> <span class="nv">$value</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="example-usage">Example Usage</h2>
-
-<p>With the implementation now in place we can see the example in practice.
+The example below stores the time of the last activity in the user&rsquo;s session, checking against the current time to validate if it has exceeded the specified duration (in minutes).
+Fingerprinting the current session with the user&rsquo;s user-agent and IP address allows us to provide another layer of security against session hijacking.
+To address network proxy issues (which could cause false positives), only the first two IP blocks are used in the calculation of the fingerprint hash.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isExpired</span>($ttl <span style=color:#f92672>=</span> <span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $activity <span style=color:#f92672>=</span> <span style=color:#a6e22e>isset</span>($_SESSION[<span style=color:#e6db74>&#39;_last_activity&#39;</span>])
+</span></span><span style=display:flex><span>        <span style=color:#f92672>?</span> $_SESSION[<span style=color:#e6db74>&#39;_last_activity&#39;</span>]
+</span></span><span style=display:flex><span>        <span style=color:#f92672>:</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ($activity <span style=color:#f92672>!==</span> <span style=color:#66d9ef>false</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>time</span>() <span style=color:#f92672>-</span> $activity <span style=color:#f92672>&gt;</span> $ttl <span style=color:#f92672>*</span> <span style=color:#ae81ff>60</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $_SESSION[<span style=color:#e6db74>&#39;_last_activity&#39;</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>time</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isFingerprint</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $hash <span style=color:#f92672>=</span> <span style=color:#a6e22e>md5</span>(
+</span></span><span style=display:flex><span>        $_SERVER[<span style=color:#e6db74>&#39;HTTP_USER_AGENT&#39;</span>] <span style=color:#f92672>.</span>
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>ip2long</span>($_SERVER[<span style=color:#e6db74>&#39;REMOTE_ADDR&#39;</span>]) <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>ip2long</span>(<span style=color:#e6db74>&#39;255.255.0.0&#39;</span>))
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isset</span>($_SESSION[<span style=color:#e6db74>&#39;_fingerprint&#39;</span>])) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $_SESSION[<span style=color:#e6db74>&#39;_fingerprint&#39;</span>] <span style=color:#f92672>===</span> $hash;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $_SESSION[<span style=color:#e6db74>&#39;_fingerprint&#39;</span>] <span style=color:#f92672>=</span> $hash;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>isValid</span>($ttl <span style=color:#f92672>=</span> <span style=color:#ae81ff>30</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#f92672>!</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isExpired</span>($ttl) <span style=color:#f92672>&amp;&amp;</span> $this<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isFingerprint</span>();
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=session-access>Session Access</h2><p>This section is not exactly security related, but as we are creating a session wrapper it is worthwhile to provide the ability to add and retrieve session values based on dot notation.
+Doing so increases the readability when accessing large array-based data structures.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>get</span>($name)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $parsed <span style=color:#f92672>=</span> <span style=color:#a6e22e>explode</span>(<span style=color:#e6db74>&#39;.&#39;</span>, $name);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $result <span style=color:#f92672>=</span> $_SESSION;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> ($parsed) {
+</span></span><span style=display:flex><span>        $next <span style=color:#f92672>=</span> <span style=color:#a6e22e>array_shift</span>($parsed);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isset</span>($result[$next])) {
+</span></span><span style=display:flex><span>            $result <span style=color:#f92672>=</span> $result[$next];
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $result;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>put</span>($name, $value)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $parsed <span style=color:#f92672>=</span> <span style=color:#a6e22e>explode</span>(<span style=color:#e6db74>&#39;.&#39;</span>, $name);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $session <span style=color:#f92672>=&amp;</span> $_SESSION;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (<span style=color:#a6e22e>count</span>($parsed) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>        $next <span style=color:#f92672>=</span> <span style=color:#a6e22e>array_shift</span>($parsed);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> <span style=color:#a6e22e>isset</span>($session[$next]) <span style=color:#f92672>||</span> <span style=color:#f92672>!</span> <span style=color:#a6e22e>is_array</span>($session[$next])) {
+</span></span><span style=display:flex><span>            $session[$next] <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        $session <span style=color:#f92672>=&amp;</span> $session[$next];
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    $session[<span style=color:#a6e22e>array_shift</span>($parsed)] <span style=color:#f92672>=</span> $value;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=example-usage>Example Usage</h2><p>With the implementation now in place we can see the example in practice.
 I have constructed a test environment which ensures that the PHP configuration uses session files stored in a relative directory.
-In conjunction, we create a new session handler instance (passing in our encryption key) and register it with the PHP engine.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$session</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SecureSessionHandler</span><span class="p">(</span><span class="s1">'cheese'</span><span class="p">);</span>
-
-<span class="nb">ini_set</span><span class="p">(</span><span class="s1">'session.save_handler'</span><span class="p">,</span> <span class="s1">'files'</span><span class="p">);</span>
-<span class="nb">session_set_save_handler</span><span class="p">(</span><span class="nv">$session</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-<span class="nb">session_save_path</span><span class="p">(</span><span class="k">__DIR__</span> <span class="mf">.</span> <span class="s1">'/sessions'</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>Finally, we start the session instance and add a worthwhile validation check (expiration of five minutes), deleting the session if the checks do not pass.
-Values can then be added to the current session using the ‘put’ method and accessed in a similar manner.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$session</span><span class="o">-&gt;</span><span class="nf">start</span><span class="p">();</span>
-
-<span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nv">$session</span><span class="o">-&gt;</span><span class="nf">isValid</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nv">$session</span><span class="o">-&gt;</span><span class="nf">destroy</span><span class="p">();</span>
-<span class="p">}</span>
-
-<span class="nv">$session</span><span class="o">-&gt;</span><span class="nf">put</span><span class="p">(</span><span class="s1">'hello.world'</span><span class="p">,</span> <span class="s1">'bonjour'</span><span class="p">);</span>
-
-<span class="nv">$session</span><span class="o">-&gt;</span><span class="nf">get</span><span class="p">(</span><span class="s1">'hello.world'</span><span class="p">);</span> <span class="c1">// bonjour</span>
-</code></pre></div></div>
-
-<p>The full class implementation can be found as a Gist - <a href="https://gist.github.com/eddmann/10262795">SecureSessionHandler.php</a>.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management">Top 10 2013-A2-Broken Authentication and Session Management</a></li>
-  <li><a href="http://blog.teamtreehouse.com/how-to-create-bulletproof-sessions">How to Create Bulletproof Sessions</a></li>
-  <li><a href="http://www.youtube.com/watch?v=O90lSMmTjjo">How to Hack a Web Site</a></li>
-  <li><a href="http://www.zimuel.it/encrypt-php-session-data/">Encrypt session data in PHP</a></li>
-  <li><a href="http://www.php.net/manual/en/class.sessionhandler.php">PHP - SessionHandler</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+In conjunction, we create a new session handler instance (passing in our encryption key) and register it with the PHP engine.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$session <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>SecureSessionHandler</span>(<span style=color:#e6db74>&#39;cheese&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ini_set</span>(<span style=color:#e6db74>&#39;session.save_handler&#39;</span>, <span style=color:#e6db74>&#39;files&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>session_set_save_handler</span>($session, <span style=color:#66d9ef>true</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>session_save_path</span>(<span style=color:#66d9ef>__DIR__</span> <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;/sessions&#39;</span>);
+</span></span></code></pre></div><p>Finally, we start the session instance and add a worthwhile validation check (expiration of five minutes), deleting the session if the checks do not pass.
+Values can then be added to the current session using the &lsquo;put&rsquo; method and accessed in a similar manner.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span>$session<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>start</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> $session<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>isValid</span>(<span style=color:#ae81ff>5</span>)) {
+</span></span><span style=display:flex><span>    $session<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>destroy</span>();
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$session<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>put</span>(<span style=color:#e6db74>&#39;hello.world&#39;</span>, <span style=color:#e6db74>&#39;bonjour&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>$session<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>get</span>(<span style=color:#e6db74>&#39;hello.world&#39;</span>); <span style=color:#75715e>// bonjour
+</span></span></span></code></pre></div><p>The full class implementation can be found as a Gist - <a href=https://gist.github.com/eddmann/10262795 rel="external noopener" target=_blank>SecureSessionHandler.php</a>.</p><h2 id=resources>Resources</h2><ul><li><a href=https://www.owasp.org/index.php/Top_10_2013-A2-Broken_Authentication_and_Session_Management rel="external noopener" target=_blank>Top 10 2013-A2-Broken Authentication and Session Management</a></li><li><a href=http://blog.teamtreehouse.com/how-to-create-bulletproof-sessions rel="external noopener" target=_blank>How to Create Bulletproof Sessions</a></li><li><a href="http://www.youtube.com/watch?v=O90lSMmTjjo" rel="external noopener" target=_blank>How to Hack a Web Site</a></li><li><a href=http://www.zimuel.it/encrypt-php-session-data/ rel="external noopener" target=_blank>Encrypt session data in PHP</a></li><li><a href=http://www.php.net/manual/en/class.sessionhandler.php rel="external noopener" target=_blank>PHP - SessionHandler</a></li></ul></main><footer class=post__tags><a href=/archive/tag/php>php</a><a href=/archive/tag/security>security</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

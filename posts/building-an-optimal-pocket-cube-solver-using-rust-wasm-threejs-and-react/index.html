@@ -1,118 +1,20 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore the process of building an optimal Pocket Cube (2x2x2) solver using Rust, WebAssembly (WASM), Three.js, and React.">
-
-    <title>
-        
-            Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React</h1>
-    <time datetime="2021-07-04T00:00:00+00:00" class="post-date">04 Jul 2021</time>
-    <p>Over the past couple of months, I have been very interested in exploring how to efficiently visualise and solve a Rubik’s Cube.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React - Edd Mann</title>
+<meta name=description content="Explore the process of building an optimal Pocket Cube (2x2x2) solver using Rust, WebAssembly (WASM), Three.js, and React."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React"><meta itemprop=description content="Over the past couple of months, I have been very interested in exploring how to efficiently visualise and solve a Rubik’s Cube. Coupled with my desire to experiment with Rust and WASM, this felt like a great opportunity to blend the two. However, before solving a 3x3x3 Rubik’s Cube, I thought it would be beneficial to explore how to optimally solve a Pocket Cube first."><meta itemprop=datePublished content="2021-07-04T00:00:00+00:00"><meta itemprop=dateModified content="2021-07-04T00:00:00+00:00"><meta itemprop=wordCount content="665"><meta itemprop=keywords content="Pocket-Cube,Rubik-Cube,Typescript,Rust,React,Threejs"><meta property="og:url" content="https://eddmann.com/posts/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React"><meta property="og:description" content="Over the past couple of months, I have been very interested in exploring how to efficiently visualise and solve a Rubik’s Cube. Coupled with my desire to experiment with Rust and WASM, this felt like a great opportunity to blend the two. However, before solving a 3x3x3 Rubik’s Cube, I thought it would be beneficial to explore how to optimally solve a Pocket Cube first."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-07-04T00:00:00+00:00"><meta property="article:modified_time" content="2021-07-04T00:00:00+00:00"><meta property="article:tag" content="Pocket-Cube"><meta property="article:tag" content="Rubik-Cube"><meta property="article:tag" content="Typescript"><meta property="article:tag" content="Rust"><meta property="article:tag" content="React"><meta property="article:tag" content="Threejs"><meta name=twitter:card content="summary"><meta name=twitter:title content="Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React"><meta name=twitter:description content="Over the past couple of months, I have been very interested in exploring how to efficiently visualise and solve a Rubik’s Cube. Coupled with my desire to experiment with Rust and WASM, this felt like a great opportunity to blend the two. However, before solving a 3x3x3 Rubik’s Cube, I thought it would be beneficial to explore how to optimally solve a Pocket Cube first."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Building an optimal Pocket Cube (2x2x2) Solver using Rust/WASM and Three.js/React</h1><time class=post__time>Jul 4, 2021</time></header><main class=prose><p>Over the past couple of months, I have been very interested in exploring how to efficiently visualise and solve a Rubik&rsquo;s Cube.
 Coupled with my desire to experiment with Rust and WASM, this felt like a great opportunity to blend the two.
-However, before solving a 3x3x3 Rubik’s Cube, I thought it would be beneficial to explore how to optimally solve a Pocket Cube first.</p>
-
-
-
-<h2 id="characteristics-of-a-pocket-cube">Characteristics of a Pocket Cube</h2>
-
-<p>There is plenty of prior art in this space, and thanks to some key characteristics of a 2x2x2 Pocket Cube, optimally solving a given cube state is not too computationally intensive.
+However, before solving a 3x3x3 Rubik&rsquo;s Cube, I thought it would be beneficial to explore how to optimally solve a Pocket Cube first.</p><h2 id=characteristics-of-a-pocket-cube>Characteristics of a Pocket Cube</h2><p>There is plenty of prior art in this space, and thanks to some key characteristics of a 2x2x2 Pocket Cube, optimally solving a given cube state is not too computationally intensive.
 The Pocket Cube consists of 8 <em>cubies</em>, each with three coloured stickers on them.
 Any permutation of the <em>cubies</em> is possible, with seven of these being able to be independently oriented in three ways.
 If we fix one of these <em>cubies</em> to a chosen position and orientation (essentially deeming it to be in a solved state), we can permit any permutation of the remaining seven <em>cubies</em> and any orientation of six <em>cubies</em>.
-This results in there only being <code class="language-plaintext highlighter-rouge">7! * 3^6 = 3,674,160</code> possible unique states.</p>
-
-<p>To ensure that we fix the given ‘solved’ <em>cubie</em>, we are only required to implement three of the possible six moves.
-These are Up, Right, and Front in my case - resulting in the Down-Bottom-Left (<code class="language-plaintext highlighter-rouge">DBL</code>) <em>cubie</em> staying in place at all times.
+This results in there only being <code>7! * 3^6 = 3,674,160</code> possible unique states.</p><p>To ensure that we fix the given &lsquo;solved&rsquo; <em>cubie</em>, we are only required to implement three of the possible six moves.
+These are Up, Right, and Front in my case - resulting in the Down-Bottom-Left (<code>DBL</code>) <em>cubie</em> staying in place at all times.
 By fixing a single <em>cubie</em>, we have managed to reduce the number of valid states.
-As such, employing a conventional <a href="https://en.wikipedia.org/wiki/Graph_traversal">graph search algorithm</a> over the search space provides us with an efficient means to reach the optimal solution move sequence.</p>
-
-<p>I was able to model <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs">this representation</a> of a Pocket Cube in Rust, taking advantage of the ability to inline tests within the same file to provide additional confidence.</p>
-
-<h2 id="using-a-bidirectional-search">Using a Bidirectional Search</h2>
-
-<p>As we know the desired goal state and the initial cube state, we can employ two simultaneous breadth-first searches - one going forward from the initial state and one backward from the goal state, stopping when they meet.
-In doing this, we provide a means to restrict the branching that occurs when the search is being performed into two separate sub-graphs, dramatically reducing the amount of exploration required.</p>
-
-<blockquote>
-  <p>Suppose the branching factor of the tree is <code class="language-plaintext highlighter-rouge">b</code>, and the distance of the goal vertex from the source is <code class="language-plaintext highlighter-rouge">d</code>, then the trivial breadth-first search complexity would be <code class="language-plaintext highlighter-rouge">O(b^d)</code>.
-On the other hand, if we execute two search operations, then the complexity would be <code class="language-plaintext highlighter-rouge">O(b^(d/2))</code> for each search, with a total complexity of <code class="language-plaintext highlighter-rouge">O(b^(d/2) + b^(d/2))</code>, which is far less than <code class="language-plaintext highlighter-rouge">O(b^d)</code>.</p>
-</blockquote>
-
-<p>On top of this, we are able to prune out move sequences that exceed <a href="https://en.wikipedia.org/wiki/God%27s_algorithm">God’s Number</a>, which is eleven moves for a Pocket Cube.
-I had a lot of fun implementing <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/solve.rs">this algorithm</a> in Rust and, in turn, exposing the solver to the browser/JavaScript using <a href="https://rustwasm.github.io/docs/book/">WASM</a>.</p>
-
-<h2 id="visualising-the-solution">Visualising the Solution</h2>
-
-<p>Now that I was able to optimally solve a given cube state in the browser via WASM, the next step was to provide a pleasing visualisation that could be followed along using a real Pocket Cube.
-For this, I decided to build the client in React using <a href="https://threejs.org/">Three.js</a>, <a href="https://github.com/pmndrs/react-three-fiber">react-three-fiber</a>, and TypeScript.
-I have had little experience with Three.js until now but thought it would be interesting to explore constructing such models in a declarative manner using React.</p>
-
-<p>I found this to be a very rewarding experience, using a facelet representation of the cube state to communicate between the client and the solver.
-The cube component itself took advantage of React Hooks to manage the state transitions and <a href="https://github.com/eddmann/pocket-cube-solver/blob/main/client/src/Cube/rotation.ts">rotation animations</a>.</p>
-
-<p><a href="https://eddmann.com/pocket-cube-solver/"><img src="/uploads/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/solution.gif" alt="Visualising the Solution" /></a></p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>To conclude, I learned a great deal about the Pocket/Rubik Cube solution space, coupled with Rust and Three.js, while completing this project.
+As such, employing a conventional <a href=https://en.wikipedia.org/wiki/Graph_traversal rel="external noopener" target=_blank>graph search algorithm</a> over the search space provides us with an efficient means to reach the optimal solution move sequence.</p><p>I was able to model <a href=https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/cube.rs rel="external noopener" target=_blank>this representation</a> of a Pocket Cube in Rust, taking advantage of the ability to inline tests within the same file to provide additional confidence.</p><h2 id=using-a-bidirectional-search>Using a Bidirectional Search</h2><p>As we know the desired goal state and the initial cube state, we can employ two simultaneous breadth-first searches - one going forward from the initial state and one backward from the goal state, stopping when they meet.
+In doing this, we provide a means to restrict the branching that occurs when the search is being performed into two separate sub-graphs, dramatically reducing the amount of exploration required.</p><blockquote><p>Suppose the branching factor of the tree is <code>b</code>, and the distance of the goal vertex from the source is <code>d</code>, then the trivial breadth-first search complexity would be <code>O(b^d)</code>.
+On the other hand, if we execute two search operations, then the complexity would be <code>O(b^(d/2))</code> for each search, with a total complexity of <code>O(b^(d/2) + b^(d/2))</code>, which is far less than <code>O(b^d)</code>.</p></blockquote><p>On top of this, we are able to prune out move sequences that exceed <a href=https://en.wikipedia.org/wiki/God%27s_algorithm rel="external noopener" target=_blank>God&rsquo;s Number</a>, which is eleven moves for a Pocket Cube.
+I had a lot of fun implementing <a href=https://github.com/eddmann/pocket-cube-solver/blob/main/solver/src/solve.rs rel="external noopener" target=_blank>this algorithm</a> in Rust and, in turn, exposing the solver to the browser/JavaScript using <a href=https://rustwasm.github.io/docs/book/ rel="external noopener" target=_blank>WASM</a>.</p><h2 id=visualising-the-solution>Visualising the Solution</h2><p>Now that I was able to optimally solve a given cube state in the browser via WASM, the next step was to provide a pleasing visualisation that could be followed along using a real Pocket Cube.
+For this, I decided to build the client in React using <a href=https://threejs.org/ rel="external noopener" target=_blank>Three.js</a>, <a href=https://github.com/pmndrs/react-three-fiber rel="external noopener" target=_blank>react-three-fiber</a>, and TypeScript.
+I have had little experience with Three.js until now but thought it would be interesting to explore constructing such models in a declarative manner using React.</p><p>I found this to be a very rewarding experience, using a facelet representation of the cube state to communicate between the client and the solver.
+The cube component itself took advantage of React Hooks to manage the state transitions and <a href=https://github.com/eddmann/pocket-cube-solver/blob/main/client/src/Cube/rotation.ts rel="external noopener" target=_blank>rotation animations</a>.</p><p><a href=https://eddmann.com/pocket-cube-solver/><img src=solution.gif alt="Visualising the Solution"></a></p><h2 id=conclusion>Conclusion</h2><p>To conclude, I learned a great deal about the Pocket/Rubik Cube solution space, coupled with Rust and Three.js, while completing this project.
 The actual solver algorithm itself, being relatively simple, allowed me to concentrate my efforts on learning Rust and its interoperability with WebAssembly.
-Going forward, I wish to expand upon this project and build a solver for the 3x3x3 Rubik’s Cube.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Going forward, I wish to expand upon this project and build a solver for the 3x3x3 Rubik&rsquo;s Cube.</p></main><footer class=post__tags><a href=/archive/tag/pocket-cube>pocket-cube</a><a href=/archive/tag/rubik-cube>rubik-cube</a><a href=/archive/tag/typescript>typescript</a><a href=/archive/tag/rust>rust</a><a href=/archive/tag/react>react</a><a href=/archive/tag/threejs>threejs</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

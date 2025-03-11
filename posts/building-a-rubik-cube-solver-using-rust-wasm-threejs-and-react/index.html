@@ -1,132 +1,26 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore the process of building a Rubik's Cube (3x3x3) solver using Rust, WebAssembly (WASM), Three.js, and React.">
-
-    <title>
-        
-            Building a Rubik's Cube Solver using Rust/WASM and Three.js/React &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Building a Rubik's Cube Solver using Rust/WASM and Three.js/React</h1>
-    <time datetime="2021-07-06T00:00:00+00:00" class="post-date">06 Jul 2021</time>
-    <p>After building the <a href="https://eddmann.com/posts/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/">Pocket Cube Solver</a>, I wished to expand upon this design and cater for a conventional 3x3x3 Rubik’s Cube.
-In this post, I discuss the process I went through in designing and building the solver and visual client alike - taking the learnings garnered from implementing the previous solver.</p>
-
-
-
-<h2 id="characteristics-of-a-rubiks-cube">Characteristics of a Rubik’s Cube</h2>
-
-<p>As documented in my previous post, a Pocket Cube has a couple of key characteristics that make it easier to construct a solver using conventional <a href="https://en.wikipedia.org/wiki/Graph_traversal">Graph searching algorithms</a>, with minimal pruning or heuristics required.
-However, in the case of a 3x3x3 Rubik’s Cube, this is not the case, largely due to the addition of a centre <em>cubie</em> - meaning the two no longer share the same optimisations that can be performed.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Building a Rubik's Cube Solver using Rust/WASM and Three.js/React - Edd Mann</title>
+<meta name=description content="Explore the process of building a Rubik's Cube (3x3x3) solver using Rust, WebAssembly (WASM), Three.js, and React."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Building a Rubik's Cube Solver using Rust/WASM and Three.js/React"><meta itemprop=description content="After building the Pocket Cube Solver, I wished to expand upon this design and cater for a conventional 3x3x3 Rubik’s Cube. In this post, I discuss the process I went through in designing and building the solver and visual client alike - taking the learnings garnered from implementing the previous solver."><meta itemprop=datePublished content="2021-07-06T00:00:00+00:00"><meta itemprop=dateModified content="2021-07-06T00:00:00+00:00"><meta itemprop=wordCount content="856"><meta itemprop=keywords content="Rubiks-Cube,Typescript,Rust,React,Threejs"><meta property="og:url" content="https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Building a Rubik's Cube Solver using Rust/WASM and Three.js/React"><meta property="og:description" content="After building the Pocket Cube Solver, I wished to expand upon this design and cater for a conventional 3x3x3 Rubik’s Cube. In this post, I discuss the process I went through in designing and building the solver and visual client alike - taking the learnings garnered from implementing the previous solver."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-07-06T00:00:00+00:00"><meta property="article:modified_time" content="2021-07-06T00:00:00+00:00"><meta property="article:tag" content="Rubiks-Cube"><meta property="article:tag" content="Typescript"><meta property="article:tag" content="Rust"><meta property="article:tag" content="React"><meta property="article:tag" content="Threejs"><meta name=twitter:card content="summary"><meta name=twitter:title content="Building a Rubik's Cube Solver using Rust/WASM and Three.js/React"><meta name=twitter:description content="After building the Pocket Cube Solver, I wished to expand upon this design and cater for a conventional 3x3x3 Rubik’s Cube. In this post, I discuss the process I went through in designing and building the solver and visual client alike - taking the learnings garnered from implementing the previous solver."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Building a Rubik's Cube Solver using Rust/WASM and Three.js/React</h1><time class=post__time>Jul 6, 2021</time></header><main class=prose><p>After building the <a href=/posts/building-an-optimal-pocket-cube-solver-using-rust-wasm-threejs-and-react/>Pocket Cube Solver</a>, I wished to expand upon this design and cater for a conventional 3x3x3 Rubik&rsquo;s Cube.
+In this post, I discuss the process I went through in designing and building the solver and visual client alike - taking the learnings garnered from implementing the previous solver.</p><h2 id=characteristics-of-a-rubiks-cube>Characteristics of a Rubik&rsquo;s Cube</h2><p>As documented in my previous post, a Pocket Cube has a couple of key characteristics that make it easier to construct a solver using conventional <a href=https://en.wikipedia.org/wiki/Graph_traversal rel="external noopener" target=_blank>Graph searching algorithms</a>, with minimal pruning or heuristics required.
+However, in the case of a 3x3x3 Rubik&rsquo;s Cube, this is not the case, largely due to the addition of a centre <em>cubie</em> - meaning the two no longer share the same optimisations that can be performed.
 The cube itself has <em>43 quintillion, 252 quadrillion, 3 trillion, 274 billion, 489 million, 856 thousand</em> different valid states, which makes it computationally infeasible to visit each possible move sequence in an adequate time.
-However, <a href="http://www.cube20.org/">research</a> has proven that God’s Number for a Rubik’s Cube is twenty - demonstrating that any initial state can be solved in twenty moves or fewer.</p>
-
-<p><img src="/uploads/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube.jpg" alt="Characteristics of a Rubik's Cube" /></p>
-
-<h2 id="solving-the-cube">Solving the Cube</h2>
-
-<p>Along with conventional <a href="https://en.wikipedia.org/wiki/Layer_by_Layer">Layer by Layer</a> approaches that <em>eventually</em> lead to a solved state, there has been much research into producing algorithms that perform this task more efficiently.</p>
-
-<h3 id="korfs-algorithm">Korf’s Algorithm</h3>
-
-<p>Initially, when setting out to build this Rubik’s Cube Solver, I had hoped to mirror the <a href="https://github.com/eddmann/pocket-cube-solver">2x2x2 counterpart</a> and create an optimal solver that ran in the browser.
-Prior work in this space documents algorithms such as <a href="https://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf">Richard Korf’s</a>, which, with the aid of several pruning tables, can provide an optimal solution from any initial state using Iterative deepening depth-first search (IDDFS) to traverse the search space.
+However, <a href=http://www.cube20.org/ rel="external noopener" target=_blank>research</a> has proven that God&rsquo;s Number for a Rubik&rsquo;s Cube is twenty - demonstrating that any initial state can be solved in twenty moves or fewer.</p><p><picture><source type=image/webp srcset=/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube_hu_756d895838ab001.webp><source type=image/jpeg srcset=/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube_hu_199a7e047cf0095.jpg><img src=/posts/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/cube_hu_199a7e047cf0095.jpg alt="Characteristics of a Rubik’s Cube" loading=lazy></picture></p><h2 id=solving-the-cube>Solving the Cube</h2><p>Along with conventional <a href=https://en.wikipedia.org/wiki/Layer_by_Layer rel="external noopener" target=_blank>Layer by Layer</a> approaches that <em>eventually</em> lead to a solved state, there has been much research into producing algorithms that perform this task more efficiently.</p><h3 id=korfs-algorithm>Korf&rsquo;s Algorithm</h3><p>Initially, when setting out to build this Rubik&rsquo;s Cube Solver, I had hoped to mirror the <a href=https://github.com/eddmann/pocket-cube-solver rel="external noopener" target=_blank>2x2x2 counterpart</a> and create an optimal solver that ran in the browser.
+Prior work in this space documents algorithms such as <a href=https://www.aaai.org/Papers/AAAI/1997/AAAI97-109.pdf rel="external noopener" target=_blank>Richard Korf&rsquo;s</a>, which, with the aid of several pruning tables, can provide an optimal solution from any initial state using Iterative deepening depth-first search (IDDFS) to traverse the search space.
 However, these pruning tables must be generated upfront and incur a large memory footprint - reaching upwards of 250MB in my experiments.
 Additionally, it is not possible to set an upper bound on how long it would take to find an optimal solution, sometimes taking over forty minutes to complete!
 When running tests, I found that any scramble exceeding ten random turns (starting from the goal state) resulted in an undesired wait for the client to return.
-Although optimal, the memory and time footprint led me to continue my search to find a better fit for the target platform.</p>
-
-<h3 id="thistlethwaites-and-kociembas-algorithms">Thistlethwaite’s and Kociemba’s Algorithms</h3>
-
-<p>Based on the above evaluation, I instead sought to provide a solution that was <em>good enough</em> - averaging an upper bound of thirty-five moves or fewer.
-Both <a href="https://www.jaapsch.net/puzzles/thistle.htm">Morwen Thistlethwaite’s</a> and the improved <a href="https://en.wikipedia.org/wiki/Optimal_solutions_for_Rubik%27s_Cube#Kociemba's_algorithm">Herbert Kociemba’s</a> algorithms solve a given cube using multiple phases (sub-groupings), where only certain moves and properties of the cube are relevant at any given time.
+Although optimal, the memory and time footprint led me to continue my search to find a better fit for the target platform.</p><h3 id=thistlethwaites-and-kociembas-algorithms>Thistlethwaite&rsquo;s and Kociemba&rsquo;s Algorithms</h3><p>Based on the above evaluation, I instead sought to provide a solution that was <em>good enough</em> - averaging an upper bound of thirty-five moves or fewer.
+Both <a href=https://www.jaapsch.net/puzzles/thistle.htm rel="external noopener" target=_blank>Morwen Thistlethwaite&rsquo;s</a> and the improved <a href=https://en.wikipedia.org/wiki/Optimal_solutions_for_Rubik%27s_Cube#Kociemba%27s_algorithm rel="external noopener" target=_blank>Herbert Kociemba&rsquo;s</a> algorithms solve a given cube using multiple phases (sub-groupings), where only certain moves and properties of the cube are relevant at any given time.
 At each phase, we generate a move sequence that satisfies a given property, allowing us to progress toward solving the cube.
-Again, pruning tables are used to accelerate transitions between different phases.</p>
-
-<h3 id="pochmanns-algorithm">Pochmann’s Algorithm</h3>
-
-<p>Before setting out to implement one of the above algorithms, I stumbled upon an interesting <a href="https://www.stefan-pochmann.info/spocc/other_stuff/tools/solver_thistlethwaite/solver_thistlethwaite_cpp.txt">C++ solver</a> that had a surprisingly small implementation and did not require additional memory for pruning tables!
-The <a href="https://www.stefan-pochmann.info/spocc/">Stefan Pochmann</a> algorithm takes inspiration from the sub-grouping and multi-phase approach of Thistlethwaite’s but instead defines several different requirements to transition between each phase.
-This approach may result in a longer move sequence, but it enables the use of Bidirectional Search (as in the Pocket Cube Solver) at each phase, which is trivial to implement.</p>
-
-<h2 id="building-the-solver">Building the Solver</h2>
-
-<p>With multiple algorithms available to solve a Rubik’s Cube, I designed my solution to accommodate multiple solvers being <em>plugged into</em> the same cube representation - achieved using Rust traits.
+Again, pruning tables are used to accelerate transitions between different phases.</p><h3 id=pochmanns-algorithm>Pochmann&rsquo;s Algorithm</h3><p>Before setting out to implement one of the above algorithms, I stumbled upon an interesting <a href=https://www.stefan-pochmann.info/spocc/other_stuff/tools/solver_thistlethwaite/solver_thistlethwaite_cpp.txt rel="external noopener" target=_blank>C++ solver</a> that had a surprisingly small implementation and did not require additional memory for pruning tables!
+The <a href=https://www.stefan-pochmann.info/spocc/ rel="external noopener" target=_blank>Stefan Pochmann</a> algorithm takes inspiration from the sub-grouping and multi-phase approach of Thistlethwaite&rsquo;s but instead defines several different requirements to transition between each phase.
+This approach may result in a longer move sequence, but it enables the use of Bidirectional Search (as in the Pocket Cube Solver) at each phase, which is trivial to implement.</p><h2 id=building-the-solver>Building the Solver</h2><p>With multiple algorithms available to solve a Rubik&rsquo;s Cube, I designed my solution to accommodate multiple solvers being <em>plugged into</em> the same cube representation - achieved using Rust traits.
 This approach allows for future exploration of the advantages and disadvantages of each algorithm.
-I applied the same level of modularity to the <a href="https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/cube.rs">cube</a> itself, recognising that different aspects of the cube are relevant depending on the algorithm used.</p>
-
-<p>I decided to implement Pochmann’s algorithm first, as it allowed me to leverage much of the knowledge and code from the 2x2x2 cube solver.
-Using the Rubik’s Cube model I built, I applied a simple representation translation that let me reference much of the original C++ implementation.
-The only additional optimisation involved simplifying <a href="https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs#L302">multi-face turn moves</a> occurring between phases.
-Once the solver was <a href="https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs">implemented</a> and adequately tested, I moved on to visualising the solution for the client.</p>
-
-<h2 id="visualising-the-solution">Visualising the Solution</h2>
-
-<p>Similar to how I visualised the Pocket Cube, I reused much of the same model built for that solution.
-Using a combination of React, <a href="https://threejs.org/">Three.js</a>, <a href="https://github.com/pmndrs/react-three-fiber">react-three-fiber</a>, and TypeScript, I expanded upon the 2x2x2 design by adding the necessary additional <em>cubies</em> and rotation animation adjustments.
-I was very pleased with how the previous work on the Pocket Cube could be adapted and expanded upon for this project.</p>
-
-<p><a href="https://eddmann.com/rubik-cube-solver/"><img src="/uploads/building-a-rubik-cube-solver-using-rust-wasm-threejs-and-react/solution.gif" alt="Visualising the Solution" /></a></p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>To conclude, exploring prior work in solving a 3x3x3 Rubik’s Cube has been very insightful.
-Being able to reuse much of the code from the <a href="https://eddmann.com/pocket-cube-solver/">2x2x2 solver</a> was immensely helpful, allowing me to focus on the unique challenges of building the solver.
-Moving forward, I plan to expand beyond the single implemented solver, giving users the ability to select additional solvers (e.g., Thistlethwaite’s and Kociemba’s) for experimentation.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+I applied the same level of modularity to the <a href=https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/cube.rs rel="external noopener" target=_blank>cube</a> itself, recognising that different aspects of the cube are relevant depending on the algorithm used.</p><p>I decided to implement Pochmann&rsquo;s algorithm first, as it allowed me to leverage much of the knowledge and code from the 2x2x2 cube solver.
+Using the Rubik&rsquo;s Cube model I built, I applied a simple representation translation that let me reference much of the original C++ implementation.
+The only additional optimisation involved simplifying <a href=https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs#L302 rel="external noopener" target=_blank>multi-face turn moves</a> occurring between phases.
+Once the solver was <a href=https://github.com/eddmann/rubik-cube-solver/blob/main/solver/src/pochmann_solver.rs rel="external noopener" target=_blank>implemented</a> and adequately tested, I moved on to visualising the solution for the client.</p><h2 id=visualising-the-solution>Visualising the Solution</h2><p>Similar to how I visualised the Pocket Cube, I reused much of the same model built for that solution.
+Using a combination of React, <a href=https://threejs.org/ rel="external noopener" target=_blank>Three.js</a>, <a href=https://github.com/pmndrs/react-three-fiber rel="external noopener" target=_blank>react-three-fiber</a>, and TypeScript, I expanded upon the 2x2x2 design by adding the necessary additional <em>cubies</em> and rotation animation adjustments.
+I was very pleased with how the previous work on the Pocket Cube could be adapted and expanded upon for this project.</p><p><a href=https://eddmann.com/rubik-cube-solver/><img src=solution.gif alt="Visualising the Solution"></a></p><h2 id=conclusion>Conclusion</h2><p>To conclude, exploring prior work in solving a 3x3x3 Rubik&rsquo;s Cube has been very insightful.
+Being able to reuse much of the code from the <a href=https://eddmann.com/pocket-cube-solver/>2x2x2 solver</a> was immensely helpful, allowing me to focus on the unique challenges of building the solver.
+Moving forward, I plan to expand beyond the single implemented solver, giving users the ability to select additional solvers (e.g., Thistlethwaite&rsquo;s and Kociemba&rsquo;s) for experimentation.</p></main><footer class=post__tags><a href=/archive/tag/rubiks-cube>rubiks-cube</a><a href=/archive/tag/typescript>typescript</a><a href=/archive/tag/rust>rust</a><a href=/archive/tag/react>react</a><a href=/archive/tag/threejs>threejs</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

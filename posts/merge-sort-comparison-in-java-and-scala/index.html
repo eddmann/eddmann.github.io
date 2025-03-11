@@ -1,176 +1,79 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A detailed comparison of Merge Sort implementations in Java and Scala, highlighting the differences between imperative and functional programming paradigms.">
-
-    <title>
-        
-            Merge sort comparison in Java and Scala &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Merge sort comparison in Java and Scala</h1>
-    <time datetime="2013-11-27T00:00:00+00:00" class="post-date">27 Nov 2013</time>
-    <p>Having only just recently got a complete shot of functional goodness in the form of the <a href="http://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a> <a href="http://en.wikipedia.org/wiki/Massive_open_online_course">MOOC</a>, my imperative standing is in a state of confusion.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Merge sort comparison in Java and Scala - Edd Mann</title>
+<meta name=description content="A detailed comparison of Merge Sort implementations in Java and Scala, highlighting the differences between imperative and functional programming paradigms."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Merge sort comparison in Java and Scala"><meta itemprop=description content="Having only just recently got a complete shot of functional goodness in the form of the Functional Programming Principles in Scala MOOC, my imperative standing is in a state of confusion. Is mutability the devil, should every function not have side-effects, what really is a monad? Okay, so I may be joking a little with these semi-rhetorical remarks - boy, have I read enough monad posts for a lifetime. Added to the mainstream application design consensus, the functional paradigm is making inroads out of multi-core necessity (goodbye Moore’s law)."><meta itemprop=datePublished content="2013-11-27T00:00:00+00:00"><meta itemprop=dateModified content="2013-11-27T00:00:00+00:00"><meta itemprop=wordCount content="866"><meta itemprop=keywords content="Java,Scala,Functional-Programming,Algorithms"><meta property="og:url" content="https://eddmann.com/posts/merge-sort-comparison-in-java-and-scala/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Merge sort comparison in Java and Scala"><meta property="og:description" content="Having only just recently got a complete shot of functional goodness in the form of the Functional Programming Principles in Scala MOOC, my imperative standing is in a state of confusion. Is mutability the devil, should every function not have side-effects, what really is a monad? Okay, so I may be joking a little with these semi-rhetorical remarks - boy, have I read enough monad posts for a lifetime. Added to the mainstream application design consensus, the functional paradigm is making inroads out of multi-core necessity (goodbye Moore’s law)."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2013-11-27T00:00:00+00:00"><meta property="article:modified_time" content="2013-11-27T00:00:00+00:00"><meta property="article:tag" content="Java"><meta property="article:tag" content="Scala"><meta property="article:tag" content="Functional-Programming"><meta property="article:tag" content="Algorithms"><meta name=twitter:card content="summary"><meta name=twitter:title content="Merge sort comparison in Java and Scala"><meta name=twitter:description content="Having only just recently got a complete shot of functional goodness in the form of the Functional Programming Principles in Scala MOOC, my imperative standing is in a state of confusion. Is mutability the devil, should every function not have side-effects, what really is a monad? Okay, so I may be joking a little with these semi-rhetorical remarks - boy, have I read enough monad posts for a lifetime. Added to the mainstream application design consensus, the functional paradigm is making inroads out of multi-core necessity (goodbye Moore’s law)."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/merge-sort-comparison-in-java-and-scala/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Merge sort comparison in Java and Scala</h1><time class=post__time>Nov 27, 2013</time></header><main class=prose><p>Having only just recently got a complete shot of functional goodness in the form of the <a href=http://www.coursera.org/course/progfun rel="external noopener" target=_blank>Functional Programming Principles in Scala</a> <a href=http://en.wikipedia.org/wiki/Massive_open_online_course rel="external noopener" target=_blank>MOOC</a>, my imperative standing is in a state of confusion.
 Is mutability the devil, should every function not have side-effects, what really is a monad?
 Okay, so I may be joking a little with these semi-rhetorical remarks - boy, have I read enough monad posts for a lifetime.
-Added to the mainstream application design consensus, the functional paradigm is making inroads out of multi-core necessity (goodbye <a href="http://en.wikipedia.org/wiki/Moore's_law">Moore’s law</a>).</p>
-
-
-
-<p>Scala is a statically typed, JVM language released in 2003 by Martin Odersky.
+Added to the mainstream application design consensus, the functional paradigm is making inroads out of multi-core necessity (goodbye <a href=http://en.wikipedia.org/wiki/Moore%27s_law rel="external noopener" target=_blank>Moore&rsquo;s law</a>).</p><p>Scala is a statically typed, JVM language released in 2003 by Martin Odersky.
 It had the ambitious goal of trying to meld the two somewhat conflicting worlds of object-oriented (business) and functional (academia) paradigms.
 As the past decade of steady adoption has proved, however (i.e. at Twitter), this has been a success.
-Its well-designed <a href="http://www.scala-lang.org/">homepage</a> (a rarity in language cycles) gives you a small hit of what makes Scala so different from the ever-growing JVM platform language world.
-A truly unified type system (à la Smalltalk and Ruby), type-inference, lazy evaluation and for-comprehensions (commonly known as list-comprehensions) are only a small subset of the features that make up the language’s power.</p>
-
-<p>Okay, now with the small Scala love-fest over, I would like to show you a dramatic (though somewhat contrived) example of the differences between Java and Scala - and to some extent, functional and imperative idioms.
-To demonstrate this I will be implementing the divide-and-conquer <a href="http://en.wikipedia.org/wiki/Merge_sort">Merge sort</a> algorithm, which works well to highlight some of the functional expressiveness present in Scala.
-Obviously in a real-world setting this task would be handled by a heavily optimised implementation such as Java’s <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html">Collections</a> library.</p>
-
-<h2 id="java">Java</h2>
-
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MergeSort</span> <span class="o">{</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">merge</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="nc">Comparable</span><span class="o">[]</span> <span class="n">tmp</span><span class="o">,</span> <span class="kt">int</span> <span class="n">l</span><span class="o">,</span> <span class="kt">int</span> <span class="n">m</span><span class="o">,</span> <span class="kt">int</span> <span class="n">h</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">l</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">h</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="n">tmp</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">arr</span><span class="o">[</span><span class="n">i</span><span class="o">];</span> <span class="c1">// copy order into temp array</span>
-        <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">l</span><span class="o">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
-        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">k</span> <span class="o">=</span> <span class="n">l</span><span class="o">;</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="n">h</span><span class="o">;</span> <span class="n">k</span><span class="o">++)</span> <span class="o">{</span>
-            <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">m</span><span class="o">)</span>                             <span class="n">arr</span><span class="o">[</span><span class="n">k</span><span class="o">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">[</span><span class="n">j</span><span class="o">++];</span> <span class="c1">// left complete</span>
-            <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">j</span> <span class="o">&gt;</span> <span class="n">h</span><span class="o">)</span>                        <span class="n">arr</span><span class="o">[</span><span class="n">k</span><span class="o">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">[</span><span class="n">i</span><span class="o">++];</span> <span class="c1">// right complete</span>
-            <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">tmp</span><span class="o">[</span><span class="n">j</span><span class="o">].</span><span class="na">compareTo</span><span class="o">(</span><span class="n">tmp</span><span class="o">[</span><span class="n">i</span><span class="o">])</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="o">)</span> <span class="n">arr</span><span class="o">[</span><span class="n">k</span><span class="o">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">[</span><span class="n">j</span><span class="o">++];</span> <span class="c1">// right &lt; left</span>
-            <span class="k">else</span>                                   <span class="n">arr</span><span class="o">[</span><span class="n">k</span><span class="o">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">[</span><span class="n">i</span><span class="o">++];</span> <span class="c1">// left &lt; right</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">,</span> <span class="nc">Comparable</span><span class="o">[]</span> <span class="n">tmp</span><span class="o">,</span> <span class="kt">int</span> <span class="n">l</span><span class="o">,</span> <span class="kt">int</span> <span class="n">h</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(</span><span class="n">l</span> <span class="o">&gt;=</span> <span class="n">h</span><span class="o">)</span> <span class="k">return</span><span class="o">;</span> <span class="c1">// 0..1</span>
-        <span class="kt">int</span> <span class="n">m</span> <span class="o">=</span> <span class="n">l</span> <span class="o">+</span> <span class="o">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="o">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">;</span>
-        <span class="n">sort</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">tmp</span><span class="o">,</span> <span class="n">l</span><span class="o">,</span> <span class="n">m</span><span class="o">);</span>     <span class="c1">// left</span>
-        <span class="n">sort</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">tmp</span><span class="o">,</span> <span class="n">m</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">h</span><span class="o">);</span> <span class="c1">// right</span>
-        <span class="n">merge</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">tmp</span><span class="o">,</span> <span class="n">l</span><span class="o">,</span> <span class="n">m</span><span class="o">,</span> <span class="n">h</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">sort</span><span class="o">(</span><span class="nc">Comparable</span><span class="o">[]</span> <span class="n">arr</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="nc">Comparable</span><span class="o">[]</span> <span class="n">tmp</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Comparable</span><span class="o">[</span><span class="n">arr</span><span class="o">.</span><span class="na">length</span><span class="o">];</span>
-        <span class="n">sort</span><span class="o">(</span><span class="n">arr</span><span class="o">,</span> <span class="n">tmp</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">arr</span><span class="o">.</span><span class="na">length</span> <span class="o">-</span> <span class="mi">1</span><span class="o">);</span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span>
-    <span class="o">{</span>
-        <span class="nc">Integer</span><span class="o">[]</span> <span class="n">arr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Integer</span><span class="o">[]</span> <span class="o">{</span> <span class="mi">4</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">3</span> <span class="o">};</span>
-        <span class="n">sort</span><span class="o">(</span><span class="n">arr</span><span class="o">);</span>
-        <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Arrays</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">arr</span><span class="o">));</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>As you can see from the above example, the sorting routine consists of three separate methods, resulting in an in-place sort.
+Its well-designed <a href=http://www.scala-lang.org/ rel="external noopener" target=_blank>homepage</a> (a rarity in language cycles) gives you a small hit of what makes Scala so different from the ever-growing JVM platform language world.
+A truly unified type system (à la Smalltalk and Ruby), type-inference, lazy evaluation and for-comprehensions (commonly known as list-comprehensions) are only a small subset of the features that make up the language&rsquo;s power.</p><p>Okay, now with the small Scala love-fest over, I would like to show you a dramatic (though somewhat contrived) example of the differences between Java and Scala - and to some extent, functional and imperative idioms.
+To demonstrate this I will be implementing the divide-and-conquer <a href=http://en.wikipedia.org/wiki/Merge_sort rel="external noopener" target=_blank>Merge sort</a> algorithm, which works well to highlight some of the functional expressiveness present in Scala.
+Obviously in a real-world setting this task would be handled by a heavily optimised implementation such as Java&rsquo;s <a href=http://docs.oracle.com/javase/7/docs/api/java/util/Collections.html rel="external noopener" target=_blank>Collections</a> library.</p><h2 id=java>Java</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-java data-lang=java><span style=display:flex><span><span style=color:#66d9ef>public</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>MergeSort</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>merge</span>(Comparable<span style=color:#f92672>[]</span> arr, Comparable<span style=color:#f92672>[]</span> tmp, <span style=color:#66d9ef>int</span> l, <span style=color:#66d9ef>int</span> m, <span style=color:#66d9ef>int</span> h)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> l; i <span style=color:#f92672>&lt;=</span> h; i<span style=color:#f92672>++</span>) tmp<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> arr<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span>; <span style=color:#75715e>// copy order into temp array</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> l, j <span style=color:#f92672>=</span> m <span style=color:#f92672>+</span> 1;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> k <span style=color:#f92672>=</span> l; k <span style=color:#f92672>&lt;=</span> h; k<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (i <span style=color:#f92672>&gt;</span> m)                             arr<span style=color:#f92672>[</span>k<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> tmp<span style=color:#f92672>[</span>j<span style=color:#f92672>++]</span>; <span style=color:#75715e>// left complete</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> (j <span style=color:#f92672>&gt;</span> h)                        arr<span style=color:#f92672>[</span>k<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> tmp<span style=color:#f92672>[</span>i<span style=color:#f92672>++]</span>; <span style=color:#75715e>// right complete</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> (tmp<span style=color:#f92672>[</span>j<span style=color:#f92672>]</span>.<span style=color:#a6e22e>compareTo</span>(tmp<span style=color:#f92672>[</span>i<span style=color:#f92672>]</span>) <span style=color:#f92672>&lt;</span> 0) arr<span style=color:#f92672>[</span>k<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> tmp<span style=color:#f92672>[</span>j<span style=color:#f92672>++]</span>; <span style=color:#75715e>// right &lt; left</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>else</span>                                   arr<span style=color:#f92672>[</span>k<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> tmp<span style=color:#f92672>[</span>i<span style=color:#f92672>++]</span>; <span style=color:#75715e>// left &lt; right</span>
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sort</span>(Comparable<span style=color:#f92672>[]</span> arr, Comparable<span style=color:#f92672>[]</span> tmp, <span style=color:#66d9ef>int</span> l, <span style=color:#66d9ef>int</span> h)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (l <span style=color:#f92672>&gt;=</span> h) <span style=color:#66d9ef>return</span>; <span style=color:#75715e>// 0..1</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>int</span> m <span style=color:#f92672>=</span> l <span style=color:#f92672>+</span> (h <span style=color:#f92672>-</span> l) <span style=color:#f92672>/</span> 2;
+</span></span><span style=display:flex><span>        sort(arr, tmp, l, m);     <span style=color:#75715e>// left</span>
+</span></span><span style=display:flex><span>        sort(arr, tmp, m <span style=color:#f92672>+</span> 1, h); <span style=color:#75715e>// right</span>
+</span></span><span style=display:flex><span>        merge(arr, tmp, l, m, h);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>sort</span>(Comparable<span style=color:#f92672>[]</span> arr)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        Comparable<span style=color:#f92672>[]</span> tmp <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Comparable<span style=color:#f92672>[</span>arr.<span style=color:#a6e22e>length</span><span style=color:#f92672>]</span>;
+</span></span><span style=display:flex><span>        sort(arr, tmp, 0, arr.<span style=color:#a6e22e>length</span> <span style=color:#f92672>-</span> 1);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span>(String<span style=color:#f92672>[]</span> args)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        Integer<span style=color:#f92672>[]</span> arr <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> Integer<span style=color:#f92672>[]</span> { 4, 2, 1, 3 };
+</span></span><span style=display:flex><span>        sort(arr);
+</span></span><span style=display:flex><span>        System.<span style=color:#a6e22e>out</span>.<span style=color:#a6e22e>println</span>(java.<span style=color:#a6e22e>util</span>.<span style=color:#a6e22e>Arrays</span>.<span style=color:#a6e22e>toString</span>(arr));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>As you can see from the above example, the sorting routine consists of three separate methods, resulting in an in-place sort.
 A temporary array is created once (same in size) and used to aid in the merging routine of the algorithm.
-There are many optimisations I could include to help increase performance, for example, using <a href="http://en.wikipedia.org/wiki/Insertion_sort">Insertion sort</a> for smaller sub-arrays and testing for pre-existing ordering.
-Along with this, I have been a little <a href="http://stackoverflow.com/questions/4830400/java-unchecked-call-to-comparetot-as-a-member-of-the-raw-type-java-lang-compa">relaxed</a> in my use of the Comparable interface by not specifying a generic type.
-However, this example successfully shows the key ingredients for implementing such an algorithm in an imperative fashion.</p>
-
-<h2 id="scala">Scala</h2>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">mergeSort</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">pred</span><span class="k">:</span> <span class="o">(</span><span class="kt">T</span><span class="o">,</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Boolean</span><span class="o">)(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">T</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-    <span class="k">def</span> <span class="nf">merge</span><span class="o">(</span><span class="n">ls</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">T</span><span class="o">],</span> <span class="n">rs</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">T</span><span class="o">])</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="n">ls</span><span class="o">,</span> <span class="n">rs</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-        <span class="nf">case</span> <span class="o">(</span><span class="nc">List</span><span class="o">(),</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">rs</span>
-        <span class="nf">case</span> <span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="nc">List</span><span class="o">())</span> <span class="k">=&gt;</span> <span class="n">ls</span>
-        <span class="nf">case</span> <span class="o">(</span><span class="n">l</span> <span class="o">::</span> <span class="n">ls1</span><span class="o">,</span> <span class="n">r</span> <span class="o">::</span> <span class="n">rs1</span><span class="o">)</span> <span class="k">=&gt;</span>
-            <span class="nf">if</span> <span class="o">(</span><span class="nf">pred</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">))</span> <span class="n">l</span> <span class="o">::</span> <span class="nf">merge</span><span class="o">(</span><span class="n">ls1</span><span class="o">,</span> <span class="n">rs</span><span class="o">)</span>
-            <span class="k">else</span> <span class="n">r</span> <span class="o">::</span> <span class="nf">merge</span><span class="o">(</span><span class="n">ls</span><span class="o">,</span> <span class="n">rs1</span><span class="o">)</span>
-    <span class="o">}</span>
-
-    <span class="k">val</span> <span class="nv">m</span> <span class="k">=</span> <span class="nv">xs</span><span class="o">.</span><span class="py">length</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="nf">if</span> <span class="o">(</span><span class="n">m</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="n">xs</span>
-    <span class="k">else</span> <span class="o">{</span>
-        <span class="nf">val</span> <span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">r</span><span class="o">)</span> <span class="k">=</span> <span class="n">xs</span> <span class="n">splitAt</span> <span class="n">m</span>
-        <span class="nf">merge</span><span class="o">(</span><span class="nf">mergeSort</span><span class="o">(</span><span class="n">pred</span><span class="o">)(</span><span class="n">l</span><span class="o">),</span> <span class="nf">mergeSort</span><span class="o">(</span><span class="n">pred</span><span class="o">)(</span><span class="n">r</span><span class="o">))</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-
-<span class="k">val</span> <span class="nv">intSort</span> <span class="k">=</span> <span class="nf">mergeSort</span><span class="o">((</span><span class="k">_:</span> <span class="kt">Int</span><span class="o">)</span> <span class="o">&lt;</span> <span class="o">(</span><span class="k">_:</span> <span class="kt">Int</span><span class="o">))</span> <span class="k">_</span>
-<span class="nf">println</span><span class="o">(</span><span class="nf">intSort</span><span class="o">(</span><span class="nc">List</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="mi">2</span><span class="o">,</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">3</span><span class="o">)))</span>
-</code></pre></div></div>
-
-<p>Well this looks a little different, only two declared functions by-name, let’s go through it piece-by-piece.
-The first point of note is the use of <a href="http://en.wikipedia.org/wiki/Currying">Currying</a> to initially provide a comparable predicate, followed then by the list of values.
-This can be seen with the ‘intSort’ partially-applied function that is created using the passed in anonymous-function predicate.
+There are many optimisations I could include to help increase performance, for example, using <a href=http://en.wikipedia.org/wiki/Insertion_sort rel="external noopener" target=_blank>Insertion sort</a> for smaller sub-arrays and testing for pre-existing ordering.
+Along with this, I have been a little <a href=http://stackoverflow.com/questions/4830400/java-unchecked-call-to-comparetot-as-a-member-of-the-raw-type-java-lang-compa rel="external noopener" target=_blank>relaxed</a> in my use of the Comparable interface by not specifying a generic type.
+However, this example successfully shows the key ingredients for implementing such an algorithm in an imperative fashion.</p><h2 id=scala>Scala</h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-scala data-lang=scala><span style=display:flex><span><span style=color:#66d9ef>def</span> mergeSort<span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>](</span>pred<span style=color:#66d9ef>:</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>T</span><span style=color:#f92672>,</span> <span style=color:#66d9ef>T</span><span style=color:#f92672>)</span> <span style=color:#66d9ef>=&gt;</span> <span style=color:#a6e22e>Boolean</span><span style=color:#f92672>)(</span>xs<span style=color:#66d9ef>:</span> <span style=color:#66d9ef>List</span><span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>])</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>List</span><span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>]</span> <span style=color:#66d9ef>=</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>def</span> merge<span style=color:#f92672>(</span>ls<span style=color:#66d9ef>:</span> <span style=color:#66d9ef>List</span><span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>],</span> rs<span style=color:#66d9ef>:</span> <span style=color:#66d9ef>List</span><span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>])</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>List</span><span style=color:#f92672>[</span><span style=color:#66d9ef>T</span><span style=color:#f92672>]</span> <span style=color:#66d9ef>=</span> <span style=color:#f92672>(</span>ls<span style=color:#f92672>,</span> rs<span style=color:#f92672>)</span> <span style=color:#66d9ef>match</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>case</span> <span style=color:#f92672>(</span><span style=color:#a6e22e>List</span><span style=color:#f92672>(),</span> <span style=color:#66d9ef>_</span><span style=color:#f92672>)</span> <span style=color:#66d9ef>=&gt;</span> rs
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>case</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>_</span><span style=color:#f92672>,</span> <span style=color:#a6e22e>List</span><span style=color:#f92672>())</span> <span style=color:#66d9ef>=&gt;</span> ls
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>case</span> <span style=color:#f92672>(</span>l <span style=color:#66d9ef>:</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>ls1</span><span style=color:#f92672>,</span> r <span style=color:#66d9ef>:</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>rs1</span><span style=color:#f92672>)</span> <span style=color:#66d9ef>=&gt;</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>pred<span style=color:#f92672>(</span>l<span style=color:#f92672>,</span> r<span style=color:#f92672>))</span> l <span style=color:#66d9ef>:</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>merge</span><span style=color:#f92672>(</span><span style=color:#66d9ef>ls1</span><span style=color:#f92672>,</span> <span style=color:#66d9ef>rs</span><span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>else</span> r <span style=color:#66d9ef>:</span><span style=color:#66d9ef>:</span> <span style=color:#66d9ef>merge</span><span style=color:#f92672>(</span><span style=color:#66d9ef>ls</span><span style=color:#f92672>,</span> <span style=color:#66d9ef>rs1</span><span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>val</span> m <span style=color:#66d9ef>=</span> xs<span style=color:#f92672>.</span>length <span style=color:#f92672>/</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>m <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span><span style=color:#f92672>)</span> xs
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>else</span> <span style=color:#f92672>{</span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>val</span> <span style=color:#f92672>(</span>l<span style=color:#f92672>,</span> r<span style=color:#f92672>)</span> <span style=color:#66d9ef>=</span> xs splitAt m
+</span></span><span style=display:flex><span>        merge<span style=color:#f92672>(</span>mergeSort<span style=color:#f92672>(</span>pred<span style=color:#f92672>)(</span>l<span style=color:#f92672>),</span> mergeSort<span style=color:#f92672>(</span>pred<span style=color:#f92672>)(</span>r<span style=color:#f92672>))</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>val</span> intSort <span style=color:#66d9ef>=</span> mergeSort<span style=color:#f92672>((</span><span style=color:#66d9ef>_:</span> <span style=color:#66d9ef>Int</span><span style=color:#f92672>)</span> <span style=color:#f92672>&lt;</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>_:</span> <span style=color:#66d9ef>Int</span><span style=color:#f92672>))</span> <span style=color:#66d9ef>_</span>
+</span></span><span style=display:flex><span>println<span style=color:#f92672>(</span>intSort<span style=color:#f92672>(</span><span style=color:#a6e22e>List</span><span style=color:#f92672>(</span><span style=color:#ae81ff>4</span><span style=color:#f92672>,</span> <span style=color:#ae81ff>2</span><span style=color:#f92672>,</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>,</span> <span style=color:#ae81ff>3</span><span style=color:#f92672>)))</span>
+</span></span></code></pre></div><p>Well this looks a little different, only two declared functions by-name, let&rsquo;s go through it piece-by-piece.
+The first point of note is the use of <a href=http://en.wikipedia.org/wiki/Currying rel="external noopener" target=_blank>Currying</a> to initially provide a comparable predicate, followed then by the list of values.
+This can be seen with the &lsquo;intSort&rsquo; partially-applied function that is created using the passed in anonymous-function predicate.
 The nested merge function takes advantage of pattern-matching and recursion to succinctly express the same problem as its Java counterpart.
-Finally declared, the ‘mergeSort’ function is recursively called dividing and merging the resulting lists.
-The returning result definition can be omitted, as Scala can take the last expression (in our case the if-expression) to be this value.</p>
-
-<p>A couple of design considerations that should be taken into account are that it uses linked-lists (instead of arrays), allowing us to perform a more elegant looking pattern match.
+Finally declared, the &lsquo;mergeSort&rsquo; function is recursively called dividing and merging the resulting lists.
+The returning result definition can be omitted, as Scala can take the last expression (in our case the if-expression) to be this value.</p><p>A couple of design considerations that should be taken into account are that it uses linked-lists (instead of arrays), allowing us to perform a more elegant looking pattern match.
 Also, for simplicity I have not addressed tail-recursion and an O(N) cons stack blow-up is likely to occur with sufficient N.
-Maybe in a future post I will address this and explore an example using a lazily evaluated Stream.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://twitter.github.io/scala_school/">Scala School from Twitter</a></li>
-  <li><a href="http://www.coursera.org/course/progfun">Functional Programming Principles in Scala</a></li>
-  <li><a href="http://www.coursera.org/course/reactive">Principles of Reactive Programming</a></li>
-  <li><a href="http://www.scalawags.tv/">Scalawags Podcast</a></li>
-  <li><a href="http://www.simplyscala.com/">Online Scala Interpreter</a></li>
-  <li><a href="http://algs4.cs.princeton.edu/home/">Algorithms, 4th Edition</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Maybe in a future post I will address this and explore an example using a lazily evaluated Stream.</p><h2 id=resources>Resources</h2><ul><li><a href=http://twitter.github.io/scala_school/ rel="external noopener" target=_blank>Scala School from Twitter</a></li><li><a href=http://www.coursera.org/course/progfun rel="external noopener" target=_blank>Functional Programming Principles in Scala</a></li><li><a href=http://www.coursera.org/course/reactive rel="external noopener" target=_blank>Principles of Reactive Programming</a></li><li><a href=http://www.scalawags.tv/ rel="external noopener" target=_blank>Scalawags Podcast</a></li><li><a href=http://www.simplyscala.com/ rel="external noopener" target=_blank>Online Scala Interpreter</a></li><li><a href=http://algs4.cs.princeton.edu/home/ rel="external noopener" target=_blank>Algorithms, 4th Edition</a></li></ul></main><footer class=post__tags><a href=/archive/tag/java>java</a><a href=/archive/tag/scala>scala</a><a href=/archive/tag/functional-programming>functional-programming</a><a href=/archive/tag/algorithms>algorithms</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

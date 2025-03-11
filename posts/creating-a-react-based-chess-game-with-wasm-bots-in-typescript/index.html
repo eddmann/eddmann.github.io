@@ -1,403 +1,271 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to build a React-based chess game integrated with WebAssembly (WASM) bots in TypeScript, utilising React Hooks, the UCI protocol and Yarn 2 features.">
-
-    <title>
-        
-            Creating a React-based Chess Game with WASM Bots in TypeScript &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Creating a React-based Chess Game with WASM Bots in TypeScript</h1>
-    <time datetime="2020-11-11T00:00:00+00:00" class="post-date">11 Nov 2020</time>
-    <p>A couple of years ago I explored using a <a href="https://github.com/niklasf/stockfish.wasm">WebAssembly port</a> of <a href="https://stockfishchess.org/">Stockfish</a> (the popular Chess engine) as a ‘Bot’ for a small React-based Chess implementation.
-I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from.</p>
-
-
-
-<p>You can experiment with the final implementation <a href="https://eddmann.com/chessbot-typescript/">here</a>.
-The source code is available on <a href="https://github.com/eddmann/chessbot-typescript">GitHub</a> to review.</p>
-
-<p><a href="https://eddmann.com/chessbot-typescript/"><img src="/uploads/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/chessbot.png" alt="Chessbot" /></a></p>
-
-<h2 id="the-game-engine">The Game Engine</h2>
-
-<p>To provide the Chess ruleset I decided to expose a simple wrapper around the popular <a href="https://github.com/jhlywa/chess.js">jhlywa/chess.js</a> library.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Creating a React-based Chess Game with WASM Bots in TypeScript - Edd Mann</title>
+<meta name=description content="Learn how to build a React-based chess game integrated with WebAssembly (WASM) bots in TypeScript, utilising React Hooks, the UCI protocol and Yarn 2 features."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Creating a React-based Chess Game with WASM Bots in TypeScript"><meta itemprop=description content="A couple of years ago I explored using a WebAssembly port of Stockfish (the popular Chess engine) as a ‘Bot’ for a small React-based Chess implementation. I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from."><meta itemprop=datePublished content="2020-11-11T00:00:00+00:00"><meta itemprop=dateModified content="2020-11-11T00:00:00+00:00"><meta itemprop=wordCount content="1653"><meta itemprop=keywords content="React,Chess,Typescript,Wasm"><meta property="og:url" content="https://eddmann.com/posts/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Creating a React-based Chess Game with WASM Bots in TypeScript"><meta property="og:description" content="A couple of years ago I explored using a WebAssembly port of Stockfish (the popular Chess engine) as a ‘Bot’ for a small React-based Chess implementation. I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-11-11T00:00:00+00:00"><meta property="article:modified_time" content="2020-11-11T00:00:00+00:00"><meta property="article:tag" content="React"><meta property="article:tag" content="Chess"><meta property="article:tag" content="Typescript"><meta property="article:tag" content="Wasm"><meta name=twitter:card content="summary"><meta name=twitter:title content="Creating a React-based Chess Game with WASM Bots in TypeScript"><meta name=twitter:description content="A couple of years ago I explored using a WebAssembly port of Stockfish (the popular Chess engine) as a ‘Bot’ for a small React-based Chess implementation. I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Creating a React-based Chess Game with WASM Bots in TypeScript</h1><time class=post__time>Nov 11, 2020</time></header><main class=prose><p>A couple of years ago I explored using a <a href=https://github.com/niklasf/stockfish.wasm rel="external noopener" target=_blank>WebAssembly port</a> of <a href=https://stockfishchess.org/ rel="external noopener" target=_blank>Stockfish</a> (the popular Chess engine) as a &lsquo;Bot&rsquo; for a small React-based Chess implementation.
+I decided over the past week to revisit it and rewrite the implementation in TypeScript, along with providing more Bot types to choose from.</p><p>You can experiment with the final implementation <a href=https://eddmann.com/chessbot-typescript/>here</a>.
+The source code is available on <a href=https://github.com/eddmann/chessbot-typescript rel="external noopener" target=_blank>GitHub</a> to review.</p><p><a href=https://eddmann.com/chessbot-typescript/><picture><source type=image/webp srcset=/posts/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/chessbot_hu_ffb9260778e14c74.webp><source type=image/jpeg srcset=/posts/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/chessbot_hu_f68238d4042e6a37.jpg><img src=/posts/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/chessbot_hu_f68238d4042e6a37.jpg alt=Chessbot loading=lazy></picture></a></p><h2 id=the-game-engine>The Game Engine</h2><p>To provide the Chess ruleset I decided to expose a simple wrapper around the popular <a href=https://github.com/jhlywa/chess.js rel="external noopener" target=_blank>jhlywa/chess.js</a> library.
 Abstracting away any state present (as the library is class-based) and providing referentially transparent functions meant that I could simplify the client code.
-All functions based their decisions on a supplied <a href="https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation">Forsyth–Edwards Notation</a> (FEN) state of the current game.</p>
-
-<p>I used a TypeScript type-definition that was provided by DefinitelyTyped for the library but noticed an issue in how it was defining the constructor.
-Thanks to <a href="https://yarnpkg.com/cli/patch">Yarn 2 patches</a> I was able to include a <a href="https://github.com/eddmann/chessbot-typescript/blob/master/%40types-chessjs.diff">diff</a> within my repository that resolved this issue, until it is fixed upstream.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">Chess</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">chess.js</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="kd">type</span> <span class="p">{</span> <span class="nx">Square</span><span class="p">,</span> <span class="nx">Move</span><span class="p">,</span> <span class="nx">ShortMove</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">chess.js</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">type</span> <span class="nx">Fen</span> <span class="o">=</span> <span class="kr">string</span><span class="p">;</span>
-<span class="k">export</span> <span class="kd">type</span> <span class="nx">GameWinner</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span> <span class="o">|</span> <span class="dl">'</span><span class="s1">w</span><span class="dl">'</span> <span class="o">|</span> <span class="kc">null</span><span class="p">;</span>
-<span class="k">export</span> <span class="kd">type</span> <span class="p">{</span> <span class="nx">Square</span><span class="p">,</span> <span class="nx">Move</span><span class="p">,</span> <span class="nx">ShortMove</span> <span class="p">};</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">newGame</span> <span class="o">=</span> <span class="p">():</span> <span class="nx">Fen</span> <span class="o">=&gt;</span> <span class="dl">'</span><span class="s1">rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isNewGame</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="nx">fen</span> <span class="o">===</span> <span class="nx">newGame</span><span class="p">();</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isBlackTurn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">turn</span><span class="p">()</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isWhiteTurn</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">turn</span><span class="p">()</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">w</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isCheck</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">in_check</span><span class="p">();</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">getGameWinner</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">GameWinner</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">game</span> <span class="o">=</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">game</span><span class="p">.</span><span class="nx">in_checkmate</span><span class="p">()</span> <span class="p">?</span> <span class="p">(</span><span class="nx">game</span><span class="p">.</span><span class="nx">turn</span><span class="p">()</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">w</span><span class="dl">'</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">b</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">w</span><span class="dl">'</span><span class="p">)</span> <span class="p">:</span> <span class="kc">null</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isGameOver</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">game_over</span><span class="p">();</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">isMoveable</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">,</span> <span class="k">from</span><span class="p">:</span> <span class="nx">Square</span><span class="p">):</span> <span class="nx">boolean</span> <span class="o">=&gt;</span>
-  <span class="k">new</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">moves</span><span class="p">({</span> <span class="na">square</span><span class="p">:</span> <span class="k">from</span> <span class="p">}).</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">move</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">,</span> <span class="k">from</span><span class="p">:</span> <span class="nx">Square</span><span class="p">,</span> <span class="nx">to</span><span class="p">:</span> <span class="nx">Square</span><span class="p">):</span> <span class="p">[</span><span class="nx">Fen</span><span class="p">,</span> <span class="nx">Move</span><span class="p">]</span> <span class="o">|</span> <span class="kc">null</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">game</span> <span class="o">=</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">game</span><span class="p">.</span><span class="nx">move</span><span class="p">({</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="na">promotion</span><span class="p">:</span> <span class="dl">'</span><span class="s1">q</span><span class="dl">'</span> <span class="p">});</span>
-  <span class="k">return</span> <span class="nx">action</span> <span class="p">?</span> <span class="p">[</span><span class="nx">game</span><span class="p">.</span><span class="nx">fen</span><span class="p">(),</span> <span class="nx">action</span><span class="p">]</span> <span class="p">:</span> <span class="kc">null</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Looking at the engine implementation above you can see that, along with some custom-made types, I also leveraged and exposed several types which were provided by the <code class="language-plaintext highlighter-rouge">chess.js</code> type-definition.</p>
-
-<h2 id="the-bots">The Bots</h2>
-
-<p>With the ability to now determine how a game of Chess is played I could then move on to explore how to model the concept of a Bot.
-I opted to define a couple of types up-front which expressed the behavioural intent of how a Bot should be initialised and used.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="kd">type</span> <span class="p">{</span> <span class="nx">Fen</span><span class="p">,</span> <span class="nx">ShortMove</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./engine</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">type</span> <span class="nx">UninitialisedBot</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">InitialisedBot</span><span class="p">;</span>
-<span class="k">export</span> <span class="kd">type</span> <span class="nx">InitialisedBot</span> <span class="o">=</span> <span class="p">(</span><span class="nx">fen</span><span class="p">:</span> <span class="nx">Fen</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">ShortMove</span><span class="o">&gt;</span><span class="p">;</span>
-<span class="k">export</span> <span class="kd">type</span> <span class="nx">AvailableBots</span> <span class="o">=</span> <span class="nb">Record</span><span class="o">&lt;</span><span class="kr">string</span><span class="p">,</span> <span class="nx">UninitialisedBot</span><span class="o">&gt;</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>Using these types I was able to implement the first example Bot – that being the trivial Random Bot.
-Given a supplied FEN it determines all the available legal moves and then randomly picks one to enact.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">randomMove</span><span class="p">:</span> <span class="nx">UninitialisedBot</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">fen</span> <span class="o">=&gt;</span>
-  <span class="k">new</span> <span class="nb">Promise</span><span class="p">(</span><span class="nx">resolve</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">moves</span> <span class="o">=</span> <span class="nx">Chess</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">moves</span><span class="p">({</span> <span class="na">verbose</span><span class="p">:</span> <span class="kc">true</span> <span class="p">});</span>
-    <span class="kd">const</span> <span class="p">{</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">moves</span><span class="p">[</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">moves</span><span class="p">.</span><span class="nx">length</span><span class="p">)];</span>
-    <span class="nx">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">resolve</span><span class="p">({</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}),</span> <span class="mi">500</span><span class="p">);</span>
-  <span class="p">});</span>
-</code></pre></div></div>
-
-<p>For client-based visual considerations I set a small delay before resolving the Promise.
-This gives the impression of the Bot ‘doing work’ to make the decision.
+All functions based their decisions on a supplied <a href=https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation rel="external noopener" target=_blank>Forsyth–Edwards Notation</a> (FEN) state of the current game.</p><p>I used a TypeScript type-definition that was provided by DefinitelyTyped for the library but noticed an issue in how it was defining the constructor.
+Thanks to <a href=https://yarnpkg.com/cli/patch rel="external noopener" target=_blank>Yarn 2 patches</a> I was able to include a <a href=https://github.com/eddmann/chessbot-typescript/blob/master/%40types-chessjs.diff rel="external noopener" target=_blank>diff</a> within my repository that resolved this issue, until it is fixed upstream.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>Chess</span> <span style=color:#66d9ef>from</span> <span style=color:#e6db74>&#39;chess.js&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#66d9ef>type</span> { <span style=color:#a6e22e>Square</span>, <span style=color:#a6e22e>Move</span>, <span style=color:#a6e22e>ShortMove</span> } <span style=color:#66d9ef>from</span> <span style=color:#e6db74>&#39;chess.js&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Fen</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>string</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>GameWinner</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;b&#39;</span> <span style=color:#f92672>|</span> <span style=color:#e6db74>&#39;w&#39;</span> <span style=color:#f92672>|</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> { <span style=color:#a6e22e>Square</span>, <span style=color:#a6e22e>Move</span>, <span style=color:#a6e22e>ShortMove</span> };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>newGame</span> <span style=color:#f92672>=</span> ()<span style=color:#f92672>:</span> <span style=color:#a6e22e>Fen</span> <span style=color:#f92672>=&gt;</span> <span style=color:#e6db74>&#39;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isNewGame</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>fen</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>newGame</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isBlackTurn</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>turn</span>() <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;b&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isWhiteTurn</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>turn</span>() <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;w&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isCheck</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>in_check</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>getGameWinner</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>GameWinner</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>game</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>game</span>.<span style=color:#a6e22e>in_checkmate</span>() <span style=color:#f92672>?</span> (<span style=color:#a6e22e>game</span>.<span style=color:#a6e22e>turn</span>() <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;w&#39;</span> <span style=color:#f92672>?</span> <span style=color:#e6db74>&#39;b&#39;</span> <span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;w&#39;</span>) <span style=color:#f92672>:</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isGameOver</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>game_over</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isMoveable</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>, <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>Square</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>boolean</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>moves</span>({ <span style=color:#a6e22e>square</span>: <span style=color:#66d9ef>from</span> }).<span style=color:#a6e22e>length</span> <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>move</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>, <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>Square</span>, <span style=color:#a6e22e>to</span>: <span style=color:#66d9ef>Square</span>)<span style=color:#f92672>:</span> [<span style=color:#a6e22e>Fen</span>, <span style=color:#a6e22e>Move</span>] <span style=color:#f92672>|</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>game</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>action</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>game</span>.<span style=color:#a6e22e>move</span>({ <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span>, <span style=color:#a6e22e>promotion</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;q&#39;</span> });
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>action</span> <span style=color:#f92672>?</span> [<span style=color:#a6e22e>game</span>.<span style=color:#a6e22e>fen</span>(), <span style=color:#a6e22e>action</span>] <span style=color:#f92672>:</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Looking at the engine implementation above you can see that, along with some custom-made types, I also leveraged and exposed several types which were provided by the <code>chess.js</code> type-definition.</p><h2 id=the-bots>The Bots</h2><p>With the ability to now determine how a game of Chess is played I could then move on to explore how to model the concept of a Bot.
+I opted to define a couple of types up-front which expressed the behavioural intent of how a Bot should be initialised and used.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#66d9ef>type</span> { <span style=color:#a6e22e>Fen</span>, <span style=color:#a6e22e>ShortMove</span> } <span style=color:#66d9ef>from</span> <span style=color:#e6db74>&#39;./engine&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>UninitialisedBot</span> <span style=color:#f92672>=</span> () <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>InitialisedBot</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>InitialisedBot</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>Fen</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>Promise</span>&lt;<span style=color:#f92672>ShortMove</span>&gt;;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>type</span> <span style=color:#a6e22e>AvailableBots</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>Record</span>&lt;<span style=color:#f92672>string</span>, <span style=color:#a6e22e>UninitialisedBot</span>&gt;;
+</span></span></code></pre></div><p>Using these types I was able to implement the first example Bot – that being the trivial Random Bot.
+Given a supplied FEN it determines all the available legal moves and then randomly picks one to enact.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>randomMove</span>: <span style=color:#66d9ef>UninitialisedBot</span> <span style=color:#f92672>=</span> () <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>fen</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Promise</span>(<span style=color:#a6e22e>resolve</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>moves</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>Chess</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>moves</span>({ <span style=color:#a6e22e>verbose</span>: <span style=color:#66d9ef>true</span> });
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> { <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>moves</span>[Math.<span style=color:#a6e22e>floor</span>(Math.<span style=color:#a6e22e>random</span>() <span style=color:#f92672>*</span> <span style=color:#a6e22e>moves</span>.<span style=color:#a6e22e>length</span>)];
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setTimeout</span>(() <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>resolve</span>({ <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }), <span style=color:#ae81ff>500</span>);
+</span></span><span style=display:flex><span>  });
+</span></span></code></pre></div><p>For client-based visual considerations I set a small delay before resolving the Promise.
+This gives the impression of the Bot &lsquo;doing work&rsquo; to make the decision.
 With this bot now available, I moved on to expressing externally provided Bots.
-Using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers">Web Workers</a> and the <a href="https://en.wikipedia.org/wiki/Universal_Chess_Interface">Universal Chess Interface</a> (UCI) I found it possible to interface with several different JavaScript/WASM-based Chess Bots.
-The code executed in the Web Worker was either JavaScript-based in the case of <a href="https://github.com/op12no2/lozza">op12no2/lozza</a> or WASM-based in the case of the Stockfish-port <a href="https://github.com/nmrugg/stockfish.js/">nmrugg/stockfish.js</a>.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">uciWorker</span> <span class="o">=</span> <span class="p">(</span><span class="nx">file</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">actions</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="kr">string</span><span class="o">&gt;</span><span class="p">):</span> <span class="nx">UninitialisedBot</span> <span class="o">=&gt;</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Worker</span><span class="p">(</span><span class="nx">file</span><span class="p">);</span>
-
-  <span class="kd">let</span> <span class="na">resolver</span><span class="p">:</span> <span class="p">((</span><span class="na">move</span><span class="p">:</span> <span class="nx">ShortMove</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">)</span> <span class="o">|</span> <span class="kc">null</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-
-  <span class="nx">worker</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">message</span><span class="dl">'</span><span class="p">,</span> <span class="nx">e</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">move</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/^bestmove</span><span class="se">\s([</span><span class="sr">a-h</span><span class="se">][</span><span class="sr">1-8</span><span class="se">])([</span><span class="sr">a-h</span><span class="se">][</span><span class="sr">1-8</span><span class="se">])</span><span class="sr">/</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">move</span> <span class="o">&amp;&amp;</span> <span class="nx">resolver</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">resolver</span><span class="p">({</span> <span class="na">from</span><span class="p">:</span> <span class="nx">move</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="na">to</span><span class="p">:</span> <span class="nx">move</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">});</span>
-      <span class="nx">resolver</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">});</span>
-
-  <span class="k">return</span> <span class="nx">fen</span> <span class="o">=&gt;</span>
-    <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">resolver</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">reject</span><span class="p">(</span><span class="dl">'</span><span class="s1">Pending move is present</span><span class="dl">'</span><span class="p">);</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="nx">resolver</span> <span class="o">=</span> <span class="nx">resolve</span><span class="p">;</span>
-      <span class="nx">worker</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="s2">`position fen </span><span class="p">${</span><span class="nx">fen</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
-      <span class="nx">actions</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="nx">action</span> <span class="o">=&gt;</span> <span class="nx">worker</span><span class="p">.</span><span class="nx">postMessage</span><span class="p">(</span><span class="nx">action</span><span class="p">));</span>
-    <span class="p">});</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Providing the above abstraction allowed me to define many different external Bots and configurations (levels and depths).
+Using <a href=https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers rel="external noopener" target=_blank>Web Workers</a> and the <a href=https://en.wikipedia.org/wiki/Universal_Chess_Interface rel="external noopener" target=_blank>Universal Chess Interface</a> (UCI) I found it possible to interface with several different JavaScript/WASM-based Chess Bots.
+The code executed in the Web Worker was either JavaScript-based in the case of <a href=https://github.com/op12no2/lozza rel="external noopener" target=_blank>op12no2/lozza</a> or WASM-based in the case of the Stockfish-port <a href=https://github.com/nmrugg/stockfish.js/ rel="external noopener" target=_blank>nmrugg/stockfish.js</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>uciWorker</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>file</span>: <span style=color:#66d9ef>string</span>, <span style=color:#a6e22e>actions</span>: <span style=color:#66d9ef>Array</span>&lt;<span style=color:#f92672>string</span>&gt;)<span style=color:#f92672>:</span> <span style=color:#a6e22e>UninitialisedBot</span> <span style=color:#f92672>=&gt;</span> () <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>worker</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Worker</span>(<span style=color:#a6e22e>file</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>resolver</span><span style=color:#f92672>:</span> ((<span style=color:#a6e22e>move</span>: <span style=color:#66d9ef>ShortMove</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>void</span>) <span style=color:#f92672>|</span> <span style=color:#66d9ef>null</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>worker</span>.<span style=color:#a6e22e>addEventListener</span>(<span style=color:#e6db74>&#39;message&#39;</span>, <span style=color:#a6e22e>e</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>move</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>data</span>.<span style=color:#a6e22e>match</span>(<span style=color:#e6db74>/^bestmove\s([a-h][1-8])([a-h][1-8])/</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>move</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>resolver</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>resolver</span>({ <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>move</span>[<span style=color:#ae81ff>1</span>], <span style=color:#a6e22e>to</span>: <span style=color:#66d9ef>move</span>[<span style=color:#ae81ff>2</span>] });
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>resolver</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>null</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>fen</span> <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Promise</span>((<span style=color:#a6e22e>resolve</span>, <span style=color:#a6e22e>reject</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>resolver</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>reject</span>(<span style=color:#e6db74>&#39;Pending move is present&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>resolver</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>resolve</span>;
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>worker</span>.<span style=color:#a6e22e>postMessage</span>(<span style=color:#e6db74>`position fen </span><span style=color:#e6db74>${</span><span style=color:#a6e22e>fen</span><span style=color:#e6db74>}</span><span style=color:#e6db74>`</span>);
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>actions</span>.<span style=color:#a6e22e>forEach</span>(<span style=color:#a6e22e>action</span> <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>worker</span>.<span style=color:#a6e22e>postMessage</span>(<span style=color:#a6e22e>action</span>));
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Providing the above abstraction allowed me to define many different external Bots and configurations (levels and depths).
 It also paves the way for extension to any other Bot that supports the UCI protocol in the future.
 Converting the Web Worker message-based system into a Promise was an interesting exercise.
-Harnessing the power of closures, I needed to keep a reference to the current <code class="language-plaintext highlighter-rouge">resolve</code> function.
-Upon the <code class="language-plaintext highlighter-rouge">bestmove</code> Bot response I could then resolve the given Promise.</p>
-
-<p>Finally, these Bots could be exposed for use within the React Chess implementation like so.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">Bots</span><span class="p">:</span> <span class="nx">AvailableBots</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">Random</span><span class="p">:</span> <span class="nx">randomMove</span><span class="p">,</span>
-  <span class="dl">'</span><span class="s1">nmrugg/stockfish (l:1,d:10)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/stockfish.js-10.0.2/stockfish.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 1</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go depth 10</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-  <span class="dl">'</span><span class="s1">nmrugg/stockfish (l:20,d:10)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/stockfish.js-10.0.2/stockfish.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 20</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go depth 10</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-  <span class="dl">'</span><span class="s1">nmrugg/stockfish (l:20,t:1s)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/stockfish.js-10.0.2/stockfish.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 20</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go movetime 1000</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-  <span class="dl">'</span><span class="s1">op12no2/lozza (l:1,d:10)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/lozza-1.18/lozza.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 1</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go depth 10</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-  <span class="dl">'</span><span class="s1">op12no2/lozza (l:20,d:10)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/lozza-1.18/lozza.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 20</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go depth 10</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-  <span class="dl">'</span><span class="s1">op12no2/lozza (l:20,t:1s)</span><span class="dl">'</span><span class="p">:</span> <span class="nx">uciWorker</span><span class="p">(</span><span class="dl">'</span><span class="s1">bots/lozza-1.18/lozza.js</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span>
-    <span class="dl">'</span><span class="s1">setoption name Skill Level value 20</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">go movetime 1000</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">]),</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<h2 id="the-react-interface">The React Interface</h2>
-
-<p>The game interface itself leverages the <a href="https://github.com/willb335/chessboardjsx">willb335/chessboardjsx</a> React component to provide the Chessboard implementation.
-I also use a typed <a href="https://create-react-app.dev/docs/adding-a-css-modules-stylesheet/">CSS Modules Stylesheet</a> to cleanly separate out the desired client-side styling concerns.
-The user is able to specify whether each player is user-based or Bot-based, and if Bot-based which configuration they would like to use.</p>
-
-<p>The <code class="language-plaintext highlighter-rouge">BotSelector</code> below provides a simple component which achieves this goal.
-Upon selection an initialised Bot is passed back to the parent component via a <code class="language-plaintext highlighter-rouge">setSelectedBot</code> function invocation.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">BotSelector</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">FC</span><span class="o">&lt;</span><span class="p">{</span>
-  <span class="na">playerName</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
-  <span class="nl">availableBots</span><span class="p">:</span> <span class="nx">AvailableBots</span><span class="p">;</span>
-  <span class="nl">selectedBot</span><span class="p">:</span> <span class="nx">SelectedBot</span><span class="p">;</span>
-  <span class="nl">setSelectedBot</span><span class="p">:</span> <span class="p">(</span><span class="na">bot</span><span class="p">:</span> <span class="nx">SelectedBot</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
-  <span class="nl">disabled</span><span class="p">:</span> <span class="nx">boolean</span><span class="p">;</span>
-<span class="p">}</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">playerName</span><span class="p">,</span> <span class="nx">availableBots</span><span class="p">,</span> <span class="nx">selectedBot</span><span class="p">,</span> <span class="nx">setSelectedBot</span><span class="p">,</span> <span class="nx">disabled</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">handleChange</span> <span class="o">=</span> <span class="p">(</span><span class="na">e</span><span class="p">:</span> <span class="nx">ChangeEvent</span><span class="o">&lt;</span><span class="nx">HTMLSelectElement</span><span class="o">&gt;</span><span class="p">):</span> <span class="k">void</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">name</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
-    <span class="nx">setSelectedBot</span><span class="p">(</span><span class="nx">name</span> <span class="p">?</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="na">move</span><span class="p">:</span> <span class="nx">availableBots</span><span class="p">[</span><span class="nx">name</span><span class="p">]()</span> <span class="p">}</span> <span class="p">:</span> <span class="kc">null</span><span class="p">);</span>
-  <span class="p">};</span>
-
-  <span class="k">return</span> <span class="p">(</span>
-    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">BotSelector</span><span class="p">}</span><span class="o">&gt;</span>
-      <span class="o">&lt;</span><span class="nx">label</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">playerName</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/label</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="nx">select</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">selectedBot</span><span class="p">?.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="nx">handleChange</span><span class="p">}</span> <span class="nx">disabled</span><span class="o">=</span><span class="p">{</span><span class="nx">disabled</span><span class="p">}</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">option</span> <span class="nx">value</span><span class="o">=</span><span class="dl">""</span> <span class="nx">key</span><span class="o">=</span><span class="dl">"</span><span class="s2">User</span><span class="dl">"</span><span class="o">&gt;</span>
-          <span class="nx">User</span>
-        <span class="o">&lt;</span><span class="sr">/option</span><span class="err">&gt;
-</span>        <span class="p">{</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">availableBots</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">name</span> <span class="o">=&gt;</span> <span class="p">(</span>
-          <span class="o">&lt;</span><span class="nx">option</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="sr">/option</span><span class="err">&gt;
-</span>        <span class="p">))}</span>
-      <span class="o">&lt;</span><span class="sr">/select</span><span class="err">&gt;
-</span>    <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
-</span>  <span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>So as to recount the game’s previous moves, I also provided the concept of a <code class="language-plaintext highlighter-rouge">History</code> listing.
-This includes all the previous moves in <a href="https://en.wikipedia.org/wiki/Portable_Game_Notation">Portable Game Notation</a> (PGN) form.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">History</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">FC</span><span class="o">&lt;</span><span class="p">{</span> <span class="na">history</span><span class="p">:</span> <span class="nb">Array</span><span class="o">&lt;</span><span class="nx">engine</span><span class="p">.</span><span class="nx">Move</span><span class="o">&gt;</span> <span class="p">}</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">history</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">endRef</span> <span class="o">=</span> <span class="nx">useRef</span><span class="o">&lt;</span><span class="nx">HTMLDivElement</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-
-  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">endRef</span><span class="p">.</span><span class="nx">current</span><span class="p">?.</span><span class="nx">scrollIntoView</span><span class="p">();</span>
-  <span class="p">},</span> <span class="p">[</span><span class="nx">history</span><span class="p">]);</span>
-
-  <span class="k">return</span> <span class="p">(</span>
-    <span class="o">&lt;</span><span class="nx">pre</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">History</span><span class="p">}</span><span class="o">&gt;</span>
-      <span class="p">{</span><span class="nx">history</span><span class="p">.</span><span class="nx">map</span><span class="p">(({</span> <span class="nx">color</span><span class="p">,</span> <span class="nx">piece</span><span class="p">,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">san</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="s2">`</span><span class="p">${</span><span class="nx">color</span><span class="p">}${</span><span class="nx">piece</span><span class="p">}${</span><span class="k">from</span><span class="p">}</span><span class="s2"> </span><span class="p">${</span><span class="nx">san</span><span class="p">}</span><span class="s2">`</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)}</span>
-      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">ref</span><span class="o">=</span><span class="p">{</span><span class="nx">endRef</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
-</span>    <span class="o">&lt;</span><span class="sr">/pre</span><span class="err">&gt;
-</span>  <span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Using an empty <code class="language-plaintext highlighter-rouge">div</code> HTML reference I was able to ensure that the listing was pinned to the bottom at all times.
-The provided effect ensured that we only attempted to interact with the DOM and scroll the HTML element when the supplied history had changed.</p>
-
-<p>Finally, we could incorporate these two components into the React interface itself.
-Storing the game state and Bot selection choices in this manner allowed me to harness a single effect to invoke any Bot moves and to determine if the game had completed.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">App</span><span class="p">:</span> <span class="nx">React</span><span class="p">.</span><span class="nx">FC</span><span class="o">&lt;</span><span class="p">{</span>
-  <span class="na">bots</span><span class="p">:</span> <span class="nx">AvailableBots</span><span class="p">;</span>
-  <span class="nl">onGameCompleted</span><span class="p">:</span> <span class="p">(</span><span class="na">winner</span><span class="p">:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">GameWinner</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">;</span>
-<span class="p">}</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">({</span> <span class="nx">bots</span><span class="p">,</span> <span class="nx">onGameCompleted</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">isPlaying</span><span class="p">,</span> <span class="nx">setPlaying</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="o">&lt;</span><span class="nx">boolean</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">fen</span><span class="p">,</span> <span class="nx">setFen</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="o">&lt;</span><span class="nx">engine</span><span class="p">.</span><span class="nx">Fen</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">engine</span><span class="p">.</span><span class="nx">newGame</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">history</span><span class="p">,</span> <span class="nx">setHistory</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="o">&lt;</span><span class="nb">Array</span><span class="o">&lt;</span><span class="nx">engine</span><span class="p">.</span><span class="nx">Move</span><span class="o">&gt;&gt;</span><span class="p">([]);</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">whiteBot</span><span class="p">,</span> <span class="nx">setWhiteBot</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="o">&lt;</span><span class="nx">SelectedBot</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">blackBot</span><span class="p">,</span> <span class="nx">setBlackBot</span><span class="p">]</span> <span class="o">=</span> <span class="nx">useState</span><span class="o">&lt;</span><span class="nx">SelectedBot</span><span class="o">&gt;</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
-
-  <span class="kd">const</span> <span class="nx">newGame</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">setPlaying</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
-    <span class="nx">setFen</span><span class="p">(</span><span class="nx">engine</span><span class="p">.</span><span class="nx">newGame</span><span class="p">);</span>
-    <span class="nx">setHistory</span><span class="p">([]);</span>
-  <span class="p">};</span>
-
-  <span class="kd">const</span> <span class="nx">doMove</span> <span class="o">=</span> <span class="nx">useCallback</span><span class="p">(</span>
-    <span class="p">(</span><span class="na">fen</span><span class="p">:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">Fen</span><span class="p">,</span> <span class="na">from</span><span class="p">:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">Square</span><span class="p">,</span> <span class="na">to</span><span class="p">:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">Square</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="kd">const</span> <span class="nx">move</span> <span class="o">=</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">move</span><span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">);</span>
-
-      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">move</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="kd">const</span> <span class="p">[</span><span class="nx">newFen</span><span class="p">,</span> <span class="nx">action</span><span class="p">]</span> <span class="o">=</span> <span class="nx">move</span><span class="p">;</span>
-
-      <span class="k">if</span> <span class="p">(</span><span class="nx">engine</span><span class="p">.</span><span class="nx">isGameOver</span><span class="p">(</span><span class="nx">newFen</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nx">onGameCompleted</span><span class="p">(</span><span class="nx">engine</span><span class="p">.</span><span class="nx">getGameWinner</span><span class="p">(</span><span class="nx">newFen</span><span class="p">));</span>
-        <span class="nx">newGame</span><span class="p">();</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="nx">setFen</span><span class="p">(</span><span class="nx">newFen</span><span class="p">);</span>
-      <span class="nx">setHistory</span><span class="p">(</span><span class="nx">history</span> <span class="o">=&gt;</span> <span class="p">[...</span><span class="nx">history</span><span class="p">,</span> <span class="nx">action</span><span class="p">]);</span>
-    <span class="p">},</span>
-    <span class="p">[</span><span class="nx">onGameCompleted</span><span class="p">]</span>
-  <span class="p">);</span>
-
-  <span class="kd">const</span> <span class="nx">onDragStart</span> <span class="o">=</span> <span class="p">({</span> <span class="na">sourceSquare</span><span class="p">:</span> <span class="k">from</span> <span class="p">}:</span> <span class="nb">Pick</span><span class="o">&lt;</span><span class="nx">BoardMove</span><span class="p">,</span> <span class="dl">'</span><span class="s1">sourceSquare</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">isWhiteBotTurn</span> <span class="o">=</span> <span class="nx">whiteBot</span> <span class="o">&amp;&amp;</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">isWhiteTurn</span><span class="p">(</span><span class="nx">fen</span><span class="p">);</span>
-    <span class="kd">const</span> <span class="nx">isBlackBotTurn</span> <span class="o">=</span> <span class="nx">blackBot</span> <span class="o">&amp;&amp;</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">isBlackTurn</span><span class="p">(</span><span class="nx">fen</span><span class="p">);</span>
-
-    <span class="k">return</span> <span class="nx">isPlaying</span> <span class="o">&amp;&amp;</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">isMoveable</span><span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="k">from</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nx">isWhiteBotTurn</span> <span class="o">||</span> <span class="nx">isBlackBotTurn</span><span class="p">);</span>
-  <span class="p">};</span>
-
-  <span class="kd">const</span> <span class="nx">onMovePiece</span> <span class="o">=</span> <span class="p">({</span> <span class="na">sourceSquare</span><span class="p">:</span> <span class="k">from</span><span class="p">,</span> <span class="na">targetSquare</span><span class="p">:</span> <span class="nx">to</span> <span class="p">}:</span> <span class="nx">BoardMove</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">doMove</span><span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">);</span>
-  <span class="p">};</span>
-
-  <span class="nx">useEffect</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isPlaying</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">let</span> <span class="nx">isBotMovePlayable</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">whiteBot</span> <span class="o">&amp;&amp;</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">isWhiteTurn</span><span class="p">(</span><span class="nx">fen</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">whiteBot</span><span class="p">.</span><span class="nx">move</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">ShortMove</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">isBotMovePlayable</span><span class="p">)</span> <span class="nx">doMove</span><span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">);</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nx">blackBot</span> <span class="o">&amp;&amp;</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">isBlackTurn</span><span class="p">(</span><span class="nx">fen</span><span class="p">))</span> <span class="p">{</span>
-      <span class="nx">blackBot</span><span class="p">.</span><span class="nx">move</span><span class="p">(</span><span class="nx">fen</span><span class="p">).</span><span class="nx">then</span><span class="p">(({</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}:</span> <span class="nx">engine</span><span class="p">.</span><span class="nx">ShortMove</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">isBotMovePlayable</span><span class="p">)</span> <span class="nx">doMove</span><span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span><span class="p">);</span>
-      <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">isBotMovePlayable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-    <span class="p">};</span>
-  <span class="p">},</span> <span class="p">[</span><span class="nx">isPlaying</span><span class="p">,</span> <span class="nx">fen</span><span class="p">,</span> <span class="nx">whiteBot</span><span class="p">,</span> <span class="nx">blackBot</span><span class="p">,</span> <span class="nx">doMove</span><span class="p">]);</span>
-
-  <span class="k">return</span> <span class="p">(</span>
-    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">App</span><span class="p">}</span><span class="o">&gt;</span>
-      <span class="o">&lt;</span><span class="nx">header</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="err">♛</span> <span class="nx">Chessbot</span><span class="o">&lt;</span><span class="sr">/h1</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="sr">/header</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">TopNav</span><span class="p">}</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">BotSelector</span>
-          <span class="nx">playerName</span><span class="o">=</span><span class="dl">"</span><span class="s2">White</span><span class="dl">"</span>
-          <span class="nx">availableBots</span><span class="o">=</span><span class="p">{</span><span class="nx">bots</span><span class="p">}</span>
-          <span class="nx">selectedBot</span><span class="o">=</span><span class="p">{</span><span class="nx">whiteBot</span><span class="p">}</span>
-          <span class="nx">setSelectedBot</span><span class="o">=</span><span class="p">{</span><span class="nx">setWhiteBot</span><span class="p">}</span>
-          <span class="nx">disabled</span><span class="o">=</span><span class="p">{</span><span class="nx">isPlaying</span><span class="p">}</span>
-        <span class="sr">/</span><span class="err">&gt;
-</span>        <span class="o">&lt;</span><span class="nx">BotSelector</span>
-          <span class="nx">playerName</span><span class="o">=</span><span class="dl">"</span><span class="s2">Black</span><span class="dl">"</span>
-          <span class="nx">availableBots</span><span class="o">=</span><span class="p">{</span><span class="nx">bots</span><span class="p">}</span>
-          <span class="nx">selectedBot</span><span class="o">=</span><span class="p">{</span><span class="nx">blackBot</span><span class="p">}</span>
-          <span class="nx">setSelectedBot</span><span class="o">=</span><span class="p">{</span><span class="nx">setBlackBot</span><span class="p">}</span>
-          <span class="nx">disabled</span><span class="o">=</span><span class="p">{</span><span class="nx">isPlaying</span><span class="p">}</span>
-        <span class="sr">/</span><span class="err">&gt;
-</span>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">Button</span><span class="p">}</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{()</span> <span class="o">=&gt;</span> <span class="nx">setPlaying</span><span class="p">(</span><span class="nx">playing</span> <span class="o">=&gt;</span> <span class="o">!</span><span class="nx">playing</span><span class="p">)}</span><span class="o">&gt;</span>
-          <span class="p">{</span><span class="nx">isPlaying</span> <span class="p">?</span> <span class="dl">'</span><span class="s1">Pause</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">Play</span><span class="dl">'</span><span class="p">}</span>
-        <span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
-</span>        <span class="o">&lt;</span><span class="nx">button</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">Button</span><span class="p">}</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="nx">newGame</span><span class="p">}</span><span class="o">&gt;</span>
-          <span class="nx">Reset</span>
-        <span class="o">&lt;</span><span class="sr">/button</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="nx">styles</span><span class="p">.</span><span class="nx">Chessboard</span><span class="p">}</span><span class="o">&gt;</span>
-        <span class="o">&lt;</span><span class="nx">Chessboard</span> <span class="nx">position</span><span class="o">=</span><span class="p">{</span><span class="nx">fen</span><span class="p">}</span> <span class="nx">allowDrag</span><span class="o">=</span><span class="p">{</span><span class="nx">onDragStart</span><span class="p">}</span> <span class="nx">onDrop</span><span class="o">=</span><span class="p">{</span><span class="nx">onMovePiece</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
-</span>      <span class="o">&lt;</span><span class="nx">History</span> <span class="nx">history</span><span class="o">=</span><span class="p">{</span><span class="nx">history</span><span class="p">}</span> <span class="sr">/</span><span class="err">&gt;
-</span>    <span class="o">&lt;</span><span class="sr">/div</span><span class="err">&gt;
-</span>  <span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Wrapping the <code class="language-plaintext highlighter-rouge">doMove</code> in a Callback hook ensured that the game effect was not needlessly invoked upon render unless the game state or <code class="language-plaintext highlighter-rouge">onGameCompleted</code> callback had changed.
-I also provided some clean-up in the way that if the game had changed in-between requesting a Bot move, we would discard the previous move, thus ensuring that the game maintained a valid state.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>I found this small project to be a very valuable exercise in exploring what is possible using TypeScript and React Hooks.
-It also provided me with a good opportunity to explore Yarn 2 and <a href="https://yarnpkg.com/features/zero-installs">Zero-installs</a>.
-I enjoyed creating the abstraction around the concept of a UCI-based Bot, paving the way for additional Bots to be added in the future.</p>
-
-<p>Going forward it would be interesting to explore providing more than just the current FEN chess state to the given Bot.
+Harnessing the power of closures, I needed to keep a reference to the current <code>resolve</code> function.
+Upon the <code>bestmove</code> Bot response I could then resolve the given Promise.</p><p>Finally, these Bots could be exposed for use within the React Chess implementation like so.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>Bots</span>: <span style=color:#66d9ef>AvailableBots</span> <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Random</span>: <span style=color:#66d9ef>randomMove</span>,
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;nmrugg/stockfish (l:1,d:10)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/stockfish.js-10.0.2/stockfish.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 1&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go depth 10&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;nmrugg/stockfish (l:20,d:10)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/stockfish.js-10.0.2/stockfish.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 20&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go depth 10&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;nmrugg/stockfish (l:20,t:1s)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/stockfish.js-10.0.2/stockfish.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 20&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go movetime 1000&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;op12no2/lozza (l:1,d:10)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/lozza-1.18/lozza.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 1&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go depth 10&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;op12no2/lozza (l:20,d:10)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/lozza-1.18/lozza.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 20&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go depth 10&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#39;op12no2/lozza (l:20,t:1s)&#39;</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>uciWorker</span>(<span style=color:#e6db74>&#39;bots/lozza-1.18/lozza.js&#39;</span>, [
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;setoption name Skill Level value 20&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;go movetime 1000&#39;</span>,
+</span></span><span style=display:flex><span>  ]),
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><h2 id=the-react-interface>The React Interface</h2><p>The game interface itself leverages the <a href=https://github.com/willb335/chessboardjsx rel="external noopener" target=_blank>willb335/chessboardjsx</a> React component to provide the Chessboard implementation.
+I also use a typed <a href=https://create-react-app.dev/docs/adding-a-css-modules-stylesheet/ rel="external noopener" target=_blank>CSS Modules Stylesheet</a> to cleanly separate out the desired client-side styling concerns.
+The user is able to specify whether each player is user-based or Bot-based, and if Bot-based which configuration they would like to use.</p><p>The <code>BotSelector</code> below provides a simple component which achieves this goal.
+Upon selection an initialised Bot is passed back to the parent component via a <code>setSelectedBot</code> function invocation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>BotSelector</span>: <span style=color:#66d9ef>React.FC</span><span style=color:#f92672>&lt;</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>playerName</span>: <span style=color:#66d9ef>string</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>availableBots</span>: <span style=color:#66d9ef>AvailableBots</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>selectedBot</span>: <span style=color:#66d9ef>SelectedBot</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>setSelectedBot</span><span style=color:#f92672>:</span> (<span style=color:#a6e22e>bot</span>: <span style=color:#66d9ef>SelectedBot</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>void</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>disabled</span>: <span style=color:#66d9ef>boolean</span>;
+</span></span><span style=display:flex><span>}<span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> ({ <span style=color:#a6e22e>playerName</span>, <span style=color:#a6e22e>availableBots</span>, <span style=color:#a6e22e>selectedBot</span>, <span style=color:#a6e22e>setSelectedBot</span>, <span style=color:#a6e22e>disabled</span> }) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>handleChange</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>e</span>: <span style=color:#66d9ef>ChangeEvent</span>&lt;<span style=color:#f92672>HTMLSelectElement</span>&gt;)<span style=color:#f92672>:</span> <span style=color:#66d9ef>void</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>name</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>e</span>.<span style=color:#a6e22e>target</span>.<span style=color:#a6e22e>value</span>;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setSelectedBot</span>(<span style=color:#a6e22e>name</span> <span style=color:#f92672>?</span> { <span style=color:#a6e22e>name</span>, <span style=color:#a6e22e>move</span>: <span style=color:#66d9ef>availableBots</span>[<span style=color:#a6e22e>name</span>]() } <span style=color:#f92672>:</span> <span style=color:#66d9ef>null</span>);
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> (
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>BotSelector</span>}&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>label</span>&gt;{<span style=color:#a6e22e>playerName</span>}&lt;/<span style=color:#f92672>label</span>&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>select</span> <span style=color:#a6e22e>value</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>selectedBot</span><span style=color:#f92672>?</span>.<span style=color:#a6e22e>name</span>} <span style=color:#a6e22e>onChange</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>handleChange</span>} <span style=color:#a6e22e>disabled</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>disabled</span>}&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>option</span> <span style=color:#a6e22e>value</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span> <span style=color:#a6e22e>key</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;User&#34;</span>&gt;
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>User</span>
+</span></span><span style=display:flex><span>        &lt;/<span style=color:#f92672>option</span>&gt;
+</span></span><span style=display:flex><span>        {Object.<span style=color:#a6e22e>keys</span>(<span style=color:#a6e22e>availableBots</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>name</span> <span style=color:#f92672>=&gt;</span> (
+</span></span><span style=display:flex><span>          &lt;<span style=color:#f92672>option</span> <span style=color:#a6e22e>key</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>name</span>}&gt;{<span style=color:#a6e22e>name</span>}&lt;/<span style=color:#f92672>option</span>&gt;
+</span></span><span style=display:flex><span>        ))}
+</span></span><span style=display:flex><span>      &lt;/<span style=color:#f92672>select</span>&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>So as to recount the game&rsquo;s previous moves, I also provided the concept of a <code>History</code> listing.
+This includes all the previous moves in <a href=https://en.wikipedia.org/wiki/Portable_Game_Notation rel="external noopener" target=_blank>Portable Game Notation</a> (PGN) form.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>History</span>: <span style=color:#66d9ef>React.FC</span><span style=color:#f92672>&lt;</span>{ <span style=color:#a6e22e>history</span>: <span style=color:#66d9ef>Array</span>&lt;<span style=color:#f92672>engine.Move</span>&gt; }<span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> ({ <span style=color:#a6e22e>history</span> }) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>endRef</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>useRef</span>&lt;<span style=color:#f92672>HTMLDivElement</span>&gt;(<span style=color:#66d9ef>null</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>useEffect</span>(() <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>endRef</span>.<span style=color:#a6e22e>current</span><span style=color:#f92672>?</span>.<span style=color:#a6e22e>scrollIntoView</span>();
+</span></span><span style=display:flex><span>  }, [<span style=color:#a6e22e>history</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> (
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>pre</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>History</span>}&gt;
+</span></span><span style=display:flex><span>      {<span style=color:#a6e22e>history</span>.<span style=color:#a6e22e>map</span>(({ <span style=color:#a6e22e>color</span>, <span style=color:#a6e22e>piece</span>, <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>san</span> }) <span style=color:#f92672>=&gt;</span> <span style=color:#e6db74>`</span><span style=color:#e6db74>${</span><span style=color:#a6e22e>color</span><span style=color:#e6db74>}${</span><span style=color:#a6e22e>piece</span><span style=color:#e6db74>}${</span><span style=color:#66d9ef>from</span><span style=color:#e6db74>}</span><span style=color:#e6db74> </span><span style=color:#e6db74>${</span><span style=color:#a6e22e>san</span><span style=color:#e6db74>}</span><span style=color:#e6db74>`</span>).<span style=color:#a6e22e>join</span>(<span style=color:#e6db74>&#39;\n&#39;</span>)}
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>ref</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>endRef</span>} /&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>pre</span>&gt;
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Using an empty <code>div</code> HTML reference I was able to ensure that the listing was pinned to the bottom at all times.
+The provided effect ensured that we only attempted to interact with the DOM and scroll the HTML element when the supplied history had changed.</p><p>Finally, we could incorporate these two components into the React interface itself.
+Storing the game state and Bot selection choices in this manner allowed me to harness a single effect to invoke any Bot moves and to determine if the game had completed.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>App</span>: <span style=color:#66d9ef>React.FC</span><span style=color:#f92672>&lt;</span>{
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>bots</span>: <span style=color:#66d9ef>AvailableBots</span>;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>onGameCompleted</span><span style=color:#f92672>:</span> (<span style=color:#a6e22e>winner</span>: <span style=color:#66d9ef>engine.GameWinner</span>) <span style=color:#f92672>=&gt;</span> <span style=color:#66d9ef>void</span>;
+</span></span><span style=display:flex><span>}<span style=color:#f92672>&gt;</span> <span style=color:#f92672>=</span> ({ <span style=color:#a6e22e>bots</span>, <span style=color:#a6e22e>onGameCompleted</span> }) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>isPlaying</span>, <span style=color:#a6e22e>setPlaying</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>useState</span>&lt;<span style=color:#f92672>boolean</span>&gt;(<span style=color:#66d9ef>false</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>fen</span>, <span style=color:#a6e22e>setFen</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>useState</span>&lt;<span style=color:#f92672>engine.Fen</span>&gt;(<span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>newGame</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>history</span>, <span style=color:#a6e22e>setHistory</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>useState</span>&lt;<span style=color:#f92672>Array</span>&lt;<span style=color:#f92672>engine.Move</span>&gt;&gt;([]);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>whiteBot</span>, <span style=color:#a6e22e>setWhiteBot</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>useState</span>&lt;<span style=color:#f92672>SelectedBot</span>&gt;(<span style=color:#66d9ef>null</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>blackBot</span>, <span style=color:#a6e22e>setBlackBot</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>useState</span>&lt;<span style=color:#f92672>SelectedBot</span>&gt;(<span style=color:#66d9ef>null</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>newGame</span> <span style=color:#f92672>=</span> () <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setPlaying</span>(<span style=color:#66d9ef>false</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setFen</span>(<span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>newGame</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>setHistory</span>([]);
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>doMove</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>useCallback</span>(
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>fen</span>: <span style=color:#66d9ef>engine.Fen</span>, <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>Square</span>, <span style=color:#a6e22e>to</span>: <span style=color:#66d9ef>engine.Square</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>move</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>move</span>(<span style=color:#a6e22e>fen</span>, <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>move</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>newFen</span>, <span style=color:#a6e22e>action</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>move</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isGameOver</span>(<span style=color:#a6e22e>newFen</span>)) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>onGameCompleted</span>(<span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>getGameWinner</span>(<span style=color:#a6e22e>newFen</span>));
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>newGame</span>();
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>setFen</span>(<span style=color:#a6e22e>newFen</span>);
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>setHistory</span>(<span style=color:#a6e22e>history</span> <span style=color:#f92672>=&gt;</span> [...<span style=color:#a6e22e>history</span>, <span style=color:#a6e22e>action</span>]);
+</span></span><span style=display:flex><span>    },
+</span></span><span style=display:flex><span>    [<span style=color:#a6e22e>onGameCompleted</span>]
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>onDragStart</span> <span style=color:#f92672>=</span> ({ <span style=color:#a6e22e>sourceSquare</span>: <span style=color:#66d9ef>from</span> }<span style=color:#f92672>:</span> <span style=color:#a6e22e>Pick</span>&lt;<span style=color:#f92672>BoardMove</span>, <span style=color:#e6db74>&#39;sourceSquare&#39;</span>&gt;) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isWhiteBotTurn</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>whiteBot</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isWhiteTurn</span>(<span style=color:#a6e22e>fen</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isBlackBotTurn</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>blackBot</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isBlackTurn</span>(<span style=color:#a6e22e>fen</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>isPlaying</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isMoveable</span>(<span style=color:#a6e22e>fen</span>, <span style=color:#66d9ef>from</span>) <span style=color:#f92672>&amp;&amp;</span> <span style=color:#f92672>!</span>(<span style=color:#a6e22e>isWhiteBotTurn</span> <span style=color:#f92672>||</span> <span style=color:#a6e22e>isBlackBotTurn</span>);
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>onMovePiece</span> <span style=color:#f92672>=</span> ({ <span style=color:#a6e22e>sourceSquare</span>: <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>targetSquare</span>: <span style=color:#66d9ef>to</span> }<span style=color:#f92672>:</span> <span style=color:#a6e22e>BoardMove</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>doMove</span>(<span style=color:#a6e22e>fen</span>, <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span>);
+</span></span><span style=display:flex><span>  };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>useEffect</span>(() <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>isPlaying</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>let</span> <span style=color:#a6e22e>isBotMovePlayable</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>whiteBot</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isWhiteTurn</span>(<span style=color:#a6e22e>fen</span>)) {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>whiteBot</span>.<span style=color:#a6e22e>move</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>then</span>(({ <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }<span style=color:#f92672>:</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>ShortMove</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isBotMovePlayable</span>) <span style=color:#a6e22e>doMove</span>(<span style=color:#a6e22e>fen</span>, <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span>);
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>blackBot</span> <span style=color:#f92672>&amp;&amp;</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>isBlackTurn</span>(<span style=color:#a6e22e>fen</span>)) {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>blackBot</span>.<span style=color:#a6e22e>move</span>(<span style=color:#a6e22e>fen</span>).<span style=color:#a6e22e>then</span>(({ <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }<span style=color:#f92672>:</span> <span style=color:#a6e22e>engine</span>.<span style=color:#a6e22e>ShortMove</span>) <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>isBotMovePlayable</span>) <span style=color:#a6e22e>doMove</span>(<span style=color:#a6e22e>fen</span>, <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span>);
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> () <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>isBotMovePlayable</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>false</span>;
+</span></span><span style=display:flex><span>    };
+</span></span><span style=display:flex><span>  }, [<span style=color:#a6e22e>isPlaying</span>, <span style=color:#a6e22e>fen</span>, <span style=color:#a6e22e>whiteBot</span>, <span style=color:#a6e22e>blackBot</span>, <span style=color:#a6e22e>doMove</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> (
+</span></span><span style=display:flex><span>    &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>App</span>}&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>header</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>h1</span>&gt;<span style=color:#960050;background-color:#1e0010>♛</span> <span style=color:#a6e22e>Chessbot</span>&lt;/<span style=color:#f92672>h1</span>&gt;
+</span></span><span style=display:flex><span>      &lt;/<span style=color:#f92672>header</span>&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>TopNav</span>}&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>BotSelector</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>playerName</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;White&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>availableBots</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>bots</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>selectedBot</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>whiteBot</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>setSelectedBot</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>setWhiteBot</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>disabled</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>isPlaying</span>}
+</span></span><span style=display:flex><span>        /&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>BotSelector</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>playerName</span><span style=color:#f92672>=</span><span style=color:#e6db74>&#34;Black&#34;</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>availableBots</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>bots</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>selectedBot</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>blackBot</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>setSelectedBot</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>setBlackBot</span>}
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>disabled</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>isPlaying</span>}
+</span></span><span style=display:flex><span>        /&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>button</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>Button</span>} <span style=color:#a6e22e>onClick</span><span style=color:#f92672>=</span>{() <span style=color:#f92672>=&gt;</span> <span style=color:#a6e22e>setPlaying</span>(<span style=color:#a6e22e>playing</span> <span style=color:#f92672>=&gt;</span> <span style=color:#f92672>!</span><span style=color:#a6e22e>playing</span>)}&gt;
+</span></span><span style=display:flex><span>          {<span style=color:#a6e22e>isPlaying</span> <span style=color:#f92672>?</span> <span style=color:#e6db74>&#39;Pause&#39;</span> <span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;Play&#39;</span>}
+</span></span><span style=display:flex><span>        &lt;/<span style=color:#f92672>button</span>&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>button</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>Button</span>} <span style=color:#a6e22e>onClick</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>newGame</span>}&gt;
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>Reset</span>
+</span></span><span style=display:flex><span>        &lt;/<span style=color:#f92672>button</span>&gt;
+</span></span><span style=display:flex><span>      &lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>div</span> <span style=color:#a6e22e>className</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>styles</span>.<span style=color:#a6e22e>Chessboard</span>}&gt;
+</span></span><span style=display:flex><span>        &lt;<span style=color:#f92672>Chessboard</span> <span style=color:#a6e22e>position</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>fen</span>} <span style=color:#a6e22e>allowDrag</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>onDragStart</span>} <span style=color:#a6e22e>onDrop</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>onMovePiece</span>} /&gt;
+</span></span><span style=display:flex><span>      &lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>      &lt;<span style=color:#f92672>History</span> <span style=color:#a6e22e>history</span><span style=color:#f92672>=</span>{<span style=color:#a6e22e>history</span>} /&gt;
+</span></span><span style=display:flex><span>    &lt;/<span style=color:#f92672>div</span>&gt;
+</span></span><span style=display:flex><span>  );
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Wrapping the <code>doMove</code> in a Callback hook ensured that the game effect was not needlessly invoked upon render unless the game state or <code>onGameCompleted</code> callback had changed.
+I also provided some clean-up in the way that if the game had changed in-between requesting a Bot move, we would discard the previous move, thus ensuring that the game maintained a valid state.</p><h2 id=conclusion>Conclusion</h2><p>I found this small project to be a very valuable exercise in exploring what is possible using TypeScript and React Hooks.
+It also provided me with a good opportunity to explore Yarn 2 and <a href=https://yarnpkg.com/features/zero-installs rel="external noopener" target=_blank>Zero-installs</a>.
+I enjoyed creating the abstraction around the concept of a UCI-based Bot, paving the way for additional Bots to be added in the future.</p><p>Going forward it would be interesting to explore providing more than just the current FEN chess state to the given Bot.
 At this time I am treating all Bots as stateless.
-It would be good to explore making them aware of historical moves, as this would help aid in their decision making and prevent them from attempting repeated moves over a certain threshold.</p>
-
-<p>Happy Chess Playing!</p>
-
-<p><a href="https://eddmann.com/chessbot-typescript/"><img src="/uploads/creating-a-react-based-chess-game-with-wasm-bots-in-typescript/example-game.gif" alt="Example Game" /></a></p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+It would be good to explore making them aware of historical moves, as this would help aid in their decision making and prevent them from attempting repeated moves over a certain threshold.</p><p>Happy Chess Playing!</p><p><a href=https://eddmann.com/chessbot-typescript/><img src=example-game.gif alt="Example Game"></a></p></main><footer class=post__tags><a href=/archive/tag/react>react</a><a href=/archive/tag/chess>chess</a><a href=/archive/tag/typescript>typescript</a><a href=/archive/tag/wasm>wasm</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

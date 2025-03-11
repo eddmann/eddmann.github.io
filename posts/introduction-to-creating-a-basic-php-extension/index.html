@@ -1,239 +1,123 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive beginners guide to setting up and building a PHP extension on CentOS, including environment setup, coding and testing.">
-
-    <title>
-        
-            Introduction to Creating a Basic PHP Extension &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Introduction to Creating a Basic PHP Extension</h1>
-    <time datetime="2014-03-12T00:00:00+00:00" class="post-date">12 Mar 2014</time>
-    <p>I recently decided to test my novice C skills in the field of building a PHP extension.
-However, despite some very good resources (<a href="http://www.phpinternalsbook.com/">here</a> and <a href="http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/">here</a>), there still seems to be a lack of beginner-friendly material on the subject.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Introduction to Creating a Basic PHP Extension - Edd Mann</title>
+<meta name=description content="A comprehensive beginners guide to setting up and building a PHP extension on CentOS, including environment setup, coding and testing."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Introduction to Creating a Basic PHP Extension"><meta itemprop=description content="I recently decided to test my novice C skills in the field of building a PHP extension. However, despite some very good resources (here and here), there still seems to be a lack of beginner-friendly material on the subject. In this post I will document a simple development environment that has worked well on a fresh CentOS 6.5 installation. Once this has been set up, we will then move on to creating a simple ‘Hello World’ extension, highlighting some of the extension platform’s capabilities."><meta itemprop=datePublished content="2014-03-12T00:00:00+00:00"><meta itemprop=dateModified content="2014-03-12T00:00:00+00:00"><meta itemprop=wordCount content="783"><meta itemprop=keywords content="Php-Extension,C,Php"><meta property="og:url" content="https://eddmann.com/posts/introduction-to-creating-a-basic-php-extension/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Introduction to Creating a Basic PHP Extension"><meta property="og:description" content="I recently decided to test my novice C skills in the field of building a PHP extension. However, despite some very good resources (here and here), there still seems to be a lack of beginner-friendly material on the subject. In this post I will document a simple development environment that has worked well on a fresh CentOS 6.5 installation. Once this has been set up, we will then move on to creating a simple ‘Hello World’ extension, highlighting some of the extension platform’s capabilities."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-03-12T00:00:00+00:00"><meta property="article:modified_time" content="2014-03-12T00:00:00+00:00"><meta property="article:tag" content="Php-Extension"><meta property="article:tag" content="C"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="Introduction to Creating a Basic PHP Extension"><meta name=twitter:description content="I recently decided to test my novice C skills in the field of building a PHP extension. However, despite some very good resources (here and here), there still seems to be a lack of beginner-friendly material on the subject. In this post I will document a simple development environment that has worked well on a fresh CentOS 6.5 installation. Once this has been set up, we will then move on to creating a simple ‘Hello World’ extension, highlighting some of the extension platform’s capabilities."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/introduction-to-creating-a-basic-php-extension/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Introduction to Creating a Basic PHP Extension</h1><time class=post__time>Mar 12, 2014</time></header><main class=prose><p>I recently decided to test my novice C skills in the field of building a PHP extension.
+However, despite some very good resources (<a href=http://www.phpinternalsbook.com/ rel="external noopener" target=_blank>here</a> and <a href=http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/ rel="external noopener" target=_blank>here</a>), there still seems to be a lack of beginner-friendly material on the subject.
 In this post I will document a simple development environment that has worked well on a fresh CentOS 6.5 installation.
-Once this has been set up, we will then move on to creating a simple ‘Hello World’ extension, highlighting some of the extension platform’s capabilities.</p>
-
-
-
-<h2 id="setup">Setup</h2>
-
-<p>The first step we need to take is to install all the prerequisite development tools (automake, autoconf, etc.) required to compile PHP from source.
-We can do this simply by running the following commands within a shell instance.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\e</span><span class="s2">xclude.*</span><span class="nv">$/</span><span class="s2">exclude=/g"</span> /etc/yum.conf <span class="c"># allow kernel-devel package.</span>
-<span class="nv">$ </span>yum groupinstall <span class="nt">-y</span> <span class="s1">'Development Tools'</span>
-</code></pre></div></div>
-
-<p>With these tools now successfully available to us, we can now pull down the PHP source code and check out the desired version.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone http://git.php.net/repository/php-src.git
-<span class="nv">$ </span>git checkout PHP-5.5
-</code></pre></div></div>
-
-<p>The final step is to configure and compile the codebase, specifying where you wish the installed binary files to be located.
-As this build is simply for testing purposes, I have decided to compile a bare-bones installation as possible, whilst still taking into consideration development requirements (i.e. debugging).</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./buildconf
-<span class="nv">$ </span>./configure <span class="nt">--prefix</span><span class="o">=</span><span class="nv">$HOME</span>/php <span class="nt">--disable-cgi</span> <span class="nt">--disable-all</span> <span class="nt">--enable-debug</span> <span class="nt">--enable-maintainer-zts</span>
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make <span class="nb">install</span>
-</code></pre></div></div>
-
-<h2 id="creating-the-extension">Creating the Extension</h2>
-
-<p>With the development environment now set up, we can commence with creating the extension.
+Once this has been set up, we will then move on to creating a simple &lsquo;Hello World&rsquo; extension, highlighting some of the extension platform&rsquo;s capabilities.</p><h2 id=setup>Setup</h2><p>The first step we need to take is to install all the prerequisite development tools (automake, autoconf, etc.) required to compile PHP from source.
+We can do this simply by running the following commands within a shell instance.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ sed -i <span style=color:#e6db74>&#34;s/^\exclude.*</span>$<span style=color:#e6db74>/exclude=/g&#34;</span> /etc/yum.conf <span style=color:#75715e># allow kernel-devel package.</span>
+</span></span><span style=display:flex><span>$ yum groupinstall -y <span style=color:#e6db74>&#39;Development Tools&#39;</span>
+</span></span></code></pre></div><p>With these tools now successfully available to us, we can now pull down the PHP source code and check out the desired version.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ git clone http://git.php.net/repository/php-src.git
+</span></span><span style=display:flex><span>$ git checkout PHP-5.5
+</span></span></code></pre></div><p>The final step is to configure and compile the codebase, specifying where you wish the installed binary files to be located.
+As this build is simply for testing purposes, I have decided to compile a bare-bones installation as possible, whilst still taking into consideration development requirements (i.e. debugging).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ ./buildconf
+</span></span><span style=display:flex><span>$ ./configure --prefix<span style=color:#f92672>=</span>$HOME/php --disable-cgi --disable-all --enable-debug --enable-maintainer-zts
+</span></span><span style=display:flex><span>$ make <span style=color:#f92672>&amp;&amp;</span> make install
+</span></span></code></pre></div><h2 id=creating-the-extension>Creating the Extension</h2><p>With the development environment now set up, we can commence with creating the extension.
 The extension we will be creating will provide the user with two functions.
-The first function, <code class="language-plaintext highlighter-rouge">hello_world()</code>, returns the string “Hello, World!” to the user.
-The second function, <code class="language-plaintext highlighter-rouge">hello(string $name, [, bool $format])</code>, greets the supplied user’s name (i.e. “Hello, Joe!”) and neatly formats the input if specified.</p>
-
-<p>To provide you with some context for what this extension is trying to achieve, the equivalent PHP code has been provided below.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">hello_world</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="k">return</span> <span class="s2">"Hello, World!"</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">hello</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$format</span> <span class="o">=</span> <span class="kc">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nv">$format</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$name</span> <span class="o">=</span> <span class="nb">ucfirst</span><span class="p">(</span><span class="nb">strtolower</span><span class="p">(</span><span class="nv">$name</span><span class="p">));</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="s2">"Hello, "</span> <span class="mf">.</span> <span class="nv">$name</span> <span class="mf">.</span> <span class="s2">"!"</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The first file that is required to successfully compile the new extension is the <code class="language-plaintext highlighter-rouge">config.m4</code> file, used when running <code class="language-plaintext highlighter-rouge">phpize</code>.
-This file defines where the extension is located and how it can be enabled.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PHP_ARG_ENABLE<span class="o">(</span>hello, whether to <span class="nb">enable </span>hello support,
-<span class="o">[</span> <span class="nt">--enable-hello</span>   Enable hello support]<span class="o">)</span>
-
-<span class="k">if </span><span class="nb">test</span> <span class="s2">"</span><span class="nv">$PHP_HELLO</span><span class="s2">"</span> <span class="o">=</span> <span class="s2">"yes"</span><span class="p">;</span> <span class="k">then
-    </span>AC_DEFINE<span class="o">(</span>HAVE_HELLO, 1, <span class="o">[</span>Whether you have hello]<span class="o">)</span>
-    PHP_NEW_EXTENSION<span class="o">(</span>hello, hello.c, <span class="nv">$ext_shared</span><span class="o">)</span>
-<span class="k">fi</span>
-</code></pre></div></div>
-
-<p>We are then able to provide the extension with an implementation using the (<code class="language-plaintext highlighter-rouge">hello.c</code>) example below.</p>
-
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifdef HAVE_CONFIG_H
-#include</span> <span class="cpf">"config.h"</span><span class="cp">
-#endif
-</span>
-<span class="cp">#include</span> <span class="cpf">"php.h"</span><span class="cp">
-</span>
-<span class="cp">#define PHP_MY_EXTENSION_VERSION "1.0"
-#define PHP_MY_EXTENSION_EXTNAME "hello"
-</span>
-<span class="n">PHP_FUNCTION</span><span class="p">(</span><span class="n">hello_world</span><span class="p">);</span>
-<span class="n">PHP_FUNCTION</span><span class="p">(</span><span class="n">hello</span><span class="p">);</span>
-
-<span class="k">extern</span> <span class="n">zend_module_entry</span> <span class="n">hello_module_entry</span><span class="p">;</span>
-<span class="cp">#define phpext_my_extension_ptr &amp;hello_module_entry
-</span>
-<span class="k">static</span> <span class="n">zend_function_entry</span> <span class="n">hello_functions</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">PHP_FE</span><span class="p">(</span><span class="n">hello_world</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span>
-    <span class="n">PHP_FE</span><span class="p">(</span><span class="n">hello</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span>
-    <span class="p">{</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">}</span>
-<span class="p">};</span>
-
-<span class="n">zend_module_entry</span> <span class="n">hello_module_entry</span> <span class="o">=</span> <span class="p">{</span>
-<span class="cp">#if ZEND_MODULE_API_NO &gt;= 20010901
-</span>    <span class="n">STANDARD_MODULE_HEADER</span><span class="p">,</span>
-<span class="cp">#endif
-</span>    <span class="n">PHP_MY_EXTENSION_EXTNAME</span><span class="p">,</span>
-    <span class="n">hello_functions</span><span class="p">,</span>
-    <span class="nb">NULL</span><span class="p">,</span>
-    <span class="nb">NULL</span><span class="p">,</span>
-    <span class="nb">NULL</span><span class="p">,</span>
-    <span class="nb">NULL</span><span class="p">,</span>
-    <span class="nb">NULL</span><span class="p">,</span>
-<span class="cp">#if ZEND_MODULE_API_NO &gt;= 20010901
-</span>    <span class="n">PHP_MY_EXTENSION_VERSION</span><span class="p">,</span>
-<span class="cp">#endif
-</span>    <span class="n">STANDARD_MODULE_PROPERTIES</span>
-<span class="p">};</span>
-
-<span class="n">ZEND_GET_MODULE</span><span class="p">(</span><span class="n">hello</span><span class="p">)</span>
-
-<span class="n">PHP_FUNCTION</span><span class="p">(</span><span class="n">hello_world</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">RETURN_STRING</span><span class="p">(</span><span class="s">"Hello, World!"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="n">PHP_FUNCTION</span><span class="p">(</span><span class="n">hello</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
-    <span class="kt">size_t</span> <span class="n">name_len</span><span class="p">;</span>
-    <span class="n">zend_bool</span> <span class="o">*</span><span class="n">format</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">zend_parse_parameters</span><span class="p">(</span><span class="n">ZEND_NUM_ARGS</span><span class="p">()</span> <span class="n">TSRMLS_CC</span><span class="p">,</span> <span class="s">"s|b"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name_len</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">format</span><span class="p">)</span> <span class="o">==</span> <span class="n">FAILURE</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">RETURN_NULL</span><span class="p">();</span>
-    <span class="p">}</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">format</span> <span class="o">&amp;&amp;</span> <span class="n">name_len</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">estrndup</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name_len</span><span class="p">);</span>
-        <span class="n">php_strtolower</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name_len</span><span class="p">);</span>
-        <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">toupper</span><span class="p">(</span><span class="o">*</span><span class="n">name</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kt">char</span> <span class="o">*</span><span class="n">out</span><span class="p">;</span>
-    <span class="kt">size_t</span> <span class="n">out_len</span> <span class="o">=</span> <span class="n">spprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">out</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Hello, %s!"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
-
-    <span class="n">RETVAL_STRINGL</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">out_len</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">format</span> <span class="o">&amp;&amp;</span> <span class="n">name_len</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">efree</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Looking at the example above, you will notice that there is far more boilerplate work required to initially set up and define the functions supplied.
-An interesting section I would like to draw your attention to is the <code class="language-plaintext highlighter-rouge">zend_parse_parameters</code> function call, which supplies the function with the user’s provided string name and optional format boolean.
+The first function, <code>hello_world()</code>, returns the string &ldquo;Hello, World!&rdquo; to the user.
+The second function, <code>hello(string $name, [, bool $format])</code>, greets the supplied user&rsquo;s name (i.e. &ldquo;Hello, Joe!&rdquo;) and neatly formats the input if specified.</p><p>To provide you with some context for what this extension is trying to achieve, the equivalent PHP code has been provided below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>hello_world</span>()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;Hello, World!&#34;</span>;
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>hello</span>($name, $format <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> ($format) {
+</span></span><span style=display:flex><span>        $name <span style=color:#f92672>=</span> <span style=color:#a6e22e>ucfirst</span>(<span style=color:#a6e22e>strtolower</span>($name));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#34;Hello, &#34;</span> <span style=color:#f92672>.</span> $name <span style=color:#f92672>.</span> <span style=color:#e6db74>&#34;!&#34;</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The first file that is required to successfully compile the new extension is the <code>config.m4</code> file, used when running <code>phpize</code>.
+This file defines where the extension is located and how it can be enabled.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>PHP_ARG_ENABLE<span style=color:#f92672>(</span>hello, whether to enable hello support,
+</span></span><span style=display:flex><span><span style=color:#f92672>[</span> --enable-hello   Enable hello support<span style=color:#f92672>])</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> test <span style=color:#e6db74>&#34;</span>$PHP_HELLO<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;yes&#34;</span>; <span style=color:#66d9ef>then</span>
+</span></span><span style=display:flex><span>    AC_DEFINE<span style=color:#f92672>(</span>HAVE_HELLO, 1, <span style=color:#f92672>[</span>Whether you have hello<span style=color:#f92672>])</span>
+</span></span><span style=display:flex><span>    PHP_NEW_EXTENSION<span style=color:#f92672>(</span>hello, hello.c, $ext_shared<span style=color:#f92672>)</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>fi</span>
+</span></span></code></pre></div><p>We are then able to provide the extension with an implementation using the (<code>hello.c</code>) example below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#ifdef HAVE_CONFIG_H
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;config.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;php.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define PHP_MY_EXTENSION_VERSION &#34;1.0&#34;
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define PHP_MY_EXTENSION_EXTNAME &#34;hello&#34;
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PHP_FUNCTION</span>(hello_world);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PHP_FUNCTION</span>(hello);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>extern</span> zend_module_entry hello_module_entry;
+</span></span><span style=display:flex><span><span style=color:#75715e>#define phpext_my_extension_ptr &amp;hello_module_entry
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span> zend_function_entry hello_functions[] <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PHP_FE</span>(hello_world, NULL)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>PHP_FE</span>(hello, NULL)
+</span></span><span style=display:flex><span>    {NULL, NULL, NULL}
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>zend_module_entry hello_module_entry <span style=color:#f92672>=</span> {
+</span></span><span style=display:flex><span><span style=color:#75715e>#if ZEND_MODULE_API_NO &gt;= 20010901
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    STANDARD_MODULE_HEADER,
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    PHP_MY_EXTENSION_EXTNAME,
+</span></span><span style=display:flex><span>    hello_functions,
+</span></span><span style=display:flex><span>    NULL,
+</span></span><span style=display:flex><span>    NULL,
+</span></span><span style=display:flex><span>    NULL,
+</span></span><span style=display:flex><span>    NULL,
+</span></span><span style=display:flex><span>    NULL,
+</span></span><span style=display:flex><span><span style=color:#75715e>#if ZEND_MODULE_API_NO &gt;= 20010901
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    PHP_MY_EXTENSION_VERSION,
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    STANDARD_MODULE_PROPERTIES
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ZEND_GET_MODULE</span>(hello)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PHP_FUNCTION</span>(hello_world)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>RETURN_STRING</span>(<span style=color:#e6db74>&#34;Hello, World!&#34;</span>, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PHP_FUNCTION</span>(hello)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>name;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>size_t</span> name_len;
+</span></span><span style=display:flex><span>    zend_bool <span style=color:#f92672>*</span>format <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>zend_parse_parameters</span>(<span style=color:#a6e22e>ZEND_NUM_ARGS</span>() TSRMLS_CC, <span style=color:#e6db74>&#34;s|b&#34;</span>, <span style=color:#f92672>&amp;</span>name, <span style=color:#f92672>&amp;</span>name_len, <span style=color:#f92672>&amp;</span>format) <span style=color:#f92672>==</span> FAILURE) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>RETURN_NULL</span>();
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (format <span style=color:#f92672>&amp;&amp;</span> name_len) {
+</span></span><span style=display:flex><span>        name <span style=color:#f92672>=</span> <span style=color:#a6e22e>estrndup</span>(name, name_len);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>php_strtolower</span>(name, name_len);
+</span></span><span style=display:flex><span>        <span style=color:#f92672>*</span>name <span style=color:#f92672>=</span> <span style=color:#a6e22e>toupper</span>(<span style=color:#f92672>*</span>name);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span>out;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>size_t</span> out_len <span style=color:#f92672>=</span> <span style=color:#a6e22e>spprintf</span>(<span style=color:#f92672>&amp;</span>out, <span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#34;Hello, %s!&#34;</span>, name);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>RETVAL_STRINGL</span>(out, out_len, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (format <span style=color:#f92672>&amp;&amp;</span> name_len) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>efree</span>(name);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Looking at the example above, you will notice that there is far more boilerplate work required to initially set up and define the functions supplied.
+An interesting section I would like to draw your attention to is the <code>zend_parse_parameters</code> function call, which supplies the function with the user&rsquo;s provided string name and optional format boolean.
 If the user has decided to format the input, we must first make a copy of the name value to work on.
-Finally, if we were required to format the string, we must do some housekeeping at the end of the function so as not to cause any memory leaks.</p>
-
-<p>With the implementation now in place, we are able to build and test the new extension.
-We must first run <code class="language-plaintext highlighter-rouge">phpize</code> to create the necessary build scripts.
+Finally, if we were required to format the string, we must do some housekeeping at the end of the function so as not to cause any memory leaks.</p><p>With the implementation now in place, we are able to build and test the new extension.
+We must first run <code>phpize</code> to create the necessary build scripts.
 Notice that I am specifying the full path to where I installed the compiled PHP binaries.
-In a similar manner, we must also configure the build, supplying the full path to the <code class="language-plaintext highlighter-rouge">php-config</code> application.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ $HOME</span>/php/bin/phpize
-<span class="nv">$ </span>./configure <span class="nt">--with-php-config</span><span class="o">=</span><span class="nv">$HOME</span>/php/bin/php-config
-<span class="nv">$ </span>make <span class="o">&amp;&amp;</span> make <span class="nb">install</span>
-</code></pre></div></div>
-
-<p>We can now test that the extension is working correctly by running the CLI PHP binary with the new extension specified.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ $HOME</span>/php/bin/php <span class="nt">-dextension</span><span class="o">=</span>hello.so <span class="nt">-r</span> <span class="s2">"echo hello_world();"</span>       <span class="c"># Hello, World!</span>
-<span class="nv">$ $HOME</span>/php/bin/php <span class="nt">-dextension</span><span class="o">=</span>hello.so <span class="nt">-r</span> <span class="s2">"echo hello('JoE');"</span>        <span class="c"># Hello, Joe!</span>
-<span class="nv">$ $HOME</span>/php/bin/php <span class="nt">-dextension</span><span class="o">=</span>hello.so <span class="nt">-r</span> <span class="s2">"echo hello('JoE', false);"</span> <span class="c"># Hello, JoE!</span>
-</code></pre></div></div>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://www.phpinternalsbook.com/">PHP Internals Book</a></li>
-  <li><a href="http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/">Extension Writing</a></li>
-  <li><a href="http://www.kchodorow.com/blog/2011/08/11/php-extensions-made-eldrich-installing-php/">PHP Extensions Made Eldrich</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+In a similar manner, we must also configure the build, supplying the full path to the <code>php-config</code> application.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ $HOME/php/bin/phpize
+</span></span><span style=display:flex><span>$ ./configure --with-php-config<span style=color:#f92672>=</span>$HOME/php/bin/php-config
+</span></span><span style=display:flex><span>$ make <span style=color:#f92672>&amp;&amp;</span> make install
+</span></span></code></pre></div><p>We can now test that the extension is working correctly by running the CLI PHP binary with the new extension specified.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ $HOME/php/bin/php -dextension<span style=color:#f92672>=</span>hello.so -r <span style=color:#e6db74>&#34;echo hello_world();&#34;</span>       <span style=color:#75715e># Hello, World!</span>
+</span></span><span style=display:flex><span>$ $HOME/php/bin/php -dextension<span style=color:#f92672>=</span>hello.so -r <span style=color:#e6db74>&#34;echo hello(&#39;JoE&#39;);&#34;</span>        <span style=color:#75715e># Hello, Joe!</span>
+</span></span><span style=display:flex><span>$ $HOME/php/bin/php -dextension<span style=color:#f92672>=</span>hello.so -r <span style=color:#e6db74>&#34;echo hello(&#39;JoE&#39;, false);&#34;</span> <span style=color:#75715e># Hello, JoE!</span>
+</span></span></code></pre></div><h2 id=resources>Resources</h2><ul><li><a href=http://www.phpinternalsbook.com/ rel="external noopener" target=_blank>PHP Internals Book</a></li><li><a href=http://devzone.zend.com/303/extension-writing-part-i-introduction-to-php-and-zend/ rel="external noopener" target=_blank>Extension Writing</a></li><li><a href=http://www.kchodorow.com/blog/2011/08/11/php-extensions-made-eldrich-installing-php/ rel="external noopener" target=_blank>PHP Extensions Made Eldrich</a></li></ul></main><footer class=post__tags><a href=/archive/tag/php-extension>php-extension</a><a href=/archive/tag/c>c</a><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

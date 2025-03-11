@@ -1,144 +1,47 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore how to implement basic Python decorators in PHP using runkit in this thought experiment. Learn about decorators, function wrapping, and PHP techniques.">
-
-    <title>
-        
-            Implementing Basic Python Decorators in PHP &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Implementing Basic Python Decorators in PHP</h1>
-    <time datetime="2014-02-10T00:00:00+00:00" class="post-date">10 Feb 2014</time>
-    <p>Having just stepped into the world of Python, I think it is only human nature to compare, if not contemplate, solutions to discovered strengths in a more familiar language.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Implementing Basic Python Decorators in PHP - Edd Mann</title>
+<meta name=description content="Explore how to implement basic Python decorators in PHP using runkit in this thought experiment. Learn about decorators, function wrapping, and PHP techniques."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Implementing Basic Python Decorators in PHP"><meta itemprop=description content="Having just stepped into the world of Python, I think it is only human nature to compare, if not contemplate, solutions to discovered strengths in a more familiar language. My familiar language being, of course, PHP, I thought it would be a good thought experiment to see if I could design a basic decorator implementation in the language. Decorators, as discussed in another post, are an easy concept to explain. Simply put, they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner."><meta itemprop=datePublished content="2014-02-10T00:00:00+00:00"><meta itemprop=dateModified content="2014-02-10T00:00:00+00:00"><meta itemprop=wordCount content="436"><meta itemprop=keywords content="Php,Python"><meta property="og:url" content="https://eddmann.com/posts/implementing-basic-python-decorators-in-php/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Implementing Basic Python Decorators in PHP"><meta property="og:description" content="Having just stepped into the world of Python, I think it is only human nature to compare, if not contemplate, solutions to discovered strengths in a more familiar language. My familiar language being, of course, PHP, I thought it would be a good thought experiment to see if I could design a basic decorator implementation in the language. Decorators, as discussed in another post, are an easy concept to explain. Simply put, they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-02-10T00:00:00+00:00"><meta property="article:modified_time" content="2014-02-10T00:00:00+00:00"><meta property="article:tag" content="Php"><meta property="article:tag" content="Python"><meta name=twitter:card content="summary"><meta name=twitter:title content="Implementing Basic Python Decorators in PHP"><meta name=twitter:description content="Having just stepped into the world of Python, I think it is only human nature to compare, if not contemplate, solutions to discovered strengths in a more familiar language. My familiar language being, of course, PHP, I thought it would be a good thought experiment to see if I could design a basic decorator implementation in the language. Decorators, as discussed in another post, are an easy concept to explain. Simply put, they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/implementing-basic-python-decorators-in-php/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Implementing Basic Python Decorators in PHP</h1><time class=post__time>Feb 10, 2014</time></header><main class=prose><p>Having just stepped into the world of Python, I think it is only human nature to compare, if not contemplate, solutions to discovered strengths in a more familiar language.
 My familiar language being, of course, PHP, I thought it would be a good thought experiment to see if I could design a basic decorator implementation in the language.
-Decorators, as discussed in <a href="/posts/using-basic-auth-and-decorators-in-pythons-flask/">another post</a>, are an easy concept to explain.
-Simply put, they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner.</p>
-
-
-
-<h2 id="the-implementation">The Implementation</h2>
-
-<p>PHP provides a means to rename existing user-land functions and subsequently redefine them, by way of an extension called <a href="http://php.net/manual/en/book.runkit.php">runkit</a>.
+Decorators, as discussed in <a href=/posts/using-basic-auth-and-decorators-in-pythons-flask/>another post</a>, are an easy concept to explain.
+Simply put, they wrap specified functions with other functions, providing a means to compose new functions in a succinct manner.</p><h2 id=the-implementation>The Implementation</h2><p>PHP provides a means to rename existing user-land functions and subsequently redefine them, by way of an extension called <a href=http://php.net/manual/en/book.runkit.php rel="external noopener" target=_blank>runkit</a>.
 For the remainder of the post I will be assuming that you have a sufficient setup configured as a prerequisite.
-Below is a simple function that uses the ‘runkit’ extension to rename the existing function declaration to a meaningful wrapped name, then includes this new function’s name in a call to the wrapper function.
-This new logic is used to redefine the pre-existing original function name.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">decorate</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$wrap</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$orig</span> <span class="o">=</span> <span class="nv">$wrap</span> <span class="mf">.</span> <span class="s1">'_'</span> <span class="mf">.</span> <span class="nv">$func</span><span class="p">;</span>
-    <span class="nb">runkit_function_rename</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$orig</span><span class="p">);</span>
-    <span class="nv">$body</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span>
-        <span class="s2">"return call_user_func_array('%s', array_merge([ '%s' ], [ func_get_args() ]));"</span><span class="p">,</span>
-        <span class="nv">$wrap</span><span class="p">,</span> <span class="nv">$orig</span>
-    <span class="p">);</span>
-    <span class="nb">runkit_function_add</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="s1">''</span><span class="p">,</span> <span class="nv">$body</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h2 id="example-usage">Example Usage</h2>
-
-<p>Now that we have defined the ‘decorate’ method, let’s put it to the test with an arbitrary example.
-Below is an example that specifies a basic ‘hello’ function which we will decorate.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">hello</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">echo</span> <span class="s2">"Hello, </span><span class="nv">$name</span><span class="s2">!</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>We will now define a couple of decorator functions used to log and time the specified function’s activity.
-You will notice, when looking at the examples below, that the functions require a function name and an argument array to be supplied, which is used to chain the calls together.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">logger</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$name</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="nv">$func</span><span class="p">);</span> <span class="c1">// last function invoked.</span>
-    <span class="k">echo</span> <span class="nb">end</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="mf">.</span> <span class="s1">'('</span> <span class="mf">.</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">', '</span> <span class="p">,</span> <span class="nv">$args</span><span class="p">)</span> <span class="mf">.</span> <span class="s2">")</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="k">function</span> <span class="n">timer</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nv">$start</span> <span class="o">=</span> <span class="nb">microtime</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-    <span class="nv">$result</span> <span class="o">=</span> <span class="nb">call_user_func_array</span><span class="p">(</span><span class="nv">$func</span><span class="p">,</span> <span class="nv">$args</span><span class="p">);</span>
-    <span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">"%s: %f</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nv">$func</span><span class="p">,</span> <span class="nb">microtime</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span> <span class="o">-</span> <span class="nv">$start</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>With the sample function and decorators now defined, we can compose a new function from these individual pieces.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">decorate</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span> <span class="s1">'timer'</span><span class="p">);</span>
-<span class="nf">decorate</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span> <span class="s1">'logger'</span><span class="p">);</span>
-
-<span class="k">echo</span> <span class="nf">hello</span><span class="p">(</span><span class="s1">'Bob'</span><span class="p">);</span>
-<span class="c1">// hello(Bob)</span>
-<span class="c1">// Hello, Bob!</span>
-<span class="c1">// timer_hello: 0.000007</span>
-</code></pre></div></div>
-
-<p>Looking at the example above, you can see that we recompose the definition of the original ‘hello’ function to be wrapped by the ‘timer’ and ‘logger’ functions.
-With this new function, we then call it with the argument ‘Bob’, which in turn invokes the logger and timer functions before calling the original code.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://php.net/manual/en/book.runkit.php">runkit</a></li>
-  <li><a href="http://wiki.python.org/moin/PythonDecorators">Python: Decorators</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Below is a simple function that uses the &lsquo;runkit&rsquo; extension to rename the existing function declaration to a meaningful wrapped name, then includes this new function&rsquo;s name in a call to the wrapper function.
+This new logic is used to redefine the pre-existing original function name.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>decorate</span>($func, $wrap)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $orig <span style=color:#f92672>=</span> $wrap <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;_&#39;</span> <span style=color:#f92672>.</span> $func;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>runkit_function_rename</span>($func, $orig);
+</span></span><span style=display:flex><span>    $body <span style=color:#f92672>=</span> <span style=color:#a6e22e>sprintf</span>(
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>&#34;return call_user_func_array(&#39;%s&#39;, array_merge([ &#39;%s&#39; ], [ func_get_args() ]));&#34;</span>,
+</span></span><span style=display:flex><span>        $wrap, $orig
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>runkit_function_add</span>($func, <span style=color:#e6db74>&#39;&#39;</span>, $body);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=example-usage>Example Usage</h2><p>Now that we have defined the &lsquo;decorate&rsquo; method, let&rsquo;s put it to the test with an arbitrary example.
+Below is an example that specifies a basic &lsquo;hello&rsquo; function which we will decorate.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>hello</span>($name)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>echo</span> <span style=color:#e6db74>&#34;Hello, </span><span style=color:#e6db74>$name</span><span style=color:#e6db74>!</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We will now define a couple of decorator functions used to log and time the specified function&rsquo;s activity.
+You will notice, when looking at the examples below, that the functions require a function name and an argument array to be supplied, which is used to chain the calls together.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>logger</span>($func, $args)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $name <span style=color:#f92672>=</span> <span style=color:#a6e22e>explode</span>(<span style=color:#e6db74>&#39;_&#39;</span>, $func); <span style=color:#75715e>// last function invoked.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>end</span>($name) <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39;(&#39;</span> <span style=color:#f92672>.</span> <span style=color:#a6e22e>implode</span>(<span style=color:#e6db74>&#39;, &#39;</span> , $args) <span style=color:#f92672>.</span> <span style=color:#e6db74>&#34;)</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>call_user_func_array</span>($func, $args);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>function</span> <span style=color:#a6e22e>timer</span>($func, $args)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    $start <span style=color:#f92672>=</span> <span style=color:#a6e22e>microtime</span>(<span style=color:#66d9ef>true</span>);
+</span></span><span style=display:flex><span>    $result <span style=color:#f92672>=</span> <span style=color:#a6e22e>call_user_func_array</span>($func, $args);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;%s: %f</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, $func, <span style=color:#a6e22e>microtime</span>(<span style=color:#66d9ef>true</span>) <span style=color:#f92672>-</span> $start);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> $result;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>With the sample function and decorators now defined, we can compose a new function from these individual pieces.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#a6e22e>decorate</span>(<span style=color:#e6db74>&#39;hello&#39;</span>, <span style=color:#e6db74>&#39;timer&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#a6e22e>decorate</span>(<span style=color:#e6db74>&#39;hello&#39;</span>, <span style=color:#e6db74>&#39;logger&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>hello</span>(<span style=color:#e6db74>&#39;Bob&#39;</span>);
+</span></span><span style=display:flex><span><span style=color:#75715e>// hello(Bob)
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// Hello, Bob!
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// timer_hello: 0.000007
+</span></span></span></code></pre></div><p>Looking at the example above, you can see that we recompose the definition of the original &lsquo;hello&rsquo; function to be wrapped by the &rsquo;timer&rsquo; and &rsquo;logger&rsquo; functions.
+With this new function, we then call it with the argument &lsquo;Bob&rsquo;, which in turn invokes the logger and timer functions before calling the original code.</p><h2 id=resources>Resources</h2><ul><li><a href=http://php.net/manual/en/book.runkit.php rel="external noopener" target=_blank>runkit</a></li><li><a href=http://wiki.python.org/moin/PythonDecorators rel="external noopener" target=_blank>Python: Decorators</a></li></ul></main><footer class=post__tags><a href=/archive/tag/php>php</a><a href=/archive/tag/python>python</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

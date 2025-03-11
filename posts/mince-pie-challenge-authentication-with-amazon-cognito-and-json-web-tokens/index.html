@@ -1,404 +1,234 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This technical post explains how to implement authentication with Amazon Cognito and JSON Web Tokens in a Serverless environment.">
-
-    <title>
-        
-            Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens</h1>
-    <time datetime="2018-06-26T00:00:00+00:00" class="post-date">26 Jun 2018</time>
-    <p>Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.
-For this, we will be using <a href="https://aws.amazon.com/cognito/">Amazon Cognito</a>, a fully managed web service which handles the user sign-up, sign-in and management processes.</p>
-
-
-
-<p>If you are keen to see how the finished example looks, you can access it within the <a href="https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/02-authentication">API repository</a>.</p>
-
-<p>Cognito provides us with the ability to register users to a specified <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html">User Pool</a> directory, or enable social sign-in services (such as Google).
-It also includes the ability to verify supplied email addresses and include additional layers of security using <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html">MFA</a>.
-This allows us to focus our attention on the key domain-specific functionality of the application, as opposed to reinventing the wheel.</p>
-
-<p>Along with managed User Pools, Cognito also provides the concept of <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/getting-started-with-identity-pools.html">Identity Pools</a>.
-We will not be using this feature, but it is good to understand how this could be of use in future development.</p>
-
-<blockquote>
-  <p>The two main components of Amazon Cognito are user pools and identity pools.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens - Edd Mann</title>
+<meta name=description content="This technical post explains how to implement authentication with Amazon Cognito and JSON Web Tokens in a Serverless environment."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens"><meta itemprop=description content="Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application. For this, we will be using Amazon Cognito, a fully managed web service which handles the user sign-up, sign-in and management processes."><meta itemprop=datePublished content="2018-06-26T00:00:00+00:00"><meta itemprop=dateModified content="2018-06-26T00:00:00+00:00"><meta itemprop=wordCount content="1911"><meta itemprop=keywords content="Cognito,Serverless,Security,Mince-Pie-Challenge-Series"><meta property="og:url" content="https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens"><meta property="og:description" content="Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application. For this, we will be using Amazon Cognito, a fully managed web service which handles the user sign-up, sign-in and management processes."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-06-26T00:00:00+00:00"><meta property="article:modified_time" content="2018-06-26T00:00:00+00:00"><meta property="article:tag" content="Cognito"><meta property="article:tag" content="Serverless"><meta property="article:tag" content="Security"><meta property="article:tag" content="Mince-Pie-Challenge-Series"><meta name=twitter:card content="summary"><meta name=twitter:title content="Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens"><meta name=twitter:description content="Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application. For this, we will be using Amazon Cognito, a fully managed web service which handles the user sign-up, sign-in and management processes."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Mince Pie Challenge: Authentication with Amazon Cognito and JSON Web Tokens</h1><time class=post__time>Jun 26, 2018</time></header><main class=prose><p>Now that we have set up the Serverless Framework, we can go about investigating how Authentication and Authorisation will be handled within the application.
+For this, we will be using <a href=https://aws.amazon.com/cognito/ rel="external noopener" target=_blank>Amazon Cognito</a>, a fully managed web service which handles the user sign-up, sign-in and management processes.</p><p>If you are keen to see how the finished example looks, you can access it within the <a href=https://github.com/eddmann/mince-pie-challenge-api-serverless/tree/02-authentication rel="external noopener" target=_blank>API repository</a>.</p><p>Cognito provides us with the ability to register users to a specified <a href=https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools.html rel="external noopener" target=_blank>User Pool</a> directory, or enable social sign-in services (such as Google).
+It also includes the ability to verify supplied email addresses and include additional layers of security using <a href=https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html rel="external noopener" target=_blank>MFA</a>.
+This allows us to focus our attention on the key domain-specific functionality of the application, as opposed to reinventing the wheel.</p><p>Along with managed User Pools, Cognito also provides the concept of <a href=https://docs.aws.amazon.com/cognito/latest/developerguide/getting-started-with-identity-pools.html rel="external noopener" target=_blank>Identity Pools</a>.
+We will not be using this feature, but it is good to understand how this could be of use in future development.</p><blockquote><p>The two main components of Amazon Cognito are user pools and identity pools.
 User pools are user directories that provide sign-up and sign-in options for your app users.
-Identity pools enable you to grant your users access to other AWS services.</p>
-</blockquote>
-
-<p>Cognito User Pools use <a href="https://jwt.io/">JSON Web Tokens</a> to transmit and validate payloads between the client and server.
-Using the Client AWS SDK, we are able to authenticate with the pool, returning a token that we can later send to the API to handle authenticated requests.</p>
-
-<h2 id="creating-the-user-pool">Creating the User Pool</h2>
-
-<p>The first step in setting up Cognito is to define the AWS-specific resources that are required.
-To do this, we will provision a User Pool and Client using <a href="https://serverless.com/framework/docs/providers/aws/guide/resources/">CloudFormation</a> within <code class="language-plaintext highlighter-rouge">resources.yml</code>.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Resources</span><span class="pi">:</span>
-  <span class="na">PieUserPool</span><span class="pi">:</span>
-    <span class="na">Type</span><span class="pi">:</span> <span class="s">AWS::Cognito::UserPool</span>
-    <span class="na">Properties</span><span class="pi">:</span>
-      <span class="na">UserPoolName</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):userPoolName, ''}</span>
-      <span class="na">Policies</span><span class="pi">:</span>
-        <span class="na">PasswordPolicy</span><span class="pi">:</span>
-          <span class="na">MinimumLength</span><span class="pi">:</span> <span class="m">6</span>
-      <span class="na">AliasAttributes</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">email</span>
-      <span class="na">AutoVerifiedAttributes</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">email</span>
-      <span class="na">Schema</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">Name</span><span class="pi">:</span> <span class="s">email</span>
-          <span class="na">AttributeDataType</span><span class="pi">:</span> <span class="s">String</span>
-          <span class="na">Mutable</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">Required</span><span class="pi">:</span> <span class="no">true</span>
-
-  <span class="na">PieUserPoolClient</span><span class="pi">:</span>
-    <span class="na">Type</span><span class="pi">:</span> <span class="s">AWS::Cognito::UserPoolClient</span>
-    <span class="na">Properties</span><span class="pi">:</span>
-      <span class="na">ClientName</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):userPoolClientName, ''}</span>
-      <span class="na">ExplicitAuthFlows</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">ADMIN_NO_SRP_AUTH</span>
-      <span class="na">GenerateSecret</span><span class="pi">:</span> <span class="no">false</span>
-      <span class="na">UserPoolId</span><span class="pi">:</span>
-        <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieUserPool</span>
-
-<span class="na">Outputs</span><span class="pi">:</span>
-  <span class="na">PieUserPoolId</span><span class="pi">:</span>
-    <span class="na">Value</span><span class="pi">:</span>
-      <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieUserPool</span>
-
-  <span class="na">PieUserPoolClientId</span><span class="pi">:</span>
-    <span class="na">Value</span><span class="pi">:</span>
-      <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieUserPoolClient</span>
-</code></pre></div></div>
-
-<p>You will notice that we have decided to name the two defined resources based on values supplied within a YAML configuration file that relates to the current stage.
+Identity pools enable you to grant your users access to other AWS services.</p></blockquote><p>Cognito User Pools use <a href=https://jwt.io/ rel="external noopener" target=_blank>JSON Web Tokens</a> to transmit and validate payloads between the client and server.
+Using the Client AWS SDK, we are able to authenticate with the pool, returning a token that we can later send to the API to handle authenticated requests.</p><h2 id=creating-the-user-pool>Creating the User Pool</h2><p>The first step in setting up Cognito is to define the AWS-specific resources that are required.
+To do this, we will provision a User Pool and Client using <a href=https://serverless.com/framework/docs/providers/aws/guide/resources/ rel="external noopener" target=_blank>CloudFormation</a> within <code>resources.yml</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>Resources</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>PieUserPool</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Type</span>: <span style=color:#ae81ff>AWS::Cognito::UserPool</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Properties</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>UserPoolName</span>: <span style=color:#ae81ff>${file(./config.${self:provider.stage}.yml):userPoolName, &#39;&#39;}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Policies</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>PasswordPolicy</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>MinimumLength</span>: <span style=color:#ae81ff>6</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>AliasAttributes</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>email</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>AutoVerifiedAttributes</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>email</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Schema</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>Name</span>: <span style=color:#ae81ff>email</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>AttributeDataType</span>: <span style=color:#ae81ff>String</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>Mutable</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>Required</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>PieUserPoolClient</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Type</span>: <span style=color:#ae81ff>AWS::Cognito::UserPoolClient</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Properties</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ClientName</span>: <span style=color:#ae81ff>${file(./config.${self:provider.stage}.yml):userPoolClientName, &#39;&#39;}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>ExplicitAuthFlows</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#ae81ff>ADMIN_NO_SRP_AUTH</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>GenerateSecret</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>UserPoolId</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>Ref</span>: <span style=color:#ae81ff>PieUserPool</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>Outputs</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>PieUserPoolId</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Value</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Ref</span>: <span style=color:#ae81ff>PieUserPool</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>PieUserPoolClientId</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>Value</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>Ref</span>: <span style=color:#ae81ff>PieUserPoolClient</span>
+</span></span></code></pre></div><p>You will notice that we have decided to name the two defined resources based on values supplied within a YAML configuration file that relates to the current stage.
 This allows us to isolate different groups of resources based on the environment (development, staging, production) we are currently in.
-We will complete this definition by supplying the required values within <code class="language-plaintext highlighter-rouge">config.dev.yml</code>.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">userPoolName</span><span class="pi">:</span> <span class="s1">'</span><span class="s">dev-mince-pie-challenge-pool'</span>
-<span class="na">userPoolClientName</span><span class="pi">:</span> <span class="s1">'</span><span class="s">dev-mince-pie-challenge-client'</span>
-</code></pre></div></div>
-
-<p>In regard to the pool itself, along with the default username and password required by the User Pool, we also specify that we would like a verified email address to be included per user.
-To provide client-side access to the pool sign-up and sign-in functionality, we must also associate a <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html">User Pool Client</a> that has access to the unauthorised endpoints.</p>
-
-<p>So as to test the newly created User Pool within the AWS CLI, we must include an explicit authentication flow entitled <code class="language-plaintext highlighter-rouge">ADMIN_NO_SRP_AUTH</code>, which permits the exclusion of the <a href="https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol">Secure Remote Password Protocol (SRP)</a>.
-Finally, we specify that we wish to output the two created resource identifiers, which will be presented to us within the terminal after a successful deployment.</p>
-
-<h2 id="authenticating-a-user">Authenticating a User</h2>
-
-<p>With the User Pool now defined, we can move our attention onto how we will authenticate an incoming request within the API.
-There is an option within Amazon API Gateway to provide a <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html">Lambda Authoriser</a> (formerly known as a Custom Authoriser), which are invoked before the intended function and provide it with the generated IAM policy.
+We will complete this definition by supplying the required values within <code>config.dev.yml</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>userPoolName</span>: <span style=color:#e6db74>&#39;dev-mince-pie-challenge-pool&#39;</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>userPoolClientName</span>: <span style=color:#e6db74>&#39;dev-mince-pie-challenge-client&#39;</span>
+</span></span></code></pre></div><p>In regard to the pool itself, along with the default username and password required by the User Pool, we also specify that we would like a verified email address to be included per user.
+To provide client-side access to the pool sign-up and sign-in functionality, we must also associate a <a href=https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html rel="external noopener" target=_blank>User Pool Client</a> that has access to the unauthorised endpoints.</p><p>So as to test the newly created User Pool within the AWS CLI, we must include an explicit authentication flow entitled <code>ADMIN_NO_SRP_AUTH</code>, which permits the exclusion of the <a href=https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol rel="external noopener" target=_blank>Secure Remote Password Protocol (SRP)</a>.
+Finally, we specify that we wish to output the two created resource identifiers, which will be presented to us within the terminal after a successful deployment.</p><h2 id=authenticating-a-user>Authenticating a User</h2><p>With the User Pool now defined, we can move our attention onto how we will authenticate an incoming request within the API.
+There is an option within Amazon API Gateway to provide a <a href=https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html rel="external noopener" target=_blank>Lambda Authoriser</a> (formerly known as a Custom Authoriser), which are invoked before the intended function and provide it with the generated IAM policy.
 Although this approach is desirable, some of the API resource endpoints require the ability to differ based on whether the user is authenticated or not.
-As such, we will instead bring this authentication logic into our application domain, and validate the claims for each intended request ourselves.</p>
-
-<p>As discussed before, Cognito uses standard JSON Web Tokens, which allows us to include a pre-existing library <a href="https://github.com/cisco/node-jose">node-jose</a>, that abstracts away this problem space.
-We will now include this dependency within the <code class="language-plaintext highlighter-rouge">package.json</code>, and create a new service within <code class="language-plaintext highlighter-rouge">src/services/userTokenAuthenticator.js</code>.</p>
-
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
-  </span><span class="nl">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nl">"node-jose"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.0.0"</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">https</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">https</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="nx">jose</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node-jose</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">generateKeySetUrl</span> <span class="o">=</span> <span class="nx">poolId</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">region</span> <span class="o">=</span> <span class="nx">poolId</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">_</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
-  <span class="k">return</span> <span class="s2">`https://cognito-idp.</span><span class="p">${</span><span class="nx">region</span><span class="p">}</span><span class="s2">.amazonaws.com/</span><span class="p">${</span><span class="nx">poolId</span><span class="p">}</span><span class="s2">/.well-known/jwks.json`</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="kd">const</span> <span class="nx">fetchKey</span> <span class="o">=</span> <span class="p">(</span><span class="nx">poolId</span><span class="p">,</span> <span class="nx">token</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">{</span> <span class="nx">kid</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">jose</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">base64url</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">.</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]));</span>
-
-  <span class="k">return</span> <span class="k">new</span> <span class="nb">Promise</span><span class="p">((</span><span class="nx">res</span><span class="p">,</span> <span class="nx">rej</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">https</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">generateKeySetUrl</span><span class="p">(</span><span class="nx">poolId</span><span class="p">),</span> <span class="nx">response</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">statusCode</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">rej</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unable to fetch keys</span><span class="dl">'</span><span class="p">);</span>
-        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
-
-      <span class="nx">response</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">data</span><span class="dl">'</span><span class="p">,</span> <span class="nx">body</span> <span class="o">=&gt;</span> <span class="p">{</span>
-        <span class="kd">const</span> <span class="p">{</span> <span class="nx">keys</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">body</span><span class="p">);</span>
-        <span class="kd">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">key</span> <span class="o">=&gt;</span> <span class="nx">key</span><span class="p">.</span><span class="nx">kid</span> <span class="o">===</span> <span class="nx">kid</span><span class="p">);</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">rej</span><span class="p">(</span><span class="dl">'</span><span class="s1">Unable to find key</span><span class="dl">'</span><span class="p">);</span>
-          <span class="k">return</span><span class="p">;</span>
-        <span class="p">}</span>
-
-        <span class="nx">jose</span><span class="p">.</span><span class="nx">JWK</span><span class="p">.</span><span class="nx">asKey</span><span class="p">(</span><span class="nx">key</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span><span class="p">);</span>
-      <span class="p">});</span>
-    <span class="p">});</span>
-  <span class="p">});</span>
-<span class="p">};</span>
-
-<span class="kd">const</span> <span class="nx">parseClaims</span> <span class="o">=</span> <span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nx">jose</span><span class="p">.</span><span class="nx">JWS</span><span class="p">.</span><span class="nx">createVerify</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">token</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(({</span> <span class="nx">payload</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="kd">const</span> <span class="nx">claims</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">payload</span><span class="p">);</span>
-
-      <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nx">claims</span><span class="p">.</span><span class="nx">exp</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">throw</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Token has expired</span><span class="dl">'</span><span class="p">);</span>
-      <span class="p">}</span>
-
-      <span class="k">return</span> <span class="nx">claims</span><span class="p">;</span>
-    <span class="p">});</span>
-
-<span class="k">export</span> <span class="k">default</span> <span class="nx">poolId</span> <span class="o">=&gt;</span> <span class="k">async</span> <span class="nx">token</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">try</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">fetchKey</span><span class="p">(</span><span class="nx">poolId</span><span class="p">,</span> <span class="nx">token</span><span class="p">);</span>
-    <span class="kd">const</span> <span class="nx">claims</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">parseClaims</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="nx">key</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">claims</span><span class="p">.</span><span class="nx">sub</span><span class="p">;</span>
-  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kc">undefined</span><span class="p">;</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>This small service fetches the associated <a href="https://auth0.com/docs/jwks">JSON Web Key Set</a>, locates the matching key, and then verifies that the provided request token is valid.
-Providing that the token has been verified to come from the intended party and has not expired, we parse the provided claims and return the user identifier.</p>
-
-<h2 id="constructing-handlers-with-user-authentication">Constructing Handlers with User Authentication</h2>
-
-<p>Now that we have a means to authenticate a request and be provided with the user identifier, we can now create a framework in which to easily construct handlers with varying permission requirements.
-We will now create a couple of small helper functions within <code class="language-plaintext highlighter-rouge">src/helpers/handlers.js</code>, which will be used to aid us in this pursuit.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">unauthorised</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./http</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">createHandler</span> <span class="o">=</span> <span class="nx">handler</span> <span class="o">=&gt;</span> <span class="nx">services</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="o">=&gt;</span>
-  <span class="nx">handler</span><span class="p">({</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">services</span> <span class="p">});</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">withOptionalHttpAuthentication</span> <span class="o">=</span> <span class="nx">handler</span> <span class="o">=&gt;</span> <span class="k">async</span> <span class="nx">params</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">{</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">services</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">params</span><span class="p">;</span>
-  <span class="kd">const</span> <span class="nx">userId</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">services</span><span class="p">.</span><span class="nx">getUserIdFromToken</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">Authorization</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">handler</span><span class="p">({</span> <span class="p">...</span><span class="nx">params</span><span class="p">,</span> <span class="nx">userId</span> <span class="p">});</span>
-<span class="p">};</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">withStrictHttpAuthentication</span> <span class="o">=</span> <span class="nx">handler</span> <span class="o">=&gt;</span> <span class="k">async</span> <span class="nx">params</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">{</span> <span class="nx">event</span><span class="p">,</span> <span class="nx">services</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">params</span><span class="p">;</span>
-  <span class="kd">const</span> <span class="nx">userId</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">services</span><span class="p">.</span><span class="nx">getUserIdFromToken</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">headers</span><span class="p">.</span><span class="nx">Authorization</span><span class="p">);</span>
-  <span class="k">return</span> <span class="nx">userId</span>
-    <span class="p">?</span> <span class="nx">handler</span><span class="p">({</span> <span class="p">...</span><span class="nx">params</span><span class="p">,</span> <span class="nx">userId</span> <span class="p">})</span>
-    <span class="p">:</span> <span class="nx">unauthorised</span><span class="p">(</span><span class="dl">'</span><span class="s1">Service requires an authenticated user</span><span class="dl">'</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>The first function is rather important.
-Instead of simply returning a standard Lambda handler, we add the concept of supplying <code class="language-plaintext highlighter-rouge">services</code> to the handler.
-This allows us to explicitly supply services (such as the user token authenticator) to a given handler in a controlled manner, which can be easily tested.</p>
-
-<p>Following this, the next two functions show how a handler can now be composed – supplying the ability to specify if the handler requires optional (<code class="language-plaintext highlighter-rouge">withOptionalHttpAuthentication</code>) or strict (<code class="language-plaintext highlighter-rouge">withStrictHttpAuthentication</code>) authentication requirements.
-In both cases, the <code class="language-plaintext highlighter-rouge">userId</code> is provided to the decorated handler.</p>
-
-<p>As we are now managing how a handler is constructed within our domain, we are able to craft how the internal handler signature looks.
+As such, we will instead bring this authentication logic into our application domain, and validate the claims for each intended request ourselves.</p><p>As discussed before, Cognito uses standard JSON Web Tokens, which allows us to include a pre-existing library <a href=https://github.com/cisco/node-jose rel="external noopener" target=_blank>node-jose</a>, that abstracts away this problem space.
+We will now include this dependency within the <code>package.json</code>, and create a new service within <code>src/services/userTokenAuthenticator.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#f92672>&#34;dependencies&#34;</span>: {
+</span></span><span style=display:flex><span>    <span style=color:#f92672>&#34;node-jose&#34;</span>: <span style=color:#e6db74>&#34;^1.0.0&#34;</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>https</span> <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;https&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>jose</span> <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;node-jose&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>generateKeySetUrl</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>poolId</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>region</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>poolId</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;_&#39;</span>)[<span style=color:#ae81ff>0</span>];
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#e6db74>`https://cognito-idp.</span><span style=color:#e6db74>${</span><span style=color:#a6e22e>region</span><span style=color:#e6db74>}</span><span style=color:#e6db74>.amazonaws.com/</span><span style=color:#e6db74>${</span><span style=color:#a6e22e>poolId</span><span style=color:#e6db74>}</span><span style=color:#e6db74>/.well-known/jwks.json`</span>;
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>fetchKey</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>poolId</span>, <span style=color:#a6e22e>token</span>) =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>kid</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>parse</span>(<span style=color:#a6e22e>jose</span>.<span style=color:#a6e22e>util</span>.<span style=color:#a6e22e>base64url</span>.<span style=color:#a6e22e>decode</span>(<span style=color:#a6e22e>token</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;.&#39;</span>)[<span style=color:#ae81ff>0</span>]));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> Promise((<span style=color:#a6e22e>res</span>, <span style=color:#a6e22e>rej</span>) =&gt; {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>https</span>.<span style=color:#a6e22e>get</span>(<span style=color:#a6e22e>generateKeySetUrl</span>(<span style=color:#a6e22e>poolId</span>), <span style=color:#a6e22e>response</span> =&gt; {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>statusCode</span> <span style=color:#f92672>!==</span> <span style=color:#ae81ff>200</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>rej</span>(<span style=color:#e6db74>&#39;Unable to fetch keys&#39;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>response</span>.<span style=color:#a6e22e>on</span>(<span style=color:#e6db74>&#39;data&#39;</span>, <span style=color:#a6e22e>body</span> =&gt; {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>keys</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>parse</span>(<span style=color:#a6e22e>body</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>key</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>keys</span>.<span style=color:#a6e22e>find</span>(<span style=color:#a6e22e>key</span> =&gt; <span style=color:#a6e22e>key</span>.<span style=color:#a6e22e>kid</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>kid</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>key</span>) {
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>rej</span>(<span style=color:#e6db74>&#39;Unable to find key&#39;</span>);
+</span></span><span style=display:flex><span>          <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>jose</span>.<span style=color:#a6e22e>JWK</span>.<span style=color:#a6e22e>asKey</span>(<span style=color:#a6e22e>key</span>).<span style=color:#a6e22e>then</span>(<span style=color:#a6e22e>res</span>);
+</span></span><span style=display:flex><span>      });
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>  });
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>parseClaims</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>token</span>, <span style=color:#a6e22e>key</span>) =&gt;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>jose</span>.<span style=color:#a6e22e>JWS</span>.<span style=color:#a6e22e>createVerify</span>(<span style=color:#a6e22e>key</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>verify</span>(<span style=color:#a6e22e>token</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>then</span>(({ <span style=color:#a6e22e>payload</span> }) =&gt; {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>claims</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>parse</span>(<span style=color:#a6e22e>payload</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>if</span> (Math.<span style=color:#a6e22e>floor</span>(<span style=color:#66d9ef>new</span> Date() <span style=color:#f92672>/</span> <span style=color:#ae81ff>1000</span>) <span style=color:#f92672>&gt;</span> <span style=color:#a6e22e>claims</span>.<span style=color:#a6e22e>exp</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>throw</span> Error(<span style=color:#e6db74>&#39;Token has expired&#39;</span>);
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>claims</span>;
+</span></span><span style=display:flex><span>    });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>default</span> <span style=color:#a6e22e>poolId</span> =&gt; <span style=color:#66d9ef>async</span> <span style=color:#a6e22e>token</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>try</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>key</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> <span style=color:#a6e22e>fetchKey</span>(<span style=color:#a6e22e>poolId</span>, <span style=color:#a6e22e>token</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>claims</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> <span style=color:#a6e22e>parseClaims</span>(<span style=color:#a6e22e>token</span>, <span style=color:#a6e22e>key</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>claims</span>.<span style=color:#a6e22e>sub</span>;
+</span></span><span style=display:flex><span>  } <span style=color:#66d9ef>catch</span> (<span style=color:#a6e22e>e</span>) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>undefined</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>This small service fetches the associated <a href=https://auth0.com/docs/jwks rel="external noopener" target=_blank>JSON Web Key Set</a>, locates the matching key, and then verifies that the provided request token is valid.
+Providing that the token has been verified to come from the intended party and has not expired, we parse the provided claims and return the user identifier.</p><h2 id=constructing-handlers-with-user-authentication>Constructing Handlers with User Authentication</h2><p>Now that we have a means to authenticate a request and be provided with the user identifier, we can now create a framework in which to easily construct handlers with varying permission requirements.
+We will now create a couple of small helper functions within <code>src/helpers/handlers.js</code>, which will be used to aid us in this pursuit.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>import</span> { <span style=color:#a6e22e>unauthorised</span> } <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;./http&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>createHandler</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>handler</span> =&gt; <span style=color:#a6e22e>services</span> =&gt; (<span style=color:#a6e22e>event</span>, <span style=color:#a6e22e>context</span>) =&gt;
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>handler</span>({ <span style=color:#a6e22e>event</span>, <span style=color:#a6e22e>context</span>, <span style=color:#a6e22e>services</span> });
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>withOptionalHttpAuthentication</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>handler</span> =&gt; <span style=color:#66d9ef>async</span> <span style=color:#a6e22e>params</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>event</span>, <span style=color:#a6e22e>services</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>params</span>;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>userId</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> <span style=color:#a6e22e>services</span>.<span style=color:#a6e22e>getUserIdFromToken</span>(<span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>headers</span>.<span style=color:#a6e22e>Authorization</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>handler</span>({ ...<span style=color:#a6e22e>params</span>, <span style=color:#a6e22e>userId</span> });
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>withStrictHttpAuthentication</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>handler</span> =&gt; <span style=color:#66d9ef>async</span> <span style=color:#a6e22e>params</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> { <span style=color:#a6e22e>event</span>, <span style=color:#a6e22e>services</span> } <span style=color:#f92672>=</span> <span style=color:#a6e22e>params</span>;
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>userId</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>await</span> <span style=color:#a6e22e>services</span>.<span style=color:#a6e22e>getUserIdFromToken</span>(<span style=color:#a6e22e>event</span>.<span style=color:#a6e22e>headers</span>.<span style=color:#a6e22e>Authorization</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>userId</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>?</span> <span style=color:#a6e22e>handler</span>({ ...<span style=color:#a6e22e>params</span>, <span style=color:#a6e22e>userId</span> })
+</span></span><span style=display:flex><span>    <span style=color:#f92672>:</span> <span style=color:#a6e22e>unauthorised</span>(<span style=color:#e6db74>&#39;Service requires an authenticated user&#39;</span>);
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>The first function is rather important.
+Instead of simply returning a standard Lambda handler, we add the concept of supplying <code>services</code> to the handler.
+This allows us to explicitly supply services (such as the user token authenticator) to a given handler in a controlled manner, which can be easily tested.</p><p>Following this, the next two functions show how a handler can now be composed – supplying the ability to specify if the handler requires optional (<code>withOptionalHttpAuthentication</code>) or strict (<code>withStrictHttpAuthentication</code>) authentication requirements.
+In both cases, the <code>userId</code> is provided to the decorated handler.</p><p>As we are now managing how a handler is constructed within our domain, we are able to craft how the internal handler signature looks.
 This leads us to opt for a single object parameter, which can be specifically destructured.
-You will also notice that we have decided to delegate creation of the unauthorised HTTP response to a specific function, which is defined within <code class="language-plaintext highlighter-rouge">src/helpers/http.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">unauthorised</span> <span class="o">=</span> <span class="nx">detail</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">401</span><span class="p">,</span>
-  <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
-    <span class="dl">'</span><span class="s1">Access-Control-Allow-Origin</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">Access-Control-Allow-Credentials</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">,</span>
-    <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/problem+json</span><span class="dl">'</span><span class="p">,</span>
-  <span class="p">},</span>
-  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="na">title</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Unauthorized</span><span class="dl">'</span><span class="p">,</span> <span class="nx">detail</span> <span class="p">}),</span>
-<span class="p">});</span>
-</code></pre></div></div>
-
-<p>This response follows the <a href="https://tools.ietf.org/html/rfc7807">Problem Details for HTTP APIs</a> specification that we highlighted when defining the API within RAML in a <a href="https://eddmann.com/posts/mince-pie-challenge-designing-the-restful-api-with-raml/">previous post</a>.</p>
-
-<h2 id="testing-the-authenticated-handler-use-cases">Testing the Authenticated Handler Use-Cases</h2>
-
-<p>Now that we have all the pieces in place, we can experiment with how this abstraction will work in practise for the different handler use-cases we have laid out.
-To do this, we will replace the Hello, World example we created in the <a href="https://eddmann.com/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/#the-hello-world-example">previous post</a> with the following configuration (<code class="language-plaintext highlighter-rouge">serverless.yml</code>, <code class="language-plaintext highlighter-rouge">config.dev.yml</code>) and endpoints (<code class="language-plaintext highlighter-rouge">functions.yml</code>).</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">provider</span><span class="pi">:</span>
-  <span class="c1"># ..</span>
-  <span class="na">environment</span><span class="pi">:</span>
-    <span class="na">USER_POOL_ID</span><span class="pi">:</span> <span class="s">${file(./config.${self:provider.stage}.yml):userPoolId}</span>
-  <span class="c1"># ...</span>
-</code></pre></div></div>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># ..</span>
-<span class="na">userPoolId</span><span class="pi">:</span>
-  <span class="na">Ref</span><span class="pi">:</span> <span class="s">PieUserPool</span>
-</code></pre></div></div>
-
-<p>As shown before, we define the value using the one present within the current stage’s YAML configuration file.
-In a similar fashion to how we reference the User Pool identifier within the resource output, we can also include them as environment variables within Lambda functions.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">public</span><span class="pi">:</span>
-  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/auth.public_</span>
-  <span class="na">events</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
-        <span class="na">path</span><span class="pi">:</span> <span class="s">/public</span>
-        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
-
-<span class="na">optional</span><span class="pi">:</span>
-  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/auth.optional</span>
-  <span class="na">events</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
-        <span class="na">path</span><span class="pi">:</span> <span class="s">/optional</span>
-        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
-
-<span class="na">strict</span><span class="pi">:</span>
-  <span class="na">handler</span><span class="pi">:</span> <span class="s">src/auth.strict</span>
-  <span class="na">events</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
-        <span class="na">path</span><span class="pi">:</span> <span class="s">/strict</span>
-        <span class="na">method</span><span class="pi">:</span> <span class="s">get</span>
-</code></pre></div></div>
-
-<p>As <code class="language-plaintext highlighter-rouge">public</code> is a reserved JavaScript keyword, we suffix the first handler with a miscellaneous <code class="language-plaintext highlighter-rouge">_</code>.
-With these endpoints now defined, we can move on to creating the underlying implementations within <code class="language-plaintext highlighter-rouge">src/auth.js</code>.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span>
-  <span class="nx">createHandler</span><span class="p">,</span>
-  <span class="nx">withOptionalHttpAuthentication</span><span class="p">,</span>
-  <span class="nx">withStrictHttpAuthentication</span><span class="p">,</span>
-<span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./helpers/handlers</span><span class="dl">'</span><span class="p">;</span>
-<span class="k">import</span> <span class="nx">createUserTokenAuthenticator</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">./services/userTokenAuthenticator</span><span class="dl">'</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">handler</span> <span class="o">=</span> <span class="k">async</span> <span class="p">({</span> <span class="nx">userId</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">N/A</span><span class="dl">'</span> <span class="p">})</span> <span class="o">=&gt;</span> <span class="p">({</span>
-  <span class="na">statusCode</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-  <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span> <span class="nx">userId</span> <span class="p">}),</span>
-<span class="p">});</span>
-
-<span class="kd">const</span> <span class="nx">getUserIdFromToken</span> <span class="o">=</span> <span class="nx">createUserTokenAuthenticator</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">USER_POOL_ID</span><span class="p">);</span>
-
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">public_</span> <span class="o">=</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">handler</span><span class="p">)({</span> <span class="nx">getUserIdFromToken</span> <span class="p">});</span>
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">optional</span> <span class="o">=</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">withOptionalHttpAuthentication</span><span class="p">(</span><span class="nx">handler</span><span class="p">))({</span>
-  <span class="nx">getUserIdFromToken</span><span class="p">,</span>
-<span class="p">});</span>
-<span class="k">export</span> <span class="kd">const</span> <span class="nx">strict</span> <span class="o">=</span> <span class="nx">createHandler</span><span class="p">(</span><span class="nx">withStrictHttpAuthentication</span><span class="p">(</span><span class="nx">handler</span><span class="p">))({</span> <span class="nx">getUserIdFromToken</span> <span class="p">});</span>
-</code></pre></div></div>
-
-<p>Thanks to how the handler is now constructed, we are able to re-use the underlying handler in all three use-cases.
-This handler returns the request’s user identifier (if present), and highlights how explicit object destructuring allows us to clearly see which parameters are being used.
-Finally, we simply have to supply each handler with the concrete user token authenticator service before exporting them for consumption.</p>
-
-<h2 id="testing-the-endpoints">Testing the Endpoints</h2>
-
-<p>Now that the three endpoints have been configured, we can move on to deploying and subsequently testing them.
-First, deploy the updated application, provisioning all the associated resources and keeping a note of the User Pool and User Pool Client identifiers in the process.</p>
-
-<p>For testing, we will use the ability within the <a href="https://aws.amazon.com/cli/">aws-cli</a> to sign up and authenticate with a given User Pool.
-In a similar fashion to how we set up the Serverless Framework with Docker, we will include a pre-existing <a href="https://github.com/mesosphere/aws-cli">aws-cli image</a> within <code class="language-plaintext highlighter-rouge">docker-compose.yml</code>, referencing the same <code class="language-plaintext highlighter-rouge">.env</code> variable file that is used within Serverless.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">services</span><span class="pi">:</span>
-  <span class="c1"># ..</span>
-  <span class="na">aws-cli</span><span class="pi">:</span>
-    <span class="na">image</span><span class="pi">:</span> <span class="s">mesosphere/aws-cli</span>
-    <span class="na">env_file</span><span class="pi">:</span> <span class="s">.env</span>
-</code></pre></div></div>
-
-<p>With this in place, we can now create a new user within the User Pool, signing up with a unique username and email address.
-We must supply the User Pool Client identifier that was created during the deployment phase, along with the region in which the User Pool was deployed.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose run <span class="nt">--rm</span> aws-cli cognito-idp sign-up <span class="se">\</span>
-  <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> <span class="se">\</span>
-  <span class="nt">--client-id</span> <span class="nv">$USER_POOL_CLIENT_ID</span> <span class="se">\</span>
-  <span class="nt">--username</span> joe_bloggs <span class="se">\</span>
-  <span class="nt">--password</span> MySuperSecurePassw0rd! <span class="se">\</span>
-  <span class="nt">--user-attributes</span> <span class="nv">Name</span><span class="o">=</span>email,Value<span class="o">=</span>joe_bloggs@email.com
-</code></pre></div></div>
-
-<p>Now we are required to confirm the newly created account.
-This can be done manually with the following command, supplying the User Pool identifier this time.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose run <span class="nt">--rm</span> aws-cli cognito-idp admin-confirm-sign-up <span class="se">\</span>
-  <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> <span class="se">\</span>
-  <span class="nt">--user-pool-id</span> <span class="nv">$USER_POOL_ID</span> <span class="se">\</span>
-  <span class="nt">--username</span> joe_bloggs
-</code></pre></div></div>
-
-<p>We can now generate a new authentication token for the newly created user, which can be used to make subsequent authenticated requests to the API.
-This token will be output to the terminal.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose run <span class="nt">--rm</span> aws-cli cognito-idp admin-initiate-auth <span class="se">\</span>
-  <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> <span class="se">\</span>
-  <span class="nt">--user-pool-id</span> <span class="nv">$USER_POOL_ID</span> <span class="se">\</span>
-  <span class="nt">--client-id</span> <span class="nv">$USER_POOL_CLIENT_ID</span> <span class="se">\</span>
-  <span class="nt">--auth-flow</span> ADMIN_NO_SRP_AUTH <span class="se">\</span>
-  <span class="nt">--query</span> AuthenticationResult.IdToken <span class="se">\</span>
-  <span class="nt">--output</span> text <span class="se">\</span>
-  <span class="nt">--auth-parameters</span> <span class="nv">USERNAME</span><span class="o">=</span>joe_bloggs,PASSWORD<span class="o">=</span>MySuperSecurePassw0rd!
-</code></pre></div></div>
-
-<p>Finally, we can experiment with this token and make requests to each of the three different endpoints.
-Notice how the behaviour of all three differs based on whether you provide a valid token or not.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http https://nw6ok0dk3k.execute-api.eu-west-1.amazonaws.com/dev/strict <span class="s1">'Authorization:$JSON_WEB_TOKEN'</span>
-</code></pre></div></div>
-
-<p>If you are interested in seeing the entire deployment and testing process for all three use-cases, you can watch the terminal video below.</p>
-
-<p><script src="https://asciinema.org/a/w6hj8mSNhjbttO56KTKBolwyK.js" id="asciicast-w6hj8mSNhjbttO56KTKBolwyK" async=""></script></p>
-
-<p>We have now successfully exercised the ability to sign up and authenticate users with the application.
-Join me in the <a href="https://eddmann.com/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/">next post</a> of the <a href="https://eddmann.com/archive/tag/mince-pie-challenge-series/">series</a>, where we will look into providing a level of code reassurance, adding the static type checker <a href="https://flow.org/">Flow</a> to our Webpack configuration.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+You will also notice that we have decided to delegate creation of the unauthorised HTTP response to a specific function, which is defined within <code>src/helpers/http.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>unauthorised</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>detail</span> =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>statusCode</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>401</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>headers</span><span style=color:#f92672>:</span> {
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Access-Control-Allow-Origin&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;*&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Access-Control-Allow-Credentials&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;*&#39;</span>,
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#39;Content-Type&#39;</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;application/problem+json&#39;</span>,
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>body</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>stringify</span>({ <span style=color:#a6e22e>title</span><span style=color:#f92672>:</span> <span style=color:#e6db74>&#39;Unauthorized&#39;</span>, <span style=color:#a6e22e>detail</span> }),
+</span></span><span style=display:flex><span>});
+</span></span></code></pre></div><p>This response follows the <a href=https://tools.ietf.org/html/rfc7807 rel="external noopener" target=_blank>Problem Details for HTTP APIs</a> specification that we highlighted when defining the API within RAML in a <a href=/posts/mince-pie-challenge-designing-the-restful-api-with-raml/>previous post</a>.</p><h2 id=testing-the-authenticated-handler-use-cases>Testing the Authenticated Handler Use-Cases</h2><p>Now that we have all the pieces in place, we can experiment with how this abstraction will work in practise for the different handler use-cases we have laid out.
+To do this, we will replace the Hello, World example we created in the <a href=/posts/mince-pie-challenge-setting-up-the-serverless-framework-with-docker-webpack-and-babel/#the-hello-world-example>previous post</a> with the following configuration (<code>serverless.yml</code>, <code>config.dev.yml</code>) and endpoints (<code>functions.yml</code>).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>provider</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># ..</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>environment</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>USER_POOL_ID</span>: <span style=color:#ae81ff>${file(./config.${self:provider.stage}.yml):userPoolId}</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># ...</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># ..</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>userPoolId</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>Ref</span>: <span style=color:#ae81ff>PieUserPool</span>
+</span></span></code></pre></div><p>As shown before, we define the value using the one present within the current stage&rsquo;s YAML configuration file.
+In a similar fashion to how we reference the User Pool identifier within the resource output, we can also include them as environment variables within Lambda functions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>public</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>handler</span>: <span style=color:#ae81ff>src/auth.public_</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>events</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/public</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>method</span>: <span style=color:#ae81ff>get</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>optional</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>handler</span>: <span style=color:#ae81ff>src/auth.optional</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>events</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/optional</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>method</span>: <span style=color:#ae81ff>get</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>strict</span>:
+</span></span><span style=display:flex><span>  <span style=color:#f92672>handler</span>: <span style=color:#ae81ff>src/auth.strict</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>events</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>http</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/strict</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>method</span>: <span style=color:#ae81ff>get</span>
+</span></span></code></pre></div><p>As <code>public</code> is a reserved JavaScript keyword, we suffix the first handler with a miscellaneous <code>_</code>.
+With these endpoints now defined, we can move on to creating the underlying implementations within <code>src/auth.js</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>import</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>createHandler</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>withOptionalHttpAuthentication</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>withStrictHttpAuthentication</span>,
+</span></span><span style=display:flex><span>} <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;./helpers/handlers&#39;</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>import</span> <span style=color:#a6e22e>createUserTokenAuthenticator</span> <span style=color:#a6e22e>from</span> <span style=color:#e6db74>&#39;./services/userTokenAuthenticator&#39;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>handler</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>async</span> ({ <span style=color:#a6e22e>userId</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;N/A&#39;</span> }) =&gt; ({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>statusCode</span><span style=color:#f92672>:</span> <span style=color:#ae81ff>200</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>body</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>JSON</span>.<span style=color:#a6e22e>stringify</span>({ <span style=color:#a6e22e>userId</span> }),
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>getUserIdFromToken</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>createUserTokenAuthenticator</span>(<span style=color:#a6e22e>process</span>.<span style=color:#a6e22e>env</span>.<span style=color:#a6e22e>USER_POOL_ID</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>public_</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>createHandler</span>(<span style=color:#a6e22e>handler</span>)({ <span style=color:#a6e22e>getUserIdFromToken</span> });
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>optional</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>createHandler</span>(<span style=color:#a6e22e>withOptionalHttpAuthentication</span>(<span style=color:#a6e22e>handler</span>))({
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>getUserIdFromToken</span>,
+</span></span><span style=display:flex><span>});
+</span></span><span style=display:flex><span><span style=color:#66d9ef>export</span> <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>strict</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>createHandler</span>(<span style=color:#a6e22e>withStrictHttpAuthentication</span>(<span style=color:#a6e22e>handler</span>))({ <span style=color:#a6e22e>getUserIdFromToken</span> });
+</span></span></code></pre></div><p>Thanks to how the handler is now constructed, we are able to re-use the underlying handler in all three use-cases.
+This handler returns the request&rsquo;s user identifier (if present), and highlights how explicit object destructuring allows us to clearly see which parameters are being used.
+Finally, we simply have to supply each handler with the concrete user token authenticator service before exporting them for consumption.</p><h2 id=testing-the-endpoints>Testing the Endpoints</h2><p>Now that the three endpoints have been configured, we can move on to deploying and subsequently testing them.
+First, deploy the updated application, provisioning all the associated resources and keeping a note of the User Pool and User Pool Client identifiers in the process.</p><p>For testing, we will use the ability within the <a href=https://aws.amazon.com/cli/ rel="external noopener" target=_blank>aws-cli</a> to sign up and authenticate with a given User Pool.
+In a similar fashion to how we set up the Serverless Framework with Docker, we will include a pre-existing <a href=https://github.com/mesosphere/aws-cli rel="external noopener" target=_blank>aws-cli image</a> within <code>docker-compose.yml</code>, referencing the same <code>.env</code> variable file that is used within Serverless.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>services</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># ..</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>aws-cli</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>image</span>: <span style=color:#ae81ff>mesosphere/aws-cli</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>env_file</span>: <span style=color:#ae81ff>.env</span>
+</span></span></code></pre></div><p>With this in place, we can now create a new user within the User Pool, signing up with a unique username and email address.
+We must supply the User Pool Client identifier that was created during the deployment phase, along with the region in which the User Pool was deployed.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose run --rm aws-cli cognito-idp sign-up <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --region $AWS_REGION <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --client-id $USER_POOL_CLIENT_ID <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --username joe_bloggs <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --password MySuperSecurePassw0rd! <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --user-attributes Name<span style=color:#f92672>=</span>email,Value<span style=color:#f92672>=</span>joe_bloggs@email.com
+</span></span></code></pre></div><p>Now we are required to confirm the newly created account.
+This can be done manually with the following command, supplying the User Pool identifier this time.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose run --rm aws-cli cognito-idp admin-confirm-sign-up <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --region $AWS_REGION <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --user-pool-id $USER_POOL_ID <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --username joe_bloggs
+</span></span></code></pre></div><p>We can now generate a new authentication token for the newly created user, which can be used to make subsequent authenticated requests to the API.
+This token will be output to the terminal.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>docker-compose run --rm aws-cli cognito-idp admin-initiate-auth <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --region $AWS_REGION <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --user-pool-id $USER_POOL_ID <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --client-id $USER_POOL_CLIENT_ID <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --auth-flow ADMIN_NO_SRP_AUTH <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --query AuthenticationResult.IdToken <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --output text <span style=color:#ae81ff>\
+</span></span></span><span style=display:flex><span><span style=color:#ae81ff></span>  --auth-parameters USERNAME<span style=color:#f92672>=</span>joe_bloggs,PASSWORD<span style=color:#f92672>=</span>MySuperSecurePassw0rd!
+</span></span></code></pre></div><p>Finally, we can experiment with this token and make requests to each of the three different endpoints.
+Notice how the behaviour of all three differs based on whether you provide a valid token or not.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>http https://nw6ok0dk3k.execute-api.eu-west-1.amazonaws.com/dev/strict <span style=color:#e6db74>&#39;Authorization:$JSON_WEB_TOKEN&#39;</span>
+</span></span></code></pre></div><p>If you are interested in seeing the entire deployment and testing process for all three use-cases, you can watch the terminal video below.</p><p>We have now successfully exercised the ability to sign up and authenticate users with the application.
+Join me in the <a href=/posts/mince-pie-challenge-setting-up-flow-with-babel-and-webpack/>next post</a> of the <a href=/archive/tag/mince-pie-challenge-series>series</a>, where we will look into providing a level of code reassurance, adding the static type checker <a href=https://flow.org/ rel="external noopener" target=_blank>Flow</a> to our Webpack configuration.</p></main><footer class=post__tags><a href=/archive/tag/cognito>cognito</a><a href=/archive/tag/serverless>serverless</a><a href=/archive/tag/security>security</a><a href=/archive/tag/mince-pie-challenge-series>mince-pie-challenge-series</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

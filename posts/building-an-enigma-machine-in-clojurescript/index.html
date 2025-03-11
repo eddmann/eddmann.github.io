@@ -1,320 +1,186 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn how to build an Enigma Machine using ClojureScript and property-based testing. This comprehensive guide covers rotor simulation, reflector configuration, and a user interface using Reagent.">
-
-    <title>
-        
-            Building an Enigma Machine in ClojureScript &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Building an Enigma Machine in ClojureScript</h1>
-    <time datetime="2020-11-25T00:00:00+00:00" class="post-date">25 Nov 2020</time>
-    <p>The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Building an Enigma Machine in ClojureScript - Edd Mann</title>
+<meta name=description content="Learn how to build an Enigma Machine using ClojureScript and property-based testing. This comprehensive guide covers rotor simulation, reflector configuration, and a user interface using Reagent."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Building an Enigma Machine in ClojureScript"><meta itemprop=description content="The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2. It was so important to the war-time efforts that work carried out by Alan Turing at Bletchley Park to decode the resulting ciphers helped end the war. For years I have been fascinated by this device, and I thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript. I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation."><meta itemprop=datePublished content="2020-11-25T00:00:00+00:00"><meta itemprop=dateModified content="2020-11-25T00:00:00+00:00"><meta itemprop=wordCount content="1649"><meta itemprop=keywords content="Enigma-Machine,Clojurescript,Property-Testing"><meta property="og:url" content="https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Building an Enigma Machine in ClojureScript"><meta property="og:description" content="The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2. It was so important to the war-time efforts that work carried out by Alan Turing at Bletchley Park to decode the resulting ciphers helped end the war. For years I have been fascinated by this device, and I thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript. I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2020-11-25T00:00:00+00:00"><meta property="article:modified_time" content="2020-11-25T00:00:00+00:00"><meta property="article:tag" content="Enigma-Machine"><meta property="article:tag" content="Clojurescript"><meta property="article:tag" content="Property-Testing"><meta name=twitter:card content="summary"><meta name=twitter:title content="Building an Enigma Machine in ClojureScript"><meta name=twitter:description content="The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2. It was so important to the war-time efforts that work carried out by Alan Turing at Bletchley Park to decode the resulting ciphers helped end the war. For years I have been fascinated by this device, and I thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript. I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/building-an-enigma-machine-in-clojurescript/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Building an Enigma Machine in ClojureScript</h1><time class=post__time>Nov 25, 2020</time></header><main class=prose><p>The Enigma Machine is a typewriter-sized substitution encryption device used by Germany in World War 2.
 It was so important to the war-time efforts that work carried out by Alan Turing at Bletchley Park to decode the resulting ciphers helped end the war.
 For years I have been fascinated by this device, and I thought it would be interesting to explore implementing a web-based Enigma Machine using ClojureScript.
-I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation.</p>
-
-
-
-<p>You can experiment with the final implementation <a href="https://eddmann.com/enigma-machine-clojurescript/">here</a>.
-The source code is available in its entirety on <a href="https://github.com/eddmann/enigma-machine-clojurescript">GitHub</a> to review.</p>
-
-<p><a href="https://eddmann.com/enigma-machine-clojurescript/"><img src="/uploads/building-an-enigma-machine-in-clojurescript/demo.png" alt="Web-based Enigma Machine" /></a></p>
-
-<h2 id="how-it-works">How it works</h2>
-
-<p>At its most basic (as many variations appeared over the years) the machine is composed of a Keyboard, Lamp Board, three Rotors, a Reflector and a Plugboard (as pictured below).
+I also thought it would be a great opportunity to explore how I can use property-based testing to help garner confidence from the resulting implementation.</p><p>You can experiment with the final implementation <a href=https://eddmann.com/enigma-machine-clojurescript/>here</a>.
+The source code is available in its entirety on <a href=https://github.com/eddmann/enigma-machine-clojurescript rel="external noopener" target=_blank>GitHub</a> to review.</p><p><a href=https://eddmann.com/enigma-machine-clojurescript/><picture><source type=image/webp srcset=/posts/building-an-enigma-machine-in-clojurescript/demo_hu_2c5fdfa1fc5a32de.webp><source type=image/jpeg srcset=/posts/building-an-enigma-machine-in-clojurescript/demo_hu_edf9c77e60ab52ce.jpg><img src=/posts/building-an-enigma-machine-in-clojurescript/demo_hu_edf9c77e60ab52ce.jpg alt="Web-based Enigma Machine" loading=lazy></picture></a></p><h2 id=how-it-works>How it works</h2><p>At its most basic (as many variations appeared over the years) the machine is composed of a Keyboard, Lamp Board, three Rotors, a Reflector and a Plugboard (as pictured below).
 Using a pre-shared machine configuration (Wheel order, Ring settings and Plug connections), when an operator presses a key on the Keyboard, a seemingly random letter illuminates on the Lamp Board.
 With these key presses forming a desired message, the resulting cipher is then sent via an agreed (often insecure) channel to interested parties.
 Using a similarly configured Enigma Machine, the recipient is able to follow the same process as the sender, except upon each key press the original message letter will illuminate on the Lamp Board.
-With the combination of the Rotors, Reflector and Plugboard, there are a staggering <em>158,962,555,217,826,360,000</em> paths a letter can take to be substituted!</p>
-
-<p><img src="/uploads/building-an-enigma-machine-in-clojurescript/enigma-machine.jpg" alt="Enigma Machine" /></p>
-
-<p>I will defer to <a href="https://hackaday.com/2017/08/22/the-enigma-enigma-how-the-enigma-machine-worked/">these</a> <a href="https://www.youtube.com/watch?v=G2_Q9FoD-oQ">great</a> <a href="https://www.youtube.com/watch?v=ASfAPOiq_eQ">resources</a> which I found very useful in helping to elaborate on the inner workings of the Enigma Machine.
-With a basic understanding of how the machine works in place, we can now move on to modelling this behaviour in code.</p>
-
-<h2 id="the-machine">The Machine</h2>
-
-<p>We will begin with what I feel is the heart of the Enigma Machine: the stepped Rotors.
+With the combination of the Rotors, Reflector and Plugboard, there are a staggering <em>158,962,555,217,826,360,000</em> paths a letter can take to be substituted!</p><p><picture><source type=image/webp srcset=/posts/building-an-enigma-machine-in-clojurescript/enigma-machine_hu_81883117c456495.webp><source type=image/jpeg srcset=/posts/building-an-enigma-machine-in-clojurescript/enigma-machine_hu_37e4f23a285346b6.jpg><img src=/posts/building-an-enigma-machine-in-clojurescript/enigma-machine_hu_37e4f23a285346b6.jpg alt="Enigma Machine" loading=lazy></picture></p><p>I will defer to <a href=https://hackaday.com/2017/08/22/the-enigma-enigma-how-the-enigma-machine-worked/ rel="external noopener" target=_blank>these</a> <a href="https://www.youtube.com/watch?v=G2_Q9FoD-oQ" rel="external noopener" target=_blank>great</a> <a href="https://www.youtube.com/watch?v=ASfAPOiq_eQ" rel="external noopener" target=_blank>resources</a> which I found very useful in helping to elaborate on the inner workings of the Enigma Machine.
+With a basic understanding of how the machine works in place, we can now move on to modelling this behaviour in code.</p><h2 id=the-machine>The Machine</h2><p>We will begin with what I feel is the heart of the Enigma Machine: the stepped Rotors.
 Comprised of three connected Rotors, the wiring corresponding to the pressed key forms a circuit based on the current positioning of the Rotors.
-Within code, we are able to represent this as <em>hash-map</em> like data structures, where we rotate the given Rotor based on a specified <em>step</em> letter and position within the Rotor collection.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="o">^</span><span class="no">:private</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span><span class="p">))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">rotors</span><span class="w">
-  </span><span class="p">{</span><span class="no">:I</span><span class="w">   </span><span class="p">{</span><span class="no">:out</span><span class="w">  </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"EKMFLGDQVZNTOWYHXUSPAIBRCJ"</span><span class="p">)</span><span class="w">
-         </span><span class="no">:in</span><span class="w">   </span><span class="n">alphabet</span><span class="w">
-         </span><span class="no">:step</span><span class="w"> </span><span class="sc">\Q</span><span class="p">}</span><span class="n">,</span><span class="w">
-   </span><span class="no">:II</span><span class="w">  </span><span class="p">{</span><span class="no">:out</span><span class="w">  </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"AJDKSIRUXBLHWTMCQGZNPYFVOE"</span><span class="p">)</span><span class="w">
-         </span><span class="no">:in</span><span class="w">   </span><span class="n">alphabet</span><span class="w">
-         </span><span class="no">:step</span><span class="w"> </span><span class="sc">\E</span><span class="p">}</span><span class="w">
-   </span><span class="no">:III</span><span class="w"> </span><span class="p">{</span><span class="no">:out</span><span class="w">  </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"BDFHJLCPRTXVZNYEIWGAKMUSQO"</span><span class="p">)</span><span class="w">
-         </span><span class="no">:in</span><span class="w">   </span><span class="n">alphabet</span><span class="w">
-         </span><span class="no">:step</span><span class="w"> </span><span class="sc">\V</span><span class="p">}})</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">step?</span><span class="w"> </span><span class="p">[</span><span class="n">rotor</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="no">:step</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="p">(</span><span class="no">:in</span><span class="w"> </span><span class="n">rotor</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">rotate-rotor</span><span class="w"> </span><span class="p">[</span><span class="n">rotor</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">rotate</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">concat</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="p">[(</span><span class="nb">first</span><span class="w"> </span><span class="n">%</span><span class="p">)])]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="n">rotor</span><span class="w">
-        </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="no">:in</span><span class="w"> </span><span class="n">rotate</span><span class="p">)</span><span class="w">
-        </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="no">:out</span><span class="w"> </span><span class="n">rotate</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">rotate-rotors</span><span class="w"> </span><span class="p">[[</span><span class="n">one</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">three</span><span class="p">]]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">step-one?</span><span class="w"> </span><span class="p">(</span><span class="nf">step?</span><span class="w"> </span><span class="n">one</span><span class="p">)</span><span class="w">
-        </span><span class="n">step-two?</span><span class="w"> </span><span class="p">(</span><span class="nf">step?</span><span class="w"> </span><span class="n">two</span><span class="p">)]</span><span class="w">
-    </span><span class="p">[(</span><span class="nf">rotate-rotor</span><span class="w"> </span><span class="n">one</span><span class="p">)</span><span class="w">
-     </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="n">step-one?</span><span class="w"> </span><span class="n">step-two?</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">rotate-rotor</span><span class="w"> </span><span class="n">two</span><span class="p">)</span><span class="w"> </span><span class="n">two</span><span class="p">)</span><span class="w">
-     </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="n">step-two?</span><span class="w"> </span><span class="p">(</span><span class="nf">rotate-rotor</span><span class="w"> </span><span class="n">three</span><span class="p">)</span><span class="w"> </span><span class="n">three</span><span class="p">)]))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">passthrough-rotors</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w"> </span><span class="n">letter</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
-   </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">letter</span><span class="w"> </span><span class="n">rotor</span><span class="p">]</span><span class="w">
-     </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="n">letter</span><span class="w">
-          </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="no">:out</span><span class="w"> </span><span class="n">rotor</span><span class="p">)))</span><span class="w">
-          </span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="p">(</span><span class="no">:in</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="w"> </span><span class="n">alphabet</span><span class="p">))))</span><span class="w">
-   </span><span class="n">letter</span><span class="w">
-   </span><span class="n">rotors</span><span class="p">))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>Using the above code, we define three of the original Rotors (with the scrambled wiring represented as <code class="language-plaintext highlighter-rouge">in</code> and <code class="language-plaintext highlighter-rouge">out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
-With the use of <em>hash-maps</em>, we are able to clearly see how the machine used substitution to form the resulting cipher.</p>
-
-<p>To complete the circuit and send the current back through the (inverted) Rotors, we use a supplied Reflector.
-These use simple static substitutions which can be represented as <em>hash-maps</em> like so.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">reflectors</span><span class="w">
-  </span><span class="p">{</span><span class="no">:A</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"EJMZALYXVBWFCRQUONTSPIKHGD"</span><span class="p">))</span><span class="w">
-   </span><span class="no">:B</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"YRUHQSLDPXNGOKMIEBFZCWVJAT"</span><span class="p">))</span><span class="w">
-   </span><span class="no">:C</span><span class="w"> </span><span class="p">(</span><span class="nb">zipmap</span><span class="w"> </span><span class="n">alphabet</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="s">"FVPJIAOYEDRZXWGCTKUQSBNMHL"</span><span class="p">))})</span><span class="w">
-</span></code></pre></div></div>
-
-<p>From here, we can now succinctly declare how a chosen letter (key press) traverses through the machine and is returned as a cipher to the operator.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">invert-rotor</span><span class="w"> </span><span class="p">[</span><span class="n">rotor</span><span class="p">]</span><span class="w">
-  </span><span class="p">{</span><span class="no">:in</span><span class="w">   </span><span class="p">(</span><span class="no">:out</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="n">,</span><span class="w">
-   </span><span class="no">:out</span><span class="w">  </span><span class="p">(</span><span class="no">:in</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="n">,</span><span class="w">
-   </span><span class="no">:step</span><span class="w"> </span><span class="p">(</span><span class="no">:step</span><span class="w"> </span><span class="n">rotor</span><span class="p">)})</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">encode-letter</span><span class="w"> </span><span class="p">[{</span><span class="no">:keys</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w"> </span><span class="n">reflector</span><span class="w"> </span><span class="n">plugboard</span><span class="p">]}</span><span class="w"> </span><span class="n">letter</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">plug</span><span class="w">            </span><span class="o">#</span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="n">plugboard</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="n">,</span><span class="w">
-        </span><span class="n">reflect</span><span class="w">         </span><span class="o">#</span><span class="p">(</span><span class="nb">get</span><span class="w"> </span><span class="n">reflector</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w">
-        </span><span class="n">inverted-rotors</span><span class="w"> </span><span class="p">(</span><span class="nb">reverse</span><span class="w"> </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="n">invert-rotor</span><span class="w"> </span><span class="n">rotors</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="n">letter</span><span class="w">
-         </span><span class="n">plug</span><span class="w">
-         </span><span class="p">(</span><span class="nf">passthrough-rotors</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w">
-         </span><span class="n">reflect</span><span class="w">
-         </span><span class="p">(</span><span class="nf">passthrough-rotors</span><span class="w"> </span><span class="n">inverted-rotors</span><span class="p">)</span><span class="w">
-         </span><span class="n">plug</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>You can see how we thread the letter through the Plugboard, passing up and down the currently configured Rotors (by way of the Reflector) and then through the Plugboard to attain the resulting cipher letter.
+Within code, we are able to represent this as <em>hash-map</em> like data structures, where we rotate the given Rotor based on a specified <em>step</em> letter and position within the Rotor collection.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span><span style=color:#f92672>^</span><span style=color:#e6db74>:private</span> alphabet (seq <span style=color:#e6db74>&#34;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span>rotors
+</span></span><span style=display:flex><span>  {<span style=color:#e6db74>:I</span>   {<span style=color:#e6db74>:out</span>  (seq <span style=color:#e6db74>&#34;EKMFLGDQVZNTOWYHXUSPAIBRCJ&#34;</span>)
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:in</span>   alphabet
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:step</span> <span style=color:#e6db74>\Q</span>},
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:II</span>  {<span style=color:#e6db74>:out</span>  (seq <span style=color:#e6db74>&#34;AJDKSIRUXBLHWTMCQGZNPYFVOE&#34;</span>)
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:in</span>   alphabet
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:step</span> <span style=color:#e6db74>\E</span>}
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:III</span> {<span style=color:#e6db74>:out</span>  (seq <span style=color:#e6db74>&#34;BDFHJLCPRTXVZNYEIWGAKMUSQO&#34;</span>)
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:in</span>   alphabet
+</span></span><span style=display:flex><span>         <span style=color:#e6db74>:step</span> <span style=color:#e6db74>\V</span>}})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>step? [rotor]
+</span></span><span style=display:flex><span>  (= (<span style=color:#e6db74>:step</span> rotor) (first (<span style=color:#e6db74>:in</span> rotor))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>rotate-rotor [rotor]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[rotate <span style=color:#f92672>#</span>(concat (rest %) [(first %)])]
+</span></span><span style=display:flex><span>    (-&gt; rotor
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>update</span> <span style=color:#e6db74>:in</span> rotate)
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>update</span> <span style=color:#e6db74>:out</span> rotate))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>rotate-rotors [[one two three]]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[step-one? (<span style=color:#a6e22e>step?</span> one)
+</span></span><span style=display:flex><span>        step-two? (<span style=color:#a6e22e>step?</span> two)]
+</span></span><span style=display:flex><span>    [(<span style=color:#a6e22e>rotate-rotor</span> one)
+</span></span><span style=display:flex><span>     (<span style=color:#66d9ef>if </span>(or step-one? step-two?) (<span style=color:#a6e22e>rotate-rotor</span> two) two)
+</span></span><span style=display:flex><span>     (<span style=color:#66d9ef>if </span>step-two? (<span style=color:#a6e22e>rotate-rotor</span> three) three)]))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>passthrough-rotors [rotors letter]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>reduce</span>
+</span></span><span style=display:flex><span>   (<span style=color:#66d9ef>fn </span>[letter rotor]
+</span></span><span style=display:flex><span>     (<span style=color:#a6e22e>-&gt;&gt;</span> letter
+</span></span><span style=display:flex><span>          (get (zipmap alphabet (<span style=color:#e6db74>:out</span> rotor)))
+</span></span><span style=display:flex><span>          (get (zipmap (<span style=color:#e6db74>:in</span> rotor) alphabet))))
+</span></span><span style=display:flex><span>   letter
+</span></span><span style=display:flex><span>   rotors))
+</span></span></code></pre></div><p>Using the above code, we define three of the original Rotors (with the scrambled wiring represented as <code>in</code> and <code>out</code>), providing the behaviour necessary to rotate and pass a letter through the given Rotor collection.
+With the use of <em>hash-maps</em>, we are able to clearly see how the machine used substitution to form the resulting cipher.</p><p>To complete the circuit and send the current back through the (inverted) Rotors, we use a supplied Reflector.
+These use simple static substitutions which can be represented as <em>hash-maps</em> like so.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span>reflectors
+</span></span><span style=display:flex><span>  {<span style=color:#e6db74>:A</span> (zipmap alphabet (seq <span style=color:#e6db74>&#34;EJMZALYXVBWFCRQUONTSPIKHGD&#34;</span>))
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:B</span> (zipmap alphabet (seq <span style=color:#e6db74>&#34;YRUHQSLDPXNGOKMIEBFZCWVJAT&#34;</span>))
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:C</span> (zipmap alphabet (seq <span style=color:#e6db74>&#34;FVPJIAOYEDRZXWGCTKUQSBNMHL&#34;</span>))})
+</span></span></code></pre></div><p>From here, we can now succinctly declare how a chosen letter (key press) traverses through the machine and is returned as a cipher to the operator.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>invert-rotor [rotor]
+</span></span><span style=display:flex><span>  {<span style=color:#e6db74>:in</span>   (<span style=color:#e6db74>:out</span> rotor),
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:out</span>  (<span style=color:#e6db74>:in</span> rotor),
+</span></span><span style=display:flex><span>   <span style=color:#e6db74>:step</span> (<span style=color:#e6db74>:step</span> rotor)})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>encode-letter [{<span style=color:#e6db74>:keys</span> [rotors reflector plugboard]} letter]
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[plug            <span style=color:#f92672>#</span>(get plugboard % %),
+</span></span><span style=display:flex><span>        reflect         <span style=color:#f92672>#</span>(get reflector %)
+</span></span><span style=display:flex><span>        inverted-rotors (reverse (map invert-rotor rotors))]
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>-&gt;&gt;</span> letter
+</span></span><span style=display:flex><span>         plug
+</span></span><span style=display:flex><span>         (<span style=color:#a6e22e>passthrough-rotors</span> rotors)
+</span></span><span style=display:flex><span>         reflect
+</span></span><span style=display:flex><span>         (<span style=color:#a6e22e>passthrough-rotors</span> inverted-rotors)
+</span></span><span style=display:flex><span>         plug)))
+</span></span></code></pre></div><p>You can see how we thread the letter through the Plugboard, passing up and down the currently configured Rotors (by way of the Reflector) and then through the Plugboard to attain the resulting cipher letter.
 We will soon be able to use this function to iteratively produce a cipher of an entire message.
 Before we do this, however, as explained at the beginning of this post, we need a means of configuring the machine based on an agreed‐upon setup.
-This is achieved using the code below.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">setup-plugboard</span><span class="w"> </span><span class="p">[</span><span class="n">plugboard</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">merge</span><span class="w"> </span><span class="n">plugboard</span><span class="w"> </span><span class="p">(</span><span class="nb">map-invert</span><span class="w"> </span><span class="n">plugboard</span><span class="p">)))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">setup-rotors</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w"> </span><span class="n">positions</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">letfn</span><span class="w">
-   </span><span class="p">[(</span><span class="nf">setup-rotor</span><span class="w"> </span><span class="p">[</span><span class="n">rotor</span><span class="w"> </span><span class="n">position</span><span class="p">]</span><span class="w">
-      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="p">(</span><span class="no">:in</span><span class="w"> </span><span class="n">rotor</span><span class="p">))</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="w">
-        </span><span class="n">rotor</span><span class="w">
-        </span><span class="p">(</span><span class="nf">recur</span><span class="w"> </span><span class="p">(</span><span class="nf">rotate-rotor</span><span class="w"> </span><span class="n">rotor</span><span class="p">)</span><span class="w"> </span><span class="n">position</span><span class="p">)))]</span><span class="w">
-    </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="n">setup-rotor</span><span class="w"> </span><span class="n">rotors</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="n">positions</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">setup-machine</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="n">machine</span><span class="w">
-      </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="no">:plugboard</span><span class="w"> </span><span class="n">setup-plugboard</span><span class="p">)</span><span class="w">
-      </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="no">:rotors</span><span class="w"> </span><span class="n">setup-rotors</span><span class="w"> </span><span class="p">(</span><span class="no">:positions</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="s">"AAA"</span><span class="p">))</span><span class="w">
-      </span><span class="p">(</span><span class="nb">assoc</span><span class="w"> </span><span class="no">:cipher</span><span class="w"> </span><span class="p">[])))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>With the assumption of the client code supplying us a desired machine setup, we are able to internally configure the starting positions of the chosen Rotors and the Plugboard mapping for use with encoding and decoding a message.
-Finally, based on a supplied machine configuration (which has been set up using the code above), we are able to <em>reduce</em> the message into its cipher counterpart.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">encode-message</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="n">message</span><span class="p">]</span><span class="w">
-  </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w">
-       </span><span class="p">(</span><span class="nb">reduce</span><span class="w">
-        </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="n">letter</span><span class="p">]</span><span class="w">
-          </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="no">:rotors</span><span class="w"> </span><span class="n">rotate-rotors</span><span class="p">)]</span><span class="w">
-            </span><span class="p">(</span><span class="nf">update</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="no">:cipher</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">conj</span><span class="w"> </span><span class="n">%</span><span class="w"> </span><span class="p">(</span><span class="nf">encode-letter</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">letter</span><span class="p">)))))</span><span class="w">
-        </span><span class="p">(</span><span class="nf">setup-machine</span><span class="w"> </span><span class="n">machine</span><span class="p">))</span><span class="w">
-       </span><span class="no">:cipher</span><span class="w">
-       </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">str</span><span class="p">)))</span><span class="w">
-</span></code></pre></div></div>
-
-<h2 id="testing">Testing</h2>
-
-<p>Now that we have modelled the behaviour of the machine, we can assert its correctness by testing the <em>public API</em>, the <code class="language-plaintext highlighter-rouge">encode-message</code> function.
-We will first do this by performing a couple of basic assertions which centre around the inclusion and exclusion of a Plugboard mapping.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">deftest</span><span class="w"> </span><span class="n">encode-message-with-empty-plugboard</span><span class="w">
-  </span><span class="p">(</span><span class="nf">is</span><span class="w">
-   </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="s">"ILBDAAMTAZ"</span><span class="w">
-      </span><span class="p">(</span><span class="nf">encode-message</span><span class="w">
-       </span><span class="p">{</span><span class="no">:rotors</span><span class="w">    </span><span class="p">[(</span><span class="no">:III</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="no">:II</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="no">:I</span><span class="w"> </span><span class="n">rotors</span><span class="p">)]</span><span class="w">
-        </span><span class="no">:positions</span><span class="w"> </span><span class="s">"AAA"</span><span class="w">
-        </span><span class="no">:reflector</span><span class="w"> </span><span class="p">(</span><span class="no">:B</span><span class="w"> </span><span class="n">reflectors</span><span class="p">)</span><span class="w">
-        </span><span class="no">:plugboard</span><span class="w"> </span><span class="p">{}}</span><span class="w">
-       </span><span class="s">"HELLOWORLD"</span><span class="p">))))</span><span class="w">
-
-</span><span class="p">(</span><span class="nf">deftest</span><span class="w"> </span><span class="n">encode-message-with-plugboard</span><span class="w">
-  </span><span class="p">(</span><span class="nf">is</span><span class="w">
-   </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="s">"ILADBBMTBZ"</span><span class="w">
-      </span><span class="p">(</span><span class="nf">encode-message</span><span class="w">
-       </span><span class="p">{</span><span class="no">:rotors</span><span class="w">    </span><span class="p">[(</span><span class="no">:III</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="no">:II</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="no">:I</span><span class="w"> </span><span class="n">rotors</span><span class="p">)]</span><span class="w">
-        </span><span class="no">:positions</span><span class="w"> </span><span class="s">"AAA"</span><span class="w">
-        </span><span class="no">:reflector</span><span class="w"> </span><span class="p">(</span><span class="no">:B</span><span class="w"> </span><span class="n">reflectors</span><span class="p">)</span><span class="w">
-        </span><span class="no">:plugboard</span><span class="w"> </span><span class="p">{</span><span class="sc">\A</span><span class="w"> </span><span class="sc">\B</span><span class="p">}}</span><span class="w">
-       </span><span class="s">"HELLOWORLD"</span><span class="p">))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>We could expand upon this test-suite greatly, but fundamentally, with each test being static (example-based), there could be no end to the possible tests we could write.
+This is achieved using the code below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>setup-plugboard [plugboard]
+</span></span><span style=display:flex><span>  (merge plugboard (map-invert plugboard)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>setup-rotors [rotors positions]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>letfn</span>
+</span></span><span style=display:flex><span>   [(<span style=color:#a6e22e>setup-rotor</span> [rotor position]
+</span></span><span style=display:flex><span>      (<span style=color:#66d9ef>if </span>(= (first (<span style=color:#e6db74>:in</span> rotor)) position)
+</span></span><span style=display:flex><span>        rotor
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>recur</span> (<span style=color:#a6e22e>rotate-rotor</span> rotor) position)))]
+</span></span><span style=display:flex><span>    (map setup-rotor rotors (seq positions))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>setup-machine [machine]
+</span></span><span style=display:flex><span>  (-&gt; machine
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>update</span> <span style=color:#e6db74>:plugboard</span> setup-plugboard)
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>update</span> <span style=color:#e6db74>:rotors</span> setup-rotors (<span style=color:#e6db74>:positions</span> machine <span style=color:#e6db74>&#34;AAA&#34;</span>))
+</span></span><span style=display:flex><span>      (assoc <span style=color:#e6db74>:cipher</span> [])))
+</span></span></code></pre></div><p>With the assumption of the client code supplying us a desired machine setup, we are able to internally configure the starting positions of the chosen Rotors and the Plugboard mapping for use with encoding and decoding a message.
+Finally, based on a supplied machine configuration (which has been set up using the code above), we are able to <em>reduce</em> the message into its cipher counterpart.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn </span>encode-message [machine message]
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>-&gt;&gt;</span> (seq message)
+</span></span><span style=display:flex><span>       (<span style=color:#a6e22e>reduce</span>
+</span></span><span style=display:flex><span>        (<span style=color:#66d9ef>fn </span>[machine letter]
+</span></span><span style=display:flex><span>          (<span style=color:#66d9ef>let </span>[machine (<span style=color:#a6e22e>update</span> machine <span style=color:#e6db74>:rotors</span> rotate-rotors)]
+</span></span><span style=display:flex><span>            (<span style=color:#a6e22e>update</span> machine <span style=color:#e6db74>:cipher</span> <span style=color:#f92672>#</span>(conj % (<span style=color:#a6e22e>encode-letter</span> machine letter)))))
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>setup-machine</span> machine))
+</span></span><span style=display:flex><span>       <span style=color:#e6db74>:cipher</span>
+</span></span><span style=display:flex><span>       (apply str)))
+</span></span></code></pre></div><h2 id=testing>Testing</h2><p>Now that we have modelled the behaviour of the machine, we can assert its correctness by testing the <em>public API</em>, the <code>encode-message</code> function.
+We will first do this by performing a couple of basic assertions which centre around the inclusion and exclusion of a Plugboard mapping.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#a6e22e>deftest</span> encode-message-with-empty-plugboard
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>is</span>
+</span></span><span style=display:flex><span>   (= <span style=color:#e6db74>&#34;ILBDAAMTAZ&#34;</span>
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>encode-message</span>
+</span></span><span style=display:flex><span>       {<span style=color:#e6db74>:rotors</span>    [(<span style=color:#e6db74>:III</span> rotors) (<span style=color:#e6db74>:II</span> rotors) (<span style=color:#e6db74>:I</span> rotors)]
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:positions</span> <span style=color:#e6db74>&#34;AAA&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:reflector</span> (<span style=color:#e6db74>:B</span> reflectors)
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:plugboard</span> {}}
+</span></span><span style=display:flex><span>       <span style=color:#e6db74>&#34;HELLOWORLD&#34;</span>))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#a6e22e>deftest</span> encode-message-with-plugboard
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>is</span>
+</span></span><span style=display:flex><span>   (= <span style=color:#e6db74>&#34;ILADBBMTBZ&#34;</span>
+</span></span><span style=display:flex><span>      (<span style=color:#a6e22e>encode-message</span>
+</span></span><span style=display:flex><span>       {<span style=color:#e6db74>:rotors</span>    [(<span style=color:#e6db74>:III</span> rotors) (<span style=color:#e6db74>:II</span> rotors) (<span style=color:#e6db74>:I</span> rotors)]
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:positions</span> <span style=color:#e6db74>&#34;AAA&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:reflector</span> (<span style=color:#e6db74>:B</span> reflectors)
+</span></span><span style=display:flex><span>        <span style=color:#e6db74>:plugboard</span> {<span style=color:#e6db74>\A</span> <span style=color:#e6db74>\B</span>}}
+</span></span><span style=display:flex><span>       <span style=color:#e6db74>&#34;HELLOWORLD&#34;</span>))))
+</span></span></code></pre></div><p>We could expand upon this test-suite greatly, but fundamentally, with each test being static (example-based), there could be no end to the possible tests we could write.
 Based on this reasoning, I thought it would be a very interesting exercise to employ <em>property-based testing</em> to help garner ever-increasing confidence in our implementation.
-This form of testing methodology can be described as:</p>
-
-<blockquote>
-  <p>Property-based tests are designed to test the aspects of a property that should always be true.
-They allow for a range of inputs to be programmed and tested within a single test, rather than having to write a different test for every value that you want to test.</p>
-</blockquote>
-
-<p>With this in mind, there are a couple of distinct properties that, regardless of what machine setup or message we provide, should always hold true.
-Using the <a href="https://clojure.org/guides/spec">spec</a> library (which was inspired by <a href="https://hackage.haskell.org/package/QuickCheck">QuickCheck</a>), we are able to model two of these properties like so.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">gen-char-upper-alpha</span><span class="w">
-  </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="nb">char</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/choose</span><span class="w"> </span><span class="mi">65</span><span class="w"> </span><span class="mi">90</span><span class="p">)))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">gen-string-upper-alpa</span><span class="w">
-  </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="n">clojure.string/join</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/vector</span><span class="w"> </span><span class="n">gen-char-upper-alpha</span><span class="p">)))</span><span class="w">
-
-</span><span class="p">(</span><span class="k">def</span><span class="w"> </span><span class="n">gen-machine</span><span class="w">
-  </span><span class="p">(</span><span class="nf">gen/hash-map</span><span class="w"> </span><span class="no">:rotors</span><span class="w"> </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">vals</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w"> </span><span class="n">gen/elements</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/vector</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w">
-                </span><span class="no">:positions</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="n">clojure.string/join</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/vector</span><span class="w"> </span><span class="n">gen-char-upper-alpha</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w">
-                </span><span class="no">:reflector</span><span class="w"> </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">vals</span><span class="w"> </span><span class="n">reflectors</span><span class="p">)</span><span class="w"> </span><span class="n">gen/elements</span><span class="p">)</span><span class="w">
-                </span><span class="no">:plugboard</span><span class="w"> </span><span class="p">(</span><span class="nf">-&gt;&gt;</span><span class="w"> </span><span class="p">(</span><span class="nf">gen/vector-distinct</span><span class="w"> </span><span class="n">gen-char-upper-alpha</span><span class="w"> </span><span class="p">{</span><span class="no">:min-elements</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="no">:max-elements</span><span class="w"> </span><span class="mi">26</span><span class="p">})</span><span class="w">
-                                </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">odd?</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="n">%</span><span class="p">))</span><span class="w">
-                                </span><span class="p">(</span><span class="nf">gen/fmap</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">hash-map</span><span class="w"> </span><span class="n">%</span><span class="p">)))))</span><span class="w">
-
-</span><span class="p">(</span><span class="nf">defspec</span><span class="w"> </span><span class="n">cipher-is-same-length-as-message</span><span class="w">
-  </span><span class="p">(</span><span class="nf">prop/for-all</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="n">gen-machine</span><span class="w">
-                 </span><span class="n">message</span><span class="w"> </span><span class="n">gen-string-upper-alpa</span><span class="p">]</span><span class="w">
-    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">cipher</span><span class="w"> </span><span class="p">(</span><span class="nf">encode-message</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">message</span><span class="p">)]</span><span class="w">
-      </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="n">cipher</span><span class="p">)))))</span><span class="w">
-
-</span><span class="p">(</span><span class="nf">defspec</span><span class="w"> </span><span class="n">encoded-cipher-matches-message</span><span class="w">
-  </span><span class="p">(</span><span class="nf">prop/for-all</span><span class="w"> </span><span class="p">[</span><span class="n">machine</span><span class="w"> </span><span class="n">gen-machine</span><span class="w">
-                 </span><span class="n">message</span><span class="w"> </span><span class="n">gen-string-upper-alpa</span><span class="p">]</span><span class="w">
-    </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">cipher</span><span class="w"> </span><span class="p">(</span><span class="nf">encode-message</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">message</span><span class="p">)]</span><span class="w">
-      </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="p">(</span><span class="nf">encode-message</span><span class="w"> </span><span class="n">machine</span><span class="w"> </span><span class="n">cipher</span><span class="p">)))))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>Providing a means of producing a valid, randomly generated machine configuration, we can assert that for any given instance, the cipher message should be the same length as the plain-text message, and we should be able to encode and decode the cipher message to the original plain-text message.
+This form of testing methodology can be described as:</p><blockquote><p>Property-based tests are designed to test the aspects of a property that should always be true.
+They allow for a range of inputs to be programmed and tested within a single test, rather than having to write a different test for every value that you want to test.</p></blockquote><p>With this in mind, there are a couple of distinct properties that, regardless of what machine setup or message we provide, should always hold true.
+Using the <a href=https://clojure.org/guides/spec rel="external noopener" target=_blank>spec</a> library (which was inspired by <a href=https://hackage.haskell.org/package/QuickCheck rel="external noopener" target=_blank>QuickCheck</a>), we are able to model two of these properties like so.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>def </span>gen-char-upper-alpha
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>gen/fmap</span> char (<span style=color:#a6e22e>gen/choose</span> <span style=color:#ae81ff>65</span> <span style=color:#ae81ff>90</span>)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span>gen-string-upper-alpa
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>gen/fmap</span> clojure.string/join (<span style=color:#a6e22e>gen/vector</span> gen-char-upper-alpha)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#66d9ef>def </span>gen-machine
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>gen/hash-map</span> <span style=color:#e6db74>:rotors</span> (-&gt; (vals rotors) gen/elements (<span style=color:#a6e22e>gen/vector</span> <span style=color:#ae81ff>3</span>))
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>:positions</span> (<span style=color:#a6e22e>gen/fmap</span> clojure.string/join (<span style=color:#a6e22e>gen/vector</span> gen-char-upper-alpha <span style=color:#ae81ff>3</span>))
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>:reflector</span> (-&gt; (vals reflectors) gen/elements)
+</span></span><span style=display:flex><span>                <span style=color:#e6db74>:plugboard</span> (<span style=color:#a6e22e>-&gt;&gt;</span> (<span style=color:#a6e22e>gen/vector-distinct</span> gen-char-upper-alpha {<span style=color:#e6db74>:min-elements</span> <span style=color:#ae81ff>0</span> <span style=color:#e6db74>:max-elements</span> <span style=color:#ae81ff>26</span>})
+</span></span><span style=display:flex><span>                                (<span style=color:#a6e22e>gen/fmap</span> <span style=color:#f92672>#</span>(<span style=color:#66d9ef>if </span>(<span style=color:#a6e22e>odd?</span> (count %)) (rest %) %))
+</span></span><span style=display:flex><span>                                (<span style=color:#a6e22e>gen/fmap</span> <span style=color:#f92672>#</span>(apply hash-map %)))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#a6e22e>defspec</span> cipher-is-same-length-as-message
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>prop/for-all</span> [machine gen-machine
+</span></span><span style=display:flex><span>                 message gen-string-upper-alpa]
+</span></span><span style=display:flex><span>    (<span style=color:#66d9ef>let </span>[cipher (<span style=color:#a6e22e>encode-message</span> machine message)]
+</span></span><span style=display:flex><span>      (= (count message) (count cipher)))))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>(<span style=color:#a6e22e>defspec</span> encoded-cipher-matches-message
+</span></span><span style=display:flex><span>  (<span style=color:#a6e22e>prop/for-all</span> [machine gen-machine
+</span></span><span style=display:flex><span>                 message gen-string-upper-alpa]
+</span></span><span style=display:flex><span>    (<span style=color:#66d9ef>let </span>[cipher (<span style=color:#a6e22e>encode-message</span> machine message)]
+</span></span><span style=display:flex><span>      (= message (<span style=color:#a6e22e>encode-message</span> machine cipher)))))
+</span></span></code></pre></div><p>Providing a means of producing a valid, randomly generated machine configuration, we can assert that for any given instance, the cipher message should be the same length as the plain-text message, and we should be able to encode and decode the cipher message to the original plain-text message.
 We can now leave it up to the <em>spec</em> library to produce a large random selection of valid machine configurations and ensure the correctness of our propositions, garnering ever more confidence in the code upon each test run.
-One of the true powers of this testing approach is that if a property does not hold true for a given test assertion, the library is able to shrink the input down as best it can to the problem input.</p>
-
-<h2 id="the-user-interface">The User Interface</h2>
-
-<p>Having modelled and verified the correctness of the machine behaviour, we can move on to providing the client with a user interface.
-For this, we will be using <a href="https://reagent-project.github.io/">Reagent</a>, which provides ClojureScript bindings for the React library.
+One of the true powers of this testing approach is that if a property does not hold true for a given test assertion, the library is able to shrink the input down as best it can to the problem input.</p><h2 id=the-user-interface>The User Interface</h2><p>Having modelled and verified the correctness of the machine behaviour, we can move on to providing the client with a user interface.
+For this, we will be using <a href=https://reagent-project.github.io/ rel="external noopener" target=_blank>Reagent</a>, which provides ClojureScript bindings for the React library.
 So as not to overload this post with code, I have decided to intentionally omit going through the client implementation in the step-by-step fashion as done above.
-Instead, I invite you to head over to the <a href="https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs"><code class="language-plaintext highlighter-rouge">app.cljs</code></a> implementation, which describes how we use Reagent to interact with our machine implementation.
-Below, you will see how we combine all the child input components declared in <code class="language-plaintext highlighter-rouge">app.cljs</code> into the stateful parent component which is rendered to the DOM.</p>
-
-<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn-</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="p">[]</span><span class="w">
-  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">[</span><span class="n">rotors</span><span class="w">    </span><span class="p">[(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"III"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"II"</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"I"</span><span class="p">)]</span><span class="w">
-        </span><span class="n">reflector</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"B"</span><span class="p">)</span><span class="w">
-        </span><span class="n">plugboard</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">""</span><span class="p">)</span><span class="w">
-        </span><span class="n">positions</span><span class="w"> </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"AAA"</span><span class="p">)</span><span class="w">
-        </span><span class="n">message</span><span class="w">   </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"HELLOWORLD"</span><span class="p">)</span><span class="w">
-        </span><span class="n">cipher</span><span class="w">    </span><span class="p">(</span><span class="nf">r/atom</span><span class="w"> </span><span class="s">"ILBDAAMTAZ"</span><span class="p">)</span><span class="w">
-        </span><span class="n">encode</span><span class="w">    </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[]</span><span class="w">
-                    </span><span class="p">(</span><span class="nf">machine/encode-message</span><span class="w">
-                     </span><span class="p">{</span><span class="no">:rotors</span><span class="w">    </span><span class="p">(</span><span class="nb">map</span><span class="w"> </span><span class="o">#</span><span class="p">((</span><span class="nb">keyword</span><span class="w"> </span><span class="o">@</span><span class="n">%</span><span class="p">)</span><span class="w"> </span><span class="n">machine/rotors</span><span class="p">)</span><span class="w"> </span><span class="n">rotors</span><span class="p">)</span><span class="w">
-                      </span><span class="no">:positions</span><span class="w"> </span><span class="o">@</span><span class="n">positions</span><span class="w">
-                      </span><span class="no">:reflector</span><span class="w"> </span><span class="p">((</span><span class="nb">keyword</span><span class="w"> </span><span class="o">@</span><span class="n">reflector</span><span class="p">)</span><span class="w"> </span><span class="n">machine/reflectors</span><span class="p">)</span><span class="w">
-                      </span><span class="no">:plugboard</span><span class="w"> </span><span class="p">(</span><span class="nb">apply</span><span class="w"> </span><span class="nb">hash-map</span><span class="w"> </span><span class="p">(</span><span class="nb">seq</span><span class="w"> </span><span class="p">(</span><span class="nf">clojure.string/replace</span><span class="w"> </span><span class="o">@</span><span class="n">plugboard</span><span class="w"> </span><span class="s">" "</span><span class="w"> </span><span class="s">""</span><span class="p">)))}</span><span class="w">
-                     </span><span class="o">@</span><span class="n">message</span><span class="p">))]</span><span class="w">
-    </span><span class="p">(</span><span class="k">fn</span><span class="w"> </span><span class="p">[]</span><span class="w">
-      </span><span class="p">[</span><span class="no">:div</span><span class="w">
-       </span><span class="p">[</span><span class="no">:div</span><span class="w">
-        </span><span class="p">{</span><span class="no">:class</span><span class="w"> </span><span class="s">"columns"</span><span class="p">}</span><span class="w">
-        </span><span class="p">(</span><span class="nb">doall</span><span class="w"> </span><span class="p">(</span><span class="nf">map-indexed</span><span class="w"> </span><span class="n">select-rotor</span><span class="w"> </span><span class="n">rotors</span><span class="p">))]</span><span class="w">
-       </span><span class="p">[</span><span class="no">:div</span><span class="w">
-        </span><span class="p">{</span><span class="no">:class</span><span class="w"> </span><span class="s">"columns"</span><span class="p">}</span><span class="w">
-        </span><span class="p">(</span><span class="nf">select-reflector</span><span class="w"> </span><span class="n">reflector</span><span class="p">)</span><span class="w">
-        </span><span class="p">(</span><span class="nf">positions-input</span><span class="w"> </span><span class="n">positions</span><span class="p">)</span><span class="w">
-        </span><span class="p">(</span><span class="nf">plugboard-input</span><span class="w"> </span><span class="n">plugboard</span><span class="p">)]</span><span class="w">
-       </span><span class="p">(</span><span class="nf">message-textarea</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w">
-       </span><span class="p">[</span><span class="no">:button</span><span class="w"> </span><span class="p">{</span><span class="no">:on-click</span><span class="w"> </span><span class="o">#</span><span class="p">(</span><span class="nf">reset!</span><span class="w"> </span><span class="n">cipher</span><span class="w"> </span><span class="p">(</span><span class="nf">encode</span><span class="p">))}</span><span class="w"> </span><span class="s">"Encode"</span><span class="p">]</span><span class="w">
-       </span><span class="p">[</span><span class="no">:pre</span><span class="w"> </span><span class="o">@</span><span class="n">cipher</span><span class="p">]])))</span><span class="w">
-</span></code></pre></div></div>
-
-<p>Making use of <a href="http://reagent-project.github.io/docs/master/reagent.ratom.html">Reagent Atoms</a>, we are able to statefully store the user’s intended configuration and invoke the <code class="language-plaintext highlighter-rouge">encode-message</code> function when required.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>I found modelling this solution in a Lisp using ClojureScript to be very enjoyable.
+Instead, I invite you to head over to the <a href=https://github.com/eddmann/enigma-machine-clojurescript/blob/master/src/enigma_machine/app.cljs rel="external noopener" target=_blank><code>app.cljs</code></a> implementation, which describes how we use Reagent to interact with our machine implementation.
+Below, you will see how we combine all the child input components declared in <code>app.cljs</code> into the stateful parent component which is rendered to the DOM.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-clojure data-lang=clojure><span style=display:flex><span>(<span style=color:#66d9ef>defn- </span>app []
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>let </span>[rotors    [(<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;III&#34;</span>) (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;II&#34;</span>) (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;I&#34;</span>)]
+</span></span><span style=display:flex><span>        reflector (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;B&#34;</span>)
+</span></span><span style=display:flex><span>        plugboard (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>        positions (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;AAA&#34;</span>)
+</span></span><span style=display:flex><span>        message   (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;HELLOWORLD&#34;</span>)
+</span></span><span style=display:flex><span>        cipher    (<span style=color:#a6e22e>r/atom</span> <span style=color:#e6db74>&#34;ILBDAAMTAZ&#34;</span>)
+</span></span><span style=display:flex><span>        encode    (<span style=color:#66d9ef>fn </span>[]
+</span></span><span style=display:flex><span>                    (<span style=color:#a6e22e>machine/encode-message</span>
+</span></span><span style=display:flex><span>                     {<span style=color:#e6db74>:rotors</span>    (map <span style=color:#f92672>#</span>((keyword <span style=color:#f92672>@</span>%) machine/rotors) rotors)
+</span></span><span style=display:flex><span>                      <span style=color:#e6db74>:positions</span> <span style=color:#f92672>@</span>positions
+</span></span><span style=display:flex><span>                      <span style=color:#e6db74>:reflector</span> ((keyword <span style=color:#f92672>@</span>reflector) machine/reflectors)
+</span></span><span style=display:flex><span>                      <span style=color:#e6db74>:plugboard</span> (apply hash-map (seq (<span style=color:#a6e22e>clojure.string/replace</span> <span style=color:#f92672>@</span>plugboard <span style=color:#e6db74>&#34; &#34;</span> <span style=color:#e6db74>&#34;&#34;</span>)))}
+</span></span><span style=display:flex><span>                     <span style=color:#f92672>@</span>message))]
+</span></span><span style=display:flex><span>    (<span style=color:#66d9ef>fn </span>[]
+</span></span><span style=display:flex><span>      [<span style=color:#e6db74>:div</span>
+</span></span><span style=display:flex><span>       [<span style=color:#e6db74>:div</span>
+</span></span><span style=display:flex><span>        {<span style=color:#e6db74>:class</span> <span style=color:#e6db74>&#34;columns&#34;</span>}
+</span></span><span style=display:flex><span>        (doall (<span style=color:#a6e22e>map-indexed</span> select-rotor rotors))]
+</span></span><span style=display:flex><span>       [<span style=color:#e6db74>:div</span>
+</span></span><span style=display:flex><span>        {<span style=color:#e6db74>:class</span> <span style=color:#e6db74>&#34;columns&#34;</span>}
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>select-reflector</span> reflector)
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>positions-input</span> positions)
+</span></span><span style=display:flex><span>        (<span style=color:#a6e22e>plugboard-input</span> plugboard)]
+</span></span><span style=display:flex><span>       (<span style=color:#a6e22e>message-textarea</span> message)
+</span></span><span style=display:flex><span>       [<span style=color:#e6db74>:button</span> {<span style=color:#e6db74>:on-click</span> <span style=color:#f92672>#</span>(<span style=color:#a6e22e>reset!</span> cipher (<span style=color:#a6e22e>encode</span>))} <span style=color:#e6db74>&#34;Encode&#34;</span>]
+</span></span><span style=display:flex><span>       [<span style=color:#e6db74>:pre</span> <span style=color:#f92672>@</span>cipher]])))
+</span></span></code></pre></div><p>Making use of <a href=http://reagent-project.github.io/docs/master/reagent.ratom.html rel="external noopener" target=_blank>Reagent Atoms</a>, we are able to statefully store the user&rsquo;s intended configuration and invoke the <code>encode-message</code> function when required.</p><h2 id=conclusion>Conclusion</h2><p>I found modelling this solution in a Lisp using ClojureScript to be very enjoyable.
 Looking back over the code, I find it amazing how a Lisp is able to so succinctly and elegantly document the behaviour of the machine.
 The more I developed the solution to this problem space, the more I felt the functional approach mapped so well.
-Being able to explore property-based testing in this fashion was a great experience, and it demonstrated how well it can fit into various aspects of the everyday programming challenges we solve.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Being able to explore property-based testing in this fashion was a great experience, and it demonstrated how well it can fit into various aspects of the everyday programming challenges we solve.</p></main><footer class=post__tags><a href=/archive/tag/enigma-machine>enigma-machine</a><a href=/archive/tag/clojurescript>clojurescript</a><a href=/archive/tag/property-testing>property-testing</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

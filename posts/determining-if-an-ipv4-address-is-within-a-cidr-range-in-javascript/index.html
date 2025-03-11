@@ -1,135 +1,45 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive guide on determining if an IPv4 address lies within a CIDR range in JavaScript, featuring code examples and detailed explanations.">
-
-    <title>
-        
-            Determining if an IPv4 address is within a CIDR range in JavaScript &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Determining if an IPv4 address is within a CIDR range in JavaScript</h1>
-    <time datetime="2018-06-05T00:00:00+00:00" class="post-date">05 Jun 2018</time>
-    <p>Recently I was required to process a group of <a href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing">CIDR</a> ranges in JavaScript to determine if a given IPv4 address fell within one of them.
-In this post I would like to discuss how I went about completing this.</p>
-
-
-
-<h2 id="what-is-cidr-notation">What is CIDR notation?</h2>
-
-<p>CIDR stands for <code class="language-plaintext highlighter-rouge">Classless Inter-Domain Routing</code>, and is a replacement for the historic <a href="https://en.wikipedia.org/wiki/Classful_network">class-based</a> system.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Determining if an IPv4 address is within a CIDR range in JavaScript - Edd Mann</title>
+<meta name=description content="A comprehensive guide on determining if an IPv4 address lies within a CIDR range in JavaScript, featuring code examples and detailed explanations."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Determining if an IPv4 address is within a CIDR range in JavaScript"><meta itemprop=description content="Recently I was required to process a group of CIDR ranges in JavaScript to determine if a given IPv4 address fell within one of them. In this post I would like to discuss how I went about completing this."><meta itemprop=datePublished content="2018-06-05T00:00:00+00:00"><meta itemprop=dateModified content="2018-06-05T00:00:00+00:00"><meta itemprop=wordCount content="543"><meta itemprop=keywords content="Javascript"><meta property="og:url" content="https://eddmann.com/posts/determining-if-an-ipv4-address-is-within-a-cidr-range-in-javascript/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Determining if an IPv4 address is within a CIDR range in JavaScript"><meta property="og:description" content="Recently I was required to process a group of CIDR ranges in JavaScript to determine if a given IPv4 address fell within one of them. In this post I would like to discuss how I went about completing this."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2018-06-05T00:00:00+00:00"><meta property="article:modified_time" content="2018-06-05T00:00:00+00:00"><meta property="article:tag" content="Javascript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Determining if an IPv4 address is within a CIDR range in JavaScript"><meta name=twitter:description content="Recently I was required to process a group of CIDR ranges in JavaScript to determine if a given IPv4 address fell within one of them. In this post I would like to discuss how I went about completing this."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/determining-if-an-ipv4-address-is-within-a-cidr-range-in-javascript/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Determining if an IPv4 address is within a CIDR range in JavaScript</h1><time class=post__time>Jun 5, 2018</time></header><main class=prose><p>Recently I was required to process a group of <a href=https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing rel="external noopener" target=_blank>CIDR</a> ranges in JavaScript to determine if a given IPv4 address fell within one of them.
+In this post I would like to discuss how I went about completing this.</p><h2 id=what-is-cidr-notation>What is CIDR notation?</h2><p>CIDR stands for <code>Classless Inter-Domain Routing</code>, and is a replacement for the historic <a href=https://en.wikipedia.org/wiki/Classful_network rel="external noopener" target=_blank>class-based</a> system.
 This approach allows for more efficient use of the IPv4 address space, reducing the size of routing tables in the process.
 Every IPv4 address consists of two parts - one to identify the network and the other to identify the host on that network.
 A CIDR address contains the typical 32-bit IPv4 address, along with information on how many bits are used for the network prefix (by way of Variable Length Subnet Masking).
 Unlike classful networks, any number of contiguous bits can be assigned to identify the network, allowing for more fine-grained IPv4 allocation.
-Due to these advantages, you will see this commonly used within networking platforms such as <a href="https://aws.amazon.com/vpc/">Amazon Virtual Private Cloud</a> and <a href="https://aws.amazon.com/waf/">AWS Web Application Firewall</a>.</p>
-
-<h2 id="matching-cidrs">Matching CIDRs</h2>
-
-<p>Now that we have had a refresher on what CIDR notation actually is, we can go about implementing the solution to the initial problem laid out.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">ip4ToInt</span> <span class="o">=</span> <span class="nx">ip</span> <span class="o">=&gt;</span> <span class="nx">ip</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">.</span><span class="dl">'</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">int</span><span class="p">,</span> <span class="nx">oct</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">int</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">oct</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span><span class="p">;</span>
-
-<span class="kd">const</span> <span class="nx">isIp4InCidr</span> <span class="o">=</span> <span class="nx">ip</span> <span class="o">=&gt;</span> <span class="nx">cidr</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">range</span><span class="p">,</span> <span class="nx">bits</span> <span class="o">=</span> <span class="mi">32</span><span class="p">]</span> <span class="o">=</span> <span class="nx">cidr</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">32</span> <span class="o">-</span> <span class="nx">bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="k">return</span> <span class="p">(</span><span class="nx">ip4ToInt</span><span class="p">(</span><span class="nx">ip</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nx">mask</span><span class="p">)</span> <span class="o">===</span> <span class="p">(</span><span class="nx">ip4ToInt</span><span class="p">(</span><span class="nx">range</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nx">mask</span><span class="p">);</span>
-<span class="p">};</span>
-
-<span class="kd">const</span> <span class="nx">isIp4InCidrs</span> <span class="o">=</span> <span class="p">(</span><span class="nx">ip</span><span class="p">,</span> <span class="nx">cidrs</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">cidrs</span><span class="p">.</span><span class="nx">some</span><span class="p">(</span><span class="nx">isIp4InCidr</span><span class="p">(</span><span class="nx">ip</span><span class="p">));</span>
-
-<span class="nx">isIp4InCidrs</span><span class="p">(</span><span class="dl">'</span><span class="s1">192.168.1.5</span><span class="dl">'</span><span class="p">,</span> <span class="p">[</span><span class="dl">'</span><span class="s1">10.10.0.0/16</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">192.168.1.1/24</span><span class="dl">'</span><span class="p">]);</span> <span class="c1">// true</span>
-</code></pre></div></div>
-
-<p>As you can see the problem has been broken up into three distinct parts.
-The first of which is converting the given IPv4 address into its integer equivalent, which is achieved by adding each <a href="https://en.wikipedia.org/wiki/Octet_(computing)">octet</a> together.
+Due to these advantages, you will see this commonly used within networking platforms such as <a href=https://aws.amazon.com/vpc/ rel="external noopener" target=_blank>Amazon Virtual Private Cloud</a> and <a href=https://aws.amazon.com/waf/ rel="external noopener" target=_blank>AWS Web Application Firewall</a>.</p><h2 id=matching-cidrs>Matching CIDRs</h2><p>Now that we have had a refresher on what CIDR notation actually is, we can go about implementing the solution to the initial problem laid out.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>ip4ToInt</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>ip</span> =&gt; <span style=color:#a6e22e>ip</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;.&#39;</span>).<span style=color:#a6e22e>reduce</span>((<span style=color:#66d9ef>int</span>, <span style=color:#a6e22e>oct</span>) =&gt; (<span style=color:#66d9ef>int</span> <span style=color:#f92672>&lt;&lt;</span> <span style=color:#ae81ff>8</span>) <span style=color:#f92672>+</span> parseInt(<span style=color:#a6e22e>oct</span>, <span style=color:#ae81ff>10</span>), <span style=color:#ae81ff>0</span>) <span style=color:#f92672>&gt;&gt;&gt;</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isIp4InCidr</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>ip</span> =&gt; <span style=color:#a6e22e>cidr</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>range</span>, <span style=color:#a6e22e>bits</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>32</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>cidr</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;/&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>mask</span> <span style=color:#f92672>=</span> <span style=color:#f92672>~</span>(<span style=color:#ae81ff>2</span> <span style=color:#f92672>**</span> (<span style=color:#ae81ff>32</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>bits</span>) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> (<span style=color:#a6e22e>ip4ToInt</span>(<span style=color:#a6e22e>ip</span>) <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>mask</span>) <span style=color:#f92672>===</span> (<span style=color:#a6e22e>ip4ToInt</span>(<span style=color:#a6e22e>range</span>) <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>mask</span>);
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>isIp4InCidrs</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>ip</span>, <span style=color:#a6e22e>cidrs</span>) =&gt; <span style=color:#a6e22e>cidrs</span>.<span style=color:#a6e22e>some</span>(<span style=color:#a6e22e>isIp4InCidr</span>(<span style=color:#a6e22e>ip</span>));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>isIp4InCidrs</span>(<span style=color:#e6db74>&#39;192.168.1.5&#39;</span>, [<span style=color:#e6db74>&#39;10.10.0.0/16&#39;</span>, <span style=color:#e6db74>&#39;192.168.1.1/24&#39;</span>]); <span style=color:#75715e>// true
+</span></span></span></code></pre></div><p>As you can see the problem has been broken up into three distinct parts.
+The first of which is converting the given IPv4 address into its integer equivalent, which is achieved by adding each <a href=https://en.wikipedia.org/wiki/Octet_%28computing%29 rel="external noopener" target=_blank>octet</a> together.
 With this at our disposal we are then able to verify a single IPv4 and CIDR combination.
 At this stage the CIDR is parsed to produce the given mask, which is then used along with the integer function to validate if the IPv4 address falls within the range outlined.
 This function is curried so that it can be partially applied in the following step.
-Finally, we are able to check many CIDRs by using this partially applied function, checking if at least one match is present.</p>
-
-<h2 id="determining-cidr-ranges">Determining CIDR ranges</h2>
-
-<p>It can also be useful to determine the start and end of a given CIDR range.
-Using a similar approach to how we tackled the initial problem, we can use the mask again to produce the minimum and maximum IPv4 addresses.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">intToIp4</span> <span class="o">=</span> <span class="nx">int</span> <span class="o">=&gt;</span>
-  <span class="p">[(</span><span class="nx">int</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">24</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">,</span> <span class="nx">int</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">].</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">.</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="kd">const</span> <span class="nx">calculateCidrRange</span> <span class="o">=</span> <span class="nx">cidr</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="p">[</span><span class="nx">range</span><span class="p">,</span> <span class="nx">bits</span> <span class="o">=</span> <span class="mi">32</span><span class="p">]</span> <span class="o">=</span> <span class="nx">cidr</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">);</span>
-  <span class="kd">const</span> <span class="nx">mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mi">32</span> <span class="o">-</span> <span class="nx">bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="k">return</span> <span class="p">[</span><span class="nx">intToIp4</span><span class="p">(</span><span class="nx">ip4ToInt</span><span class="p">(</span><span class="nx">range</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nx">mask</span><span class="p">),</span> <span class="nx">intToIp4</span><span class="p">(</span><span class="nx">ip4ToInt</span><span class="p">(</span><span class="nx">range</span><span class="p">)</span> <span class="o">|</span> <span class="o">~</span><span class="nx">mask</span><span class="p">)];</span>
-<span class="p">};</span>
-
-<span class="nx">calculateCidrRange</span><span class="p">(</span><span class="dl">'</span><span class="s1">192.168.1.0/24</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// ["192.168.1.0", "192.168.1.255"]</span>
-</code></pre></div></div>
-
-<p>During development it proved useful to investigate what the internal binary representation of the given IPv4 addresses and masks were.
-This was achieved using another small function which converted the integer to a binary string output.</p>
-
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">intToBin</span> <span class="o">=</span> <span class="nx">int</span> <span class="o">=&gt;</span>
-  <span class="p">(</span><span class="nx">int</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">padStart</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/.</span><span class="se">{1,8}</span><span class="sr">/g</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">.</span><span class="dl">'</span><span class="p">);</span>
-
-<span class="nx">intToBin</span><span class="p">(</span><span class="nx">ip4ToInt</span><span class="p">(</span><span class="dl">'</span><span class="s1">192.168.1.1</span><span class="dl">'</span><span class="p">));</span> <span class="c1">// 11000000.10101000.00000001.00000001</span>
-</code></pre></div></div>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Finally, we are able to check many CIDRs by using this partially applied function, checking if at least one match is present.</p><h2 id=determining-cidr-ranges>Determining CIDR ranges</h2><p>It can also be useful to determine the start and end of a given CIDR range.
+Using a similar approach to how we tackled the initial problem, we can use the mask again to produce the minimum and maximum IPv4 addresses.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>intToIp4</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>int</span> =&gt;
+</span></span><span style=display:flex><span>  [(<span style=color:#66d9ef>int</span> <span style=color:#f92672>&gt;&gt;&gt;</span> <span style=color:#ae81ff>24</span>) <span style=color:#f92672>&amp;</span> <span style=color:#ae81ff>0xff</span>, (<span style=color:#66d9ef>int</span> <span style=color:#f92672>&gt;&gt;&gt;</span> <span style=color:#ae81ff>16</span>) <span style=color:#f92672>&amp;</span> <span style=color:#ae81ff>0xff</span>, (<span style=color:#66d9ef>int</span> <span style=color:#f92672>&gt;&gt;&gt;</span> <span style=color:#ae81ff>8</span>) <span style=color:#f92672>&amp;</span> <span style=color:#ae81ff>0xff</span>, <span style=color:#66d9ef>int</span> <span style=color:#f92672>&amp;</span> <span style=color:#ae81ff>0xff</span>].<span style=color:#a6e22e>join</span>(<span style=color:#e6db74>&#39;.&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>calculateCidrRange</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>cidr</span> =&gt; {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>range</span>, <span style=color:#a6e22e>bits</span> <span style=color:#f92672>=</span> <span style=color:#ae81ff>32</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>cidr</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;/&#39;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>mask</span> <span style=color:#f92672>=</span> <span style=color:#f92672>~</span>(<span style=color:#ae81ff>2</span> <span style=color:#f92672>**</span> (<span style=color:#ae81ff>32</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>bits</span>) <span style=color:#f92672>-</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> [<span style=color:#a6e22e>intToIp4</span>(<span style=color:#a6e22e>ip4ToInt</span>(<span style=color:#a6e22e>range</span>) <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>mask</span>), <span style=color:#a6e22e>intToIp4</span>(<span style=color:#a6e22e>ip4ToInt</span>(<span style=color:#a6e22e>range</span>) <span style=color:#f92672>|</span> <span style=color:#f92672>~</span><span style=color:#a6e22e>mask</span>)];
+</span></span><span style=display:flex><span>};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>calculateCidrRange</span>(<span style=color:#e6db74>&#39;192.168.1.0/24&#39;</span>); <span style=color:#75715e>// [&#34;192.168.1.0&#34;, &#34;192.168.1.255&#34;]
+</span></span></span></code></pre></div><p>During development it proved useful to investigate what the internal binary representation of the given IPv4 addresses and masks were.
+This was achieved using another small function which converted the integer to a binary string output.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-js data-lang=js><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>intToBin</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>int</span> =&gt;
+</span></span><span style=display:flex><span>  (<span style=color:#66d9ef>int</span> <span style=color:#f92672>&gt;&gt;&gt;</span> <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>toString</span>(<span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>padStart</span>(<span style=color:#ae81ff>32</span>, <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>match</span>(<span style=color:#e6db74>/.{1,8}/g</span>)
+</span></span><span style=display:flex><span>    .<span style=color:#a6e22e>join</span>(<span style=color:#e6db74>&#39;.&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>intToBin</span>(<span style=color:#a6e22e>ip4ToInt</span>(<span style=color:#e6db74>&#39;192.168.1.1&#39;</span>)); <span style=color:#75715e>// 11000000.10101000.00000001.00000001
+</span></span></span></code></pre></div></main><footer class=post__tags><a href=/archive/tag/javascript>javascript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

@@ -1,125 +1,22 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="This blog series details my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.">
-
-    <title>
-        
-            Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution</h1>
-    <time datetime="2023-08-08T00:00:00+00:00" class="post-date">08 Aug 2023</time>
-    <p>Now that the interpreter’s performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed.
-In the final post within the <a href="https://eddmann.com/archive/tag/santa-lang-in-rust-series/">series</a>, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.</p>
-
-
-
-<h2 id="pipeline">Pipeline</h2>
-
-<p>As documented in a <a href="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/">previous post</a>, the project has been structured as a monorepo Cargo workspace, with the language and runtimes being separated into different packages.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution - Edd Mann</title>
+<meta name=description content="This blog series details my experience rewriting the santa-lang interpreter in Rust. In this post, I delve into how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution"><meta itemprop=description content="Now that the interpreter’s performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed. In the final post within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline."><meta itemprop=datePublished content="2023-08-08T00:00:00+00:00"><meta itemprop=dateModified content="2023-08-08T00:00:00+00:00"><meta itemprop=wordCount content="744"><meta itemprop=keywords content="Rust,Santa-Lang,Interpreter,Santa-Lang-in-Rust-Series"><meta property="og:url" content="https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution"><meta property="og:description" content="Now that the interpreter’s performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed. In the final post within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2023-08-08T00:00:00+00:00"><meta property="article:modified_time" content="2023-08-08T00:00:00+00:00"><meta property="article:tag" content="Rust"><meta property="article:tag" content="Santa-Lang"><meta property="article:tag" content="Interpreter"><meta property="article:tag" content="Santa-Lang-in-Rust-Series"><meta name=twitter:card content="summary"><meta name=twitter:title content="Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution"><meta name=twitter:description content="Now that the interpreter’s performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed. In the final post within the series, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Rewriting the santa-lang Interpreter in Rust, Part 4 - Distribution</h1><time class=post__time>Aug 8, 2023</time></header><main class=prose><p>Now that the interpreter&rsquo;s performance concerns had been addressed, it was time to decide how each of the available runtimes would be packaged and distributed.
+In the final post within the <a href=/archive/tag/santa-lang-in-rust-series>series</a>, I will document how the language and runtimes were built, tested, and distributed using a custom CI/CD pipeline.</p><h2 id=pipeline>Pipeline</h2><p>As documented in a <a href=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/>previous post</a>, the project has been structured as a monorepo Cargo workspace, with the language and runtimes being separated into different packages.
 This allows the packages to be built and tested in isolation from one another.
-To provide a deterministic build and release process, I created a <a href="https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github">CI/CD pipeline</a> using <a href="https://docs.github.com/en/actions/using-workflows">GitHub Action workflows</a>.
-I also opted to add a GitHub Action called <a href="https://github.com/release-drafter/release-drafter">Release Drafter</a> to the project.
-This provides automatic collection and creation of relevant release notes and semantic versioning based on merged GitHub pull requests (and tags).</p>
-
-<p>I thought the best way to describe this pipeline was visually.
-Below is a diagram depicting the journey of a change that has been merged into the <code class="language-plaintext highlighter-rouge">main</code> branch, being built, tested, and distributed to relevant external package managers:</p>
-
-<p><img src="/uploads/rewriting-the-santa-lang-interpreter-in-rust/pipeline.png" alt="CI/CD Pipeline" /></p>
-
-<ol>
-  <li>Once a development branch is <em>passing</em>, it can be merged into the <code class="language-plaintext highlighter-rouge">main</code> branch. Once merged, the test suite is run (again), and the <code class="language-plaintext highlighter-rouge">draft-release</code> branch is updated to point to this merged commit.</li>
-  <li>Upon changes appearing in the <code class="language-plaintext highlighter-rouge">draft-release</code> branch, the draft GitHub release notes and version are created/updated using Release Drafter. From here, the runtime binary artefacts are built and attached to the draft GitHub release.</li>
-  <li>With the draft GitHub release now updated, the associated artefacts can be downloaded for local testing/validation.</li>
-  <li>When happy with the draft release, it can then be published. Upon publishing the release, it in turn publishes all the relevant artefacts to the external package managers (i.e. Docker Hub, NPM, and AWS Lambda layers).</li>
-</ol>
-
-<p>I am very happy with the resulting CI/CD pipeline, with all the build steps being broken out into separate <a href="https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows">workflow files</a> for readability.
-These <code class="language-plaintext highlighter-rouge">build-*.yml</code> workflows require a supplied <em>release version</em> argument to correctly build the specific runtime artefact.</p>
-
-<p>I had hoped to be able to keep all the build steps as deterministic Docker entries within the Makefile.
+To provide a deterministic build and release process, I created a <a href=https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github rel="external noopener" target=_blank>CI/CD pipeline</a> using <a href=https://docs.github.com/en/actions/using-workflows rel="external noopener" target=_blank>GitHub Action workflows</a>.
+I also opted to add a GitHub Action called <a href=https://github.com/release-drafter/release-drafter rel="external noopener" target=_blank>Release Drafter</a> to the project.
+This provides automatic collection and creation of relevant release notes and semantic versioning based on merged GitHub pull requests (and tags).</p><p>I thought the best way to describe this pipeline was visually.
+Below is a diagram depicting the journey of a change that has been merged into the <code>main</code> branch, being built, tested, and distributed to relevant external package managers:</p><p><a href=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/pipeline.png><picture><source type=image/webp srcset=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/pipeline_hu_1d4562a992ec8bbe.webp><source type=image/jpeg srcset=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/pipeline_hu_57c0ea08af12c396.jpg><img src=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/pipeline_hu_57c0ea08af12c396.jpg alt="CI/CD Pipeline" loading=lazy></picture></a></p><ol><li>Once a development branch is <em>passing</em>, it can be merged into the <code>main</code> branch. Once merged, the test suite is run (again), and the <code>draft-release</code> branch is updated to point to this merged commit.</li><li>Upon changes appearing in the <code>draft-release</code> branch, the draft GitHub release notes and version are created/updated using Release Drafter. From here, the runtime binary artefacts are built and attached to the draft GitHub release.</li><li>With the draft GitHub release now updated, the associated artefacts can be downloaded for local testing/validation.</li><li>When happy with the draft release, it can then be published. Upon publishing the release, it in turn publishes all the relevant artefacts to the external package managers (i.e. Docker Hub, NPM, and AWS Lambda layers).</li></ol><p>I am very happy with the resulting CI/CD pipeline, with all the build steps being broken out into separate <a href=https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows rel="external noopener" target=_blank>workflow files</a> for readability.
+These <code>build-*.yml</code> workflows require a supplied <em>release version</em> argument to correctly build the specific runtime artefact.</p><p>I had hoped to be able to keep all the build steps as deterministic Docker entries within the Makefile.
 However, I had issues with compiling the macOS and WASM binaries using this route.
-As such, the CLI and WASM both use the native GitHub Action runners’ environment.
-The CLI uses a workflow <a href="https://github.com/eddmann/santa-lang-rs/blob/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows/build-cli.yml#L45">job matrix</a> to compile and package the binary artefacts per target operating system.</p>
-
-<p>With this pipeline now in place, easing the future process of making reliable changes to the project, it was time to step back and reflect on the project as a whole.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>What a fun project!
-What was originally planned to take up to a month ended up being a multi-month personal project, where I was able to delve into not only the Rust language but also many aspects of performance benchmarking and profiling in general.</p>
-
-<p>I am very happy with the resulting interpreter and the many different runtimes I was able to build along the way.
-Being able to leverage Cargo’s rich package ecosystem played a big part in making this as enjoyable as it was.
-I also found that linting the code with <a href="https://doc.rust-lang.org/clippy/">Clippy</a> and formatting it with <a href="https://github.com/zBaitu/rsfmt">rsfmt</a> greatly helped the development process.
-Upon reflection, it would be good to revise the amount of <code class="language-plaintext highlighter-rouge">Rc&lt;RefCell&lt;T&gt;&gt;</code> usage within the Evaluator, along with refactoring parts of the Lazy Sequence implementation.
-These are areas I would like to revisit after gaining more experience with Rust in future projects.</p>
-
-<p>I also really enjoyed <a href="https://eddmann.com/santa-lang/">documenting</a> the language and runtimes using MkDocs, being able to provide executable examples throughout, thanks to the WASM runtime.
-It sounds a little odd, but having documentation such as this makes it feel more like a ‘real’ language.</p>
-
-<p><img src="/uploads/rewriting-the-santa-lang-interpreter-in-rust/documentation.png" alt="Documentation" /></p>
-
-<p>Although I managed to achieve considerable performance gains, I still think there is plenty more that can be done!
+As such, the CLI and WASM both use the native GitHub Action runners&rsquo; environment.
+The CLI uses a workflow <a href=https://github.com/eddmann/santa-lang-rs/blob/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows/build-cli.yml#L45 rel="external noopener" target=_blank>job matrix</a> to compile and package the binary artefacts per target operating system.</p><p>With this pipeline now in place, easing the future process of making reliable changes to the project, it was time to step back and reflect on the project as a whole.</p><h2 id=conclusion>Conclusion</h2><p>What a fun project!
+What was originally planned to take up to a month ended up being a multi-month personal project, where I was able to delve into not only the Rust language but also many aspects of performance benchmarking and profiling in general.</p><p>I am very happy with the resulting interpreter and the many different runtimes I was able to build along the way.
+Being able to leverage Cargo&rsquo;s rich package ecosystem played a big part in making this as enjoyable as it was.
+I also found that linting the code with <a href=https://doc.rust-lang.org/clippy/ rel="external noopener" target=_blank>Clippy</a> and formatting it with <a href=https://github.com/zBaitu/rsfmt rel="external noopener" target=_blank>rsfmt</a> greatly helped the development process.
+Upon reflection, it would be good to revise the amount of <code>Rc&lt;RefCell&lt;T>></code> usage within the Evaluator, along with refactoring parts of the Lazy Sequence implementation.
+These are areas I would like to revisit after gaining more experience with Rust in future projects.</p><p>I also really enjoyed <a href=https://eddmann.com/santa-lang/>documenting</a> the language and runtimes using MkDocs, being able to provide executable examples throughout, thanks to the WASM runtime.
+It sounds a little odd, but having documentation such as this makes it feel more like a &lsquo;real&rsquo; language.</p><p><picture><source type=image/webp srcset=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/documentation_hu_9bfd3243f799391b.webp><source type=image/jpeg srcset=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/documentation_hu_28f547d6691e0e15.jpg><img src=/posts/rewriting-the-santa-lang-interpreter-in-rust-part-4-distribution/documentation_hu_28f547d6691e0e15.jpg alt=Documentation loading=lazy></picture></p><p>Although I managed to achieve considerable performance gains, I still think there is plenty more that can be done!
 Evaluation is still performed using a tree-walking interpreter, and there is only so much that can be achieved using this model of execution.
-If I were to delve further into performance, I would perhaps look at <a href="https://blog.cloudflare.com/building-fast-interpreters-in-rust/#dynamic-dispatch-and-closures-to-the-rescue">compiling to closures</a>, the addition of a JIT, and even implementing a full-blown virtual machine.
-One thing I have realised since jumping into language design and evaluation is the sheer number of options and considerations at play, all coming with their own complexities and trade-offs.</p>
-
-<p>To conclude, I look forward to using this version of santa-lang in Advent of Code calendars to come!</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+If I were to delve further into performance, I would perhaps look at <a href=https://blog.cloudflare.com/building-fast-interpreters-in-rust/#dynamic-dispatch-and-closures-to-the-rescue rel="external noopener" target=_blank>compiling to closures</a>, the addition of a JIT, and even implementing a full-blown virtual machine.
+One thing I have realised since jumping into language design and evaluation is the sheer number of options and considerations at play, all coming with their own complexities and trade-offs.</p><p>To conclude, I look forward to using this version of santa-lang in Advent of Code calendars to come!</p></main><footer class=post__tags><a href=/archive/tag/rust>rust</a><a href=/archive/tag/santa-lang>santa-lang</a><a href=/archive/tag/interpreter>interpreter</a><a href=/archive/tag/santa-lang-in-rust-series>santa-lang-in-rust-series</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

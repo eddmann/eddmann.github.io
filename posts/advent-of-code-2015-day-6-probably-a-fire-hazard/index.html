@@ -1,224 +1,116 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Solving the Advent of Code 2015 Day 6 puzzle using TypeScript.">
-
-    <title>
-        
-            Advent of Code 2015 - Day 6 - Probably a Fire Hazard &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Advent of Code 2015 - Day 6 - Probably a Fire Hazard</h1>
-    <time datetime="2021-01-30T00:00:00+00:00" class="post-date">30 Jan 2021</time>
-    <p>On the sixth day of Advent of Code 2015, we are tasked with trying to win the holiday house decorating contest - by designing the best light sequence 💡.</p>
-
-
-
-<h2 id="part-1">Part 1</h2>
-
-<p>We are first told that the lights are configured in a <em>1000x1000 grid</em> and that, based on instructions that Santa has provided, we should operate each light in different ways.
-Like before, we start off by parsing the provided instructions (actions and grid position ranges) into a form we can enact going forward.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">Light</span> <span class="o">=</span> <span class="p">{</span> <span class="na">row</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span> <span class="nl">col</span><span class="p">:</span> <span class="kr">number</span> <span class="p">};</span>
-<span class="kd">type</span> <span class="nx">Range</span> <span class="o">=</span> <span class="p">{</span> <span class="na">from</span><span class="p">:</span> <span class="nx">Light</span><span class="p">;</span> <span class="nl">to</span><span class="p">:</span> <span class="nx">Light</span> <span class="p">};</span>
-<span class="kr">enum</span> <span class="nx">Action</span> <span class="p">{</span>
-  <span class="nx">On</span><span class="p">,</span>
-  <span class="nx">Off</span><span class="p">,</span>
-  <span class="nx">Toggle</span><span class="p">,</span>
-<span class="p">}</span>
-<span class="kd">type</span> <span class="nx">Instruction</span> <span class="o">=</span> <span class="p">[</span><span class="nx">Action</span><span class="p">,</span> <span class="nx">Range</span><span class="p">];</span>
-
-<span class="kd">const</span> <span class="nx">parseInstructions</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="nx">Instruction</span><span class="p">[]</span> <span class="o">=&gt;</span>
-  <span class="nx">input</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">line</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="kd">const</span> <span class="p">[,</span> <span class="nx">action</span><span class="p">,</span> <span class="nx">fr</span><span class="p">,</span> <span class="nx">fc</span><span class="p">,</span> <span class="nx">tr</span><span class="p">,</span> <span class="nx">tc</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
-      <span class="sr">/</span><span class="se">(</span><span class="sr">.+</span><span class="se">)</span><span class="sr"> </span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">,</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr"> through </span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">,</span><span class="se">(\d</span><span class="sr">+</span><span class="se">)</span><span class="sr">/</span>
-    <span class="p">);</span>
-    <span class="k">return</span> <span class="p">[</span>
-      <span class="nx">action</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">turn on</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">On</span>
-        <span class="p">:</span> <span class="nx">action</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">turn off</span><span class="dl">'</span>
-        <span class="p">?</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Off</span>
-        <span class="p">:</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Toggle</span><span class="p">,</span>
-      <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="p">{</span> <span class="na">row</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">fr</span><span class="p">),</span> <span class="na">col</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">fc</span><span class="p">)</span> <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="p">{</span> <span class="na">row</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">tr</span><span class="p">),</span> <span class="na">col</span><span class="p">:</span> <span class="nx">toInt</span><span class="p">(</span><span class="nx">tc</span><span class="p">)</span> <span class="p">},</span>
-      <span class="p">},</span>
-    <span class="p">];</span>
-  <span class="p">});</span>
-</code></pre></div></div>
-
-<p>We initially define a couple of types to help map the domain problem into our code solution.
-Using a Regular Expression, we are able to translate every instruction line into the given action and grid position range (<code class="language-plaintext highlighter-rouge">from</code>, <code class="language-plaintext highlighter-rouge">to</code>).
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Advent of Code 2015 - Day 6 - Probably a Fire Hazard - Edd Mann</title>
+<meta name=description content="Solving the Advent of Code 2015 Day 6 puzzle using TypeScript."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Advent of Code 2015 - Day 6 - Probably a Fire Hazard"><meta itemprop=description content="On the sixth day of Advent of Code 2015, we are tasked with trying to win the holiday house decorating contest - by designing the best light sequence 💡."><meta itemprop=datePublished content="2021-01-30T00:00:00+00:00"><meta itemprop=dateModified content="2021-01-30T00:00:00+00:00"><meta itemprop=wordCount content="1069"><meta itemprop=keywords content="Advent-of-Code,Advent-of-Code-2015,Typescript"><meta property="og:url" content="https://eddmann.com/posts/advent-of-code-2015-day-6-probably-a-fire-hazard/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Advent of Code 2015 - Day 6 - Probably a Fire Hazard"><meta property="og:description" content="On the sixth day of Advent of Code 2015, we are tasked with trying to win the holiday house decorating contest - by designing the best light sequence 💡."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2021-01-30T00:00:00+00:00"><meta property="article:modified_time" content="2021-01-30T00:00:00+00:00"><meta property="article:tag" content="Advent-of-Code"><meta property="article:tag" content="Advent-of-Code-2015"><meta property="article:tag" content="Typescript"><meta name=twitter:card content="summary"><meta name=twitter:title content="Advent of Code 2015 - Day 6 - Probably a Fire Hazard"><meta name=twitter:description content="On the sixth day of Advent of Code 2015, we are tasked with trying to win the holiday house decorating contest - by designing the best light sequence 💡."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/advent-of-code-2015-day-6-probably-a-fire-hazard/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Advent of Code 2015 - Day 6 - Probably a Fire Hazard</h1><time class=post__time>Jan 30, 2021</time></header><main class=prose><p>On the sixth day of Advent of Code 2015, we are tasked with trying to win the holiday house decorating contest - by designing the best light sequence 💡.</p><h2 id=part-1>Part 1</h2><p>We are first told that the lights are configured in a <em>1000x1000 grid</em> and that, based on instructions that Santa has provided, we should operate each light in different ways.
+Like before, we start off by parsing the provided instructions (actions and grid position ranges) into a form we can enact going forward.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Light</span> <span style=color:#f92672>=</span> { <span style=color:#a6e22e>row</span>: <span style=color:#66d9ef>number</span>; <span style=color:#a6e22e>col</span>: <span style=color:#66d9ef>number</span> };
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Range</span> <span style=color:#f92672>=</span> { <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> <span style=color:#a6e22e>Light</span>; <span style=color:#a6e22e>to</span>: <span style=color:#66d9ef>Light</span> };
+</span></span><span style=display:flex><span><span style=color:#66d9ef>enum</span> <span style=color:#a6e22e>Action</span> {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>On</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Off</span>,
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>Toggle</span>,
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#66d9ef>type</span> <span style=color:#a6e22e>Instruction</span> <span style=color:#f92672>=</span> [<span style=color:#a6e22e>Action</span>, <span style=color:#a6e22e>Range</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>parseInstructions</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>Instruction</span>[] <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>input</span>.<span style=color:#a6e22e>split</span>(<span style=color:#e6db74>&#39;\n&#39;</span>).<span style=color:#a6e22e>map</span>(<span style=color:#a6e22e>line</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> [, <span style=color:#a6e22e>action</span>, <span style=color:#a6e22e>fr</span>, <span style=color:#a6e22e>fc</span>, <span style=color:#a6e22e>tr</span>, <span style=color:#a6e22e>tc</span>] <span style=color:#f92672>=</span> <span style=color:#a6e22e>line</span>.<span style=color:#a6e22e>match</span>(
+</span></span><span style=display:flex><span>      <span style=color:#e6db74>/(.+) (\d+),(\d+) through (\d+),(\d+)/</span>
+</span></span><span style=display:flex><span>    );
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> [
+</span></span><span style=display:flex><span>      <span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;turn on&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>?</span> <span style=color:#a6e22e>Action.On</span>
+</span></span><span style=display:flex><span>        : <span style=color:#66d9ef>action</span> <span style=color:#f92672>===</span> <span style=color:#e6db74>&#39;turn off&#39;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>?</span> <span style=color:#a6e22e>Action.Off</span>
+</span></span><span style=display:flex><span>        : <span style=color:#66d9ef>Action.Toggle</span>,
+</span></span><span style=display:flex><span>      {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>from</span><span style=color:#f92672>:</span> { <span style=color:#a6e22e>row</span>: <span style=color:#66d9ef>toInt</span>(<span style=color:#a6e22e>fr</span>), <span style=color:#a6e22e>col</span>: <span style=color:#66d9ef>toInt</span>(<span style=color:#a6e22e>fc</span>) },
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>to</span><span style=color:#f92672>:</span> { <span style=color:#a6e22e>row</span>: <span style=color:#66d9ef>toInt</span>(<span style=color:#a6e22e>tr</span>), <span style=color:#a6e22e>col</span>: <span style=color:#66d9ef>toInt</span>(<span style=color:#a6e22e>tc</span>) },
+</span></span><span style=display:flex><span>      },
+</span></span><span style=display:flex><span>    ];
+</span></span><span style=display:flex><span>  });
+</span></span></code></pre></div><p>We initially define a couple of types to help map the domain problem into our code solution.
+Using a Regular Expression, we are able to translate every instruction line into the given action and grid position range (<code>from</code>, <code>to</code>).
 I have opted for using a ternary operator in such a way that it can provide three choices.
-I would usually shy away from doing this in <em>professional code</em> due to readability and possible errors.</p>
-
-<p>With the instructions now parsed, we can look into solving the first part of today’s problem.
+I would usually shy away from doing this in <em>professional code</em> due to readability and possible errors.</p><p>With the instructions now parsed, we can look into solving the first part of today&rsquo;s problem.
 For this, we will be using a two-dimensional array, which I have decided to define as a generic function for creation in both parts.
-Providing the size and default value allows us to build a type-safe array, which the client can then use.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">create2DArray</span> <span class="o">=</span> <span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">rows</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">cols</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">defaultValue</span><span class="p">:</span> <span class="nx">T</span><span class="p">):</span> <span class="nx">T</span><span class="p">[][]</span> <span class="o">=&gt;</span>
-  <span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nb">Array</span><span class="p">(</span><span class="nx">rows</span><span class="p">),</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nb">Array</span><span class="p">(</span><span class="nx">cols</span><span class="p">).</span><span class="nx">fill</span><span class="p">(</span><span class="nx">defaultValue</span><span class="p">));</span>
-</code></pre></div></div>
-
-<p>Based on the three actions (<code class="language-plaintext highlighter-rouge">On</code>, <code class="language-plaintext highlighter-rouge">Off</code>, and <code class="language-plaintext highlighter-rouge">Toggle</code>), we are required to iterate through the instructions and manipulate the specified lights (based on a given range) using a double <code class="language-plaintext highlighter-rouge">for</code> loop like so:</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="nx">create2DArray</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}]</span> <span class="k">of</span> <span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">col</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">lights</span><span class="p">[</span><span class="nx">row</span><span class="p">][</span><span class="nx">col</span><span class="p">]</span> <span class="o">=</span>
-          <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">On</span>
-            <span class="p">?</span> <span class="kc">true</span>
-            <span class="p">:</span> <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Off</span>
-            <span class="p">?</span> <span class="kc">false</span>
-            <span class="p">:</span> <span class="o">!</span><span class="nx">lights</span><span class="p">[</span><span class="nx">row</span><span class="p">][</span><span class="nx">col</span><span class="p">];</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">flat</span><span class="p">().</span><span class="nx">filter</span><span class="p">(</span><span class="nb">Boolean</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Once we have followed the instructions, we can flatten the two-dimensional array into a single dimension and tally up all the lights that are still lit to reach the desired answer 🌟.</p>
-
-<p>Alternatively, we could replace the two-dimensional array with a more performant <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array"><code class="language-plaintext highlighter-rouge">UInt8Array</code></a> one-dimensional array.
-In doing so, we lose the ability to express the light state as a <code class="language-plaintext highlighter-rouge">Boolean</code> and instead map these states to <code class="language-plaintext highlighter-rouge">1</code> or <code class="language-plaintext highlighter-rouge">0</code> accordingly.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">);</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}]</span> <span class="k">of</span> <span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">col</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">lights</span><span class="p">[</span><span class="mi">1000</span> <span class="o">*</span> <span class="nx">row</span> <span class="o">+</span> <span class="nx">col</span><span class="p">]</span> <span class="o">=</span>
-          <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">On</span>
-            <span class="p">?</span> <span class="mi">1</span>
-            <span class="p">:</span> <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Off</span>
-            <span class="p">?</span> <span class="mi">0</span>
-            <span class="p">:</span> <span class="mi">1</span> <span class="o">-</span> <span class="nx">lights</span><span class="p">[</span><span class="mi">1000</span> <span class="o">*</span> <span class="nx">row</span> <span class="o">+</span> <span class="nx">col</span><span class="p">];</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Accessing the desired row and column is now achieved using a small formula <code class="language-plaintext highlighter-rouge">1000 * row + col</code>.
-To toggle the light state, we use the <code class="language-plaintext highlighter-rouge">1 - n</code> trick to flip the state between <code class="language-plaintext highlighter-rouge">1</code> and <code class="language-plaintext highlighter-rouge">0</code>.
-Finally, we can sum up all the lights that are on with a single reduction, thanks to the values we are now storing (integers) and using a one-dimensional array.</p>
-
-<h2 id="part-2">Part 2</h2>
-
-<p>In part two, we are required to iterate through the provided instructions again, but instead of just turning the light on or off, we now control their brightness.
+Providing the size and default value allows us to build a type-safe array, which the client can then use.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>create2DArray</span> <span style=color:#f92672>=</span> &lt;<span style=color:#f92672>T</span>&gt;(<span style=color:#a6e22e>rows</span>: <span style=color:#66d9ef>number</span>, <span style=color:#a6e22e>cols</span>: <span style=color:#66d9ef>number</span>, <span style=color:#a6e22e>defaultValue</span>: <span style=color:#66d9ef>T</span>)<span style=color:#f92672>:</span> <span style=color:#a6e22e>T</span>[][] <span style=color:#f92672>=&gt;</span>
+</span></span><span style=display:flex><span>  Array.<span style=color:#66d9ef>from</span>(Array(<span style=color:#a6e22e>rows</span>), () <span style=color:#f92672>=&gt;</span> Array(<span style=color:#a6e22e>cols</span>).<span style=color:#a6e22e>fill</span>(<span style=color:#a6e22e>defaultValue</span>));
+</span></span></code></pre></div><p>Based on the three actions (<code>On</code>, <code>Off</code>, and <code>Toggle</code>), we are required to iterate through the instructions and manipulate the specified lights (based on a given range) using a double <code>for</code> loop like so:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part1</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>lights</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>create2DArray</span>(<span style=color:#ae81ff>1000</span>, <span style=color:#ae81ff>1000</span>, <span style=color:#66d9ef>false</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>action</span>, { <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }] <span style=color:#66d9ef>of</span> <span style=color:#a6e22e>parseInstructions</span>(<span style=color:#a6e22e>input</span>)) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>col</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>lights</span>[<span style=color:#a6e22e>row</span>][<span style=color:#a6e22e>col</span>] <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>On</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>?</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>:</span> <span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>Off</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>?</span> <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>:</span> <span style=color:#f92672>!</span><span style=color:#a6e22e>lights</span>[<span style=color:#a6e22e>row</span>][<span style=color:#a6e22e>col</span>];
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>flat</span>().<span style=color:#a6e22e>filter</span>(Boolean).<span style=color:#a6e22e>length</span>;
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Once we have followed the instructions, we can flatten the two-dimensional array into a single dimension and tally up all the lights that are still lit to reach the desired answer 🌟.</p><p>Alternatively, we could replace the two-dimensional array with a more performant <a href=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array rel="external noopener" target=_blank><code>UInt8Array</code></a> one-dimensional array.
+In doing so, we lose the ability to express the light state as a <code>Boolean</code> and instead map these states to <code>1</code> or <code>0</code> accordingly.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part1</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>lights</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Uint8Array</span>(<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#ae81ff>1000</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>action</span>, { <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }] <span style=color:#66d9ef>of</span> <span style=color:#a6e22e>parseInstructions</span>(<span style=color:#a6e22e>input</span>)) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>col</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>lights</span>[<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>col</span>] <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>On</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>?</span> <span style=color:#a6e22e>1</span>
+</span></span><span style=display:flex><span>            : <span style=color:#66d9ef>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>Off</span>
+</span></span><span style=display:flex><span>            <span style=color:#f92672>?</span> <span style=color:#a6e22e>0</span>
+</span></span><span style=display:flex><span>            : <span style=color:#66d9ef>1</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>lights</span>[<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>col</span>];
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>reduce</span>(<span style=color:#a6e22e>sum</span>);
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Accessing the desired row and column is now achieved using a small formula <code>1000 * row + col</code>.
+To toggle the light state, we use the <code>1 - n</code> trick to flip the state between <code>1</code> and <code>0</code>.
+Finally, we can sum up all the lights that are on with a single reduction, thanks to the values we are now storing (integers) and using a one-dimensional array.</p><h2 id=part-2>Part 2</h2><p>In part two, we are required to iterate through the provided instructions again, but instead of just turning the light on or off, we now control their brightness.
 As such, we now wish to store integer values in our two-dimensional array.
-Thanks to the help of <a href="https://www.typescriptlang.org/docs/handbook/generics.html">Generics</a> and the supplied default value, this is made type-safe.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="nx">create2DArray</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}]</span> <span class="k">of</span> <span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">col</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">lights</span><span class="p">[</span><span class="nx">row</span><span class="p">][</span><span class="nx">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span>
-          <span class="mi">0</span><span class="p">,</span>
-          <span class="nx">lights</span><span class="p">[</span><span class="nx">row</span><span class="p">][</span><span class="nx">col</span><span class="p">]</span> <span class="o">+</span>
-            <span class="p">(</span><span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">On</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Off</span> <span class="p">?</span> <span class="o">-</span><span class="mi">1</span> <span class="p">:</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">flat</span><span class="p">().</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>Following a very similar form to part one, the only code that has really changed is the action we wish to enact based on the given instruction’s light range.
-Having iterated through the provided instructions, we can again flatten the grid and return the light brightness sum to reach our desired answer 🌟.</p>
-
-<p>Following suit with part one’s alternative implementation, we can again opt to use a <code class="language-plaintext highlighter-rouge">Uint8Array</code> instead and use a small mathematical formula to locate a given row and column.</p>
-
-<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">part2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">input</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">number</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="kd">const</span> <span class="nx">lights</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Uint8Array</span><span class="p">(</span><span class="mi">1000</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">);</span>
-
-  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="p">[</span><span class="nx">action</span><span class="p">,</span> <span class="p">{</span> <span class="k">from</span><span class="p">,</span> <span class="nx">to</span> <span class="p">}]</span> <span class="k">of</span> <span class="nx">parseInstructions</span><span class="p">(</span><span class="nx">input</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">row</span><span class="p">;</span> <span class="nx">row</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">col</span> <span class="o">=</span> <span class="k">from</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span> <span class="o">&lt;=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">col</span><span class="p">;</span> <span class="nx">col</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">lights</span><span class="p">[</span><span class="mi">1000</span> <span class="o">*</span> <span class="nx">row</span> <span class="o">+</span> <span class="nx">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span>
-          <span class="mi">0</span><span class="p">,</span>
-          <span class="nx">lights</span><span class="p">[</span><span class="mi">1000</span> <span class="o">*</span> <span class="nx">row</span> <span class="o">+</span> <span class="nx">col</span><span class="p">]</span> <span class="o">+</span>
-            <span class="p">(</span><span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">On</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="nx">action</span> <span class="o">===</span> <span class="nx">Action</span><span class="p">.</span><span class="nx">Off</span> <span class="p">?</span> <span class="o">-</span><span class="mi">1</span> <span class="p">:</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="nx">lights</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">sum</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre></div></div>
-
-<p>The benefits of using this approach are for performance, as the interpreter is able to determine the type and size of the array up-front.
-In the case of the two-dimensional array, we produce this array somewhat dynamically, and the engine is not able to be sure of what exact type we will be storing throughout its lifetime (as JavaScript arrays are heterogeneous).</p>
-
-<p>Upon review, due to how similar both part one and two were, we could have possibly distilled the logic for iterating through an instruction set and applying a given action into a more generalised higher-order function.
+Thanks to the help of <a href=https://www.typescriptlang.org/docs/handbook/generics.html rel="external noopener" target=_blank>Generics</a> and the supplied default value, this is made type-safe.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part2</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>lights</span> <span style=color:#f92672>=</span> <span style=color:#a6e22e>create2DArray</span>(<span style=color:#ae81ff>1000</span>, <span style=color:#ae81ff>1000</span>, <span style=color:#ae81ff>0</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>action</span>, { <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }] <span style=color:#66d9ef>of</span> <span style=color:#a6e22e>parseInstructions</span>(<span style=color:#a6e22e>input</span>)) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>col</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>lights</span>[<span style=color:#a6e22e>row</span>][<span style=color:#a6e22e>col</span>] <span style=color:#f92672>=</span> Math.<span style=color:#a6e22e>max</span>(
+</span></span><span style=display:flex><span>          <span style=color:#ae81ff>0</span>,
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>lights</span>[<span style=color:#a6e22e>row</span>][<span style=color:#a6e22e>col</span>] <span style=color:#f92672>+</span>
+</span></span><span style=display:flex><span>            (<span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>On</span> <span style=color:#f92672>?</span> <span style=color:#a6e22e>1</span> : <span style=color:#66d9ef>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>Off</span> <span style=color:#f92672>?</span> <span style=color:#f92672>-</span><span style=color:#a6e22e>1</span> : <span style=color:#66d9ef>2</span>)
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>flat</span>().<span style=color:#a6e22e>reduce</span>(<span style=color:#a6e22e>sum</span>);
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>Following a very similar form to part one, the only code that has really changed is the action we wish to enact based on the given instruction&rsquo;s light range.
+Having iterated through the provided instructions, we can again flatten the grid and return the light brightness sum to reach our desired answer 🌟.</p><p>Following suit with part one&rsquo;s alternative implementation, we can again opt to use a <code>Uint8Array</code> instead and use a small mathematical formula to locate a given row and column.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-typescript data-lang=typescript><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#a6e22e>part2</span> <span style=color:#f92672>=</span> (<span style=color:#a6e22e>input</span>: <span style=color:#66d9ef>string</span>)<span style=color:#f92672>:</span> <span style=color:#66d9ef>number</span> <span style=color:#f92672>=&gt;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>const</span> <span style=color:#a6e22e>lights</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Uint8Array</span>(<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#ae81ff>1000</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> [<span style=color:#a6e22e>action</span>, { <span style=color:#66d9ef>from</span>, <span style=color:#a6e22e>to</span> }] <span style=color:#66d9ef>of</span> <span style=color:#a6e22e>parseInstructions</span>(<span style=color:#a6e22e>input</span>)) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>row</span>; <span style=color:#a6e22e>row</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>let</span> <span style=color:#a6e22e>col</span> <span style=color:#f92672>=</span> <span style=color:#66d9ef>from</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span> <span style=color:#f92672>&lt;=</span> <span style=color:#a6e22e>to</span>.<span style=color:#a6e22e>col</span>; <span style=color:#a6e22e>col</span><span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>lights</span>[<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>col</span>] <span style=color:#f92672>=</span> Math.<span style=color:#a6e22e>max</span>(
+</span></span><span style=display:flex><span>          <span style=color:#ae81ff>0</span>,
+</span></span><span style=display:flex><span>          <span style=color:#a6e22e>lights</span>[<span style=color:#ae81ff>1000</span> <span style=color:#f92672>*</span> <span style=color:#a6e22e>row</span> <span style=color:#f92672>+</span> <span style=color:#a6e22e>col</span>] <span style=color:#f92672>+</span>
+</span></span><span style=display:flex><span>            (<span style=color:#a6e22e>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>On</span> <span style=color:#f92672>?</span> <span style=color:#a6e22e>1</span> : <span style=color:#66d9ef>action</span> <span style=color:#f92672>===</span> <span style=color:#a6e22e>Action</span>.<span style=color:#a6e22e>Off</span> <span style=color:#f92672>?</span> <span style=color:#f92672>-</span><span style=color:#a6e22e>1</span> : <span style=color:#66d9ef>2</span>)
+</span></span><span style=display:flex><span>        );
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>lights</span>.<span style=color:#a6e22e>reduce</span>(<span style=color:#a6e22e>sum</span>);
+</span></span><span style=display:flex><span>};
+</span></span></code></pre></div><p>The benefits of using this approach are for performance, as the interpreter is able to determine the type and size of the array up-front.
+In the case of the two-dimensional array, we produce this array somewhat dynamically, and the engine is not able to be sure of what exact type we will be storing throughout its lifetime (as JavaScript arrays are heterogeneous).</p><p>Upon review, due to how similar both part one and two were, we could have possibly distilled the logic for iterating through an instruction set and applying a given action into a more generalised higher-order function.
 In doing so, it could have abstracted away how we stored the lighting grid and how we produced the desired resulting sum.
-As the callee, we could then just supply different actions (possibly of the type <code class="language-plaintext highlighter-rouge">(Light) =&gt; Light</code>) to form the basis of each part’s concrete solution.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+As the callee, we could then just supply different actions (possibly of the type <code>(Light) => Light</code>) to form the basis of each part&rsquo;s concrete solution.</p></main><footer class=post__tags><a href=/archive/tag/advent-of-code>advent-of-code</a><a href=/archive/tag/advent-of-code-2015>advent-of-code-2015</a><a href=/archive/tag/typescript>typescript</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

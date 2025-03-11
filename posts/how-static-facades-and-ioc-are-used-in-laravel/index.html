@@ -1,231 +1,126 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Demystifying the magic behind Static Facades and IoC in Laravel: Discover how Laravel employs static facades and inversion of control to enhance flexibility and maintainability.">
-
-    <title>
-        
-            How Static Facades and IoC are used in Laravel &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">How Static Facades and IoC are used in Laravel</h1>
-    <time datetime="2014-01-08T00:00:00+00:00" class="post-date">08 Jan 2014</time>
-    <p>When you first take a look at <a href="http://laravel.com/">Laravel</a> you may ask yourself, what is with all the static?
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>How Static Facades and IoC are used in Laravel - Edd Mann</title>
+<meta name=description content="Demystifying the magic behind Static Facades and IoC in Laravel: Discover how Laravel employs static facades and inversion of control to enhance flexibility and maintainability."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="How Static Facades and IoC are used in Laravel"><meta itemprop=description content="When you first take a look at Laravel you may ask yourself, what is with all the static? It is a valid question, as on the surface it can seem like the framework is heavily static method based. However, this could be no further from the truth. A deeper exploration reveals that the static calls we make really mask a great number of instance objects. In this post I hope to provide a simple explanation as to what is really going on, and along the way build a basic implementation to practise these newfound findings."><meta itemprop=datePublished content="2014-01-08T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-08T00:00:00+00:00"><meta itemprop=wordCount content="1072"><meta itemprop=keywords content="Laravel,Php"><meta property="og:url" content="https://eddmann.com/posts/how-static-facades-and-ioc-are-used-in-laravel/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="How Static Facades and IoC are used in Laravel"><meta property="og:description" content="When you first take a look at Laravel you may ask yourself, what is with all the static? It is a valid question, as on the surface it can seem like the framework is heavily static method based. However, this could be no further from the truth. A deeper exploration reveals that the static calls we make really mask a great number of instance objects. In this post I hope to provide a simple explanation as to what is really going on, and along the way build a basic implementation to practise these newfound findings."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-08T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-08T00:00:00+00:00"><meta property="article:tag" content="Laravel"><meta property="article:tag" content="Php"><meta name=twitter:card content="summary"><meta name=twitter:title content="How Static Facades and IoC are used in Laravel"><meta name=twitter:description content="When you first take a look at Laravel you may ask yourself, what is with all the static? It is a valid question, as on the surface it can seem like the framework is heavily static method based. However, this could be no further from the truth. A deeper exploration reveals that the static calls we make really mask a great number of instance objects. In this post I hope to provide a simple explanation as to what is really going on, and along the way build a basic implementation to practise these newfound findings."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/how-static-facades-and-ioc-are-used-in-laravel/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>How Static Facades and IoC are used in Laravel</h1><time class=post__time>Jan 8, 2014</time></header><main class=prose><p>When you first take a look at <a href=http://laravel.com/ rel="external noopener" target=_blank>Laravel</a> you may ask yourself, what is with all the static?
 It is a valid question, as on the surface it can seem like the framework is heavily static method based.
 However, this could be no further from the truth.
 A deeper exploration reveals that the static calls we make really mask a great number of instance objects.
-In this post I hope to provide a simple explanation as to what is really going on, and along the way build a basic implementation to practise these newfound findings.</p>
-
-
-
-<h2 id="inversion-of-control-container">Inversion of Control Container</h2>
-
-<p>A concept that gets thrown around a lot when the topic of discussion turns to Laravel is the <a href="http://en.wikipedia.org/wiki/Inversion_of_control">Inversion of Control</a> (IoC) container.
+In this post I hope to provide a simple explanation as to what is really going on, and along the way build a basic implementation to practise these newfound findings.</p><h2 id=inversion-of-control-container>Inversion of Control Container</h2><p>A concept that gets thrown around a lot when the topic of discussion turns to Laravel is the <a href=http://en.wikipedia.org/wiki/Inversion_of_control rel="external noopener" target=_blank>Inversion of Control</a> (IoC) container.
 Simply put, it provides you with a key-value store for resolving the instance of a class you wish to use.
 The typical object-orientated flow of static assignment is then replaced with a builder object, which binds objects at run-time.
 Though this may seem on the surface to over-complicate matters, removing the benefits of compile-time static analysis, it provides us with great control over how and what object instances are used.
 Using this technique allows us to easily replace instances with other conforming implementations - a good example of this can be seen for mocking objects when testing.
-Now that we have conceptualised the technique from a high level, I know that personally nothing beats a clean, focused example.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">App</span> <span class="p">{</span>
-
-    <span class="k">private</span> <span class="k">static</span> <span class="nv">$instances</span> <span class="o">=</span> <span class="p">[];</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">set</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$instance</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$instance</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nv">$instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nv">$instance</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">static</span><span class="o">::</span><span class="nv">$instances</span><span class="p">[</span><span class="nv">$name</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$instance</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">get</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$instance</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="nv">$instances</span><span class="p">[</span><span class="nv">$name</span><span class="p">];</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nv">$instance</span> <span class="k">instanceof</span> <span class="nc">Closure</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$instance</span> <span class="o">=</span> <span class="nv">$instance</span><span class="p">();</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nv">$instance</span><span class="p">;</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>For brevity, the solution shown above uses a static implementation.
+Now that we have conceptualised the technique from a high level, I know that personally nothing beats a clean, focused example.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>App</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>private</span> <span style=color:#66d9ef>static</span> $instances <span style=color:#f92672>=</span> [];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>set</span>($name, $instance)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>is_string</span>($instance)) {
+</span></span><span style=display:flex><span>            $instance <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> $instance();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$instances[$name] <span style=color:#f92672>=</span> $instance;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>get</span>($name)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $instance <span style=color:#f92672>=</span> <span style=color:#66d9ef>static</span><span style=color:#f92672>::</span>$instances[$name];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ($instance <span style=color:#a6e22e>instanceof</span> <span style=color:#a6e22e>Closure</span>) {
+</span></span><span style=display:flex><span>            $instance <span style=color:#f92672>=</span> $instance();
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> $instance;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>For brevity, the solution shown above uses a static implementation.
 We are only going to require a single container for this example.
 The two defined methods wrap the interaction with the associative array, allowing the user to either add or retrieve an instance (by name) from the container.
 When adding an item, a name and instance (or means to create an instance) must be supplied.
-When retrieving an instance, the key’s value is checked to see if it is a closure or anonymous function.
+When retrieving an instance, the key&rsquo;s value is checked to see if it is a closure or anonymous function.
 If so, it is called before being returned.
 This provides you with the flexibility of supplying the container with more complex requirements when creating an instance, including constructor arguments.
 For simplicity, the option to provide a class name by string has been included.
 Supplying a class name creates a new instance of the class (by way of an empty constructor), with the instance being shared between retrieval requests (similar to a singleton).
-We can then use this implementation in the manner shown below.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">interface</span> <span class="nc">MessageInterface</span> <span class="p">{</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">greeting</span><span class="p">();</span>
-
-<span class="p">}</span>
-
-<span class="kd">class</span> <span class="nc">EnglishMessage</span> <span class="kd">implements</span> <span class="nc">MessageInterface</span> <span class="p">{</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">greeting</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">'Hello!'</span><span class="p">;</span> <span class="p">}</span>
-
-<span class="p">}</span>
-
-<span class="nc">App</span><span class="o">::</span><span class="nf">set</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="k">new</span> <span class="nc">EnglishMessage</span><span class="p">();</span> <span class="p">});</span>
-<span class="c1">// or</span>
-<span class="nc">App</span><span class="o">::</span><span class="nf">set</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="s1">'EnglishMessage'</span><span class="p">);</span>
-
-<span class="k">echo</span> <span class="nc">App</span><span class="o">::</span><span class="nf">get</span><span class="p">(</span><span class="s1">'message'</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">greeting</span><span class="p">();</span> <span class="c1">// Hello!</span>
-</code></pre></div></div>
-
-<p>It may seem like an over-complication to include an interface in this example.
+We can then use this implementation in the manner shown below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>interface</span> <span style=color:#a6e22e>MessageInterface</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>greeting</span>();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>EnglishMessage</span> <span style=color:#66d9ef>implements</span> <span style=color:#a6e22e>MessageInterface</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>greeting</span>() { <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;Hello!&#39;</span>; }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>set</span>(<span style=color:#e6db74>&#39;message&#39;</span>, <span style=color:#66d9ef>function</span>() { <span style=color:#66d9ef>return</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>EnglishMessage</span>(); });
+</span></span><span style=display:flex><span><span style=color:#75715e>// or
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>set</span>(<span style=color:#e6db74>&#39;message&#39;</span>, <span style=color:#e6db74>&#39;EnglishMessage&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>get</span>(<span style=color:#e6db74>&#39;message&#39;</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>greeting</span>(); <span style=color:#75715e>// Hello!
+</span></span></span></code></pre></div><p>It may seem like an over-complication to include an interface in this example.
 However, the design choice will become clear in the following discussion.
 We are now able to retrieve the desired class instance by name alone, ignoring any implementation details required to instantiate and return the instance.
-This abstraction also allows us to define an alternative implementation, shown below with replacing the existing example instance.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">FrenchMessage</span> <span class="kd">implements</span> <span class="nc">MessageInterface</span> <span class="p">{</span>
-
-    <span class="k">public</span> <span class="k">function</span> <span class="n">greeting</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">'Bonjour!'</span><span class="p">;</span> <span class="p">}</span>
-
-<span class="p">}</span>
-
-<span class="nc">App</span><span class="o">::</span><span class="nf">set</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="s1">'FrenchMessage'</span><span class="p">);</span>
-
-<span class="k">echo</span> <span class="nc">App</span><span class="o">::</span><span class="nf">get</span><span class="p">(</span><span class="s1">'message'</span><span class="p">)</span><span class="o">-&gt;</span><span class="nf">greeting</span><span class="p">();</span> <span class="c1">// Bonjour!</span>
-</code></pre></div></div>
-
-<p>The same call to the message instance at run-time will now use the alternative ‘FrenchMessage’ class instance.
+This abstraction also allows us to define an alternative implementation, shown below with replacing the existing example instance.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>FrenchMessage</span> <span style=color:#66d9ef>implements</span> <span style=color:#a6e22e>MessageInterface</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>greeting</span>() { <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;Bonjour!&#39;</span>; }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>set</span>(<span style=color:#e6db74>&#39;message&#39;</span>, <span style=color:#e6db74>&#39;FrenchMessage&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>get</span>(<span style=color:#e6db74>&#39;message&#39;</span>)<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>greeting</span>(); <span style=color:#75715e>// Bonjour!
+</span></span></span></code></pre></div><p>The same call to the message instance at run-time will now use the alternative &lsquo;FrenchMessage&rsquo; class instance.
 No tedious code modification is required as the process occurs dynamically.
 One issue that you may highlight, though, is the loss of succinct class declaration.
-With the added requirement of having to retrieve the instance from the container before acting upon it, code can start to look very verbose.</p>
-
-<h2 id="facades">Facades</h2>
-
-<p>PHP provides us with a very elegant way of solving this problem, allowing us to define how missing class methods should be handled in code.
-With this power, we are able to add the same level of indirection present in the IoC container, ‘facading’ the verbose resolution with the clean static syntax.
-Below is a simple implementation which addresses this requirement.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">abstract</span> <span class="kd">class</span> <span class="nc">Facade</span> <span class="p">{</span>
-
-    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="n">getName</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="k">throw</span> <span class="k">new</span> <span class="nc">Exception</span><span class="p">(</span><span class="s1">'Facade does not implement getName method.'</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="n">__callStatic</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="nv">$instance</span> <span class="o">=</span> <span class="nc">App</span><span class="o">::</span><span class="nf">get</span><span class="p">(</span><span class="k">static</span><span class="o">::</span><span class="nf">getName</span><span class="p">());</span>
-
-        <span class="k">if</span> <span class="p">(</span> <span class="o">!</span> <span class="nb">method_exists</span><span class="p">(</span><span class="nv">$instance</span><span class="p">,</span> <span class="nv">$method</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">throw</span> <span class="k">new</span> <span class="nc">Exception</span><span class="p">(</span><span class="nb">get_called_class</span><span class="p">()</span> <span class="mf">.</span> <span class="s1">' does not implement '</span> <span class="mf">.</span> <span class="nv">$method</span> <span class="mf">.</span> <span class="s1">' method.'</span><span class="p">);</span>
-        <span class="p">}</span>
-
-        <span class="k">return</span> <span class="nb">call_user_func_array</span><span class="p">([</span> <span class="nv">$instance</span><span class="p">,</span> <span class="nv">$method</span> <span class="p">],</span> <span class="nv">$args</span><span class="p">);</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The example implementation above defines an abstract ‘Facade’ class which provides the dynamic static invocation required by each facade.
-There is a requirement for each facade created to override the ‘getName’ method, simply returning the related name of the container instance.
+With the added requirement of having to retrieve the instance from the container before acting upon it, code can start to look very verbose.</p><h2 id=facades>Facades</h2><p>PHP provides us with a very elegant way of solving this problem, allowing us to define how missing class methods should be handled in code.
+With this power, we are able to add the same level of indirection present in the IoC container, &lsquo;facading&rsquo; the verbose resolution with the clean static syntax.
+Below is a simple implementation which addresses this requirement.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>abstract</span> <span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Facade</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>getName</span>()
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Exception</span>(<span style=color:#e6db74>&#39;Facade does not implement getName method.&#39;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>public</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> __callStatic($method, $args)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        $instance <span style=color:#f92672>=</span> <span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>get</span>(<span style=color:#66d9ef>static</span><span style=color:#f92672>::</span><span style=color:#a6e22e>getName</span>());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> ( <span style=color:#f92672>!</span> <span style=color:#a6e22e>method_exists</span>($instance, $method)) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>throw</span> <span style=color:#66d9ef>new</span> <span style=color:#a6e22e>Exception</span>(<span style=color:#a6e22e>get_called_class</span>() <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39; does not implement &#39;</span> <span style=color:#f92672>.</span> $method <span style=color:#f92672>.</span> <span style=color:#e6db74>&#39; method.&#39;</span>);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#a6e22e>call_user_func_array</span>([ $instance, $method ], $args);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>The example implementation above defines an abstract &lsquo;Facade&rsquo; class which provides the dynamic static invocation required by each facade.
+There is a requirement for each facade created to override the &lsquo;getName&rsquo; method, simply returning the related name of the container instance.
 As static methods cannot rightfully be made abstract, we instead throw an exception which informs the user of this restriction.
-Being the only concrete method defined in the class, any resolved container instance with a method called ‘getName’ will not be successfully called as it will not invoke <code class="language-plaintext highlighter-rouge">__callStatic</code>.
+Being the only concrete method defined in the class, any resolved container instance with a method called &lsquo;getName&rsquo; will not be successfully called as it will not invoke <code>__callStatic</code>.
 In a more developed implementation, this method name could be changed to something that would reduce the risk of conflicting with instance method names.
-The other method that is defined is the <a href="http://www.php.net/manual/en/language.oop5.magic.php">magic</a> <code class="language-plaintext highlighter-rouge">__callStatic</code> method, providing the ability to handle missing static method calls.
+The other method that is defined is the <a href=http://www.php.net/manual/en/language.oop5.magic.php rel="external noopener" target=_blank>magic</a> <code>__callStatic</code> method, providing the ability to handle missing static method calls.
 Using the name that is returned in the concrete facade class, we are able to retrieve the correct instance from the container.
 From here, we simply check to see if the instance contains the method.
 If this is not the case, we throw a suitable error for the user.
 Finally, we call the method on the instance, passing in any arguments that were specified and return the result.
-The example below expands on the previous message implementation to take advantage of the more elegant looking facade type.</p>
-
-<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">class</span> <span class="nc">Message</span> <span class="kd">extends</span> <span class="nc">Facade</span> <span class="p">{</span>
-
-    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="n">getName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">'message'</span><span class="p">;</span> <span class="p">}</span>
-
-<span class="p">}</span>
-
-<span class="k">echo</span> <span class="nc">Message</span><span class="o">::</span><span class="nf">greeting</span><span class="p">();</span> <span class="c1">// Hello!</span>
-
-<span class="nc">App</span><span class="o">::</span><span class="nf">set</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span> <span class="s1">'FrenchMessage'</span><span class="p">);</span>
-
-<span class="k">echo</span> <span class="nc">Message</span><span class="o">::</span><span class="nf">greeting</span><span class="p">();</span> <span class="c1">// Bonjour!</span>
-
-<span class="k">try</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="nc">Message</span><span class="o">::</span><span class="nf">goodbye</span><span class="p">();</span>
-<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nc">Exception</span> <span class="nv">$ex</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="nv">$ex</span><span class="o">-&gt;</span><span class="nf">getMessage</span><span class="p">();</span>
-<span class="p">}</span> <span class="c1">// Message does not implement goodbye method.</span>
-</code></pre></div></div>
-
-<p>So now we have been able to create an implementation which has all the flexibility provided to us by dynamic class instantiation and invocation, while retaining the succinct properties of static classes.</p>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://laravel.com/docs/ioc">Laravel: IoC Container</a></li>
-  <li><a href="http://laravel.com/docs/facades">Laravel: Facades</a></li>
-  <li><a href="http://martinfowler.com/articles/injection.html">Inversion of Control Containers and the Dependency Injection pattern</a></li>
-  <li><a href="http://www.php.net/manual/en/language.oop5.magic.php">PHP: Magic Methods</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+The example below expands on the previous message implementation to take advantage of the more elegant looking facade type.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-php data-lang=php><span style=display:flex><span><span style=color:#66d9ef>class</span> <span style=color:#a6e22e>Message</span> <span style=color:#66d9ef>extends</span> <span style=color:#a6e22e>Facade</span> {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>protected</span> <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>function</span> <span style=color:#a6e22e>getName</span>() { <span style=color:#66d9ef>return</span> <span style=color:#e6db74>&#39;message&#39;</span>; }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>Message</span><span style=color:#f92672>::</span><span style=color:#a6e22e>greeting</span>(); <span style=color:#75715e>// Hello!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>App</span><span style=color:#f92672>::</span><span style=color:#a6e22e>set</span>(<span style=color:#e6db74>&#39;message&#39;</span>, <span style=color:#e6db74>&#39;FrenchMessage&#39;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>Message</span><span style=color:#f92672>::</span><span style=color:#a6e22e>greeting</span>(); <span style=color:#75715e>// Bonjour!
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>try</span> {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>echo</span> <span style=color:#a6e22e>Message</span><span style=color:#f92672>::</span><span style=color:#a6e22e>goodbye</span>();
+</span></span><span style=display:flex><span>} <span style=color:#66d9ef>catch</span> (<span style=color:#a6e22e>Exception</span> $ex) {
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>echo</span> $ex<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>getMessage</span>();
+</span></span><span style=display:flex><span>} <span style=color:#75715e>// Message does not implement goodbye method.
+</span></span></span></code></pre></div><p>So now we have been able to create an implementation which has all the flexibility provided to us by dynamic class instantiation and invocation, while retaining the succinct properties of static classes.</p><h2 id=resources>Resources</h2><ul><li><a href=http://laravel.com/docs/ioc rel="external noopener" target=_blank>Laravel: IoC Container</a></li><li><a href=http://laravel.com/docs/facades rel="external noopener" target=_blank>Laravel: Facades</a></li><li><a href=http://martinfowler.com/articles/injection.html rel="external noopener" target=_blank>Inversion of Control Containers and the Dependency Injection pattern</a></li><li><a href=http://www.php.net/manual/en/language.oop5.magic.php rel="external noopener" target=_blank>PHP: Magic Methods</a></li></ul></main><footer class=post__tags><a href=/archive/tag/laravel>laravel</a><a href=/archive/tag/php>php</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

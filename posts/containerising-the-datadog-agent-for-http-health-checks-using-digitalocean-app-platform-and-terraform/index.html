@@ -1,204 +1,96 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Explore containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform, reducing infrastructure overhead while maintaining effective monitoring.">
-
-    <title>
-        
-            Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform</h1>
-    <time datetime="2022-04-28T00:00:00+00:00" class="post-date">28 Apr 2022</time>
-    <p>We have been big fans of DataDog and the level of telemetry/monitoring it provides us for many years now.
-One such aspect of monitoring that we employ throughout the services we maintain is <a href="https://docs.datadoghq.com/integrations/http_check/">HTTP health checks</a>, which are intentionally run on a separate cloud provider to our primary, which is AWS.
-DataDog has provided the ability to handle running these checks via <a href="https://docs.datadoghq.com/agent/">their agent</a> for many years, offering us a sufficient black-box means of ensuring a service is functioning as expected.
-This past week, we explored the viability of containerising this responsibility into a service that could be run on a serverless platform such as the <a href="https://www.digitalocean.com/products/app-platform">DigitalOcean App Platform</a>.</p>
-
-
-
-<h2 id="how-it-was">How It Was…</h2>
-
-<p>In the past, we have been running the DataDog Agent, which powers the HTTP check integration, on a separate cloud provider’s virtual private server (VPS).
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform - Edd Mann</title>
+<meta name=description content="Explore containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform, reducing infrastructure overhead while maintaining effective monitoring."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform"><meta itemprop=description content="We have been big fans of DataDog and the level of telemetry/monitoring it provides us for many years now. One such aspect of monitoring that we employ throughout the services we maintain is HTTP health checks, which are intentionally run on a separate cloud provider to our primary, which is AWS. DataDog has provided the ability to handle running these checks via their agent for many years, offering us a sufficient black-box means of ensuring a service is functioning as expected. This past week, we explored the viability of containerising this responsibility into a service that could be run on a serverless platform such as the DigitalOcean App Platform."><meta itemprop=datePublished content="2022-04-28T00:00:00+00:00"><meta itemprop=dateModified content="2022-04-28T00:00:00+00:00"><meta itemprop=wordCount content="1007"><meta itemprop=keywords content="Datadog,Digitalocean,Terraform,Docker"><meta property="og:url" content="https://eddmann.com/posts/containerising-the-datadog-agent-for-http-health-checks-using-digitalocean-app-platform-and-terraform/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform"><meta property="og:description" content="We have been big fans of DataDog and the level of telemetry/monitoring it provides us for many years now. One such aspect of monitoring that we employ throughout the services we maintain is HTTP health checks, which are intentionally run on a separate cloud provider to our primary, which is AWS. DataDog has provided the ability to handle running these checks via their agent for many years, offering us a sufficient black-box means of ensuring a service is functioning as expected. This past week, we explored the viability of containerising this responsibility into a service that could be run on a serverless platform such as the DigitalOcean App Platform."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-04-28T00:00:00+00:00"><meta property="article:modified_time" content="2022-04-28T00:00:00+00:00"><meta property="article:tag" content="Datadog"><meta property="article:tag" content="Digitalocean"><meta property="article:tag" content="Terraform"><meta property="article:tag" content="Docker"><meta name=twitter:card content="summary"><meta name=twitter:title content="Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform"><meta name=twitter:description content="We have been big fans of DataDog and the level of telemetry/monitoring it provides us for many years now. One such aspect of monitoring that we employ throughout the services we maintain is HTTP health checks, which are intentionally run on a separate cloud provider to our primary, which is AWS. DataDog has provided the ability to handle running these checks via their agent for many years, offering us a sufficient black-box means of ensuring a service is functioning as expected. This past week, we explored the viability of containerising this responsibility into a service that could be run on a serverless platform such as the DigitalOcean App Platform."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/containerising-the-datadog-agent-for-http-health-checks-using-digitalocean-app-platform-and-terraform/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Containerising the DataDog Agent for HTTP health-checks using DigitalOcean App Platform and Terraform</h1><time class=post__time>Apr 28, 2022</time></header><main class=prose><p>We have been big fans of DataDog and the level of telemetry/monitoring it provides us for many years now.
+One such aspect of monitoring that we employ throughout the services we maintain is <a href=https://docs.datadoghq.com/integrations/http_check/ rel="external noopener" target=_blank>HTTP health checks</a>, which are intentionally run on a separate cloud provider to our primary, which is AWS.
+DataDog has provided the ability to handle running these checks via <a href=https://docs.datadoghq.com/agent/ rel="external noopener" target=_blank>their agent</a> for many years, offering us a sufficient black-box means of ensuring a service is functioning as expected.
+This past week, we explored the viability of containerising this responsibility into a service that could be run on a serverless platform such as the <a href=https://www.digitalocean.com/products/app-platform rel="external noopener" target=_blank>DigitalOcean App Platform</a>.</p><h2 id=how-it-was>How It Was&mldr;</h2><p>In the past, we have been running the DataDog Agent, which powers the HTTP check integration, on a separate cloud provider&rsquo;s virtual private server (VPS).
 This was provisioned using Puppet, and we were responsible for handling all server concerns (patching, upgrades, etc.).
 This worked well at the time as the instance was also responsible for several other infrastructural tasks.
-However, these responsibilities have slowly been delegated to other means, and as such, the idea of hosting a full VPS just for handling HTTP checks was not ideal.</p>
-
-<p>Over the past year or so, we have explored using <a href="https://docs.datadoghq.com/synthetics/">DataDog Synthetic Monitoring</a>, which provides a means of not only evaluating HTTP checks but also includes in-depth performance analysis and browser recording capabilities.
+However, these responsibilities have slowly been delegated to other means, and as such, the idea of hosting a full VPS just for handling HTTP checks was not ideal.</p><p>Over the past year or so, we have explored using <a href=https://docs.datadoghq.com/synthetics/ rel="external noopener" target=_blank>DataDog Synthetic Monitoring</a>, which provides a means of not only evaluating HTTP checks but also includes in-depth performance analysis and browser recording capabilities.
 These additional features, combined with Terraform support, are extremely powerful, and we have had good success porting several key endpoint request checks over to this product.
 Unfortunately, this additional functionality comes with an increased price tag, and we do not see an increase in monitoring confidence by moving all our current checks over to this product.
-As such, we decided that it would be ideal to keep the same HTTP health checks in place but manage this service at a higher level of compute (Serverless 😎).</p>
-
-<h2 id="containerising-the-datadog-agent">Containerising the DataDog Agent</h2>
-
-<p>With this in mind, we looked into the viability of containerising the DataDog Agent itself.
-Fortunately, there are many use cases of carrying out such a task using <a href="https://docs.datadoghq.com/agent/docker/">Docker</a> and container orchestration platforms such as <a href="https://docs.datadoghq.com/agent/kubernetes/">Kubernetes</a> and <a href="https://docs.datadoghq.com/agent/amazon_ecs/">ECS</a>.
+As such, we decided that it would be ideal to keep the same HTTP health checks in place but manage this service at a higher level of compute (Serverless 😎).</p><h2 id=containerising-the-datadog-agent>Containerising the DataDog Agent</h2><p>With this in mind, we looked into the viability of containerising the DataDog Agent itself.
+Fortunately, there are many use cases of carrying out such a task using <a href=https://docs.datadoghq.com/agent/docker/ rel="external noopener" target=_blank>Docker</a> and container orchestration platforms such as <a href=https://docs.datadoghq.com/agent/kubernetes/ rel="external noopener" target=_blank>Kubernetes</a> and <a href=https://docs.datadoghq.com/agent/amazon_ecs/ rel="external noopener" target=_blank>ECS</a>.
 Our end goal, however, was a little different from the norm, as we wished to only ship and run the agent as a standalone service, not provide a means for other ancillary containers to relay data back to DataDog.
-With a little help from the DataDog documentation, we were able to assemble a <code class="language-plaintext highlighter-rouge">Dockerfile</code> that enabled only the desired built-in HTTP check integration like so.</p>
-
-<div class="language-dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> datadog/agent:7</span>
-
-<span class="k">ENV</span><span class="s"> DD_HOSTNAME "httpcheck"</span>
-<span class="k">ENV</span><span class="s"> DD_USE_DOGSTATSD "false"</span>
-<span class="k">ENV</span><span class="s"> DD_PROCESS_AGENT_ENABLED "false"</span>
-<span class="k">ENV</span><span class="s"> DD_APM_ENABLED "false"</span>
-<span class="k">ENV</span><span class="s"> DD_LOGS_ENABLED "false"</span>
-<span class="k">ENV</span><span class="s"> DD_ENABLE_METADATA_COLLECTION "false"</span>
-
-<span class="k">RUN </span><span class="nb">rm</span> <span class="nt">-rf</span> /etc/datadog-agent/conf.d
-<span class="k">ADD</span><span class="s"> http_check.yaml /etc/datadog-agent/conf.d/http_check.d/conf.yaml</span>
-</code></pre></div></div>
-
-<p>An example definition of what can be found in the <code class="language-plaintext highlighter-rouge">http_check.yaml</code> file is presented below.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">init_config</span><span class="pi">:</span>
-
-<span class="na">instances</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Homepage</span>
-    <span class="na">url</span><span class="pi">:</span> <span class="s">https://www.mybuilder.com</span>
-    <span class="na">http_response_status_code</span><span class="pi">:</span> <span class="m">200</span>
-    <span class="na">content_match</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Hire</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">exceptional</span><span class="nv"> </span><span class="s">tradesperson'</span>
-    <span class="na">tls_verify</span><span class="pi">:</span> <span class="no">true</span>
-</code></pre></div></div>
-
-<p>Upon experimentation with the built image, we noticed that by default, the hostname is discerned from the running container instance ID.
-To keep a stable instance hostname within DataDog, we opted to override the <code class="language-plaintext highlighter-rouge">DD_HOSTNAME</code> environment variable.</p>
-
-<h2 id="deploying-the-service">Deploying the Service</h2>
-
-<p>Now that we had built the service into a self-managed container, we investigated the platforms available to deploy and run it.
-There are many platforms available that offer such means, from <a href="https://aws.amazon.com/fargate/">AWS Fargate</a> to <a href="https://cloud.google.com/run">Google Cloud Run</a>.
-Upon review, we opted for <a href="https://docs.digitalocean.com/products/app-platform/">DigitalOcean App Platform</a>, which provided a cost-effective means ($5 a month!) of spinning up and running a container.</p>
-
-<p>Not only is App Platform cost-efficient, but it also provided egress network access (a requirement for such a service as ours) and the ability to seamlessly integrate the deployment process into a GitHub repository pipeline.
-This allows us to simply push changes to the service repository within GitHub and let DigitalOcean handle building and deploying the new image.</p>
-
-<p>We are big proponents of Infrastructure as Code (IaC) at MyBuilder, and another selling point to us was the ability to define the App Platform service within Terraform.
-Coupled with DataDog, we were able to combine the two third-party providers into our desired configuration like so.</p>
-
-<div class="language-hcl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">resource</span> <span class="s2">"digitalocean_app"</span> <span class="s2">"datadog_http_check"</span> <span class="p">{</span>
-  <span class="nx">spec</span> <span class="p">{</span>
-    <span class="nx">name</span>   <span class="p">=</span> <span class="s2">"datadog-http-check"</span>
-    <span class="nx">region</span> <span class="p">=</span> <span class="s2">"lon"</span>
-
-    <span class="nx">worker</span> <span class="p">{</span>
-      <span class="nx">name</span>               <span class="p">=</span> <span class="s2">"datadog-http-check"</span>
-      <span class="nx">source_dir</span>         <span class="p">=</span> <span class="s2">"/"</span>
-      <span class="nx">dockerfile_path</span>    <span class="p">=</span> <span class="s2">"Dockerfile"</span>
-      <span class="nx">instance_count</span>     <span class="p">=</span> <span class="mi">1</span>
-      <span class="nx">instance_size_slug</span> <span class="p">=</span> <span class="s2">"basic-xxs"</span>
-
-      <span class="nx">github</span> <span class="p">{</span>
-        <span class="nx">repo</span>           <span class="p">=</span> <span class="s2">"mybuilder/datadog-http-check"</span>
-        <span class="nx">branch</span>         <span class="p">=</span> <span class="s2">"main"</span>
-        <span class="nx">deploy_on_push</span> <span class="p">=</span> <span class="kc">true</span>
-      <span class="p">}</span>
-
-      <span class="nx">env</span> <span class="p">{</span>
-        <span class="nx">key</span>   <span class="p">=</span> <span class="s2">"DD_API_KEY"</span>
-        <span class="nx">value</span> <span class="p">=</span> <span class="nx">datadog_api_key</span><span class="err">.</span><span class="nx">datadog_http_check</span><span class="err">.</span><span class="nx">key</span>
-        <span class="nx">scope</span> <span class="p">=</span> <span class="s2">"RUN_TIME"</span>
-        <span class="nx">type</span>  <span class="p">=</span> <span class="s2">"SECRET"</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="nx">resource</span> <span class="s2">"datadog_api_key"</span> <span class="s2">"datadog_http_check"</span> <span class="p">{</span>
-  <span class="nx">name</span> <span class="p">=</span> <span class="s2">"datadog-http-check"</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Finally, we were able to provision a DataDog monitor that handled alerting us to any unexpected changes found by the newly created HTTP check service.</p>
-
-<div class="language-hcl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">resource</span> <span class="s2">"datadog_monitor"</span> <span class="s2">"datadog_http_check"</span> <span class="p">{</span>
-  <span class="nx">type</span> <span class="p">=</span> <span class="s2">"service check"</span>
-  <span class="nx">name</span> <span class="p">=</span> <span class="s2">"HTTP checks"</span>
-
-  <span class="nx">query</span> <span class="p">=</span> <span class="s2">"</span><span class="se">\"</span><span class="s2">http.can_connect</span><span class="se">\"</span><span class="s2">.over(</span><span class="se">\"</span><span class="s2">*</span><span class="se">\"</span><span class="s2">).by(</span><span class="se">\"</span><span class="s2">url</span><span class="se">\"</span><span class="s2">).last(4).count_by_status()"</span>
-
-  <span class="nx">message</span> <span class="p">=</span> <span class="o">&lt;&lt;-</span><span class="no">EOM</span><span class="sh">
-    {{#is_alert}}
-    We are having issues connecting to {{url.name}}. {{check_message}}
-    {{/is_alert}}
-
-    {{#is_recovery}}
-    We are now able to connect to {{url.name}}. {{check_message}}
-    {{/is_recovery}}
-</span><span class="no">  EOM
-
-</span>  <span class="nx">monitor_thresholds</span> <span class="p">{</span>
-    <span class="nx">critical</span> <span class="p">=</span> <span class="mi">3</span>
-    <span class="nx">warning</span>  <span class="p">=</span> <span class="mi">1</span>
-    <span class="nx">ok</span>       <span class="p">=</span> <span class="mi">1</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<h3 id="one-small-gotcha">One Small Gotcha…</h3>
-
-<p>One additional change we were required to make to the built image for use with DigitalOcean App Platform was the inclusion of an overridden <code class="language-plaintext highlighter-rouge">/proc/cpuinfo</code> file.
-Upon investigation, it seems the <code class="language-plaintext highlighter-rouge">/proc/cpuinfo</code> output provided by the DigitalOcean host machine includes an <code class="language-plaintext highlighter-rouge">unknown</code> value for the CPU <code class="language-plaintext highlighter-rouge">stepping</code> attribute.
-This is expected to be an integer within the <a href="https://github.com/DataDog/gopsutil/blob/dd/cpu/cpu_linux.go#L150">Go package</a> used by the DataDog Agent and, as such, causes the Agent to <a href="https://github.com/DataDog/datadog-agent/blob/main/cmd/process-agent/main_common.go#L332">critically restart</a> upon initialisation.
-Fortunately, the package provides a means of supplying an <a href="https://github.com/DataDog/gopsutil#usage">overridden host</a> <code class="language-plaintext highlighter-rouge">/proc</code> directory in which we were able to stub out this <em>stepping</em> attribute to ensure the agent initialises correctly.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>To conclude, we are very happy with the ease in which we have been able to abstract this service to a higher level of compute, removing the concerns of having to manage the underlying host machine in the process.
-Now only maintaining ownership of a Docker image means we can trivially move this service to another cloud provider platform in the future if we so wish.</p>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+With a little help from the DataDog documentation, we were able to assemble a <code>Dockerfile</code> that enabled only the desired built-in HTTP check integration like so.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dockerfile data-lang=dockerfile><span style=display:flex><span><span style=color:#66d9ef>FROM</span><span style=color:#e6db74> datadog/agent:7</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_HOSTNAME <span style=color:#e6db74>&#34;httpcheck&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_USE_DOGSTATSD <span style=color:#e6db74>&#34;false&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_PROCESS_AGENT_ENABLED <span style=color:#e6db74>&#34;false&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_APM_ENABLED <span style=color:#e6db74>&#34;false&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_LOGS_ENABLED <span style=color:#e6db74>&#34;false&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ENV</span> DD_ENABLE_METADATA_COLLECTION <span style=color:#e6db74>&#34;false&#34;</span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>RUN</span> rm -rf /etc/datadog-agent/conf.d<span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span><span style=color:#66d9ef>ADD</span> http_check.yaml /etc/datadog-agent/conf.d/http_check.d/conf.yaml<span style=color:#960050;background-color:#1e0010>
+</span></span></span></code></pre></div><p>An example definition of what can be found in the <code>http_check.yaml</code> file is presented below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>init_config</span>:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>instances</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Homepage</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>url</span>: <span style=color:#ae81ff>https://www.mybuilder.com</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>http_response_status_code</span>: <span style=color:#ae81ff>200</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>content_match</span>: <span style=color:#e6db74>&#39;Hire an exceptional tradesperson&#39;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>tls_verify</span>: <span style=color:#66d9ef>true</span>
+</span></span></code></pre></div><p>Upon experimentation with the built image, we noticed that by default, the hostname is discerned from the running container instance ID.
+To keep a stable instance hostname within DataDog, we opted to override the <code>DD_HOSTNAME</code> environment variable.</p><h2 id=deploying-the-service>Deploying the Service</h2><p>Now that we had built the service into a self-managed container, we investigated the platforms available to deploy and run it.
+There are many platforms available that offer such means, from <a href=https://aws.amazon.com/fargate/ rel="external noopener" target=_blank>AWS Fargate</a> to <a href=https://cloud.google.com/run rel="external noopener" target=_blank>Google Cloud Run</a>.
+Upon review, we opted for <a href=https://docs.digitalocean.com/products/app-platform/ rel="external noopener" target=_blank>DigitalOcean App Platform</a>, which provided a cost-effective means ($5 a month!) of spinning up and running a container.</p><p>Not only is App Platform cost-efficient, but it also provided egress network access (a requirement for such a service as ours) and the ability to seamlessly integrate the deployment process into a GitHub repository pipeline.
+This allows us to simply push changes to the service repository within GitHub and let DigitalOcean handle building and deploying the new image.</p><p>We are big proponents of Infrastructure as Code (IaC) at MyBuilder, and another selling point to us was the ability to define the App Platform service within Terraform.
+Coupled with DataDog, we were able to combine the two third-party providers into our desired configuration like so.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;digitalocean_app&#34; &#34;datadog_http_check&#34;</span> {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>spec</span> {
+</span></span><span style=display:flex><span>    name   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;datadog-http-check&#34;</span>
+</span></span><span style=display:flex><span>    region <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;lon&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>worker</span> {
+</span></span><span style=display:flex><span>      name               <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;datadog-http-check&#34;</span>
+</span></span><span style=display:flex><span>      source_dir         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;/&#34;</span>
+</span></span><span style=display:flex><span>      dockerfile_path    <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Dockerfile&#34;</span>
+</span></span><span style=display:flex><span>      instance_count     <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>      instance_size_slug <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;basic-xxs&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>github</span> {
+</span></span><span style=display:flex><span>        repo           <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;mybuilder/datadog-http-check&#34;</span>
+</span></span><span style=display:flex><span>        branch         <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;main&#34;</span>
+</span></span><span style=display:flex><span>        deploy_on_push <span style=color:#f92672>=</span> <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>      <span style=color:#66d9ef>env</span> {
+</span></span><span style=display:flex><span>        key   <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;DD_API_KEY&#34;</span>
+</span></span><span style=display:flex><span>        value <span style=color:#f92672>=</span> <span style=color:#66d9ef>datadog_api_key</span>.<span style=color:#66d9ef>datadog_http_check</span>.<span style=color:#66d9ef>key</span>
+</span></span><span style=display:flex><span>        scope <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;RUN_TIME&#34;</span>
+</span></span><span style=display:flex><span>        type  <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;SECRET&#34;</span>
+</span></span><span style=display:flex><span>      }
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;datadog_api_key&#34; &#34;datadog_http_check&#34;</span> {
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;datadog-http-check&#34;</span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Finally, we were able to provision a DataDog monitor that handled alerting us to any unexpected changes found by the newly created HTTP check service.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-hcl data-lang=hcl><span style=display:flex><span><span style=color:#66d9ef>resource</span> <span style=color:#e6db74>&#34;datadog_monitor&#34; &#34;datadog_http_check&#34;</span> {
+</span></span><span style=display:flex><span>  type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;service check&#34;</span>
+</span></span><span style=display:flex><span>  name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;HTTP checks&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  query <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;\&#34;http.can_connect\&#34;.over(\&#34;*\&#34;).by(\&#34;url\&#34;).last(4).count_by_status()&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  message <span style=color:#f92672>=</span> <span style=color:#960050;background-color:#1e0010>&lt;&lt;-</span><span style=color:#66d9ef>EOM</span>
+</span></span><span style=display:flex><span>    {{<span style=color:#75715e>#is_alert}}
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>We</span> <span style=color:#66d9ef>are</span> <span style=color:#66d9ef>having</span> <span style=color:#66d9ef>issues</span> <span style=color:#66d9ef>connecting</span> <span style=color:#66d9ef>to</span> {{<span style=color:#66d9ef>url</span>.<span style=color:#66d9ef>name</span>}}. {{<span style=color:#66d9ef>check_message</span>}}
+</span></span><span style=display:flex><span>    {{<span style=color:#960050;background-color:#1e0010>/</span><span style=color:#66d9ef>is_alert</span>}}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    {{<span style=color:#75715e>#is_recovery}}
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>We</span> <span style=color:#66d9ef>are</span> <span style=color:#66d9ef>now</span> <span style=color:#66d9ef>able</span> <span style=color:#66d9ef>to</span> <span style=color:#66d9ef>connect</span> <span style=color:#66d9ef>to</span> {{<span style=color:#66d9ef>url</span>.<span style=color:#66d9ef>name</span>}}. {{<span style=color:#66d9ef>check_message</span>}}
+</span></span><span style=display:flex><span>    {{<span style=color:#960050;background-color:#1e0010>/</span><span style=color:#66d9ef>is_recovery</span>}}
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>EOM</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>monitor_thresholds</span> {
+</span></span><span style=display:flex><span>    critical <span style=color:#f92672>=</span> <span style=color:#ae81ff>3</span>
+</span></span><span style=display:flex><span>    warning  <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>    ok       <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=one-small-gotcha>One Small Gotcha&mldr;</h3><p>One additional change we were required to make to the built image for use with DigitalOcean App Platform was the inclusion of an overridden <code>/proc/cpuinfo</code> file.
+Upon investigation, it seems the <code>/proc/cpuinfo</code> output provided by the DigitalOcean host machine includes an <code>unknown</code> value for the CPU <code>stepping</code> attribute.
+This is expected to be an integer within the <a href=https://github.com/DataDog/gopsutil/blob/dd/cpu/cpu_linux.go#L150 rel="external noopener" target=_blank>Go package</a> used by the DataDog Agent and, as such, causes the Agent to <a href=https://github.com/DataDog/datadog-agent/blob/main/cmd/process-agent/main_common.go#L332 rel="external noopener" target=_blank>critically restart</a> upon initialisation.
+Fortunately, the package provides a means of supplying an <a href=https://github.com/DataDog/gopsutil#usage rel="external noopener" target=_blank>overridden host</a> <code>/proc</code> directory in which we were able to stub out this <em>stepping</em> attribute to ensure the agent initialises correctly.</p><h2 id=conclusion>Conclusion</h2><p>To conclude, we are very happy with the ease in which we have been able to abstract this service to a higher level of compute, removing the concerns of having to manage the underlying host machine in the process.
+Now only maintaining ownership of a Docker image means we can trivially move this service to another cloud provider platform in the future if we so wish.</p></main><footer class=post__tags><a href=/archive/tag/datadog>datadog</a><a href=/archive/tag/digitalocean>digitalocean</a><a href=/archive/tag/terraform>terraform</a><a href=/archive/tag/docker>docker</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

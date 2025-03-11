@@ -1,132 +1,35 @@
-<!doctype html>
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A comprehensive guide to compiling PHP 5.5 from source with ZTS and pthreads support on CentOS 6.5.">
-
-    <title>
-        
-            Compiling PHP 5.5 with ZTS and pthreads Support &middot; Edd Mann
-        
-    </title>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script>
-    <script>
-       window.dataLayer = window.dataLayer || [];
-       function gtag(){dataLayer.push(arguments);}
-       gtag('js', new Date());
-       gtag('config', 'G-ZPQ7WHNXH4');
-    </script>
-
-    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,700italic,400italic">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/styles.css">
-
-    <link rel="shortcut icon" href="/favicon.ico">
-
-    <link rel="alternate" href="/rss.xml" title="" type="application/rss+xml">
-
-    
-</head>
-
-    <body>
-        <div class="container content">
-            <header class="masthead">
-                <h3 class="masthead-title">
-                    <a href="/" title="Home">Edd Mann</a>
-                    <small><i class="fa fa-code"></i> Developer</small>
-                </h3>
-                <nav>
-                    <a href="https://twitter.com/edd_mann"><i class="fa fa-twitter"></i></a>
-                    <a href="https://github.com/eddmann"><i class="fa fa-github"></i></a>
-                    <a href="mailto:the@eddmann.com"><i class="fa fa-envelope"></i></a>
-                </nav>
-                <div class="cf"></div>
-            </header>
-
-            <main>
-                <article class="post">
-    <h1 class="post-title">Compiling PHP 5.5 with ZTS and pthreads Support</h1>
-    <time datetime="2014-01-30T00:00:00+00:00" class="post-date">30 Jan 2014</time>
-    <p><a href="http://en.wikipedia.org/wiki/POSIX_Threads">POSIX Threads</a> are a standard for threading implementations available in many Unix-like operating systems.
-Written in C, they provide developers with high-level thread management methods, synchronisation, etc. 
-Support for these methods in PHP is provided by an extension called <a href="http://pthreads.org/">pthreads</a>, enabling user-land multi-threaded applications to be built.
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Compiling PHP 5.5 with ZTS and pthreads Support - Edd Mann</title>
+<meta name=description content="A comprehensive guide to compiling PHP 5.5 from source with ZTS and pthreads support on CentOS 6.5."><meta name=author content="Edd Mann"><script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPQ7WHNXH4"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-ZPQ7WHNXH4")}</script><meta itemprop=name content="Compiling PHP 5.5 with ZTS and pthreads Support"><meta itemprop=description content="POSIX Threads are a standard for threading implementations available in many Unix-like operating systems. Written in C, they provide developers with high-level thread management methods, synchronisation, etc."><meta itemprop=datePublished content="2014-01-30T00:00:00+00:00"><meta itemprop=dateModified content="2014-01-30T00:00:00+00:00"><meta itemprop=wordCount content="536"><meta itemprop=keywords content="Php,Pthreads"><meta property="og:url" content="https://eddmann.com/posts/compiling-php-5-5-with-zts-and-pthreads-support/"><meta property="og:site_name" content="Edd Mann"><meta property="og:title" content="Compiling PHP 5.5 with ZTS and pthreads Support"><meta property="og:description" content="POSIX Threads are a standard for threading implementations available in many Unix-like operating systems. Written in C, they provide developers with high-level thread management methods, synchronisation, etc."><meta property="og:locale" content="en_GB"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2014-01-30T00:00:00+00:00"><meta property="article:modified_time" content="2014-01-30T00:00:00+00:00"><meta property="article:tag" content="Php"><meta property="article:tag" content="Pthreads"><meta name=twitter:card content="summary"><meta name=twitter:title content="Compiling PHP 5.5 with ZTS and pthreads Support"><meta name=twitter:description content="POSIX Threads are a standard for threading implementations available in many Unix-like operating systems. Written in C, they provide developers with high-level thread management methods, synchronisation, etc."><meta name=twitter:site content="@edd_mann"><link rel="preload stylesheet" as=style href=/css/style.min.6c18b9cbfe138a24784e64860eaa9d70076170f03c68d8be3b3f1ae99e51df9f.css integrity="sha256-bBi5y/4TiiR4TmSGDqqdcAdhcPA8aNi+Oz8a6Z5R358="><link rel=preload as=image href=/assets/x.svg><link rel=preload as=image href=/assets/github.svg><link rel=icon type=image/png sizes=32x32 href=/favicon-32x3x.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://eddmann.com/posts/compiling-php-5-5-with-zts-and-pthreads-support/></head><body><header class="site-header wrapper"><a href=https://eddmann.com/><h3 class=site-header__title>Edd Mann
+<span style=--url:url(/assets/code.svg)>Developer</span></h3></a><div class=site-header__mobile-navigation-button aria-label="Toggle mobile site navigation" aria-expanded=false aria-controls=site-navigation></div><div class=site-header__navigation id=site-navigation><nav aria-label="Primary navigation"><ul class=site-header__primary-navigation><li><a href=/archive>Archive</a></li><li><a href=/projects>Projects</a></li><li><a href=/about>About</a></li></ul></nav><nav aria-label="Social links"><ul class=site-header__social-navigation><li><a class=social-icon style=--url:url(/assets/x.svg) href=https://x.com/edd_mann rel="external noopener" target=_blank>Twitter (X)</a></li><li><a class=social-icon style=--url:url(/assets/github.svg) href=https://github.com/eddmann rel="external noopener" target=_blank>GitHub</a></li></ul></nav></div></header><main class=wrapper><article><header class=page-title><h1>Compiling PHP 5.5 with ZTS and pthreads Support</h1><time class=post__time>Jan 30, 2014</time></header><main class=prose><p><a href=http://en.wikipedia.org/wiki/POSIX_Threads rel="external noopener" target=_blank>POSIX Threads</a> are a standard for threading implementations available in many Unix-like operating systems.
+Written in C, they provide developers with high-level thread management methods, synchronisation, etc.</p><p>Support for these methods in PHP is provided by an extension called <a href=http://pthreads.org/ rel="external noopener" target=_blank>pthreads</a>, enabling user-land multi-threaded applications to be built.
 Designed in a similar manner to the implementation specified in Java, PHP can now create, read, write, execute and synchronise with Threads, Workers and Stackables.
-This is a major step in the right direction for PHP development, providing better-suited solutions than simply <a href="http://en.wikipedia.org/wiki/Fork_(system_call)">forking</a> (process copying).
+This is a major step in the right direction for PHP development, providing better-suited solutions than simply <a href=http://en.wikipedia.org/wiki/Fork_%28system_call%29 rel="external noopener" target=_blank>forking</a> (process copying).
 To experiment with this extension, however, it is required to have a PHP built with ZTS enabled (thread-safety support).
 This option can only be specified at compile-time, and as such I felt that it would be an ideal time to provide a simple guide to compile PHP from source.
-For this example, I am working with a base CentOS 6.5 installation.</p>
-
-<h2 id="compiling-php-55-with-zts-support">Compiling PHP 5.5 with ZTS Support</h2>
-
-<p>To compile PHP from source, we must first make sure the required development tools are present (such as GCC).
-One issue that cropped up when trying to install the ‘Development Tools’ group was the complaint of not having access to kernel packages.
-To overcome this problem, I simply removed <code class="language-plaintext highlighter-rouge">kernel*</code> from the excluded list provided in <code class="language-plaintext highlighter-rouge">/etc/yum.conf</code>.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sed</span> <span class="nt">-i</span> <span class="s2">"s/^</span><span class="se">\e</span><span class="s2">xclude.*</span><span class="nv">$/</span><span class="s2">exclude=/g"</span> /etc/yum.conf
-<span class="nv">$ </span>yum groupinstall <span class="nt">-y</span> <span class="s1">'Development Tools'</span>
-</code></pre></div></div>
-
-<p>Looking at the first command above, we remove all excludes that have currently been set.
-In my case, this was only <code class="language-plaintext highlighter-rouge">kernel*</code>, but I recommend you check your setup first.
+For this example, I am working with a base CentOS 6.5 installation.</p><h2 id=compiling-php-55-with-zts-support>Compiling PHP 5.5 with ZTS Support</h2><p>To compile PHP from source, we must first make sure the required development tools are present (such as GCC).
+One issue that cropped up when trying to install the &lsquo;Development Tools&rsquo; group was the complaint of not having access to kernel packages.
+To overcome this problem, I simply removed <code>kernel*</code> from the excluded list provided in <code>/etc/yum.conf</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ sed -i <span style=color:#e6db74>&#34;s/^\exclude.*</span>$<span style=color:#e6db74>/exclude=/g&#34;</span> /etc/yum.conf
+</span></span><span style=display:flex><span>$ yum groupinstall -y <span style=color:#e6db74>&#39;Development Tools&#39;</span>
+</span></span></code></pre></div><p>Looking at the first command above, we remove all excludes that have currently been set.
+In my case, this was only <code>kernel*</code>, but I recommend you check your setup first.
 We are now able to install the required packages to download the compressed source code and compile the XML library provided in PHP.
-I decided to set a global variable with the desired version of PHP I wished to compile, making the command listing more flexible when updates arise.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ VERSION</span><span class="o">=</span>5.5.8 <span class="c"># set version</span>
-<span class="nv">$ </span>yum <span class="nb">install</span> <span class="nt">-y</span> wget libxml2-devel
-<span class="nv">$ </span><span class="nb">cd</span> /usr/local/src
-<span class="nv">$ </span>wget http://www.php.net/distributions/php-<span class="nv">$VERSION</span>.tar.gz
-<span class="nv">$ </span><span class="nb">tar </span>zxvf php-<span class="nv">$VERSION</span>.tar.gz
-<span class="nv">$ </span><span class="nb">cd</span> /usr/local/src/php-<span class="nv">$VERSION</span>
-<span class="nv">$ </span>./configure <span class="nt">--prefix</span><span class="o">=</span>/usr <span class="nt">--with-config-file-path</span><span class="o">=</span>/etc <span class="nt">--enable-maintainer-zts</span>
-<span class="nv">$ </span>make
-<span class="nv">$ </span>make <span class="nb">install</span>
-<span class="nv">$ </span><span class="nb">cp </span>php.ini-development /etc/php.ini
-</code></pre></div></div>
-
-<p>We download and uncompress the source code into the preferred <code class="language-plaintext highlighter-rouge">/usr/local/src</code> directory.
+I decided to set a global variable with the desired version of PHP I wished to compile, making the command listing more flexible when updates arise.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ VERSION<span style=color:#f92672>=</span>5.5.8 <span style=color:#75715e># set version</span>
+</span></span><span style=display:flex><span>$ yum install -y wget libxml2-devel
+</span></span><span style=display:flex><span>$ cd /usr/local/src
+</span></span><span style=display:flex><span>$ wget http://www.php.net/distributions/php-$VERSION.tar.gz
+</span></span><span style=display:flex><span>$ tar zxvf php-$VERSION.tar.gz
+</span></span><span style=display:flex><span>$ cd /usr/local/src/php-$VERSION
+</span></span><span style=display:flex><span>$ ./configure --prefix<span style=color:#f92672>=</span>/usr --with-config-file-path<span style=color:#f92672>=</span>/etc --enable-maintainer-zts
+</span></span><span style=display:flex><span>$ make
+</span></span><span style=display:flex><span>$ make install
+</span></span><span style=display:flex><span>$ cp php.ini-development /etc/php.ini
+</span></span></code></pre></div><p>We download and uncompress the source code into the preferred <code>/usr/local/src</code> directory.
 From here, we configure the build to meet our requirements.
-As I only desire to use this build to test pthreads (on the CLI), I specify that the binary file should be placed in <code class="language-plaintext highlighter-rouge">/usr/bin</code>, the configuration location at <code class="language-plaintext highlighter-rouge">/etc</code>, and enable ZTS.
+As I only desire to use this build to test pthreads (on the CLI), I specify that the binary file should be placed in <code>/usr/bin</code>, the configuration location at <code>/etc</code>, and enable ZTS.
 With the options in place, we can now make the build and then install the compilation using the provided Makefile.
-Finally, I copy across the development <code class="language-plaintext highlighter-rouge">php.ini</code> file to the specified <code class="language-plaintext highlighter-rouge">/etc</code> directory.</p>
-
-<h2 id="compiling-pthreads-extension">Compiling pthreads Extension</h2>
-
-<p>PHP comes with <a href="http://pecl.php.net/">PECL</a> (PHP Extension Community Library) command support by default, which saves us the hassle of having to compile the extension manually.
-We can instead just run the installation command below.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pecl <span class="nb">install </span>pthreads
-<span class="nv">$ </span><span class="nb">echo</span> <span class="s2">"extension=pthreads.so"</span> <span class="o">&gt;&gt;</span> /etc/php.ini
-</code></pre></div></div>
-
-<p>With the extension now successfully installed, we must include the extension to be loaded in the <code class="language-plaintext highlighter-rouge">php.ini</code> configuration file.
-We can test that the extension has been successfully loaded with the PHP interpreter by running and inspecting the output from the following command.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>php <span class="nt">-m</span> | <span class="nb">grep </span>pthreads
-</code></pre></div></div>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="http://docs.php.net/manual/en/book.pthreads.php">pthreads</a></li>
-  <li><a href="https://github.com/krakjoe/pthreads">Github: pthreads</a></li>
-  <li><a href="http://benramsey.com/blog/2012/03/build-php-54-on-centos-62/">Build PHP 5.4 on CentOS 6.2</a></li>
-</ul>
-
-</article>
-
-            </main>
-
-            <footer class="footer">
-                <img src="https://www.gravatar.com/avatar/c5c2978bb14d16460f73399c394b6acd?s=160">
-                <ul>
-                    <li>Developer at <a href="http://www.mybuilder.com/">MyBuilder</a></li>
-                    <li><a href="http://threedevsandamaybe.com/">Three Devs and a Maybe</a> podcast co-host</li>
-                    <li>All ramblings can be found in the <a href="/archive/">Archive</a></li>
-                </ul>
-                <div class="cf"></div>
-            </footer>
-        </div>
-    </body>
-</html>
+Finally, I copy across the development <code>php.ini</code> file to the specified <code>/etc</code> directory.</p><h2 id=compiling-pthreads-extension>Compiling pthreads Extension</h2><p>PHP comes with <a href=http://pecl.php.net/ rel="external noopener" target=_blank>PECL</a> (PHP Extension Community Library) command support by default, which saves us the hassle of having to compile the extension manually.
+We can instead just run the installation command below.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ pecl install pthreads
+</span></span><span style=display:flex><span>$ echo <span style=color:#e6db74>&#34;extension=pthreads.so&#34;</span> &gt;&gt; /etc/php.ini
+</span></span></code></pre></div><p>With the extension now successfully installed, we must include the extension to be loaded in the <code>php.ini</code> configuration file.
+We can test that the extension has been successfully loaded with the PHP interpreter by running and inspecting the output from the following command.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=display:flex><span>$ php -m | grep pthreads
+</span></span></code></pre></div><h2 id=resources>Resources</h2><ul><li><a href=http://docs.php.net/manual/en/book.pthreads.php rel="external noopener" target=_blank>pthreads</a></li><li><a href=https://github.com/krakjoe/pthreads rel="external noopener" target=_blank>Github: pthreads</a></li><li><a href=http://benramsey.com/blog/2012/03/build-php-54-on-centos-62/ rel="external noopener" target=_blank>Build PHP 5.4 on CentOS 6.2</a></li></ul></main><footer class=post__tags><a href=/archive/tag/php>php</a><a href=/archive/tag/pthreads>pthreads</a></footer></article></main><footer class="site-footer wrapper"><div>&copy; 2025, Edd Mann</div></footer><script>(function(){document.querySelector(".site-header__mobile-navigation-button").addEventListener("click",e=>{document.documentElement.classList.toggle("mobile-navigation-open"),e.target.setAttribute("aria-expanded",e.target.getAttribute("aria-expanded")==="false"?"true":"false")});const n=document.querySelector(".site-header");let t=window.pageYOffset,e=!1;window.addEventListener("scroll",()=>{if(e)return;const s=window.pageYOffset;window.requestAnimationFrame(()=>{n.classList.toggle("is-sticky",t>s),t=s,e=!1}),e=!0})})()</script></body></html>

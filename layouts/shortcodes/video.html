@@ -1,0 +1,31 @@
+{{- $src := $.Get "src" -}}
+{{- $video := or ($.Page.Resources.GetMatch $src) (resources.GetMatch $src) -}}
+{{- $controls := $.Get "controls" | default true -}}
+{{- $muted := $.Get "muted" -}}
+{{- $preload := $.Get "preload" | default "metadata" -}}
+{{- $type := $.Get "type" -}}
+{{- $caption := $.Get "caption" -}}
+{{- $loop := $.Get "loop" -}}
+{{- $autoplay := $.Get "autoplay" -}}
+{{- $poster := $.Get "poster" -}}
+
+{{- with $video -}}
+  {{- if $caption -}}
+  <figure>
+  {{- end -}}
+    <video style="width:100%" preload="{{ $preload }}"
+      {{- if $controls }} controls{{ end -}}
+      {{- if $muted }} muted{{ end -}}
+      {{- if $loop }} loop{{ end -}}
+      {{- if $autoplay }} autoplay{{ end -}}
+      {{- with $poster }} poster="{{ . }}"{{ end -}}>
+      <source src="{{ .RelPermalink }}" type="{{ $type | default .MediaType.Type }}">
+      Your browser does not support the video element.
+    </video>
+  {{- with $caption -}}
+    <figcaption>{{ . }}</figcaption>
+  </figure>
+  {{- end -}}
+{{- else -}}
+  {{- warnf "Video resource not found: %s" $src -}}
+{{- end -}}

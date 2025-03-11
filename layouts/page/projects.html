@@ -1,0 +1,35 @@
+{{- define "main" -}}
+
+<main class="wrapper">
+  <header class="page-title">
+    <h1><span class="visually-hidden">{{ site.Title }}'s</span> Projects</h1>
+  </header>
+
+  <section class="projects">
+    {{- range .Site.Data.projects -}}
+      <article class="project">
+        <div class="project__image-container">
+          <img class="project__image" src="/projects/{{- .image -}}" alt="{{- .name -}}" />
+        </div>
+        <div class="project__details">
+          <header>
+            <h2 class="project__title underline">{{- .name -}}</h2>
+          </header>
+          <main>
+            <p class="project__description">{{- .description -}} </p>
+            <a class="overlay" href="{{- .url -}}" rel="external noopener" target="_blank">Read more</a>
+          </main>
+          <footer>
+            <ul class="project__tags">
+              {{- range .tags -}}
+                <li>{{- . -}}</li>
+              {{- end -}}
+            </ul>
+          </footer>
+        </div>
+      </article>
+    {{- end -}}
+  </section>
+</main>
+
+{{- end -}}

@@ -1,0 +1,56 @@
+{{- define "main" -}}
+
+{{- $pages := union .RegularPages .Sections -}}
+{{- if $.IsHome -}}
+  {{- $pages = where .Site.RegularPages "Section" "posts" -}}
+{{- end -}}
+{{- $paginator := .Paginate $pages -}}
+
+{{- if and $.IsHome (eq $paginator.PageNumber 1) -}}
+  <div class="posts__background"></div>
+{{- end -}}
+
+<main class="posts wrapper">
+  {{- if eq .Section "tags" -}}
+    <header>
+      <h1 class="page-title">#{{- lower .Title -}}</h1>
+    </header>
+  {{- end -}}
+
+  {{ if and $.IsHome (eq $paginator.PageNumber 1) }}
+    <div class="posts__heading">
+      <div class="avatar avatar--spin">
+        <img src="{{- `assets/avatar.png` | relURL -}}" alt="A photo of {{ site.Title }}" />
+      </div>
+    </div>
+  {{ end }}
+
+  {{- range $index, $page := $paginator.Pages -}}
+    {{- $featured := and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
+    <article class="posts__post{{- if $featured }} posts__post--featured{{- end -}}">
+      <header>
+        <h2 class="underline">{{- .Title -}}</h2>
+        <time>{{- .Date | time.Format ":date_medium" -}}</time>
+      </header>
+      <main>
+        <p>{{- .Summary -}}</p>
+      </main>
+      <footer>
+        <a class="overlay" href="{{- .RelPermalink -}}">Read more</a>
+      </footer>
+    </article>
+  {{- end -}}
+
+  {{- if gt $paginator.TotalPages 1 -}}
+    <nav class="posts__navigation">
+      {{- if $paginator.HasPrev -}}
+        <a class="button" href="{{- $paginator.Prev.URL -}}">← Previous Page</a>
+      {{- end -}}
+      {{- if $paginator.HasNext -}}
+        <a class="button" href="{{- $paginator.Next.URL -}}">Next Page →</a>
+      {{- end -}}
+    </nav>
+  {{- end -}}
+</main>
+
+{{- end -}}

@@ -1,0 +1,40 @@
+<header class="site-header wrapper">
+  <a href="{{- .Site.BaseURL -}}">
+    {{- if $.IsHome -}}
+    <h1 class="site-header__title">
+      {{- site.Title }}
+      <span style="--url: url({{- `assets/code.svg` | relURL -}})">{{- .Site.Params.subtitle -}}</span>
+    </h1>
+    {{- else -}}
+    <h3 class="site-header__title">
+      {{- site.Title }}
+      <span style="--url: url({{- `assets/code.svg` | relURL -}})">{{- .Site.Params.subtitle -}}</span>
+    </h3>
+    {{- end -}}
+  </a>
+  <div
+    class="site-header__mobile-navigation-button"
+    aria-label="Toggle mobile site navigation"
+    aria-expanded="false"
+    aria-controls="site-navigation"
+  ></div>
+  <div class="site-header__navigation" id="site-navigation">
+    <nav aria-label="Primary navigation">
+      <ul class="site-header__primary-navigation">
+        {{- range site.Menus.main }}
+          <li><a href="{{- .URL | relURL -}}">{{- .Name -}}</a></li>
+        {{- end -}}
+      </ul>
+    </nav>
+    <nav aria-label="Social links">
+      <ul class="site-header__social-navigation">
+        <li>
+          <a class="social-icon" style="--url: url({{- `assets/x.svg` | relURL -}})" href="https://x.com/{{- .Site.Params.social.twitter -}}" rel="external noopener" target="_blank">Twitter (X)</a>
+        </li>
+        <li>
+          <a class="social-icon" style="--url: url({{- `assets/github.svg` | relURL -}})" href="https://github.com/{{- .Site.Params.social.github -}}" rel="external noopener" target="_blank">GitHub</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

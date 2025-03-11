@@ -31,7 +31,7 @@ Below, I will discuss the different areas I needed to consider, which led to the
 
 ## App'ification
 
-{{< video src="ios-install.mp4" >}} {{< video src="android-install.mp4" >}}
+{{< video src="ios-install.mp4" muted="true" >}} {{< video src="android-install.mp4" muted="true" >}}
 
 ### Look and Feel
 
@@ -81,7 +81,7 @@ In contrast to mobile development, making the app feel native on desktop require
 Since PWAs are only supported in Google Chrome (and variants such as Microsoft Edge), the scope of browsers that needed catering was limited.
 What is great about this approach is that there is no need to wrap your application in an [Electron](https://www.electronjs.org/)/[Tauri](https://tauri.app/) wrapper if the APIs supplied by Google Chrome meet your needs.
 
-{{< video src="desktop-install.mp4" >}}
+{{< video src="desktop-install.mp4" muted="true" >}}
 
 ## Conclusion
 

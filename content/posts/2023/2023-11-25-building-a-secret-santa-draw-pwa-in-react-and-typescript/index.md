@@ -52,7 +52,7 @@ This is a little unperformant as we are required to encode and write JSON entiti
 
 ### Snowfall
 
-{{< video src="ios-loading.mp4" >}}
+{{< video src="ios-loading.mp4" muted="true" >}}
 
 There is a small _easter egg_ on the application's home screen.
 Using the [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent), when you shake the device, the amount and speed of the snow falling increases.

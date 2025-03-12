@@ -29,19 +29,26 @@
   {{ end }}
 
   {{- range $index, $post := $paginator.Pages -}}
-    {{- $featured := and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
-    <article class="posts__post{{- if $featured }} posts__post--featured{{- end -}}">
-      <header>
+    {{- if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
+      <article class="posts__post posts__post--featured">
+        <header>
+          <h2 class="posts__post-title underline transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
+          <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="posts__post-time">{{- .Date | time.Format ":date_medium" -}}</time>
+        </header>
+        <main class="posts__post-summary">
+          {{- .Summary -}}
+        </main>
+        <footer>
+          <a class="overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
+        </footer>
+      </article>
+    {{- else -}}
+      <section class="posts__post">
         <h2 class="posts__post-title underline transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
         <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="posts__post-time">{{- .Date | time.Format ":date_medium" -}}</time>
-      </header>
-      <main class="posts__post-summary">
-        {{- .Summary -}}
-      </main>
-      <footer>
         <a class="overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
-      </footer>
-    </article>
+      </section>
+    {{- end -}}
   {{- end -}}
 
   {{- if gt $paginator.TotalPages 1 -}}

@@ -32,10 +32,10 @@
     {{- $featured := and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
     <article class="posts__post{{- if $featured }} posts__post--featured{{- end -}}">
       <header>
-        <h2 class="underline transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
-        <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}">{{- .Date | time.Format ":date_medium" -}}</time>
+        <h2 class="posts__post-title underline transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
+        <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="posts__post-time">{{- .Date | time.Format ":date_medium" -}}</time>
       </header>
-      <main>
+      <main class="posts__post-summary">
         {{- .Summary -}}
       </main>
       <footer>

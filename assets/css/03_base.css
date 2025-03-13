@@ -136,3 +136,30 @@ time {
 [data-theme='dark'] .theme-toggle {
   transform: rotate(0deg);
 }
+
+.scroll-watcher {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-watcher {
+    display: block;
+    position: fixed;
+    height: 5px;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: calc(var(--mobile-navigation-z-index) - 1);
+    background-color: rgb(var(--text-colour-rgb));
+    scale: 0 1;
+    transform-origin: left;
+    animation: scroll-watcher linear;
+    animation-timeline: scroll();
+  }
+
+  @keyframes scroll-watcher {
+    to {
+      scale: 1 1;
+    }
+  }
+}

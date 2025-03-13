@@ -1,14 +1,16 @@
 (function () {
-  document.querySelector('.theme-toggle').addEventListener('click', () => {
-    localStorage.setItem(
-      'theme',
-      localStorage.getItem('theme') === 'dark' ? 'light' : 'dark'
-    );
-    document.documentElement.setAttribute(
-      'data-theme',
-      localStorage.getItem('theme')
-    );
-  });
+  document
+    .querySelector('.site-footer__theme-toggle')
+    .addEventListener('click', () => {
+      localStorage.setItem(
+        'theme',
+        localStorage.getItem('theme') === 'dark' ? 'light' : 'dark'
+      );
+      document.documentElement.setAttribute(
+        'data-theme',
+        localStorage.getItem('theme')
+      );
+    });
 
   document
     .querySelector('.site-header__mobile-navigation-button')

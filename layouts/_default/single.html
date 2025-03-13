@@ -4,31 +4,35 @@
   <article>
     <header class="l-page-title">
       <h1 class="u-transition-between-pages" style="--id: {{ .Slug }}">{{ .Title }}</h1>
-      <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="time">{{- .Date | time.Format ":date_medium" -}}</time>
+      <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="published-at">{{- .Date | time.Format ":date_medium" -}}</time>
     </header>
 
-    <main class="u-prose">{{ .Content }}</main>
+    <main class="u-prose">
+      {{- .Content -}}
+    </main>
 
-    {{- if .Params.tags -}}
-      <footer class="post__tags">
-        {{- range .Params.tags -}}
-          {{- $href := print (relURL "/archive/tag/") (urlize .) -}}
-          <a href="{{ $href }}">{{ . }}</a>
-        {{- end -}}
-      </footer>
-    {{- end -}}
+    <footer class="post-footer">
+      {{- with .Params.tags -}}
+        <ul class="tags tags--large">
+          {{- range . -}}
+            {{- $href := print (relURL "/archive/tag/") (urlize .) -}}
+            <li><a href="{{ $href }}">{{ . }}</a></li>
+          {{- end -}}
+        </ul>
+      {{- end -}}
+
+      {{- with site.RegularPages.Related . | first 5 -}}
+        <div class="related">
+          <h3 class="related__title">Related Posts</h3>
+          <ul class="related__posts">
+            {{- range . -}}
+              <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+            {{- end -}}
+          </ul>
+        </div>
+      {{- end -}}
+    </footer>
   </article>
-
-  {{- with site.RegularPages.Related . | first 5 -}}
-    <div class="related-posts u-prose">
-      <h3>Related Posts</h3>
-      <ul>
-        {{- range . -}}
-          <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-        {{- end -}}
-      </ul>
-    </div>
-  {{- end -}}
 
   <div class="scroll-watcher"></div>
 </main>

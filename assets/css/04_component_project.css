@@ -1,20 +1,10 @@
-.projects {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-8);
-
-  @media (width < 760px) {
-    grid-template-columns: 1fr;
-  }
-}
-
 .project {
   border-radius: var(--border-radius-2);
   overflow: hidden;
   box-shadow: 0 4px 6px rgb(var(--text-colour-rgb) / 10%);
   transition: transform 250ms ease-in-out;
 
-  @media (hover: hover) {
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     &:hover {
       transform: scale(1.03);
 
@@ -42,7 +32,7 @@
   }
 }
 
-.project__image-container {
+.project__image-wrapper {
   overflow: hidden;
   position: relative;
   height: 150px;
@@ -60,26 +50,12 @@
 
 .project__details {
   padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
 }
 
 .project__description {
+  margin-top: calc(var(--spacing-2) * -1);
   color: rgb(var(--text-colour-rgb) / 60%);
-}
-
-.project__tags {
-  display: flex;
-  list-style: none;
-  flex-wrap: wrap;
-  gap: var(--spacing-2);
-  padding: 0;
-  margin-top: var(--spacing-4);
-  margin-bottom: 0;
-
-  li {
-    font-weight: var(--font-weight-1);
-    font-size: var(--font-size--1);
-    background-color: rgb(var(--text-colour-rgb) / 3%);
-    padding: var(--spacing-1) var(--spacing-3);
-    border-radius: var(--border-radius-1);
-  }
 }

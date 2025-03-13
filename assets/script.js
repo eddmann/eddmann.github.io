@@ -15,7 +15,7 @@
   document
     .querySelector('.site-header__mobile-navigation-button')
     .addEventListener('click', e => {
-      document.documentElement.classList.toggle('mobile-navigation-open');
+      document.documentElement.classList.toggle('js-mobile-navigation-open');
       e.target.setAttribute(
         'aria-expanded',
         e.target.getAttribute('aria-expanded') === 'false' ? 'true' : 'false'

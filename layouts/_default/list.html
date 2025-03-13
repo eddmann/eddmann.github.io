@@ -44,7 +44,7 @@
       </article>
     {{- else -}}
       <section class="posts__post">
-        <h2 class="posts__post-title underline transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
+        <h2 class="posts__post-title underline{{- if ne $.Section `tags` }} transition-between-pages{{- end -}}" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
         <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="posts__post-time">{{- .Date | time.Format ":date_medium" -}}</time>
         <a class="overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
       </section>

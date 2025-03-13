@@ -30,7 +30,7 @@
 
   {{- range $index, $post := $paginator.Pages -}}
     {{- if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
-      <article class="posts__post posts__post--featured">
+      <article class="posts__post posts__post--featured u-underline-on-hover">
         <header>
           <h2 class="posts__post-title u-underline u-transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
           <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="time">{{- .Date | time.Format ":date_medium" -}}</time>
@@ -43,7 +43,7 @@
         </footer>
       </article>
     {{- else -}}
-      <section class="posts__post">
+      <section class="posts__post u-underline-on-hover">
         <h2 class="posts__post-title u-underline{{- if ne $.Section `tags` }} u-transition-between-pages{{- end -}}" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
         <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="time">{{- .Date | time.Format ":date_medium" -}}</time>
         <a class="u-overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>

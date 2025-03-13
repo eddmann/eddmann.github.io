@@ -30,7 +30,7 @@
     setTimeout(() => {
       const currentPosition = window.pageYOffset;
       header.classList.toggle(
-        'is-sticky',
+        'site-header--sticky',
         currentPosition > 0 && previousPosition > currentPosition
       );
       previousPosition = currentPosition;

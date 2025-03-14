@@ -6,13 +6,9 @@
 {{- end -}}
 {{- $paginator := .Paginate $pages -}}
 
-{{- if and $.IsHome (eq $paginator.PageNumber 1) -}}
-  <div class="posts__background"></div>
-{{- end -}}
-
-<main class="posts l-wrapper">
+<main class="posts">
   {{- if eq .Section "tags" -}}
-    <header>
+    <header class="l-wrapper">
       <h1 class="l-page-title">#{{- lower .Title -}}</h1>
     </header>
   {{- end -}}
@@ -28,39 +24,41 @@
     </div>
   {{ end }}
 
-  {{- range $index, $post := $paginator.Pages -}}
-    {{- if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
-      <article class="posts__post posts__post--featured u-underline-on-hover u-overlay-wrapper">
-        <header>
-          <h2 class="u-h3 u-underline u-transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
+  <div class="l-wrapper">
+    {{- range $index, $post := $paginator.Pages -}}
+      {{- if and $.IsHome (eq $paginator.PageNumber 1) (eq $index 0) -}}
+        <article class="posts__post posts__post--featured u-underline-on-hover u-overlay-wrapper">
+          <header>
+            <h2 class="u-h3 u-underline u-transition-between-pages" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
+            <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="published-at">{{- .Date | time.Format ":date_medium" -}}</time>
+          </header>
+          <main class="posts__post-summary">
+            {{- .Summary -}}
+          </main>
+          <footer>
+            <a class="u-overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
+          </footer>
+        </article>
+      {{- else -}}
+        <section class="posts__post u-underline-on-hover u-overlay-wrapper">
+          <h2 class="u-h3 u-underline{{- if ne $.Section `tags` }} u-transition-between-pages{{- end -}}" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
           <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="published-at">{{- .Date | time.Format ":date_medium" -}}</time>
-        </header>
-        <main class="posts__post-summary">
-          {{- .Summary -}}
-        </main>
-        <footer>
           <a class="u-overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
-        </footer>
-      </article>
-    {{- else -}}
-      <section class="posts__post u-underline-on-hover u-overlay-wrapper">
-        <h2 class="u-h3 u-underline{{- if ne $.Section `tags` }} u-transition-between-pages{{- end -}}" style="--id: {{ .Slug }}">{{- .Title -}}</h2>
-        <time datetime="{{- .Date.Format `2006-01-02T15:04:05Z07:00` -}}" class="published-at">{{- .Date | time.Format ":date_medium" -}}</time>
-        <a class="u-overlay" href="{{- .RelPermalink -}}">{{- .Title -}}</a>
-      </section>
+        </section>
+      {{- end -}}
     {{- end -}}
-  {{- end -}}
 
-  {{- if gt $paginator.TotalPages 1 -}}
-    <nav class="posts__navigation">
-      {{- if $paginator.HasPrev -}}
-        <a class="button" href="{{- $paginator.Prev.URL -}}">← Previous Page</a>
-      {{- end -}}
-      {{- if $paginator.HasNext -}}
-        <a class="button" href="{{- $paginator.Next.URL -}}">Next Page →</a>
-      {{- end -}}
-    </nav>
-  {{- end -}}
+    {{- if gt $paginator.TotalPages 1 -}}
+      <nav class="posts__navigation">
+        {{- if $paginator.HasPrev -}}
+          <a class="button" href="{{- $paginator.Prev.URL -}}">← Previous Page</a>
+        {{- end -}}
+        {{- if $paginator.HasNext -}}
+          <a class="button" href="{{- $paginator.Next.URL -}}">Next Page →</a>
+        {{- end -}}
+      </nav>
+    {{- end -}}
+  </div>
 </main>
 
 {{- end -}}

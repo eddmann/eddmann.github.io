@@ -5,7 +5,7 @@ meta: 'Learn how to validate Bitcoin transactions using Merkle proofs in JavaScr
 tags: ['bitcoin', 'javascript']
 ---
 
-In this video, we expand on the previous one, in which we computed a Merkle root for a given list of transactions using Merkle trees.
+In this video, we expand on the [previous one](../2017-11-09-bitcoin-internals-how-blocks-use-merkle-trees-in-javascript/index.md), in which we computed a Merkle root for a given list of transactions using Merkle trees.
 We will now compute a Merkle proof for a given transaction, allowing clients to validate that a transaction exists in a block without having to download its entire contents.
 This technique is used widely in lightweight Bitcoin clients (using Simplified Payment Verification).
 We codify a JavaScript solution that creates a Merkle proof for a transaction and then does the inverse by validating that proof's claim based on the block's Merkle root.

@@ -40,7 +40,7 @@ Throughout development, I was able to sprinkle in several CSS animations to aid 
 Remote draws are carried out on a single device with the resulting allocations being shared with each participant via an encrypted URL (using the [Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API)).
 When the encrypted URL is visited, the participant is presented with a similar screen to a local draw, where they can reveal who they are Secret Santa for.
 Being encrypted (using the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)), the user of the device who completed the draw (and was tasked with sharing the results) is unable to _snoop_ on each allocation.
-As all state about the allocation is stored within the URL, there is no need for remote state persistence, and the application can remain a simple SPA deployed on [GitHub Actions](.github/workflows/release.yml) 🎉.
+As all state about the allocation is stored within the URL, there is no need for remote state persistence, and the application can remain a simple SPA deployed on [GitHub Actions](https://github.com/eddmann/secret-santa-pwa/blob/main/.github/workflows/release.yml) 🎉.
 
 ### Draw history
 

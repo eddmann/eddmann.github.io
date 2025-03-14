@@ -1,12 +1,12 @@
 ---
-date: '2025-03-13 14:00:00'
+date: '2025-03-14 07:56:00'
 title: 'About'
 layout: 'about'
 ---
 
-Hey there! I'm Edd 👋🏻, a passionate problem-solver with a deep love for programming.
-With over 15+ years of experience, I consider myself fortunate to do what I love professionally.
-I'm always eager to explore and learn new technologies, sharing my insights and experiences on this blog.
+Hey there! I'm Edd 👋🏻, a problem-solver who enjoys programming.
+With over 15 years of experience, I consider myself fortunate to work in a field I'm passionate about.
+I'm always eager to explore and learn new technologies, sharing my insights and experiences on this blog along the way.
 
 ## Projects
 

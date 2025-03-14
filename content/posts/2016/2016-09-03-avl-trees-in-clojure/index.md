@@ -2,11 +2,12 @@
 layout: post
 title: 'AVL Trees in Clojure'
 meta: 'Learn how to implement a self-balancing AVL binary search tree in Clojure, ensuring optimal search performance through automatic rebalancing.'
+summary: "An AVL tree is a self-balancing binary search tree, whereby the height of a node's children differs by at most one. In the event that this property is violated, a rebalancing process takes place."
 tags: ['clojure', 'data-structures', 'functional-programming']
 ---
 
 An AVL tree is a self-balancing binary search tree, whereby the height of a node's children differs by at most one.
-In the event that this property is violated, a rebalancing process takes place. <!--more-->
+In the event that this property is violated, a rebalancing process takes place.
 In the past, I have discussed how to implement a [Binary Search Tree in Clojure](../2016-01-20-binary-search-trees-in-clojure/index.md), providing an average time complexity of O(log n).
 However, if the order of insertion is sequential (where each value is either greater than or less than the last), time complexity increases to be linear, the same as a linked list.
 Self-balancing trees, such as the AVL variant, provide us with a worst-case complexity of O(log n), thanks to their rebalancing phase.

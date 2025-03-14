@@ -2,11 +2,12 @@
 layout: post
 title: 'Compiling PHP 5.5 with ZTS and pthreads Support'
 meta: 'A comprehensive guide to compiling PHP 5.5 from source with ZTS and pthreads support on CentOS 6.5.'
+summary: 'POSIX Threads are a standard for threading implementations available in many Unix-like operating systems. Written in C, they provide developers with high-level thread management methods, synchronisation, etc.'
 tags: ['php', 'pthreads']
 ---
 
 [POSIX Threads](http://en.wikipedia.org/wiki/POSIX_Threads) are a standard for threading implementations available in many Unix-like operating systems.
-Written in C, they provide developers with high-level thread management methods, synchronisation, etc. <!--more-->
+Written in C, they provide developers with high-level thread management methods, synchronisation, etc.
 Support for these methods in PHP is provided by an extension called [pthreads](http://pthreads.org/), enabling user-land multi-threaded applications to be built.
 Designed in a similar manner to the implementation specified in Java, PHP can now create, read, write, execute and synchronise with Threads, Workers and Stackables.
 This is a major step in the right direction for PHP development, providing better-suited solutions than simply [forking](<http://en.wikipedia.org/wiki/Fork_(system_call)>) (process copying).

@@ -2,6 +2,7 @@
 layout: post
 title: 'Using Anonymous Functions (Lambdas) and Closures in PHP'
 meta: 'Learn how to harness the power of anonymous functions and closures in PHP with clear examples on lambdas, dynamic methods, and validation libraries.'
+summary: 'Having spent some significant time with more functional-oriented languages such as Scala, I have been keen to explore and take advantage of some of these concepts in my current day-to-day language (PHP).'
 tags: ['php', 'functional-programming']
 ---
 
@@ -10,7 +11,7 @@ Delving into the subject, however, seems to highlight some confusion between the
 An anonymous function (also known as a lambda), originating from the [Lambda calculus](http://en.wikipedia.org/wiki/Lambda_calculus), is a function that has no assigned name and can be considered a value in itself.
 Functions of this category are first-class value types, on a par with integers, booleans, etc., allowing you to pass them as arguments or return them from functions (also known as higher-order functions).
 A closure, on the other hand, is a function that captures the state of the surrounding context or environment upon definition, retaining these references even if the variable falls out of lexical scope.
-Neither depends on the other at an implementation level; however, you typically see the two used in conjunction. <!--more-->
+Neither depends on the other at an implementation level; however, you typically see the two used in conjunction.
 Below is an example of a trivial addition lambda and its use-case.
 
 ```php

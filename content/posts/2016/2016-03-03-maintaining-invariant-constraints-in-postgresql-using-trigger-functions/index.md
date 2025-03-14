@@ -2,13 +2,14 @@
 layout: post
 title: 'Maintaining Invariant Constraints in PostgreSQL using Trigger Functions'
 meta: 'Learn how to maintain complex invariant constraints in PostgreSQL using trigger functions for enhanced data integrity.'
+summary: 'Recently, a feature I was working on required me to alter a unique constraint that existed on a table column. The invariant had now been weakened to allow storing of duplicate `email` addresses, provided they shared an equivalent `link_id` (excluding `NULL`). Sadly, the ease with which I had initially added the general unique constraint had disappeared. However, I was able to take advantage of insertion/update triggers to regain these invariant reassurances.'
 tags: ['postgresql', 'sql']
 ---
 
 Recently, a feature I was working on required me to alter a unique constraint that existed on a table column.
 The invariant had now been weakened to allow storing of duplicate `email` addresses, provided they shared an equivalent `link_id` (excluding `NULL`).
 Sadly, the ease with which I had initially added the general unique constraint had disappeared.
-However, I was able to take advantage of insertion/update triggers to regain these invariant reassurances. <!--more-->
+However, I was able to take advantage of insertion/update triggers to regain these invariant reassurances.
 I should note that I am in favour of placing business-critical constraints within the database layer, even if this seems like a blurring of responsibility between application logic and the data store.
 
 ```sql

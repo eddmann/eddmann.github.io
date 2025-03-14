@@ -2,12 +2,13 @@
 layout: post
 title: 'Providing Local JS and CSS Resources for CDN Fallbacks'
 meta: 'Learn how to provide reliable local JavaScript and CSS fallback options for CDN-hosted assets such as jQuery and Twitter Bootstrap.'
+summary: 'In a recent podcast the topic of using Content Delivery Networks (CDN) to host commonly used resources such as jQuery and Twitter Bootstrap came up. The merits of having access to large-scale delivery infrastructure provided by Google etc. are significant.'
 tags: ['cdn', 'javascript', 'css']
 ---
 
 In a recent [podcast](https://threedevsandamaybe.com/html-experiences-part-1/) the topic of using Content Delivery Networks (CDN) to host commonly used resources such as jQuery and Twitter Bootstrap came up.
 The merits of having access to large-scale delivery infrastructure provided by Google etc. are significant.
-There is also the possibility that the client will already have these assets cached. <!--more-->
+There is also the possibility that the client will already have these assets cached.
 One pessimistic comment which can arise, however, is what happens if these CDNs suddenly become unavailable.
 Though highly unlikely in the case of Google's [Hosted Libraries](https://developers.google.com/speed/libraries/devguide), similar issues during development whilst offline may result in the same effect.
 To overcome this, hosting a local fallback version of the assets is a worthwhile investment.

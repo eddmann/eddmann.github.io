@@ -2,10 +2,11 @@
 layout: post
 title: "Recreating 'Let' using a Macro in Clojure"
 meta: "Learn how to recreate the 'let' special form using a clever Clojure macro with lambda trickery and underlying calculus fundamentals."
+summary: "Inspired by a good friend's recent Gist on how the functionality of the special form `let` could be achieved using a little Lambda trickery, I decided to write a simple macro that would do this transformation."
 tags: ['clojure']
 ---
 
-Inspired by a good friend's recent [Gist](https://gist.github.com/keyvanakbary/190eb819632db0d6c303) on how the functionality of the special form `let` could be achieved using a little Lambda trickery, I decided to write a simple macro that would do this transformation. <!--more-->
+Inspired by a good friend's recent [Gist](https://gist.github.com/keyvanakbary/190eb819632db0d6c303) on how the functionality of the special form `let` could be achieved using a little Lambda trickery, I decided to write a simple macro that would do this transformation.
 It is very interesting to see how concepts such as this can be built up from underlying calculus fundamentals.
 
 ```clojure

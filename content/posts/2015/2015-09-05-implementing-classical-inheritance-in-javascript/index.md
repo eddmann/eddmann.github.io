@@ -2,12 +2,13 @@
 layout: post
 title: 'Implementing Classical Inheritance in JavaScript'
 meta: 'A comprehensive guide on implementing classical inheritance in JavaScript using ES6 syntactic sugar to simplify object-oriented programming principles.'
+summary: "Developers who are well versed in class-based languages such as Java and C++ may find JavaScript's prototypical and, in my heart, true object-oriented nature confusing. With the addition of the `class` keyword in ES6 it has become extremely easy to crossover these class-based principles into JavaScript. However, it should be noted that this is nothing more than syntactic sugar over an extremely expressive and flexible language construct."
 tags: ['javascript']
 ---
 
 Developers who are well versed in class-based languages such as Java and C++ may find JavaScript's prototypical and, in my heart, true object-oriented nature confusing.
 With the addition of the `class` keyword in ES6 it has become extremely easy to crossover these class-based principles into JavaScript.
-However, it should be noted that this is nothing more than syntactic sugar over an extremely expressive and flexible language construct. <!--more-->
+However, it should be noted that this is nothing more than syntactic sugar over an extremely expressive and flexible language construct.
 In fact, it is very easy to build our own Class implementation, using specially constructed 'class' functions as templates for the 'new' instances we wish to use.
 Below is an example implementation highlighting how to simply create a classical inheritance hierarchy within JavaScript.
 

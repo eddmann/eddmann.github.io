@@ -2,10 +2,11 @@
 layout: post
 title: 'Undefined Variable Checks in JavaScript'
 meta: 'Learn how to check for the existence of a variable in JavaScript without encountering a ReferenceError.'
+summary: 'This morning, I stumbled upon an issue surrounding checking for the existence of a variable in JavaScript.'
 tags: ['javascript']
 ---
 
-This morning, I stumbled upon an issue surrounding checking for the existence of a variable in JavaScript. <!--more-->
+This morning, I stumbled upon an issue surrounding checking for the existence of a variable in JavaScript.
 I was under the impression that I could perform this check as follows:
 
 ```js

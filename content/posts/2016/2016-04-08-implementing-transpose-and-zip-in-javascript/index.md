@@ -2,10 +2,11 @@
 layout: post
 title: 'Implementing Transpose and Zip in JavaScript'
 meta: "Learn how to implement 'transpose' and 'zip' in JavaScript to manipulate multi-dimensional arrays effectively."
+summary: 'In a recent Full Stack Radio podcast, a discussion around the application of `transpose` and `zip` on collections made me wonder how I would go about implementing such a feature in JavaScript.'
 tags: ['javascript', 'functional-programming']
 ---
 
-In a recent [Full Stack Radio](http://www.fullstackradio.com/39) podcast, a discussion around the application of `transpose` and `zip` on collections made me wonder how I would go about implementing such a feature in JavaScript. <!--more-->
+In a recent [Full Stack Radio](http://www.fullstackradio.com/39) podcast, a discussion around the application of `transpose` and `zip` on collections made me wonder how I would go about implementing such a feature in JavaScript.
 The concept behind 'transpose' is to turn a multi-dimensional array's rows into columns and vice versa.
 I typically think of a 'zip' as a limited form of this, handling only two collections, but with the added bonus of permitting collections of different lengths.
 This can be resolved by either padding out the arrays with empty values or only including elements up to the shortest collection's length.

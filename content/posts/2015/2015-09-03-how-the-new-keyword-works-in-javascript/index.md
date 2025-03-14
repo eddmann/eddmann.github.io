@@ -2,11 +2,12 @@
 layout: post
 title: "How the 'new' keyword works in JavaScript"
 meta: "Learn how the 'new' keyword operates under-the-hood in JavaScript with a clear, step-by-step explanation and a user-land implementation."
+summary: 'The `new` keyword in JavaScript can sometimes slip up new and experienced programmers alike. We typically associate this word with classical-based object-oriented languages (such as Java, etc.), whereas in JavaScript it works a little differently.'
 tags: ['javascript']
 ---
 
 The `new` keyword in JavaScript can sometimes slip up new and experienced programmers alike.
-We typically associate this word with classical-based object-oriented languages (such as Java, etc.), whereas in JavaScript it works a little differently. <!--more-->
+We typically associate this word with classical-based object-oriented languages (such as Java, etc.), whereas in JavaScript it works a little differently.
 In fact, due to the language's prototypical behaviour, any function can be used as a constructor call, which adds more fuel to the confusion.
 To demystify the process that occurs, this post will take you through the four operations that occur when the `new` keyword is invoked on a Function.
 After describing these steps, we will then work through codifying a user-land function that mimics its behaviour.

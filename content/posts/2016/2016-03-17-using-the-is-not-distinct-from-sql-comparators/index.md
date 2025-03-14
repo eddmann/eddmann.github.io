@@ -2,11 +2,12 @@
 layout: post
 title: "Using the 'IS (NOT) DISTINCT FROM' SQL Comparators"
 meta: "Learn how to use the 'IS (NOT) DISTINCT FROM' SQL comparators to handle NULL values effectively in SQL queries."
+summary: 'In a recent SQL statement, I stumbled upon an issue regarding the handling of `NULL` values within a given predicate. Coming from languages such as PHP, which are very liberal in their type coercion (`NULL` can be treated as a falsy value), I was surprised to find how the inclusion of such a value resulted in a sort of predicate short-circuiting.'
 tags: ['sql']
 ---
 
 In a recent SQL statement, I stumbled upon an issue regarding the handling of `NULL` values within a given predicate.
-Coming from languages such as PHP, which are very liberal in their type coercion (`NULL` can be treated as a falsy value), I was surprised to find how the inclusion of such a value resulted in a sort of predicate short-circuiting. <!--more-->
+Coming from languages such as PHP, which are very liberal in their type coercion (`NULL` can be treated as a falsy value), I was surprised to find how the inclusion of such a value resulted in a sort of predicate short-circuiting.
 This occurs because `NULL`, in its strictest sense, is an unknown value.
 As such, the entire condition is deemed unknown in the event of its presence.
 However, if you wish to weaken this constraint within a comparison, you can take advantage of `IS DISTINCT FROM`, which instead treats `NULL` as a known value.

@@ -2,11 +2,12 @@
 layout: post
 title: 'Peano Numbers and Arithmetic in JavaScript'
 meta: 'Discover how to represent natural numbers using Peano numbers in JavaScript through functional programming techniques and recursive arithmetic operations.'
+summary: 'Whilst completing the Functional Programming Principles in Scala course a couple of years ago one of the exercises was in the realm of Peano numbers. This subject fascinated me, demonstrating how we were able to represent non-negative natural numbers without any pre-existing concepts - relying solely on logical expressions and recursive algorithms.'
 tags: ['javascript', 'functional-programming']
 ---
 
 Whilst completing the [Functional Programming Principles in Scala](https://www.coursera.org/course/progfun) course a couple of years ago one of the exercises was in the realm of Peano numbers.
-This subject fascinated me, demonstrating how we were able to represent non-negative natural numbers without any pre-existing concepts - relying solely on logical expressions and recursive algorithms. <!--more-->
+This subject fascinated me, demonstrating how we were able to represent non-negative natural numbers without any pre-existing concepts - relying solely on logical expressions and recursive algorithms.
 Peano numbers allow us to represent all natural numbers using a defined zero value and a successor function.
 
 ```js

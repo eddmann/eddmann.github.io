@@ -2,11 +2,12 @@
 layout: post
 title: "Arrow Functions Lexical 'this' Scoping in JavaScript"
 meta: "Exploring the lexical scoping of 'this' in Arrow Functions and previous alternative solutions in JavaScript."
+summary: "One feature of ES2015 that I feel can be a stumbling block (but is extremely useful) is Arrow Functions' lexical scoping of `this`. Before this addition, every new function defined its own `this`, meaning we were required to explicitly bind or locally store the `this` reference that we desired in many use cases."
 tags: ['javascript']
 ---
 
 One feature of ES2015 that I feel can be a stumbling block (but is extremely useful) is Arrow Functions' lexical scoping of `this`.
-Before this addition, every new function defined its own `this`, meaning we were required to explicitly bind or locally store the `this` reference that we desired in many use cases. <!--more-->
+Before this addition, every new function defined its own `this`, meaning we were required to explicitly bind or locally store the `this` reference that we desired in many use cases.
 The two techniques used to overcome this problem are highlighted below, using a locally stored `this` reference or a bound function.
 
 ```js

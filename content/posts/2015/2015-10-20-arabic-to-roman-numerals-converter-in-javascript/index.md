@@ -2,10 +2,11 @@
 layout: post
 title: 'Arabic to Roman Numerals Converter in JavaScript'
 meta: 'Learn how to convert Arabic numbers to Roman numerals using modern JavaScript and ES2015 features with two distinct solutions.'
+summary: 'Having an hour to spare recently, I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals.'
 tags: ['javascript', 'algorithms']
 ---
 
-Having an hour to spare recently, I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals. <!--more-->
+Having an hour to spare recently, I decided to solve the common problem of converting from Hindu-Arabic to Roman numerals.
 Below are two different solutions to solve this problem, taking advantage of many ES2015 additions in the process.
 Both implementations use the lookup table provided below to handle the translation of the seven symbols, along with the subtractive form used to avoid four characters being repeated in a row.
 

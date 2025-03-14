@@ -2,10 +2,11 @@
 layout: post
 title: 'Creating a IPersistentSet compatible Binary Tree in Clojure'
 meta: 'Learn how to implement IPersistentSet using a Binary Tree in Clojure, making it compatible with existing Clojure functions and libraries.'
+summary: 'Following on from my post on Binary Search Trees last week, I decided to explore how I could use types and interfaces to implement the glue required to make the Binary Tree implementation compatible with the `clojure.lang.IPersistentSet` interface.'
 tags: ['clojure', 'functional-programming', 'data-structures']
 ---
 
-Following on from my post on Binary Search Trees [last week](../2016-01-20-binary-search-trees-in-clojure/index.md), I decided to explore how I could use types and interfaces to implement the glue required to make the Binary Tree implementation compatible with the `clojure.lang.IPersistentSet` interface. <!--more-->
+Following on from my post on Binary Search Trees [last week](../2016-01-20-binary-search-trees-in-clojure/index.md), I decided to explore how I could use types and interfaces to implement the glue required to make the Binary Tree implementation compatible with the `clojure.lang.IPersistentSet` interface.
 By doing so, any library or function requiring an `IPersistentSet` would be able to use the Binary Tree data structure seamlessly.
 
 ## Prerequisites

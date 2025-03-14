@@ -2,12 +2,13 @@
 layout: post
 title: 'Implementing Streams in PHP'
 meta: 'A comprehensive guide to implementing streams in PHP using class-based and generator approaches for efficient lazy evaluation and infinite list generation.'
+summary: 'Typically, when we think about a list of elements we assume there is both a start and a finite end. In this example the list has been precomputed and stored for subsequent traversal and transformation. If instead,  we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.'
 tags: ['php', 'data-structures']
 ---
 
 Typically, when we think about a list of elements we assume there is both a start and a finite end.
 In this example the list has been precomputed and stored for subsequent traversal and transformation.
-If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists. <!--more-->
+If instead, we replaced the finite ending with a promise to return the next element in the sequence, we would have the architecture to provide infinite lists.
 Not only would these lists be capable of generating infinite elements, but they would also be lazy, only producing the next element in the sequence when absolutely required.
 This concept is called a [Stream](<http://en.wikipedia.org/wiki/Stream_(computing)>) and is commonly also referred to as a lazy list.
 It is a foundational concept in languages such as Haskell.

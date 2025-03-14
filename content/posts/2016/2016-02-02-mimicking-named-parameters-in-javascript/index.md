@@ -2,11 +2,12 @@
 layout: post
 title: 'Mimicking Named Parameters in JavaScript'
 meta: 'Learn how to use object destructuring in ES2015 to implement a form of named parameters in JavaScript for cleaner, more readable code.'
+summary: "Whilst working today, I came across a test helper function that required a few too many parameters. Debating whether to break the function up, I decided that an elegant solution would be to take advantage of ES2015 object destructuring and produce a form of 'Named Parameters'."
 tags: ['javascript']
 ---
 
 Whilst working today, I came across a test helper function that required a few too many parameters.
-Debating whether to break the function up, I decided that an elegant solution would be to take advantage of ES2015 object destructuring and produce a form of 'Named Parameters'. <!--more-->
+Debating whether to break the function up, I decided that an elegant solution would be to take advantage of ES2015 object destructuring and produce a form of 'Named Parameters'.
 We are all very familiar with code in the past that looks like this:
 
 ```js

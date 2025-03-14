@@ -2,12 +2,13 @@
 layout: post
 title: 'Depth-First Search and Breadth-First Search in Python'
 meta: 'An in-depth guide to implementing Depth-First Search and Breadth-First Search in Python, exploring graph theory, connected components and pathfinding algorithms.'
+summary: 'Graph theory and, in particular, the graph ADT (abstract data type) is widely explored and implemented in the field of Computer Science and Mathematics. Consisting of vertices (nodes) and the edges (optionally directed or weighted) that connect them, the data structure is effectively able to represent and solve many problem domains. One of the most popular areas of algorithm design within this space is the problem of checking for the existence of, or the (shortest) path between, two or more vertices in the graph.'
 tags: ['python', 'algorithms']
 ---
 
 Graph theory and, in particular, the graph ADT (abstract data type) is widely explored and implemented in the field of Computer Science and Mathematics.
 Consisting of vertices (nodes) and the edges (optionally directed or weighted) that connect them, the data structure is effectively able to represent and solve many problem domains.
-One of the most popular areas of algorithm design within this space is the problem of checking for the existence of, or the (shortest) path between, two or more vertices in the graph. <!--more-->
+One of the most popular areas of algorithm design within this space is the problem of checking for the existence of, or the (shortest) path between, two or more vertices in the graph.
 Properties such as edge weighting and direction are two factors that the algorithm designer can take into consideration.
 In this post I will be exploring two of the simpler available algorithms, depth-first and breadth-first search, to achieve the goals highlighted below:
 

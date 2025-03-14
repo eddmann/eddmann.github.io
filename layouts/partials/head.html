@@ -41,12 +41,10 @@
 <link rel="canonical" href="{{- .Permalink -}}" />
 
 <script>
-  (function() {
-    document.documentElement.setAttribute(
-      'data-theme',
-      localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches && "dark") || 'light'
-    );
-  })();
+  document.documentElement.setAttribute(
+    'data-theme',
+    localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches && "dark") || 'light'
+  );
 </script>
 {{- $script := resources.Get "script.js" | js.Build "script.js" | minify | fingerprint -}}
 <script src="{{ $script.RelPermalink }}" integrity="{{ $script.Data.Integrity }}" defer></script>

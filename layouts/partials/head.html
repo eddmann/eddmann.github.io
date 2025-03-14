@@ -27,10 +27,10 @@
 {{- $styles := resources.Match "css/*.css" | resources.Concat "css/style.css" | minify | fingerprint }}
 <link rel="stylesheet" href="{{- $styles.RelPermalink }}" integrity="{{- $styles.Data.Integrity -}}" />
 
-<link rel="preload" as="image" href="{{- `assets/x.svg` | relURL -}}" />
-<link rel="preload" as="image" href="{{- `assets/github.svg` | relURL -}}" />
+<link rel="preload" as="image" href="{{- `assets/x.svg` | relURL -}}" crossorigin="anonymous" />
+<link rel="preload" as="image" href="{{- `assets/github.svg` | relURL -}}" crossorigin="anonymous" />
 {{- if $.IsHome -}}
-<link rel="preload" as="image" href="{{- `assets/avatar.webp` | relURL -}}" />
+<link rel="preload" as="image" href="{{- `assets/avatar.webp` | relURL -}}" crossorigin="anonymous" />
 {{- end -}}
 
 <link rel="icon" type="image/png" sizes="32x32" href="{{- `favicon-32x32.png` | relURL -}}" />

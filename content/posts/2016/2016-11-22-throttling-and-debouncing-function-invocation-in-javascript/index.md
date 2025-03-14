@@ -44,10 +44,3 @@ const debounce = (fn, delay) => {
   };
 };
 ```
-
-## Scrolling Example
-
-You can clearly differentiate between the two techniques whilst experimenting with the example below.
-This highlights how and when the function invocations occur, based on the choice of throttling or debouncing.
-
-<a class="jsbin-embed" href="http://jsbin.com/luxopeforu/embed?console,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.40.2"></script>

@@ -37,9 +37,3 @@ const backoff = (retries, fn, delay = 500) =>
 
 As you can see, both implementations use a recursive structure with decrementing `retries` to hit the base case.
 What I find so impressive about the Promise abstraction is how easy it is to codify complex problems such as this with minimal code.
-
-## Demo
-
-Below, you can see a JSBin demo that uses an intentionally unreliable Promise to exercise the two functions' retrying behaviour.
-
-<a class="jsbin-embed" href="http://jsbin.com/topagew/1/embed?js,output">JS Bin on jsbin.com</a><script src="http://static.jsbin.com/js/embed.min.js?3.41.10"></script>

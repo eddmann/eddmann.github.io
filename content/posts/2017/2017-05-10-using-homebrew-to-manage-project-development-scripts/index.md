@@ -140,6 +140,3 @@ brew install project-dev-tools
 ## Demo
 
 The example Tap and Formula can be found within [this](https://github.com/eddmann/homebrew-project-dev-tools) GitHub repository.
-You can see an interactive example of installing and using the scripts created below:
-
-<p><script type="text/javascript" src="https://asciinema.org/a/apc3kpg72qgrizdhzt1s7h1kc.js" id="asciicast-apc3kpg72qgrizdhzt1s7h1kc" async></script></p>

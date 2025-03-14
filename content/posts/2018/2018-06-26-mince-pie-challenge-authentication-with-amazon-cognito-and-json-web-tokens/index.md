@@ -348,9 +348,5 @@ Notice how the behaviour of all three differs based on whether you provide a val
 http https://nw6ok0dk3k.execute-api.eu-west-1.amazonaws.com/dev/strict 'Authorization:$JSON_WEB_TOKEN'
 ```
 
-If you are interested in seeing the entire deployment and testing process for all three use-cases, you can watch the terminal video below.
-
-<p><script src="https://asciinema.org/a/w6hj8mSNhjbttO56KTKBolwyK.js" id="asciicast-w6hj8mSNhjbttO56KTKBolwyK" async></script></p>
-
 We have now successfully exercised the ability to sign up and authenticate users with the application.
 Join me in the [next post](../2018-07-09-mince-pie-challenge-setting-up-flow-with-babel-and-webpack/index.md) of the [series]({{< tag "mince-pie-challenge-series" >}}), where we will look into providing a level of code reassurance, adding the static type checker [Flow](https://flow.org/) to our Webpack configuration.

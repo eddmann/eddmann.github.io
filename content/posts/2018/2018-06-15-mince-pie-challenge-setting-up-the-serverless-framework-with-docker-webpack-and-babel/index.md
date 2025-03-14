@@ -224,9 +224,6 @@ Now that we have some actual functionality we can interact with, we can go about
 Simply executing `make deploy` will instruct our Dockerised Serverless Framework to package up and deploy the function, along with the required resources.
 If you are interested in a more in-depth look into this process, I have created [several](https://www.youtube.com/watch?v=ke3eQv-PUC8) [different](https://www.youtube.com/watch?v=B0r3QdcCy8g) videos on the topic.
 Once this has completed, an API Gateway endpoint will be presented that you can then visit to test out the service.
-You can see this module installation and deployment process in action within the following screencast.
-
-<p><script src="https://asciinema.org/a/6BAfJE1YFYLoSw0StVA9jWUaN.js" id="asciicast-6BAfJE1YFYLoSw0StVA9jWUaN" async></script></p>
 
 With the Serverless Framework configured and a sample function now deployed, we can begin the process of implementing our API.
 Join me in the [next post](../2018-06-26-mince-pie-challenge-authentication-with-amazon-cognito-and-json-web-tokens/index.md) of the [series]({{< tag "mince-pie-challenge-series" >}}), where I will discuss the process of configuring [Amazon Cognito](https://aws.amazon.com/cognito/), the authentication service that will be used within our API.

@@ -2,6 +2,7 @@
 layout: post
 title: 'Bitcoin Internals: How Blocks use Merkle Trees in JavaScript'
 meta: "Explore how Bitcoin utilises Merkle trees internally, featuring a JavaScript example demonstrating how to compute and verify Merkle roots for a block's transactions."
+summary: 'In this video, I take a look into how Bitcoin internally uses Merkle trees to generate its block Merkle roots. We delve into how this is computed and why it is so important to validate the state of transactions.'
 tags: ['bitcoin', 'javascript']
 ---
 

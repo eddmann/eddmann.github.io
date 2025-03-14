@@ -2,6 +2,7 @@
 layout: post
 title: 'Bitcoin Internals: Verifying Merkle Roots using Merkle Proofs in JavaScript'
 meta: 'Learn how to validate Bitcoin transactions using Merkle proofs in JavaScript. This guide covers computing Merkle proofs, verifying transactions in blocks, and leveraging Simplified Payment Verification for lightweight Bitcoin clients.'
+summary: 'In this video, we expand on the previous one, in which we computed a Merkle root for a given list of transactions using Merkle trees. We will now compute a Merkle proof for a given transaction, allowing clients to validate that a transaction exists in a block without having to download its entire contents.'
 tags: ['bitcoin', 'javascript']
 ---
 

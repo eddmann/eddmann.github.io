@@ -8,6 +8,8 @@ tags: ['postgresql', 'sql']
 I recently had the pleasure of chatting with Adam Wathan on [Full Stack Radio](https://fullstackradio.com/40) about PostgreSQL - a technology near and dear to my heart.
 During our conversation, we dove into the advantages PostgreSQL offers over MySQL, the most common obstacles teams encounter when making the switch, and how to decide whether certain tasks should be handled in the database rather than in application code.
 
+<!--more-->
+
 In addition to these topics, we covered PostgreSQL's ACID properties and powerful features like partial indexes, JSON support, and even the possibility of using JavaScript within the database!
 We also touched on the benefits of Common Table Expressions (CTEs) for more complex queries.
 

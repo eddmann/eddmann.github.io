@@ -5,7 +5,13 @@ meta: "In-depth notes and guidance on Sam Newman's Monolith to Microservices boo
 tags: ['notes', 'microservices']
 ---
 
-[![Book cover of "Monolith to Microservices" by Sam Newman. Features an illustration of a jellyfish with intricate details, and the O'Reilly logo at the top.](cover.jpg)](https://www.oreilly.com/library/view/monolith-to-microservices/9781492047834/)
+I've recently finished reading [Monolith to Microservices](https://www.oreilly.com/library/view/monolith-to-microservices/9781492047834/) by Sam Newman.
+This post contains my notes from the book, which I wrote while reading to help digest the material.
+It also serves as a future reference.
+
+<!--more-->
+
+![Book cover of "Monolith to Microservices" by Sam Newman. Features an illustration of a jellyfish with intricate details, and the O'Reilly logo at the top.](cover.jpg)
 
 ## Just Enough Microservices
 

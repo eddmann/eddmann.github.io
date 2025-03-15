@@ -1,24 +1,19 @@
 {{- $source := .Page.Resources.GetMatch (.Destination) -}}
-{{- if and $source (or (eq $source.MediaType.Type "image/jpeg") (eq $source.MediaType.Type "image/png")) -}}
+{{- if and $source (in (slice "image/jpeg" "image/png") $source.MediaType.Type) -}}
   {{- $maxWidth := site.Params.maxImageWidth -}}
-  {{- $responseSizes := slice (div $maxWidth 2) $maxWidth (math.Min $source.Width (mul $maxWidth 2)) -}}
+  {{- $sizes := slice (math.Min $source.Width (div $maxWidth 2)) (math.Min $source.Width $maxWidth) (math.Min $source.Width (mul $maxWidth 2)) | uniq -}}
+
   <picture>
     <source type="image/webp" srcset="
-    {{- with $responseSizes -}}
-      {{- range $i, $e := . -}}
-        {{- if ge $source.Width . -}}
-          {{- if $i }}, {{ end -}}{{- ($source.Resize (print . `x webp`)).RelPermalink }} {{ . }}w
-        {{- end -}}
+      {{- range $idx, $size := $sizes -}}
+        {{- if $idx }}, {{ end -}}{{- ($source.Resize (print $size `x webp`)).RelPermalink }} {{ $size }}w
       {{- end -}}
-    {{- end -}}" />
+    " />
     <source type="image/jpeg" srcset="
-    {{- with $responseSizes -}}
-      {{- range $i, $e := . -}}
-        {{- if ge $source.Width . -}}
-          {{- if $i }}, {{ end -}}{{- ($source.Resize (print . `x jpg`)).RelPermalink }} {{ . }}w
-        {{- end -}}
+      {{- range $idx, $size := $sizes -}}
+        {{- if $idx }}, {{ end -}}{{- ($source.Resize (print $size `x jpg`)).RelPermalink }} {{ $size }}w
       {{- end -}}
-    {{- end -}}" />
+    " />
     <img src="{{- ($source.Resize (print (math.Min $source.Width $maxWidth) `x jpg`)).RelPermalink -}}" alt="{{- .PlainText -}}" loading="lazy"
       {{- with .Title -}} title="{{- . -}}" {{- end -}}
       {{- range $k, $v := .Attributes -}}

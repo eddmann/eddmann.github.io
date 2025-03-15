@@ -1,35 +1,48 @@
 {{- $source := .Page.Resources.GetMatch (.Destination) -}}
 {{- if and $source (in (slice "image/jpeg" "image/png") $source.MediaType.Type) -}}
+  {{- $sourceWidth := $source.Width -}}
   {{- $maxWidth := site.Params.maxImageWidth -}}
-  {{- $sizes := slice (math.Min $source.Width (div $maxWidth 2)) (math.Min $source.Width $maxWidth) (math.Min $source.Width (mul $maxWidth 2)) | uniq -}}
-
+  {{- $defaultSize := math.Min $sourceWidth $maxWidth }}
+  {{- $responsiveSizes := slice
+    (math.Min $sourceWidth (div $maxWidth 2))
+    $defaultSize
+    (math.Min $sourceWidth (mul $maxWidth 2))
+  | uniq -}}
   <picture>
+    {{- /* WebP format for better compression */}}
     <source type="image/webp" srcset="
-      {{- range $idx, $size := $sizes -}}
-        {{- if $idx }}, {{ end -}}{{- ($source.Resize (print $size `x webp`)).RelPermalink }} {{ $size }}w
+      {{- range $idx, $size := $responsiveSizes -}}
+        {{- if $idx }}, {{ end -}}{{ ($source.Resize (print $size `x webp`)).RelPermalink }} {{ $size }}w
       {{- end -}}
     " />
+
+    {{- /* JPEG format as a fallback */}}
     <source type="image/jpeg" srcset="
-      {{- range $idx, $size := $sizes -}}
-        {{- if $idx }}, {{ end -}}{{- ($source.Resize (print $size `x jpg`)).RelPermalink }} {{ $size }}w
+      {{- range $idx, $size := $responsiveSizes -}}
+        {{- if $idx }}, {{ end -}}{{ ($source.Resize (print $size `x jpg`)).RelPermalink }} {{ $size }}w
       {{- end -}}
     " />
-    <img src="{{- ($source.Resize (print (math.Min $source.Width $maxWidth) `x jpg`)).RelPermalink -}}" alt="{{- .PlainText -}}" loading="lazy"
-      {{- with .Title -}} title="{{- . -}}" {{- end -}}
-      {{- range $k, $v := .Attributes -}}
-        {{- if $v -}}
-          {{- printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr -}}
-        {{- end -}}
+
+    {{- /* Default image rendering */}}
+    <img
+      src="{{ ($source.Resize (print $defaultSize `x jpg`)).RelPermalink }}"
+      alt="{{ .PlainText }}"
+      loading="lazy"
+      {{ with .Title }}title="{{ . }}" {{ end -}}
+      {{- range $k, $v := .Attributes }}
+        {{- if $v }} {{ printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr }} {{- end }}
       {{- end -}}
     />
   </picture>
 {{- else -}}
-  <img src="{{- .Destination -}}" alt="{{- .PlainText -}}"
-    {{- with .Title -}} title="{{- . -}}" {{- end -}}
-    {{- range $k, $v := .Attributes -}}
-      {{- if $v -}}
-        {{- printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr -}}
-      {{- end -}}
+  {{/* Fallback for non-processed images */}}
+  <img
+    src="{{ if $source }}{{ $source.RelPermalink }}{{ else }}{{ .Destination }}{{ end }}"
+    alt="{{ .PlainText }}"
+    loading="lazy"
+    {{ with .Title }}title="{{ . }}" {{ end -}}
+    {{- range $k, $v := .Attributes }}
+      {{- if $v }} {{ printf " %s=%q" $k ($v | transform.HTMLEscape) | safeHTMLAttr }} {{- end }}
     {{- end -}}
   />
 {{- end -}}

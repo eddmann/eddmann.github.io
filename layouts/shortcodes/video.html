@@ -1,31 +1,39 @@
-{{- $src := $.Get "src" -}}
-{{- $video := or ($.Page.Resources.GetMatch $src) (resources.GetMatch $src) -}}
+{{- $source := $.Get "src" -}}
+{{- if not $source -}}
+  {{- warnf "Video 'src' must be supplied" -}}
+{{- end -}}
+{{- $video := or ($.Page.Resources.GetMatch $source) (resources.GetMatch $source) -}}
+{{- $type := $.Get "type" -}}
+{{- if $video -}}
+  {{- $type = $type | default $video.MediaType.Type -}}
+{{- end -}}
+{{- if not $type -}}
+  {{- warnf "Video 'type' must be supplied" -}}
+{{- end -}}
+{{- $caption := $.Get "caption" -}}
+{{- $preload := $.Get "preload" | default "metadata" -}}
 {{- $controls := $.Get "controls" | default true -}}
 {{- $muted := $.Get "muted" -}}
-{{- $preload := $.Get "preload" | default "metadata" -}}
-{{- $type := $.Get "type" -}}
-{{- $caption := $.Get "caption" -}}
 {{- $loop := $.Get "loop" -}}
 {{- $autoplay := $.Get "autoplay" -}}
 {{- $poster := $.Get "poster" -}}
 
-{{- with $video -}}
-  {{- if $caption -}}
-  <figure>
-  {{- end -}}
-    <video preload="{{ $preload }}"
-      {{- if $controls }} controls{{ end -}}
-      {{- if $muted }} muted{{ end -}}
-      {{- if $loop }} loop{{ end -}}
-      {{- if $autoplay }} autoplay{{ end -}}
-      {{- with $poster }} poster="{{ . }}"{{ end -}}>
-      <source src="{{ .RelPermalink }}" type="{{ $type | default .MediaType.Type }}">
-      Your browser does not support the video element.
-    </video>
-  {{- with $caption -}}
-    <figcaption>{{ . }}</figcaption>
-  </figure>
-  {{- end -}}
-{{- else -}}
-  {{- warnf "Video resource not found: %s" $src -}}
+{{- if $caption -}}
+<figure>
+{{- end -}}
+  <video preload="{{ $preload }}"
+    {{- if $controls }} controls{{ end -}}
+    {{- if $muted }} muted{{ end -}}
+    {{- if $loop }} loop{{ end -}}
+    {{- if $autoplay }} autoplay{{ end -}}
+    {{- with $poster }} poster="{{ . }}"{{ end -}}>
+    <source
+      src="{{ with $video }}{{ .RelPermalink }}{{ else }}{{ $source }}{{ end }}"
+      type="{{ $type }}"
+    >
+    Your browser does not support the video element.
+  </video>
+{{- with $caption -}}
+  <figcaption>{{ . }}</figcaption>
+</figure>
 {{- end -}}

@@ -1,6 +1,6 @@
 {{- $source := $.Get "src" -}}
 {{- if not $source -}}
-  {{- warnf "Audio 'src' must be supplied" -}}
+  {{- errorf "Audio 'src' must be supplied" -}}
 {{- end -}}
 {{- $audio := or ($.Page.Resources.GetMatch $source) (resources.GetMatch $source) -}}
 {{- $type := $.Get "type" -}}
@@ -8,7 +8,7 @@
   {{- $type = $type | default $audio.MediaType.Type -}}
 {{- end -}}
 {{- if not $type -}}
-  {{- warnf "Audio 'type' must be supplied" -}}
+  {{- errorf "Audio 'type' must be supplied" -}}
 {{- end -}}
 {{- $caption := $.Get "caption" -}}
 {{- $preload := $.Get "preload" | default "metadata" -}}

@@ -23,7 +23,7 @@ Below is the Video shortcode that I created, which handles both local (standard 
 ```
 {{- $source := $.Get "src" -}}
 {{- if not $source -}}
-  {{- warnf "Video 'src' must be supplied" -}}
+  {{- errorf "Video 'src' must be supplied" -}}
 {{- end -}}
 {{- $video := or ($.Page.Resources.GetMatch $source) (resources.GetMatch $source) -}}
 {{- $type := $.Get "type" -}}
@@ -31,7 +31,7 @@ Below is the Video shortcode that I created, which handles both local (standard 
   {{- $type = $type | default $video.MediaType.Type -}}
 {{- end -}}
 {{- if not $type -}}
-  {{- warnf "Video 'type' must be supplied" -}}
+  {{- errorf "Video 'type' must be supplied" -}}
 {{- end -}}
 {{- $caption := $.Get "caption" -}}
 {{- $preload := $.Get "preload" | default "metadata" -}}

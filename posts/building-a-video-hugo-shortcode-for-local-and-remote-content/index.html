@@ -5,7 +5,7 @@ However, I required a way to embed other forms of local and remote video content
 To achieve this, I built a <a href=https://gohugo.io/content-management/shortcodes/#custom rel="external noopener" target=_blank>custom shortcode</a> for Hugo.</p><h2 id=what-are-shortcodes>What Are Shortcodes?</h2><p>Shortcodes provide a way to include custom markup (with optional arguments) in Markdown, which is then parsed and rendered based on defined templates.
 This allows you to avoid embedding HTML markup directly in your Markdown, separating these markup concerns from the final desired rendered output.</p><h2 id=the-video-shortcode>The Video Shortcode</h2><p>Below is the Video shortcode that I created, which handles both local (standard and <a href=https://gohugo.io/content-management/page-resources/ rel="external noopener" target=_blank>page resources</a>) and remote video media content.</p><pre tabindex=0><code>{{- $source := $.Get &#34;src&#34; -}}
 {{- if not $source -}}
-  {{- warnf &#34;Video &#39;src&#39; must be supplied&#34; -}}
+  {{- errorf &#34;Video &#39;src&#39; must be supplied&#34; -}}
 {{- end -}}
 {{- $video := or ($.Page.Resources.GetMatch $source) (resources.GetMatch $source) -}}
 {{- $type := $.Get &#34;type&#34; -}}
@@ -13,7 +13,7 @@ This allows you to avoid embedding HTML markup directly in your Markdown, separa
   {{- $type = $type | default $video.MediaType.Type -}}
 {{- end -}}
 {{- if not $type -}}
-  {{- warnf &#34;Video &#39;type&#39; must be supplied&#34; -}}
+  {{- errorf &#34;Video &#39;type&#39; must be supplied&#34; -}}
 {{- end -}}
 {{- $caption := $.Get &#34;caption&#34; -}}
 {{- $preload := $.Get &#34;preload&#34; | default &#34;metadata&#34; -}}

@@ -13,6 +13,8 @@ However, similar to my [previous post](../2025-03-27-bridging-the-gap-between-io
 To provide bi-directional communication between the JavaScript application running within the `WebView` and the native functionality available within the wrapper application, I built a thin bridge placed in the middle.
 In this post, I wish to provide an example pattern I have been using which handles the typical asynchronous lifecycle of the given functionality.
 
+![Illustration of a bridge over a river connecting Kotlin and JavaScript logos, symbolizing interoperability between the two programming languages.](bridge.png)
+
 ## Bridging the Gap
 
 To set up the bridge between the native Kotlin wrapper application and the JavaScript web application, you must supply an instance of a class which exposes functions that have been annotated with `@JavascriptInterface`.

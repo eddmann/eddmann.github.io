@@ -13,6 +13,8 @@ However, I already have an existing iOS application that I wished to include thi
 To provide bi-directional communication between the JavaScript application running within the `WKWebView` and the native functionality available within the wrapper application, I built a thin bridge placed in the middle.
 In this post, I wish to provide an example pattern I have been using which handles the typical asynchronous lifecycle of the given functionality.
 
+![Illustration of a stone bridge over water with Swift logo on the left and JavaScript logo on the right, symbolizing a connection between the two programming languages.](bridge.png)
+
 ## Bridging the Gap
 
 To set up the bridge between the native Swift wrapper application and the JavaScript web application, you must implement a class which conforms to the `WKScriptMessageHandler` protocol.

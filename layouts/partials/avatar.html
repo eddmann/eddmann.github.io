@@ -1,4 +1,12 @@
-<div class="avatar avatar--spin">
+<div class="avatar avatar--spin" data-avatars='[
+{{- $avatars := resources.Match "avatars/*" -}}
+  {{- range $i, $img := $avatars -}}
+    {{- if gt $i 0 }},{{ end }}
+    {{- with $img.Resize "500x webp" -}}
+      "{{ .RelPermalink }}"
+    {{- end -}}
+  {{- end -}}
+]'>
   <picture>
     <source type="image/webp" srcset="{{- `assets/avatar.webp` | relURL -}}" />
     <img src="{{- `assets/avatar.jpg` | relURL -}}" alt="A photo of {{ site.Title }}" />

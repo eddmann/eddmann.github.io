@@ -59,3 +59,43 @@ document
     { passive: true }
   );
 })();
+
+(() => {
+  if (
+    !window.matchMedia(
+      '(hover: hover) and (prefers-reduced-motion: no-preference)'
+    ).matches
+  ) {
+    return;
+  }
+
+  document.querySelectorAll('.avatar--spin').forEach(avatar => {
+    let isInitialised = false;
+    let image, transitionAt, avatars, index, timer;
+
+    avatar.addEventListener('animationstart', () => {
+      if (!isInitialised) {
+        image = avatar.querySelector('img');
+        transitionAt =
+          (parseFloat(getComputedStyle(avatar).animationDuration) * 1000) / 2;
+        avatars = [
+          image.src,
+          ...(JSON.parse(avatar.getAttribute('data-avatars')) || []),
+        ];
+        index = 0;
+        timer = null;
+        avatar.querySelector('source').remove();
+        isInitialised = true;
+      }
+
+      timer = setTimeout(() => {
+        index = (index + 1) % avatars.length;
+        image.src = avatars[index];
+      }, transitionAt);
+    });
+
+    avatar.addEventListener('animationcancel', () => {
+      if (timer) clearTimeout(timer);
+    });
+  });
+})();

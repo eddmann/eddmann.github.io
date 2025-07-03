@@ -3,7 +3,7 @@ layout: post
 title: 'Exploring NextJS 14 at Full Throttle: An F1 Picks Rebuild'
 meta: 'A hands-on rebuild of an F1 prediction game using NextJS 14, AWS Lambda, and CDK. Explore cutting-edge features like React Server Components, Server Actions, and serverless deployment with real-world insights.'
 summary: "I rebuilt my family's Formula 1 prediction game using NextJS 14, embracing new features like the App Router, React Server Components, and Server Actions. Deploying to AWS Lambda with the Lambda Web Adaptor was a fun challenge that pushed me to explore serverless architecture in a modern frontend context. While the code is a bit wild, the journey taught me a ton about the evolving NextJS ecosystem and infrastructure-as-code with CDK."
-tags: ['js', 'serverless', 'nextjs', 'react', 'aws']
+tags: ['javascript', 'serverless', 'nextjs', 'react', 'aws']
 ---
 
 If you read my previous post, ["Building an F1 Picks Game in 4 Hours: It's Lights Out and Away We Go!"](../2024-08-30-building-an-f1-picks-game-in-4-hours/index.md), you'll know that my family and I have been enjoying a Formula 1 prediction game this season - submitting our top three picks for each race, scoring points, and keeping the family WhatsApp chat buzzing with friendly rivalry.

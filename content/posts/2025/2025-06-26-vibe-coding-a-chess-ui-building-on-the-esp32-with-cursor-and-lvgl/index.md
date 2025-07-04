@@ -2,7 +2,7 @@
 layout: post
 title: 'Vibe Coding a Chess UI: Building on the ESP32 with Cursor & LVGL'
 meta: "Exploring vibe coding with the ESP32 microcontroller, Cursor, and LVGL - how AI-assisted development tools like Claude and OpenAI's o3 enable rapid prototyping and high-level architectural thinking in building an embedded chess UI."
-summary: "In this post, I share my experience using AI-driven tools like Cursor, Claude Sonnet, and OpenAI's o3 to rapidly prototype an embedded chess UI on the ESP32 microcontroller using LVGL. Letting the AI handle implementation let me stay focused on high-level design, iterate quickly, and stay in flow. Hype aside, it's a powerful tool for exploring ideas faster."
+summary: "In this post, I share my experience using AI-driven tools like Cursor, Claude Sonnet, and OpenAI's o3 to rapidly prototype an embedded chess UI on the ESP32 microcontroller using LVGL. Letting the AI handle implementation allowed me to stay focused on high-level design, iterate quickly, and stay in flow. Hype aside, it's a powerful tool for exploring ideas faster."
 tags: ['esp32', 'cursor', 'llm']
 ---
 

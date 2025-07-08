@@ -21,12 +21,19 @@ Let's dive in!
 
 ## Why Transactional Outbox? 🤔
 
-In service-oriented architectures (like microservices), publishing domain events reliably is essential for loosely coupled, event-driven systems.
-But distributed transactions are notoriously tricky and can lead to all sorts of hair-pulling scenarios - like double-publishing or missing events if your database write succeeds but the event bus call fails (or vice versa).
+In service-oriented architectures like microservices, reliably publishing domain events is critical for building loosely coupled, event-driven systems.
+However, distributed transactions are inherently difficult, and a key challenge is the _dual-write_ problem.
+
+This problem arises when a single operation needs to perform both a database write (e.g., saving a record) and an event publication (e.g., sending a message to a message broker), typically involving two separate systems.
+If one of these actions succeeds while the other fails - for instance, the database commit succeeds but the message publish fails - it can lead to data inconsistencies, such as:
+
+- A record saved without a corresponding event notification
+- An event published about a change that never actually occurred
 
 The Transactional Outbox pattern sidesteps this by writing the event as data within the same transaction as your business entity.
 Later, a separate process reads (or listens for) new events and publishes them to your event bus (e.g., [AWS EventBridge](https://aws.amazon.com/eventbridge/)).
-This ensures your state and events are always in sync.
+
+This ensures that your system's state and emitted events remain consistent, even across system boundaries.
 
 ## Approach 1: DynamoDB Streams – Change Data Capture
 
@@ -114,7 +121,7 @@ EventOutboxTable:
       StreamViewType: NEW_IMAGE
 ```
 
-We specify `NEW_IMAGE` in the stream configuration because we’re only interested in the new version of the item that was just inserted into the outbox table.
+We specify `NEW_IMAGE` in the stream configuration because we're only interested in the new version of the item that was just inserted into the outbox table.
 In this use case, we don't need to compare the new and old versions of the record - only the new event payload matters for publishing.
 
 #### 3. Lambda Publisher
@@ -150,8 +157,8 @@ module.exports.handle = async streamEvent => {
 
 **Nice and simple:** the Lambda is only triggered for new inserts, which represent new events needing to be published.
 
-An added benefit of this approach is that we don’t need to manage any continuously running polling task.
-Instead, we get to leverage AWS’s event-driven model, where the Lambda is automatically invoked when changes occur - similar to how SQS-triggered Lambdas work.
+An added benefit of this approach is that we don't need to manage any continuously running polling task.
+Instead, we get to leverage AWS's event-driven model, where the Lambda is automatically invoked when changes occur - similar to how SQS-triggered Lambdas work.
 This reduces operational overhead and aligns well with serverless best practices.
 
 ## Approach 2: Relational Database – Polling Worker
@@ -258,11 +265,11 @@ const { Client } = require('pg');
 
 **A few thoughts:**
 
-The worker is designed to only pick up events that haven’t yet been published, as indicated by the `published_at IS NULL` condition.
+The worker is designed to only pick up events that haven't yet been published, as indicated by the `published_at IS NULL` condition.
 After a successful publish to EventBridge, it marks the event as published by setting the `published_at` timestamp.
 This simple approach ensures that each event is processed only once.
 
-To safely support concurrent workers, the solution relies on PostgreSQL’s `FOR UPDATE` clause.
+To safely support concurrent workers, the solution relies on PostgreSQL's `FOR UPDATE` clause.
 This mechanism locks the selected rows during processing, so only one worker can claim and publish a given event at a time.
 It effectively prevents duplicate or conflicting work without needing additional coordination infrastructure.
 

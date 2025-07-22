@@ -1,8 +1,8 @@
 ---
 layout: post
 title: 'My First PCB Design: Prototyping an Electronic Chessboard'
-meta: 'Follow my hands-on journey building a prototype electronic chessboard using ESP32-S3, hall sensors, and Neopixel LEDs. Learn about PCB design, prototyping, and lessons for creating interactive hardware projects.'
-summary: 'In this post, I share my journey designing and prototyping my first PCB: a scaled-down electronic chessboard using an ESP32-S3, hall sensors, and Neopixel LEDs. I cover the motivations, design decisions, schematic and PCB layout challenges, and lessons learned while validating key concepts before scaling up to a full 8x8 board.'
+meta: 'Follow my hands-on journey building a prototype electronic chessboard using ESP32-S3, hall sensors, and WS2812 (NeoPixel) LEDs. Learn about PCB design, prototyping, and lessons for creating interactive hardware projects.'
+summary: 'In this post, I share my journey designing and prototyping my first PCB: a scaled-down electronic chessboard using an ESP32-S3, hall sensors, and WS2812 (NeoPixel) LEDs. I cover the motivations, design decisions, schematic and PCB layout challenges, and lessons learned while validating key concepts before scaling up to a full 8x8 board.'
 tags: ['esp32', 'pcb', 'chessboard']
 ---
 
@@ -20,7 +20,7 @@ I wanted a project that would not only push my technical boundaries but also yie
 An electronic chessboard ticked all the boxes:
 
 - **Local and remote play**: The idea is to play against local and remote (using the [Chessmate](https://chessmate.cloud/) API) bots, with the future goal of supporting remote human play.
-- **User feedback**: I opted for per-square feedback using Neopixel RGB LEDs, providing clear visual cues for moves and game states.
+- **User feedback**: I opted for per-square feedback using WS2812 (aka NeoPixel) RGB LEDs, providing clear visual cues for moves and game states.
 - **Piece presence detection**: Instead of identifying individual pieces (which would have required costly RFID hardware), I decided to use hall sensors to simply detect whether a piece is present on a square.
   The MCU (ESP32-S3) would maintain the board state and inform the user of its internal model, so physical and digital states can stay synchronised.
 
@@ -32,7 +32,7 @@ Interestingly, I discovered that with [JLCPCB](https://jlcpcb.com/), smaller PCB
 ### Key Goals for the First Board
 
 - **Test hall sensor through-PCB detection**: I needed to verify that the hall sensors could reliably detect magnetic pieces through the PCB material and determine their optimal positioning.
-- **Validate Neopixel LED placement and brightness**: I wanted to ensure the LEDs would be bright enough for clear visibility in various lighting conditions without interfering with the hall sensors.
+- **Validate WS2812 LED placement and brightness**: I wanted to ensure the LEDs would be bright enough for clear visibility in various lighting conditions without interfering with the hall sensors.
 - **Confirm MCU (ESP32-S3) configuration and power management**: I needed to verify the ESP32-S3 could handle multiple tasks simultaneously - reading sensors, controlling LEDs, managing game logic, handling the display, and running local chess engines.
 - **Explore button placement options**: I wanted to test different button positions for user interface elements like reset buttons, mode switches, and menu navigation.
 - **Break out pins for display exploration**: I added a pin header exposing all unused MCU pins to experiment with display options for the full chessboard.

@@ -1,12 +1,12 @@
 ---
-date: '2025-03-14 07:56:00'
+date: '2025-07-23 11:00:00'
 title: 'About'
 layout: 'about'
 ---
 
 Hey there! I'm Edd 👋🏻, a problem-solver who enjoys programming.
 With over 15 years of experience, I consider myself fortunate to work in a field I'm passionate about.
-I'm always eager to explore and learn new technologies, sharing my insights and experiences on this blog along the way.
+I'm always eager to explore and learn new technologies, sharing my insights and experiences on this blog and [podcast](https://compiledconversations.com/) along the way.
 
 ## Projects
 
@@ -19,6 +19,13 @@ Some of my favorites from recent years include:
 - [**Serverless Fargate**](https://www.serverless.com/plugins/serverless-fargate): A solution to maintain long-running Fargate ECS tasks within Serverless Framework.
 
 ## Podcasting
+
+I currently host the [Compiled Conversations](https://compiledconversations.com/) podcast - in-depth conversations with the people shaping software and technology.
+
+Each episode explores real-world experiences, technical challenges, and the thinking behind the tools, systems, and decisions that drive modern development.
+From engineering practices to architectural choices, this is a show for developers who care about how software is built - and who's building it.
+
+### Past Podcasting
 
 From 2013 to 2019, I co-hosted the [Three Devs and a Maybe](https://threedevsandamaybe.com/) podcast, where we delved into various aspects of software development.
 Initially focused on web technologies, the podcast evolved to cover a broad spectrum of topics, allowing me to engage with and learn from some truly remarkable individuals.

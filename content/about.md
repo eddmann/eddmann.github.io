@@ -8,6 +8,8 @@ Hey there! I'm Edd 👋🏻, a problem-solver who enjoys programming.
 With over 15 years of experience, I consider myself fortunate to work in a field I'm passionate about.
 I'm always eager to explore and learn new technologies, sharing my insights and experiences on this blog and [podcast](https://compiledconversations.com/) along the way.
 
+For a concise overview of my experience, see my [CV](/cv.html).
+
 ## Projects
 
 Outside of work, I enjoy developing small projects to learn new technologies, showcasing them [here](./projects/index.md).

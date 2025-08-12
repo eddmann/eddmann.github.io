@@ -43,15 +43,16 @@ jobs:
           mkdir -p static
           cp cv/cv.html static/cv.html
           cp cv/cv.pdf static/cv.pdf
+          cp cv/cv.json static/cv.json
 
       - name: Commit and push updated artifacts
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add static/cv.html static/cv.pdf
+          git add static/cv.html static/cv.pdf static/cv.json
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Update CV artifacts (HTML & PDF)"
+          git commit -m "Update CV artifacts (HTML, PDF & JSON)"
           git push

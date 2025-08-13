@@ -13,7 +13,8 @@ From this directory:
 npm ci --no-audit --no-fund
 npm run build:html   # generates cv.html
 npm run build:pdf    # generates cv.pdf
+npm run build:txt    # generates cv.txt
 npm run serve        # preview using resume-cli
 ```
 
-Build artifacts (`cv.html`, `cv.pdf`) are produced in this folder. A GitHub Actions workflow (`.github/workflows/build-cv.yml`) also copies `cv.html`, `cv.pdf`, and `cv.json` into the site `static/` directory so they are published.
+Build artifacts (`cv.html`, `cv.pdf`, `cv.txt`) are produced in this folder. A GitHub Actions workflow (`.github/workflows/build-cv.yml`) also copies `cv.html`, `cv.pdf`, and `cv.json` into the site `static/` directory so they are published.

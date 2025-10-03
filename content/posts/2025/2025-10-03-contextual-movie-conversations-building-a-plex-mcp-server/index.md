@@ -83,37 +83,7 @@ The AI assistant uses these tools behind the scenes, combining Plex session data
 
 ![Prompt example](prompt.png)
 
-## Deployment Options
-
 As part of this exploration, I decided to implement support for both MCP transport methods: stdio for local integration and streamable HTTP for web-based clients.
-
-**Streamable HTTP** - For web-based MCP clients:
-
-```json
-{
-  "mcpServers": {
-    "plex": {
-      "type": "http",
-      "url": "http://localhost:8001/mcp/plex"
-    }
-  }
-}
-```
-
-**Stdio** - For local integration (Claude Desktop, Cursor, etc.):
-
-```json
-{
-  "mcpServers": {
-    "plex": {
-      "command": "make",
-      "args": ["mcp/plex"]
-    }
-  }
-}
-```
-
-I used Docker to keep the setup portable, with configuration managed through environment variables for Plex authentication tokens and OpenSubtitles credentials.
 
 ## Example Usage
 

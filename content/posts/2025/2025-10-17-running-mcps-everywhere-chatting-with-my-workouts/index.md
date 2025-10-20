@@ -2,7 +2,7 @@
 layout: post
 title: 'Running MCPs Everywhere: Chatting with My Workouts'
 meta: 'Building Strava and Garmin Connect MCP servers to enable natural language conversations with workout data. Exploring MCP tool design patterns, deployment options, and the power of combining analysis capabilities with LLMs.'
-summary: 'As both a runner and someone curious about MCPs, I wanted to chat about my workouts with an LLM. This led me to build Strava and Garmin Connect MCP servers, exploring the Python/FastMCP stack and discovering patterns for designing effective MCP tools. The result: a system that lets Claude generate throwaway code to analyse my training data in ways I never anticipated.'
+summary: 'As both a runner and someone curious about MCPs, I wanted to chat about my workouts with an LLM. This led me to build Strava and Garmin Connect MCP servers, exploring the Python/FastMCP stack and discovering patterns for designing effective MCP tools. The result: a system that lets Claude/ChatGPT generate throwaway code to analyse my training data in ways I never anticipated.'
 tags: ['mcp', 'strava', 'garmin', 'python', 'llm']
 ---
 
@@ -28,7 +28,7 @@ What I wanted was:
 - True conversation: Ask "why did that run feel hard?" and get thoughtful analysis
 - Flexible exploration: Generate custom graphs, compare arbitrary workouts, find patterns
 - Combined analysis: Pull data from multiple sources (Strava + Garmin) and synthesise insights
-- Code generation: Let Claude write throwaway analysis scripts for one-off questions
+- Code generation: Let Claude/ChatGPT write throwaway analysis scripts for one-off questions
 
 This led me to build MCP servers for both [Strava](https://github.com/eddmann/strava-mcp) and [Garmin Connect](https://github.com/eddmann/garmin-connect-mcp).
 
@@ -113,7 +113,8 @@ The fix was to provide multiple representations of temporal data:
 - Day of week explicitly stated
 
 This redundancy feels verbose when you look at the raw JSON, but it dramatically improved the accuracy of date-based queries.
-The LLM no longer needs to do calendar math in its head.
+While LLMs with code generation capabilities _can_ calculate day of week from a timestamp, why rely on it when you can provide the information directly?
+It's solving a problem you've already solved, and saves tokens on unnecessary computation.
 
 ### Server-side computation
 
@@ -134,7 +135,8 @@ This serves two purposes:
 Similarly, in the Garmin MCP, when retrieving activity details, the server automatically calculates kilometre and mile splits if no lap data is present for a run.
 This means the LLM always has consistent split data to work with, regardless of whether the runner manually lapped their watch.
 
-The LLM becomes better at interpretation and conversation when you handle the computation.
+The LLM becomes better at interpretation and conversation when you handle the computation server-side, even though it could technically generate code to perform these calculations.
+Provide pre-computed insights for typical queries, and save the code generation for novel analysis.
 
 ### Resources and Prompts
 
@@ -145,20 +147,12 @@ Beyond tools, MCP supports **Resources** (persistent context that's always avail
 Resources provide background context that the LLM can reference throughout a conversation without explicit tool calls.
 This is particularly useful for information that's frequently needed but rarely changes.
 
-Strava MCP:
+Both MCPs provide athlete profile resources (stats, zones, gear/PRs), while the Garmin MCP additionally exposes training readiness and health metrics.
 
-- Athlete profile (stats, zones, gear)
+For example, my athlete profile includes my measurement preference (metric) and heart rate zones.
+This means when discussing any run, the LLM automatically presents pace in min/km and distances in kilometres, and can interpret effort levels based on my specific HR zones - all without having to repeatedly ask "Do you prefer metric or imperial?" or "What are your heart rate zones?" in every conversation.
 
-Garmin MCP:
-
-- Athlete profile (stats, zones, PRs)
-- Training readiness (current Body Battery, recovery status)
-- Daily health snapshot (today's steps, sleep, stress, heart rate)
-
-When you ask "Am I ready for a hard workout today?", the LLM can immediately reference your current Body Battery and recovery status from the Garmin resources without needing to fetch them.
-Similarly, when discussing pace targets, it can refer to your threshold heart rate from your athlete profile.
-
-This avoids the pattern of the LLM asking "What's your threshold pace?" when it's information that's already available in your profile.
+This background context keeps conversations focused on analysis rather than data gathering.
 
 #### Prompts: Multi-Tool Orchestration
 
@@ -201,7 +195,7 @@ The simplest setup: MCP servers communicating via standard input/output.
 This works great for single-user, local development with tools like Claude Desktop or Cursor.
 It's fast, requires no exposed ports or firewall rules, and keeps everything contained on your machine.
 
-For Claude Desktop, you configure it in `claude_desktop_config.json`:
+For MCP clients like Claude Desktop or Cursor, you configure it in the client's config file:
 
 ```json
 {
@@ -225,7 +219,7 @@ For Claude Desktop, you configure it in `claude_desktop_config.json`:
 
 I wanted to make these MCP servers easily distributable for single-user scenarios without requiring people to install Python, manage virtual environments, or deal with dependencies.
 
-By packaging the servers as Docker containers, you can configure them in `claude_desktop_config.json`:
+By packaging the servers as Docker containers, you can configure them in the client's config file:
 
 ```json
 {
@@ -332,7 +326,7 @@ One technical challenge worth mentioning: cursor-based pagination.
 When dealing with years of workout data, you can quickly hit LLM context window limits.
 I implemented cursor-based pagination in both MCP servers to ensure we don't try to load thousands of activities at once.
 
-At the moment, I've set arbitrary limits on the amount returned per page.
+Currently, each page returns a maximum of 25 activities to balance context usage with data completeness.
 But I'm thinking about making this more intelligent going forward - perhaps dynamically adjusting based on the type of analysis being performed or automatically summarizing older data.
 
 ## What's Next

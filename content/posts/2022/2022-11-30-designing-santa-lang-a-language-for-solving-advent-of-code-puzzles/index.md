@@ -13,7 +13,7 @@ That way, if I grow to dislike the language, I only have myself to blame!
 
 <!--more-->
 
-[![santa-lang](logo.png)](https://github.com/eddmann/santa-lang-ts)
+[![santa-lang](logo.png)](https://github.com/eddmann/santa-lang-prancer)
 
 Welcome _santa-lang_, my [tree-walking interpreted](<https://en.wikipedia.org/wiki/Interpreter_(computing)>) programming language designed to help tackle Advent of Code puzzles.
 In this article, I would like to discuss the high-level thought process and design considerations that went into building the initial language.
@@ -51,11 +51,11 @@ Thinking upon past experience whilst solving Advent of Code puzzles, and how a l
 With my desired language and runtime goals laid out, I set off in developing the initial implementation.
 Fortunately, there are [some](https://interpreterbook.com/) [amazing](https://monkeylang.org/) [resources](https://craftinginterpreters.com/) available to help get started building your own programming language.
 With respect to my runtime requirements (CLI and Web), and with the feeling that this journey would no doubt be a huge learning experience in itself, I felt it best to opt for a host language I was comfortable in.
-As such, I chose [TypeScript](https://github.com/eddmann/santa-lang-ts).
+As such, I chose [TypeScript](https://github.com/eddmann/santa-lang-prancer).
 
 ### Show me the code?!
 
-One of the biggest takeaways from the initial development phase was the importance of spending time in the [language](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang) you are designing and exercising its use within the domain you want to solve problems in.
+One of the biggest takeaways from the initial development phase was the importance of spending time in the [language](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang) you are designing and exercising its use within the domain you want to solve problems in.
 In my case, this was Advent of Code puzzles.
 Below is an example of this process, where I went about solving [day 1](https://adventofcode.com/2020/day/1) of the 2020 calendar in _santa-lang_.
 
@@ -152,22 +152,22 @@ test: {
 
 Within the above solution to [day 1](https://adventofcode.com/2015/day/1) of the 2015 calendar, you can see the use of infinite ranges, [trailing Lambdas](https://kotlinlang.org/docs/lambdas.html#passing-trailing-lambdas), `if` expressions, and short-circuiting a fold operation early (inspired by [Clojure's](https://clojuredocs.org/clojure.core/reduced) capability).
 
-For more examples, check out the TypeScript implementation's [README](https://github.com/eddmann/santa-lang-ts#readme) and [examples](https://github.com/eddmann/santa-lang-ts/tree/main/examples) directory.
-One example of note is the re-implementation of [map, filter, fold, and reduce](https://github.com/eddmann/santa-lang-ts/blob/main/examples/map-filter-fold-reduce.santa) within the language itself - effectively highlighting the use of pattern matching.
+For more examples, check out the TypeScript implementation's [README](https://github.com/eddmann/santa-lang-prancer#readme) and [examples](https://github.com/eddmann/santa-lang-prancer/tree/main/examples) directory.
+One example of note is the re-implementation of [map, filter, fold, and reduce](https://github.com/eddmann/santa-lang-prancer/blob/main/examples/map-filter-fold-reduce.santa) within the language itself - effectively highlighting the use of pattern matching.
 
 ### The CLI Runtime
 
-Once I had built the [core language](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang) and [runner](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/runner), a lot of time was then focused on developing the [CLI](https://github.com/eddmann/santa-lang-ts/tree/main/src/cli) runtime.
+Once I had built the [core language](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang) and [runner](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang/src/runner), a lot of time was then focused on developing the [CLI](https://github.com/eddmann/santa-lang-prancer/tree/main/src/cli) runtime.
 This was to ensure that I had the correct level of abstraction for what would be required as a runtime (CLI, Web) and core language/runner responsibility.
 
-The resulting CLI is compiled into a single JavaScript artefact using [esbuild](https://esbuild.github.io/), and then subsequently packaged into a [binary](https://github.com/eddmann/santa-lang-ts/blob/main/src/cli/pkg.json) distribution (using [pkg](https://github.com/vercel/pkg)) and a [Docker image](https://github.com/eddmann/santa-lang-ts/blob/main/src/cli/Dockerfile).
+The resulting CLI is compiled into a single JavaScript artefact using [esbuild](https://esbuild.github.io/), and then subsequently packaged into a [binary](https://github.com/eddmann/santa-lang-prancer/blob/main/src/cli/pkg.json) distribution (using [pkg](https://github.com/vercel/pkg)) and a [Docker image](https://github.com/eddmann/santa-lang-prancer/blob/main/src/cli/Dockerfile).
 The inclusion of a Docker image provides me with the ability to easily run the [test suite](https://github.com/eddmann/advent-of-code/blob/master/.github/workflows/2018-santa-lang-test.yml) within my GitHub Action CI environment, in line with other calendar solutions.
 
 ![CLI runtime](cli-runtime.png)
 
 With the optional `-t` flag, we are able to switch between exercising and validating the test input and the real input.
 Additionally, input and output (per runtime) are abstracted away from the core language.
-In the case of the [CLI](https://github.com/eddmann/santa-lang-ts/blob/main/src/cli/src/io.ts), I was able to optionally download (and locally cache) the user's puzzle input with the inclusion of a `SANTA_CLI_SESSION_TOKEN` environment variable.
+In the case of the [CLI](https://github.com/eddmann/santa-lang-prancer/blob/main/src/cli/src/io.ts), I was able to optionally download (and locally cache) the user's puzzle input with the inclusion of a `SANTA_CLI_SESSION_TOKEN` environment variable.
 
 ![CLI runtime error](cli-runtime-error.png)
 
@@ -176,14 +176,14 @@ Aided by the error details the core language emits, I was able to present errors
 
 ### The Web Runtime
 
-With the CLI runtime built, I then moved on to developing the [Web](https://github.com/eddmann/santa-lang-ts/tree/main/src/web) runtime equivalent.
+With the CLI runtime built, I then moved on to developing the [Web](https://github.com/eddmann/santa-lang-prancer/tree/main/src/web) runtime equivalent.
 
-[![Web runtime](web-runtime.png)](https://eddmann.com/santa-lang-ts/)
+[![Web runtime](web-runtime.png)](https://eddmann.com/santa-lang-prancer/)
 
 I opted to use [Next.js](https://nextjs.org/) (purely out of interest, as [CRA](https://reactjs.org/docs/create-a-new-react-app.html) would have sufficed) and [esbuild](https://esbuild.github.io/) to compile and package the resulting artefact.
 Unlike the CLI, which only required source file location input, this version also needed a means for the user to enter a given solution.
 For this, I employed [CodeMirror](https://codemirror.net/), which has a great library with React bindings.
-Upon solution execution, to avoid blocking the user's main browser thread, the language runtime is evaluated within a dedicated [web worker](https://github.com/eddmann/santa-lang-ts/blob/main/src/web/worker.ts).
+Upon solution execution, to avoid blocking the user's main browser thread, the language runtime is evaluated within a dedicated [web worker](https://github.com/eddmann/santa-lang-prancer/blob/main/src/web/worker.ts).
 
 ### The (Bonus) AWS Lambda Runtime
 
@@ -191,11 +191,11 @@ After developing the language and initial CLI and Web runtimes, I took a little 
 This year, I decided to combine every supported Lambda runtime into a Step Function workflow (because... why not?!).
 One such runtime was `provided.al2`, which provides a means of executing your own custom runtime.
 With this project in mind, I thought - wouldn't it be cool to be able to run _santa-lang_ within Lambda?
-As such, I went about building a [Lambda](https://github.com/eddmann/santa-lang-ts/tree/main/src/lambda) runtime that used a defined _section_ to handle the given request.
+As such, I went about building a [Lambda](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lambda) runtime that used a defined _section_ to handle the given request.
 
 ![Lambda runtime](lambda-runtime.png)
 
-The runtime itself was packaged in a similar manner to the CLI binary distribution (using _pkg_), except it honoured the [Custom Runtime API](https://github.com/eddmann/santa-lang-ts/blob/main/src/lambda/src/index.ts) contract laid out for AWS Lambda.
+The runtime itself was packaged in a similar manner to the CLI binary distribution (using _pkg_), except it honoured the [Custom Runtime API](https://github.com/eddmann/santa-lang-prancer/blob/main/src/lambda/src/index.ts) contract laid out for AWS Lambda.
 This highlighted the language's versatility - not only for solving Advent of Code puzzles (by way of the _runner_), but also as a general-purpose language.
 
 ## Conclusion
@@ -207,7 +207,7 @@ The one caveat to this decision, however, is that choosing such a high-level hos
 But as performance was not a key design goal of this project (favouring readability and correctness), I feel this trade-off is acceptable.
 
 Another takeaway from this experience is how the building blocks that compose the final language and runtime can all be built and tested at each isolated level.
-For example, the [lexer](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/lexer), [parser](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/parser), [evaluator](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/evaluator), and subsequent AoC [runner](https://github.com/eddmann/santa-lang-ts/tree/main/src/lang/src/runner) are all separate concerns, built on top of the base formed by previous responsibilities.
+For example, the [lexer](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang/src/lexer), [parser](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang/src/parser), [evaluator](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang/src/evaluator), and subsequent AoC [runner](https://github.com/eddmann/santa-lang-prancer/tree/main/src/lang/src/runner) are all separate concerns, built on top of the base formed by previous responsibilities.
 I found that [the book](https://interpreterbook.com/) laid this concept out very well, and I borrowed a lot of inspiration from it.
 
 On top of this, I have been able to define the specification and intended language behaviour entirely through the included tests.

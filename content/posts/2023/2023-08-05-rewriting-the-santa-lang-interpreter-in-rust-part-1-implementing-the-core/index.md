@@ -41,7 +41,7 @@ For data structure-centric outputs such as the Lexer and Parser, this was ideal.
 ## Lexer
 
 Within the Lexer, I decided to implement the tokenizer as an `Iterator`, which the Parser could consume.
-I additionally used a [macro](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/token.rs#L118-L177) (shown below) to express the Lexer tokens in an [easier-to-read](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/mod.rs#L44) form than the `Token` enumeration itself.
+I additionally used a [macro](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/token.rs#L118-L177) (shown below) to express the Lexer tokens in an [easier-to-read](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/lexer/mod.rs#L44) form than the `Token` enumeration itself.
 
 ```rust
 #[macro_export]
@@ -59,7 +59,7 @@ With the Lexer implemented and tested, the generated tokens were then used to co
 Several interesting choices were made due to using Rust as the implementation language.
 
 In this case, an error was handled using an explicit `Result` type, as opposed to throwing an exception.
-Upon a parser error being found, a [`ParserErr`](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/parser/mod.rs#L26) would be returned with a detailed message and the source location.
+Upon a parser error being found, a [`ParserErr`](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/parser/mod.rs#L26) would be returned with a detailed message and the source location.
 To avoid _indentation hell_, I appreciated how we could express an `Err`, short-circuiting execution using the [question mark operator](https://doc.rust-lang.org/rust-by-example/std/result/question_mark.html).
 For example, `self.expect(T![ID])?` ensures that the next token consumed is an _identifier_, else it short-circuits and returns the `Err` type.
 This syntax also works for `Option` types.
@@ -98,12 +98,12 @@ For example, in the case of `Box<Expression>`, we do not know the exact type/siz
 
 The largest undertaking was evaluating the parsed AST.
 In this step, I opted to use the concept of `Frames` to model the stacked computation.
-Represented as an [enumeration](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/mod.rs#L42C10-L60), it allowed me to trivially express and destructure the different states.
+Represented as an [enumeration](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/mod.rs#L42C10-L60), it allowed me to trivially express and destructure the different states.
 
 Like the TypeScript implementation, trying to break up the evaluation behaviour into manageable-sized chunks was an important task.
 To achieve this, I decided to break up key behaviours into separate functions (located in separate files).
 To ensure that there was no performance penalty or unnecessary function invocation for this decision, I used [inline annotations](https://nnethercote.github.io/perf-book/inlining.html), which will be discussed more in a [future post](../2023-08-07-rewriting-the-santa-lang-interpreter-in-rust-part-3-performance/index.md) within the [series]({{< tag "santa-lang-in-rust-series" >}}).
-Some behaviours that I separated out were language [function invocation](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/function.rs) (user-land, memoized, closures, external and built-in), [infix operations](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/infix.rs), and santa-lang's [match expressions](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/matcher.rs).
+Some behaviours that I separated out were language [function invocation](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/function.rs) (user-land, memoized, closures, external and built-in), [infix operations](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/infix.rs), and santa-lang's [match expressions](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/matcher.rs).
 
 ### Rc\<RefCell\<T\>\>
 
@@ -144,7 +144,7 @@ I had used [dynamic dispatch](https://www.shuttle.rs/blog/2024/04/18/using-trait
 Although highly readable and extendable, it was going to result in runtime performance penalties I was not willing to incur.
 As such, I was only left with in-place invocation.
 
-Taking inspiration from the [enum_dispatch](https://docs.rs/enum_dispatch/latest/enum_dispatch/) crate, I decided to build my own [`builtin!`](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/macros.rs) function suite of macros.
+Taking inspiration from the [enum_dispatch](https://docs.rs/enum_dispatch/latest/enum_dispatch/) crate, I decided to build my own [`builtin!`](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/macros.rs) function suite of macros.
 This allowed me to remove the boilerplate of choosing inline invocation whilst keeping a clean DSL for defining the many different functions the language had to offer.
 A good example of this is how the `map` function is defined, whereby we are able to co-locate the different mapping behaviours based on type.
 
@@ -160,7 +160,7 @@ builtin! {
 }
 ```
 
-Additionally, it catered for [multi-arity arguments](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/collection.rs#L835).
+Additionally, it catered for [multi-arity arguments](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/evaluator/builtins/collection.rs#L835).
 
 ```rust
 builtin! {
@@ -185,7 +185,7 @@ However, it should be noted that a heap allocation is not required if the trait 
 ## Runner
 
 Finally, I was able to build the Advent of Code Runner, which was used to parse the _AoC_ file format and execute the solutions (with provided tests).
-At this step, I enjoyed building a [`Time`](https://github.com/eddmann/santa-lang-rs/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/runner/mod.rs#L82-L84) trait, which was used for runtimes to specify how they determined the current time, as we could not rely solely on a [POSIX](https://en.wikipedia.org/wiki/POSIX) implementation (i.e. WASM).
+At this step, I enjoyed building a [`Time`](https://github.com/eddmann/santa-lang-comet/blob/ec9a5ecc795ea9a67844d0c5d3720e960a8bd31b/lang/src/runner/mod.rs#L82-L84) trait, which was used for runtimes to specify how they determined the current time, as we could not rely solely on a [POSIX](https://en.wikipedia.org/wiki/POSIX) implementation (i.e. WASM).
 I also encapsulated the internal Parser and Runtime errors into a type that is publicly accessible to the runtimes using the `From` trait (`From<RuntimeErr> for RunErr`).
 This ensured that the internal error types remained private and were not leaked out of the _core domain_.
 

@@ -14,7 +14,7 @@ In the final post within the [series]({{< tag "santa-lang-in-rust-series" >}}), 
 
 As documented in a [previous post](../2023-08-05-rewriting-the-santa-lang-interpreter-in-rust-part-1-implementing-the-core/index.md), the project has been structured as a monorepo Cargo workspace, with the language and runtimes being separated into different packages.
 This allows the packages to be built and tested in isolation from one another.
-To provide a deterministic build and release process, I created a [CI/CD pipeline](https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github) using [GitHub Action workflows](https://docs.github.com/en/actions/using-workflows).
+To provide a deterministic build and release process, I created a [CI/CD pipeline](https://github.com/eddmann/santa-lang-comet/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github) using [GitHub Action workflows](https://docs.github.com/en/actions/using-workflows).
 I also opted to add a GitHub Action called [Release Drafter](https://github.com/release-drafter/release-drafter) to the project.
 This provides automatic collection and creation of relevant release notes and semantic versioning based on merged GitHub pull requests (and tags).
 
@@ -28,13 +28,13 @@ Below is a diagram depicting the journey of a change that has been merged into t
 3. With the draft GitHub release now updated, the associated artefacts can be downloaded for local testing/validation.
 4. When happy with the draft release, it can then be published. Upon publishing the release, it in turn publishes all the relevant artefacts to the external package managers (i.e. Docker Hub, NPM, and AWS Lambda layers).
 
-I am very happy with the resulting CI/CD pipeline, with all the build steps being broken out into separate [workflow files](https://github.com/eddmann/santa-lang-rs/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows) for readability.
+I am very happy with the resulting CI/CD pipeline, with all the build steps being broken out into separate [workflow files](https://github.com/eddmann/santa-lang-comet/tree/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows) for readability.
 These `build-*.yml` workflows require a supplied _release version_ argument to correctly build the specific runtime artefact.
 
 I had hoped to be able to keep all the build steps as deterministic Docker entries within the Makefile.
 However, I had issues with compiling the macOS and WASM binaries using this route.
 As such, the CLI and WASM both use the native GitHub Action runners' environment.
-The CLI uses a workflow [job matrix](https://github.com/eddmann/santa-lang-rs/blob/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows/build-cli.yml#L45) to compile and package the binary artefacts per target operating system.
+The CLI uses a workflow [job matrix](https://github.com/eddmann/santa-lang-comet/blob/d175c6a692265d2b66355e17e7cbe2f51f36b3d1/.github/workflows/build-cli.yml#L45) to compile and package the binary artefacts per target operating system.
 
 With this pipeline now in place, easing the future process of making reliable changes to the project, it was time to step back and reflect on the project as a whole.
 

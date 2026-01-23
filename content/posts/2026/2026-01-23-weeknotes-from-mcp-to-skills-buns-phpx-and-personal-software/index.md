@@ -54,6 +54,8 @@ It can even pull in other libraries (graphing ones for example) if the task warr
 
 This past weekend I released two projects that extend this pattern to other ecosystems.
 
+![buns](logo-buns.png)
+
 **[buns](https://github.com/eddmann/buns)** brings UV-style inline scripts to Bun and TypeScript.
 You can write a script with inline npm dependencies:
 
@@ -67,6 +69,8 @@ console.log(chalk.green('Hello from buns!'));
 ```
 
 No `package.json` needed. buns handles dependency isolation, automatic Bun version management, and - crucially - **sandboxing**.
+
+![phpx](logo-phpx.png)
 
 **[phpx](https://github.com/eddmann/phpx)** does the same for PHP with Composer dependencies:
 
@@ -94,10 +98,14 @@ What's been remarkable is using Claude's [frontend-design skill](https://github.
 The quality of designs it produces is genuinely impressive.
 I've built landing pages for [VoiceScribe](https://github.com/eddmann/VoiceScribe), [ClipVault](https://github.com/eddmann/ClipVault), [ClaudeMeter](https://github.com/eddmann/ClaudeMeter), and the various CLIs.
 
+![VoiceScribe landing page](landing-page-voicescribe.png) ![strava-cli landing page](landing-page-strava-cli.png) ![ClaudeMeter landing page](landing-page-claudemeter.png)
+
 Then there's **Step Wars** - a friendly step competition game I built to be used with a friend.
 We compete in step challenges, and since he's into Star Wars, I thought it would be fun to lean into that theme (I'm sure there's a massive copyright claim in there somewhere - please don't sue me).
 The Star Wars crawl intro, the iconic styling - I essentially one-shot prompted it and it just... worked.
 Some refinement for mobile, but the CSS animations and transitions it generated were spot on.
+
+{{< video src="step-wars.mp4" muted="true" loop="true" >}}
 
 This raises the bar for what's expected from open source projects.
 Good documentation, a logo, a landing page - these used to be nice-to-haves.
@@ -118,6 +126,8 @@ I built it for my council, then added a couple of others.
 One of them needed Puppeteer for scraping, which was an interesting [Cloudflare feature](https://developers.cloudflare.com/browser-rendering/puppeteer/) to get to exercise.
 Between that, [D1](https://developers.cloudflare.com/d1/) for SQLite, and [KV](https://developers.cloudflare.com/kv/) for caching - the ecosystem makes these small projects trivial to spin up.
 Now family and friends can subscribe to the iCal feed and we all get reminders.
+
+![BinCal - a bin collection calendar subscription service](bincal.jpg)
 
 Part of why this was so fast is that I'm working "on-distribution" - React, TypeScript, common web patterns.
 The model has seen tons of this in training data, so it just flows.

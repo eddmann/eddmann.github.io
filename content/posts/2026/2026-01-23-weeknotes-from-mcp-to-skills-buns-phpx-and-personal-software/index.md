@@ -116,6 +116,7 @@ The solution: a small app that scrapes the council website and generates calenda
 From idea to deployed took about 20 minutes - idea, implementation, polish, deployment.
 I built it for my council, then added a couple of others.
 One of them needed Puppeteer for scraping, which was an interesting [Cloudflare feature](https://developers.cloudflare.com/browser-rendering/puppeteer/) to get to exercise.
+Between that, [D1](https://developers.cloudflare.com/d1/) for SQLite, and [KV](https://developers.cloudflare.com/kv/) for caching - the ecosystem makes these small projects trivial to spin up.
 Now family and friends can subscribe to the iCal feed and we all get reminders.
 
 Part of why this was so fast is that I'm working "on-distribution" - React, TypeScript, common web patterns.
@@ -192,6 +193,16 @@ Proper change logs, proper releases, proper distribution.
 The toil of managing this across multiple projects would have been prohibitive before.
 Now it's almost automatic.
 
+## Compiled Conversations: Event Sourcing with Shawn McCool
+
+I finally got the chance to release a conversation I had with [Shawn McCool](https://shawnmc.cool/) at the end of last year - [episode 17 of Compiled Conversations](https://compiledconversations.com/17/).
+
+What initially started as a discussion around event sourcing soon expanded into how the architecture had changed the way he thinks about building software at a fundamental level.
+I admire how Shawn is able to articulate such complex concepts, and I feel his [Event Sourcery](https://www.youtube.com/c/EventSourcery) course is an invaluable resource to learn not only event sourcing but domain modelling as well.
+
+An important part of our discussion was moving away from noun-centric thinking - framing aggregates as "lifecycles, not nouns".
+His practical example of payment processing with 30-minute event lifecycles was a good illustration of how short-lived event streams simplify versioning and data retention.
+
 ## What I've Been Watching/Listening To
 
 Some links that have been rattling around:
@@ -207,7 +218,6 @@ Some links that have been rattling around:
 **Videos:**
 
 - [The Ralph Wiggum Loop from 1st Principles](https://www.youtube.com/watch?v=4Nna09dG_c0) - Geoffrey Huntley explaining context allocation and avoiding compaction
-- [Inventing the Ralph Wiggum Loop](https://www.youtube.com/watch?v=C1YNGy6qusg) - Dev Interrupted podcast with Geoffrey Huntley
 - [Ralph Wiggum (and why Claude Code's implementation isn't it)](https://www.youtube.com/watch?v=O2bBWDoxO4s) - Geoffrey Huntley and Dex Horthy fireside chat
 - [Ralph Wiggum Showdown](https://www.youtube.com/watch?v=SB6cO97tfiY) - Dex and Geoff comparing implementations
 - [We need to talk about Ralph](https://www.youtube.com/watch?v=Yr9O6KFwbW4) - what if we put Claude Code in a while loop?
@@ -220,6 +230,8 @@ Some links that have been rattling around:
 **Podcasts:**
 
 - [Ethers Club #58: Mario Zechner on Pi and AI Agents](https://www.buzzsprout.com/1988715/episodes/18532669) - conversation on coding agents
+- [Raising An Agent #9](https://youtu.be/2wjnV6F2arc) - Quinn and Thorsten discuss Gemini 3 and Opus 4.5, the death of the assistant paradigm, and building agentic codebases
+- [Inventing the Ralph Wiggum Loop](https://www.youtube.com/watch?v=C1YNGy6qusg) - Dev Interrupted podcast with Geoffrey Huntley
 
 ---
 

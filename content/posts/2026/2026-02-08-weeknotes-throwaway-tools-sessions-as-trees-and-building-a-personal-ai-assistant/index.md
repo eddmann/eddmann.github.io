@@ -35,7 +35,7 @@ But more importantly, you can give the agent the ability to close its own feedba
 
 This doesn't replace good test coverage - automated testing and regression suites are still essential.
 But these temporary tools fill the role that writing tests for discovery used to.
-Where in the past you'd write a quick test to explore a hypothesis, now you build a rich CLI or dashboard instead.
+Where in the past you'd write a quick test to explore a hypothesis, now you can build a rich CLI or dashboard instead.
 
 ## F1 Picks 2026
 

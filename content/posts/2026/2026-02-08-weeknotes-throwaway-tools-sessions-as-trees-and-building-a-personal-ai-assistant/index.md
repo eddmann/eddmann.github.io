@@ -72,15 +72,16 @@ Instead, we went **pragmatic**.
 The core principle from all these approaches is the same: depend on abstractions, not implementations.
 So the driven ports are there - all infrastructure concerns (database, external APIs) are abstracted behind interfaces that can be tested in isolation.
 But there are no driving port adapters.
-The delivery layer calls the use cases (really just _fat_ services) directly.
+The delivery layer calls the use cases (really just _fat_ application services) directly, and there's no distinct domain model layer underneath - shared types are used as-is.
 
 The testing strategy matters just as much.
 I'm a big fan of the Chicago school - test behaviour at the public API boundary, not implementation details.
 This is what [Ian Cooper talks about](https://www.youtube.com/watch?v=EZ05e7EMOLM) in his "TDD, Where Did It All Go Wrong" talk: test the behaviour from the outside, _double_ the collaborators, and you get tests that tell you _what_ broke, not just _that_ something broke.
 
-The reason you test at different levels is about **locating problems**.
-If everything is tested end-to-end, a failure could be anywhere.
-A focused unit (of behaviour) test around a use case with external concerns _doubled_ out tells you exactly where the problem is.
+The reason you test at different levels is about **localised, timely feedback**.
+A broad end-to-end test tells you something is broken, but the problem could be anywhere in the stack - you've gained confidence but not locality.
+A focused unit (of behaviour) test around a use case with external concerns _doubled_ out narrows the blast radius: when it fails, you know _where_ the problem is, and you know _fast_.
+The more localised the test, the tighter the feedback loop.
 
 What's rewarding is being able to discuss this _with_ the agent at a high level - "what architecture pattern fits here?", "how should we approach testing?", "should we use MSW for the client?" - and then have it implement those decisions consistently across both the client and the API.
 Write it up in the documentation, get alignment, and the agent follows the patterns.
@@ -241,7 +242,10 @@ Self-correcting skill development.
 
 This pattern of using libraries directly - the Plex Python library, [Playwright](https://playwright.dev/) for browser automation, [Octokit](https://github.com/octokit/octokit.js) for GitHub - feels more powerful than wrapping everything in CLIs.
 
-Over the next few weeks I want to explore memory more deeply.
+For memory, the current approach is straightforward: the context window is the last 50 messages, and a set of core memory files (like MEMORY.md and USER.md) are always injected into the system prompt.
+There are also daily memory files (memory/YYYY-MM-DD.md) for episodic notes.
+The assistant is given guidance to update both core and daily memory when it sees fit - there's no forced sync point or trigger, it just maintains its own memory as the conversation flows.
+Over the next few weeks I want to explore memory more deeply - TJ's work on Truths and multi-generational consolidation, along with the OpenClaw and NanoClaw approaches, have given me a lot of ideas.
 
 ## What I've Been Watching/Listening To
 

@@ -50,7 +50,7 @@ At the time, I thought that was impressive - flinging code between ChatGPT and m
 Very much a person in the middle.
 
 The 2026 version? About an hour.
-Full new system on Cloudflare with a D1 database, a completely reworked point system that I explored and validated with the family, compreshive test coverage, solid architecture.
+Full new system on Cloudflare with a D1 database, a completely reworked point system that I explored and validated with the family, comprehensive test coverage, solid architecture.
 And this isn't vibe coding - I ran it through the same deliberate process I described [last week](../2026-01-31-weeknotes-model-personalities-building-my-own-agent-and-two-schools-of-agentic-development/): explore with Opus 4.5, solidify with Codex 5.2, then implement with patterns established.
 
 ![F1 Picks 2026 - Dashboard](f1-picks-dashboard.png) ![F1 Picks 2026 - Calendar](f1-picks-calendar.png)

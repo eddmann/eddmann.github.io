@@ -223,6 +223,8 @@ NanoClaw's philosophy resonated: small enough to understand, secure by container
 So I built **[Jeeves](https://github.com/eddmann/jeeves)** - my personal AI assistant, housed in a Docker container running on a Raspberry Pi.
 It sits somewhere between NanoClaw's simplicity and OpenClaw's ambition.
 
+![Jeeves](jeeves-header.png)
+
 Key design decisions:
 
 - **Telegram only** - it's what I use

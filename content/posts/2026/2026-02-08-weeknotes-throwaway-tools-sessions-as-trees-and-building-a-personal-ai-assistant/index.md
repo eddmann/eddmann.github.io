@@ -218,9 +218,9 @@ The [refinement update](https://www.tjmiller.me/posts/truths-refinement-update/)
 That conversation, combined with listening to [Mario and Armin on Syntax.fm](https://syntax.fm/show/976/pi-the-ai-harness-that-powers-openclaw-w-armin-ronacher-and-mario-zechner) discussing Pi and [OpenClaw](https://openclaw.ai/), pushed me to build my own.
 
 I'd been looking more closely at OpenClaw, and then I noticed [NanoClaw](https://github.com/gavrielc/nanoclaw) - a stripped-down, easy to understand alternative.
-NanoClaw's philosophy resonated: small enough to understand, secure by container isolation (not permission checks), built for one user.
+NanoClaw's philosophy resonated: small enough to understand, secure by container isolation, built for one user.
 
-So I built **Jeeves** - my personal AI assistant, housed in a Docker container running on a Raspberry Pi.
+So I built **[Jeeves](https://github.com/eddmann/jeeves)** - my personal AI assistant, housed in a Docker container running on a Raspberry Pi.
 It sits somewhere between NanoClaw's simplicity and OpenClaw's ambition.
 
 Key design decisions:
@@ -242,8 +242,8 @@ Self-correcting skill development.
 
 This pattern of using libraries directly - the Plex Python library, [Playwright](https://playwright.dev/) for browser automation, [Octokit](https://github.com/octokit/octokit.js) for GitHub - feels more powerful than wrapping everything in CLIs.
 
-For memory, the current approach is straightforward: the context window is the last 50 messages, and a set of core memory files (like MEMORY.md and USER.md) are always injected into the system prompt.
-There are also daily memory files (memory/YYYY-MM-DD.md) for episodic notes.
+For memory, the current approach is straightforward: the context window is the last 50 messages, and a set of core memory files (like `MEMORY.md` and `USER.md`) are always injected into the system prompt.
+There are also daily memory files (`memory/YYYY-MM-DD.md`) for episodic notes.
 The assistant is given guidance to update both core and daily memory when it sees fit - there's no forced sync point or trigger, it just maintains its own memory as the conversation flows.
 Over the next few weeks I want to explore memory more deeply - TJ's work on Truths and multi-generational consolidation, along with the OpenClaw and NanoClaw approaches, have given me a lot of ideas.
 

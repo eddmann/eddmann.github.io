@@ -82,7 +82,7 @@ It's additive, not a rewrite.
 
 ![Step Wars with HealthKit integration](step-wars-healthkit.png)
 
-## Coding Agent: Refactoring with Codex 5.3
+## Coding Agent: Refactoring with GPT‑5.3‑Codex
 
 I continued refactoring [My Own Coding Agent](https://github.com/eddmann/my-own-coding-agent) this week, with two big threads: testing philosophy and model support.
 
@@ -97,16 +97,16 @@ Thinking carefully about what constitutes a public API boundary forces you to th
 Better tests led to better structure.
 
 The other thread was model support.
-I added **[OpenAI Codex 5.3](https://openai.com/index/introducing-gpt-5-3-codex/)** support at the beginning of the week, which means you can now use your ChatGPT subscription with the agent.
+I added **[GPT‑5.3‑Codex](https://openai.com/index/introducing-gpt-5-3-codex/)** support at the beginning of the week, which means you can now use your ChatGPT subscription with the agent.
 I also revisited **OpenRouter** support and played with local language models - using OpenRouter as an OpenAI-compatible LLM provider, and running models locally using [Ollama](https://ollama.com/).
 Documented all of that too, which was a satisfying exercise in itself.
 
 The workflow from previous weeks continues to evolve but the shape is the same.
 **Opus 4.6 for quick iteration** - tight REPL loops, tracer bullets, fast feedback.
-**Codex for big architectural thinking** - structural changes, refactoring, rethinking boundaries.
-The new Codex 5.3 gave me a great opportunity to exercise this: using it for the testing refactoring, letting it reason about module boundaries and test design while I focused on direction.
+**GPT‑5.3‑Codex for big architectural thinking** - structural changes, refactoring, rethinking boundaries.
+The new GPT‑5.3‑Codex gave me a great opportunity to exercise this: using it for the testing refactoring, letting it reason about module boundaries and test design while I focused on direction.
 
-One observation that keeps surprising me: **I don't think about context windows anymore** when working with Codex.
+One observation that keeps surprising me: **I don't think about context windows anymore** when working with GPT‑5.3‑Codex.
 I just talk.
 The compaction is intelligent enough that I don't see regressions even in long sessions with big architectural changes.
 The model maintains coherence across compaction boundaries in a way that feels seamless.

@@ -110,11 +110,11 @@ One observation that keeps surprising me: **I don't think about context windows 
 I just talk.
 The compaction is intelligent enough that I don't see regressions even in long sessions with big architectural changes.
 The model maintains coherence across compaction boundaries in a way that feels seamless.
-I may be doing these big structural changes, splitting modules, reorganising tests - and the model tracks it all through compaction without missing a beat.
+I could be making big structural changes, splitting modules, reorganising tests - and the model tracks it all through compaction without missing a beat.
 
 ## Jeeves: Hybrid Memory and Multimodal
 
-I managed to spend alittle more time on [Jeeves](https://github.com/eddmann/jeeves) this week, building on the conversation I had with [TJ Miller](https://tjmiller.me/) about memory last week.
+I managed to spend a little more time on [Jeeves](https://github.com/eddmann/jeeves) this week, building on the conversation I had with [TJ Miller](https://tjmiller.me/) about memory last week.
 
 The biggest addition is the **long-term memory system** - a hybrid search index using SQLite.
 [FTS5](https://www.sqlite.org/fts5.html) handles keyword search, and [`sqlite-vec`](https://github.com/asg017/sqlite-vec) provides native vector similarity search using OpenAI embeddings.
@@ -180,6 +180,12 @@ All the basic principles of security - least privilege, defence in depth, separa
 Because here's the tension: **security is friction, and usefulness comes from giving agents access**.
 The magic happens when you let agents operate mostly autonomously with broad access to your machine, your codebase, your services.
 But that's exactly the access an injected prompt would exploit.
+
+Simon Willison calls this the **[lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)**: an agent that can read private data, take actions (send emails, execute code), _and_ process untrusted content.
+Any two of those are manageable; all three together and a successful prompt injection becomes a full compromise.
+Jeeves pointed this out to me itself, unprompted - it ticks all three boxes.
+
+![Jeeves discussing the lethal trifecta](jeeves-lethal-trifecta.png)
 
 We need to be thinking about this seriously as the ecosystem matures.
 It's not a solved problem.

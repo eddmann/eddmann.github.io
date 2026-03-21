@@ -206,6 +206,7 @@ Links, reads, watches, and listens from the week.
 - [Skill Test-Driven Development for Claude Code](https://www.aihero.dev/skill-test-driven-development-claude-code) - a TDD skill that enforces one-test-one-implementation vertical slicing
 - [ypi: A Recursive Coding Agent](https://raw.works/ypi-a-recursive-coding-agent/) - a recursive agent built on Pi that delegates sub-problems to itself
 - [DeepWiki](https://deepwiki.com/) - conversational AI documentation for GitHub repositories
+- [Joy & Curiosity #74](https://registerspill.thorstenball.com/p/joy-and-curiosity-74) - Thorsten Ball on AI's transformative impact on software engineering and the shifting nature of technical work
 
 **Podcasts/Videos:**
 

@@ -125,6 +125,7 @@ Links, reads, watches, and listens from the week.
 **Articles:**
 
 - [Joy & Curiosity #75](https://registerspill.thorstenball.com/p/joy-and-curiosity-75) - Thorsten Ball on where software is heading in the age of AI agents
+- [Joy & Curiosity #76](https://registerspill.thorstenball.com/p/joy-and-curiosity-76) - Thorsten Ball on why manually writing code still matters for learning, even with agents
 - [Agentic Engineering Patterns](https://simonwillison.net/2026/Feb/23/agentic-engineering-patterns/) - Simon Willison collecting patterns for building software with coding agents
 
 **Podcasts/Videos:**

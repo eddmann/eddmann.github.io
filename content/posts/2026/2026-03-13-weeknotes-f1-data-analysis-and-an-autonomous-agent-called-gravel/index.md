@@ -83,6 +83,7 @@ Links, reads, watches, and listens from the week.
 - [From IDEs to AI Agents with Steve Yegge](https://newsletter.pragmaticengineer.com/p/from-ides-to-ai-agents-with-steve) - Pragmatic Engineer on the shift from traditional IDEs to agentic development
 - [Daniel Bourke — Fine-tuning SLMs for iPhone](https://youtu.be/EXB8HokGVMI) - getting small language models running on-device
 - [Pragmatic AI: The Education Business in an AI World](https://share.transistor.fm/s/0d04649f) - Jeffrey Way on education when AI can teach
+- [State of Agentic Coding #4](https://www.youtube.com/watch?v=7bMqicE5Jmk) - Armin Ronacher and Ben on the current state of coding with agents
 
 ---
 

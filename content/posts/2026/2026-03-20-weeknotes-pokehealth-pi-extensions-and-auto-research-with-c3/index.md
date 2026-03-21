@@ -113,6 +113,8 @@ Links, reads, watches, and listens from the week.
 **Podcasts/Videos:**
 
 - [Pragmatic AI: How AI Is Changing Writing](https://share.transistor.fm/s/0d04649f) - Jordan Keller on AI's impact on writing
+- [Cloudflare's Next.js Slop Fork](https://www.youtube.com/watch?v=h39oZb2-7Xo) - Syntax on Cloudflare's opinionated Next.js fork
+- [Daniel Priestley: AI Will Make Plumbers Earn More Than Lawyers](https://www.youtube.com/watch?v=fpETS6q1Hww) - The Diary Of A CEO on how AI reshapes which jobs hold value
 
 ---
 

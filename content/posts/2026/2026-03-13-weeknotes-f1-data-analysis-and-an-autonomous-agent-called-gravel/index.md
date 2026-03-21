@@ -74,6 +74,8 @@ Links, reads, watches, and listens from the week.
 - [NanoClaw Docker Sandboxes](https://nanoclaw.dev/blog/nanoclaw-docker-sandboxes/) - container-based sandboxing for AI agent execution
 - [Your LLM Doesn't Write Correct Code](https://blog.katanaquant.com/p/your-llm-doesnt-write-correct-code) - why generated code needs verification, not blind trust
 - [This CSS Proves Me Human](https://will-keleher.com/posts/this-css-makes-me-human/) - the small creative choices in CSS that AI doesn't replicate
+- [AINews: The high-return activity of raising your aspirations for LLMs](https://www.latent.space/p/ainews-the-high-return-activity-of) - Latent Space on agent infrastructure, MCP debates, and raising ambitions for what LLMs can do
+- [AINews: Context Drought](https://www.latent.space/p/ainews-context-drought) - Latent Space on why context windows haven't grown past 1M and the memory shortage behind it
 
 **Podcasts/Videos:**
 

@@ -109,6 +109,8 @@ Links, reads, watches, and listens from the week.
 - [Which AI Model Is Best for Laravel?](https://laravel.com/blog/which-ai-model-is-best-for-laravel) - benchmarking models against Laravel-specific tasks
 - [Porting software is trivial now](https://ghuntley.com/porting/) - Geoffrey Huntley on how AI makes cross-platform porting near-effortless
 - [Joy & Curiosity #78](https://registerspill.thorstenball.com/p/joy-and-curiosity-78) - Thorsten Ball on curiosity-driven development and staying sharp
+- [AINews: Claude Cowork Dispatch](https://www.latent.space/p/ainews-claude-cowork-dispatch-anthropics) - Latent Space on Anthropic's answer to OpenClaw, GPT-5.4 mini/nano, and agent sandboxes
+- [AINews: Every Lab has bought their own Devtools](https://www.latent.space/p/ainews-every-lab-serious-enough-about) - Latent Space on OpenAI acquiring Astral, Cursor Composer 2, and the shift to agent fleets
 
 **Podcasts/Videos:**
 

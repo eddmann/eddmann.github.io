@@ -64,15 +64,25 @@ It also works with your Claude Max plan, which makes running it regularly viable
 
 The SDK sits underneath Claude Code, so understanding it gives you a better mental model of what's happening when you use the higher-level tools.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
+
+**Articles:**
+
+- [Why ATMs didn't kill bank teller jobs, but the iPhone did](https://davidoks.blog/p/why-the-atm-didnt-kill-bank-teller) - automation doesn't always displace, sometimes it reshapes
+- [NanoClaw Docker Sandboxes](https://nanoclaw.dev/blog/nanoclaw-docker-sandboxes/) - container-based sandboxing for AI agent execution
+- [Your LLM Doesn't Write Correct Code](https://blog.katanaquant.com/p/your-llm-doesnt-write-correct-code) - why generated code needs verification, not blind trust
+- [This CSS Proves Me Human](https://will-keleher.com/posts/this-css-makes-me-human/) - the small creative choices in CSS that AI doesn't replicate
 
 **Podcasts/Videos:**
 
 - [Taylor Otwell at Laracon EU](https://www.youtube.com/watch?v=cucIWpAenro&t=32587s) - self-healing Laravel app live on stage, the full autonomous loop
-
-**Tools:**
-
-- [Google Workspace CLI](https://github.com/googleworkspace/cli) - official CLI for Drive/Gmail/Calendar/Sheets in Rust with MCP server. Big companies seeing value in CLIs and skills
+- [Dylan Patel — Bottlenecks to Scaling AI Compute](https://www.dwarkesh.com/p/dylan-patel) - Dwarkesh Patel on the hardware and supply chain constraints limiting AI scale
+- [The Most Important Question About AI](https://www.dwarkesh.com/p/dow-anthropic) - Dwarkesh Patel on what matters most as AI capabilities advance
+- [From IDEs to AI Agents with Steve Yegge](https://newsletter.pragmaticengineer.com/p/from-ides-to-ai-agents-with-steve) - Pragmatic Engineer on the shift from traditional IDEs to agentic development
+- [Daniel Bourke — Fine-tuning SLMs for iPhone](https://youtu.be/EXB8HokGVMI) - getting small language models running on-device
+- [Pragmatic AI: The Education Business in an AI World](https://share.transistor.fm/s/0d04649f) - Jeffrey Way on education when AI can teach
 
 ---
 

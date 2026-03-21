@@ -280,7 +280,9 @@ Nick walked through his four-pillar framework for modernization and talked about
 What I found particularly interesting was how he's using Claude Code for code analysis, refactoring, and maintaining living documentation.
 He talked about guardrails - linting, test coverage, complexity limits - and running multi-agent workflows in parallel.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 

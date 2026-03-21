@@ -118,7 +118,9 @@ The knowledge accumulates even when I'm away from a desk.
 It's gone from scrolling to curation.
 Jeeves distils what matters based on what it knows about me.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 

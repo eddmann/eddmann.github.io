@@ -100,18 +100,27 @@ Instead of lossy compaction, LCM builds a DAG of hierarchical summaries. Nothing
 Relevant to Jeeves's context bloat.
 This is something I'm looking to explore in the near future.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 
 - [Clinejection](https://adnanthekhan.com/posts/clinejection/) - supply chain attack via prompt injection in a GitHub issue title, one AI tool bootstrapping another without consent
 - [The AI Vampire](https://steve-yegge.medium.com/the-ai-vampire-eda6e4f07163) - Steve Yegge on burnout in the age of AI
 - [Agent Safehouse](https://agent-safehouse.dev/) - kernel-level macOS sandboxing via a single shell script, zero access by default
+- [Welcome to the Wasteland: A Thousand Gas Towns](https://steve-yegge.medium.com/welcome-to-the-wasteland-a-thousand-gas-towns-a5eb9bc8dc1f) - Steve Yegge on the coming wave of AI-generated software
+- [NanoClaw Security Model](https://nanoclaw.dev/blog/nanoclaw-security-model/) - "Don't trust AI agents", sandboxing and permission models for agentic code
+- [Software development costs less than minimum wage](https://ghuntley.com/real/) - Geoffrey Huntley on the collapsing cost of producing software
+- [Writing code is cheap now](https://simonwillison.net/guides/agentic-engineering-patterns/code-is-cheap/) - Simon Willison on agentic engineering patterns when generating code costs almost nothing
 
 **Podcasts/Videos:**
 
 - [Marc Andreessen on Lenny's Newsletter](https://www.lennysnewsletter.com/p/marc-andreessen-the-real-ai-boom) - AI countering demographic collapse, E-shaped careers, still learn to code
 - [Joy & Curiosity #77](https://registerspill.thorstenball.com/p/joy-and-curiosity-77) - Thorsten Ball on attention management with agents, software deflation, Don Knuth's open problem solved by Opus 4.6
+- [Building Claude Code with Boris Cherny](https://newsletter.pragmaticengineer.com/p/building-claude-code-with-boris-cherny) - Pragmatic Engineer deep dive into how Claude Code was built
+- [Pragmatic AI: Dreaming Bigger](https://share.transistor.fm/s/0d04649f) - Aaron Francis on thinking bigger with AI
+- [Pragmatic AI: AI's Impact on Open Source Funding](https://share.transistor.fm/s/0d04649f) - Adam Wathan on how AI changes the open source funding model
 
 ---
 

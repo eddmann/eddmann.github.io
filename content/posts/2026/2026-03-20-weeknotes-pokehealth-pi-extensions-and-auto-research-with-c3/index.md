@@ -98,6 +98,22 @@ I've been able to tailor the agent harness specifically for this project. The au
 A more opinionated harness would fight you on this kind of customisation.
 Pi just gets out of the way and lets you close the feedback loop however you need to.
 
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
+
+**Articles:**
+
+- [MCP is Dead; Long Live MCP!](https://chrlschn.dev/blog/2026/03/mcp-is-dead-long-live-mcp/) - the protocol's limitations and what comes next
+- [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) - Anthropic's reference guide on agent architecture and design patterns
+- [Which AI Model Is Best for Laravel?](https://laravel.com/blog/which-ai-model-is-best-for-laravel) - benchmarking models against Laravel-specific tasks
+- [Porting software is trivial now](https://ghuntley.com/porting/) - Geoffrey Huntley on how AI makes cross-platform porting near-effortless
+- [Joy & Curiosity #78](https://registerspill.thorstenball.com/p/joy-and-curiosity-78) - Thorsten Ball on curiosity-driven development and staying sharp
+
+**Podcasts/Videos:**
+
+- [Pragmatic AI: How AI Is Changing Writing](https://share.transistor.fm/s/0d04649f) - Jordan Keller on AI's impact on writing
+
 ---
 
 PokéHealth has been pure fun, and a good excuse to put PWAKit through its paces with real native integration.

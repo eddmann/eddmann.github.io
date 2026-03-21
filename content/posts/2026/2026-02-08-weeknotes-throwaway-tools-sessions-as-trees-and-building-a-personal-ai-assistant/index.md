@@ -249,7 +249,9 @@ There are also daily memory files (`memory/YYYY-MM-DD.md`) for episodic notes.
 The assistant is given guidance to update both core and daily memory when it sees fit - there's no forced sync point or trigger, it just maintains its own memory as the conversation flows.
 Over the next few weeks I want to explore memory more deeply - TJ's work on Truths and multi-generational consolidation, along with the OpenClaw and NanoClaw approaches, have given me a lot of ideas.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 

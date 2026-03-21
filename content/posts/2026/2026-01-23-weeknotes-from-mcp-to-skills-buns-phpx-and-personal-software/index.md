@@ -213,9 +213,9 @@ I admire how Shawn is able to articulate such complex concepts, and I feel his [
 An important part of our discussion was moving away from noun-centric thinking - framing aggregates as "lifecycles, not nouns".
 His practical example of payment processing with 30-minute event lifecycles was a good illustration of how short-lived event streams simplify versioning and data retention.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
 
-Some links that have been rattling around:
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 

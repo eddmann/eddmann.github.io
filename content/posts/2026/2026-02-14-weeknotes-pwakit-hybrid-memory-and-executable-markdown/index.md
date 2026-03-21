@@ -192,7 +192,9 @@ It's not a solved problem.
 It may not be solvable in the traditional sense.
 But awareness matters.
 
-## What I've Been Watching/Listening To
+## What I've Been Learning From
+
+Links, reads, watches, and listens from the week.
 
 **Articles:**
 

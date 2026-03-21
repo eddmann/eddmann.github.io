@@ -32,7 +32,7 @@ The implementation runs Pokémon Red via the `binjgb` Game Boy emulator in WASM,
 Health data comes through PWAKit's HealthKit bridge on iOS.
 The JS side computes modifiers from your daily metrics and periodically writes them into the emulator's shared memory region. The ROM reads those bytes and applies the effects.
 
-![PokéHealth gameplay](pokehealth-gameplay.png) ![PokéHealth health stats](pokehealth-health.png) ![PokéHealth debug panel](pokehealth-debug.png)
+![PokéHealth gameplay](pokehealth-gameplay.png) ![PokéHealth health stats](pokehealth-health.png) ![PokéHealth HealthKit data](pokehealth-debug.png)
 
 It's been a lot of fun to build, and a great excuse to properly exercise PWAKit with native feature integration.
 Inspired in part by [Dimillian's PokeSwift](https://github.com/Dimillian/PokeSwift) work, which got me thinking about Pokémon projects again.

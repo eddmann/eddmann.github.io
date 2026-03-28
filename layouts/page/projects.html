@@ -6,30 +6,166 @@
   </header>
 
   <section class="projects">
-    {{- range .Site.Data.projects -}}
-      <article class="project u-underline-on-hover u-overlay-wrapper">
-        <div class="project__image-wrapper">
-          <img class="project__image" src="/projects/{{- .image -}}" alt="{{- .name -}}" />
-        </div>
-        <div class="project__details">
-          <header>
-            <h2 class="u-h4 u-underline">{{- .name -}}</h2>
-          </header>
-          <main>
-            <p class="project__description">{{- .description -}} </p>
-            <a class="u-overlay" href="{{- .url -}}" rel="external noopener" target="_blank">{{- .name -}}</a>
-          </main>
-          <footer>
+    {{/* santa-lang */}}
+    <div class="projects__section">
+      <h2 class="projects__heading">
+        <a href="https://eddmann.com/santa-lang/" rel="external noopener" target="_blank">santa-lang</a>
+      </h2>
+      <p class="projects__intro">I built a programming language to learn how they work - then kept going...</p>
+      <ul class="tags">
+        {{- range (index .Site.Data.projects.languages 0).tags -}}
+          <li>{{- . -}}</li>
+        {{- end -}}
+      </ul>
+      <div class="projects__children">
+        {{- range (index .Site.Data.projects.languages 0).children -}}
+          <a class="projects__child" href="{{- .url -}}" rel="external noopener" target="_blank">
+            <span class="projects__child-name">{{- .name -}}</span>
+            <span class="projects__child-description">{{- .description -}}</span>
+          </a>
+        {{- end -}}
+      </div>
+    </div>
+
+    {{/* Apps */}}
+    <div class="projects__section">
+      <h2 class="projects__heading">Apps</h2>
+      <p class="projects__intro">Native apps I've built for iOS and macOS, most scratching a personal itch.</p>
+      <div class="projects__list">
+        {{- range .Site.Data.projects.apps -}}
+          <a class="projects__app" href="{{- .url -}}" rel="external noopener" target="_blank">
+            <img class="projects__app-icon" src="/projects/{{- .icon -}}" alt="{{- .name -}}" loading="lazy" />
+            <div class="projects__app-details">
+              <h3 class="projects__app-name">{{- .name -}}</h3>
+              <p class="projects__app-description">{{- .description -}}</p>
+            </div>
+            <span class="projects__app-platform">{{- .platform -}}</span>
+          </a>
+        {{- end -}}
+      </div>
+    </div>
+
+    {{/* AI & Agents */}}
+    <div class="projects__section">
+      <h2 class="projects__heading">AI & Agents</h2>
+      <p class="projects__intro">Exploring how to build AI agents and connect them to the services I use every day.</p>
+      <div class="projects__list">
+        {{- range .Site.Data.projects.ai.agents -}}
+          <a class="projects__item" href="{{- .url -}}" rel="external noopener" target="_blank">
+            <div class="projects__item-details">
+              <h3 class="projects__item-name">{{- .name -}}</h3>
+              <p class="projects__item-description">{{- .description -}}</p>
+            </div>
             <ul class="tags">
               {{- range .tags -}}
                 <li>{{- . -}}</li>
               {{- end -}}
             </ul>
-          </footer>
+          </a>
+        {{- end -}}
+      </div>
+      <details class="projects__collapsible">
+        <summary class="projects__collapsible-trigger">Integrations</summary>
+        <div class="projects__list">
+          {{- range .Site.Data.projects.ai.integrations -}}
+            <div class="projects__item projects__item--static">
+              <div class="projects__item-details">
+                <h3 class="projects__item-name">{{- .name -}}</h3>
+                <p class="projects__item-description">{{- .description -}}</p>
+              </div>
+              <div class="projects__item-links">
+                {{- if .cli_url -}}
+                  <a class="projects__item-link" href="{{- .cli_url -}}" rel="external noopener" target="_blank">CLI</a>
+                {{- end -}}
+                {{- if .mcp_url -}}
+                  <a class="projects__item-link" href="{{- .mcp_url -}}" rel="external noopener" target="_blank">MCP</a>
+                {{- end -}}
+              </div>
+            </div>
+          {{- end -}}
         </div>
-      </article>
-    {{- end -}}
+      </details>
+    </div>
+
+    {{/* Secret Santa */}}
+    <div class="projects__section">
+      <h2 class="projects__heading">Secret Santa</h2>
+      <p class="projects__intro">Every Christmas I find a new, increasingly unnecessary way to allocate Secret Santa names.</p>
+      <ul class="tags">
+        {{- range (index .Site.Data.projects.secret_santa 0).tags -}}
+          <li>{{- . -}}</li>
+        {{- end -}}
+      </ul>
+      <div class="projects__children">
+        {{- range (index .Site.Data.projects.secret_santa 0).children -}}
+          <a class="projects__child" href="{{- .url -}}" rel="external noopener" target="_blank">
+            <span class="projects__child-name">{{- .name -}}</span>
+            <span class="projects__child-description">{{- .description -}}</span>
+          </a>
+        {{- end -}}
+      </div>
+    </div>
+
+    {{/* Experiments & More */}}
+    <div class="projects__section">
+      <h2 class="projects__heading">Experiments & More</h2>
+      <p class="projects__intro">Things I built mostly to see if I could.</p>
+      <div class="projects__list">
+        {{- range .Site.Data.projects.experiments -}}
+          <a class="projects__item" href="{{- .url -}}" rel="external noopener" target="_blank">
+            <div class="projects__item-details">
+              <h3 class="projects__item-name">{{- .name -}}</h3>
+              <p class="projects__item-description">{{- .description -}}</p>
+            </div>
+            <ul class="tags">
+              {{- range .tags -}}
+                <li>{{- . -}}</li>
+              {{- end -}}
+            </ul>
+          </a>
+        {{- end -}}
+      </div>
+    </div>
   </section>
 </main>
+
+<script>
+  (() => {
+    if (
+      !window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+    ) {
+      return;
+    }
+
+    const sections = document.querySelectorAll('.projects__section');
+
+    sections.forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight) {
+        el.style.transition = 'none';
+        el.classList.add('js-visible');
+        el.offsetHeight;
+        el.style.transition = '';
+      }
+    });
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('js-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '-100px 0px' }
+    );
+
+    sections.forEach(el => {
+      if (!el.classList.contains('js-visible')) {
+        observer.observe(el);
+      }
+    });
+  })();
+</script>
 
 {{- end -}}

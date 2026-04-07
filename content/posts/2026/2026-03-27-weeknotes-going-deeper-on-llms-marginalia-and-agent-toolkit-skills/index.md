@@ -110,6 +110,16 @@ Now I can just reference a project by name and the skill knows where the project
 - [Some Things Just Take Time](https://lucumr.pocoo.org/2026/3/20/some-things-just-take-time/)
 - [Which AI Model Is Best for Laravel?](https://laravel.com/blog/which-ai-model-is-best-for-laravel)
 
+**Videos/Podcasts:**
+
+- [Code Execution with MCP: Fix Tool Token Bloat (Adam Jones, Anthropic)](https://www.youtube.com/watch?v=o_2_s60ui48)
+- [OpenClaw Creator built App to Control Claude Code](https://www.youtube.com/watch?v=fu7th5HiADo)
+- [Everything We Got Wrong About Research-Plan-Implement - Dexter Horthy](https://www.youtube.com/watch?v=YwZR6tc7qYg)
+- [Pi Agent Creator on future of Agentic Coding](https://www.youtube.com/watch?v=PZ-sko1NWa0)
+- [Jensen Huang: NVIDIA - The $4 Trillion Company & the AI Revolution | Lex Fridman Podcast #494](https://www.youtube.com/watch?v=vif8NQcjVf0)
+- [Jeff Kaplan: World of Warcraft, Overwatch, Blizzard, and Future of Gaming | Lex Fridman Podcast #493](https://www.youtube.com/watch?v=H9rF1CSSh-w)
+- [Dylan Patel — Deep dive on the 3 big bottlenecks to scaling AI compute](https://www.dwarkesh.com/p/dylan-patel)
+
 ---
 
 The common thread this week is learning.

@@ -45,7 +45,7 @@ Several years back in the ChatGPT 3.5 Turbo days I attempted to get the LLM to w
 With the insane amount of progress these models have taken since then I always wanted to come back to this project.
 So one evening I decided to do so.
 I wanted to see if an agent could now write idiomatic santa-lang - not just translate line-by-line from another language, but actually use the functional idioms and preferences the language was designed around.
-So I built [santa-agent](https://github.com/eddmann/advent-of-code/tree/main/.santa-agent), a closed feedback loop that translates existing Advent of Code solutions into santa-lang.
+So I built [santa-agent](https://github.com/eddmann/advent-of-code/tree/master/.santa-agent), a closed feedback loop that translates existing Advent of Code solutions into santa-lang.
 
 It uses the [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk) to discover which puzzles are missing santa-lang solutions, reads the source solution in another language (TypeScript, Python, Rust, etc.), fetches the puzzle description and submitted answers from adventofcode.com, then has Claude write the `.santa` file.
 The agent has access to in-memory MCP tools to test and verify answers against AoC - so it writes, tests, fixes failures, and verifies in a closed loop.

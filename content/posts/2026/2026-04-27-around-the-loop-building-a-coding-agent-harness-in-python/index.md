@@ -82,6 +82,8 @@ However, this is not an agreed-upon standard, more first-mover adoption than ind
 
 The first ring exists to hide all of that behind two small abstractions: a unified event stream, and a narrow provider protocol.
 
+![Provider logos feeding into a single Provider Adapter, which emits one unified model stream](providers.png)
+
 ### Two small abstractions
 
 Every provider adapter yields events in a shared shape:
@@ -171,11 +173,18 @@ The registry catches four kinds of failure (`unknown_tool`, `validation`, `tool_
 Permissions decide whether a given tool call is allowed to run. They are the line between "the model wants to do this" and "the harness lets it".
 Without them an agent does whatever it asks for, which is not a great security posture and increasingly less acceptable the further you take it.
 
+![An agent's tool call passes through a permission check before reaching tool execution](tools-and-permissions.png)
+
 Claude Code, Codex and OpenCode ship with first-class permission systems: approval prompts, allow/deny lists, scope-bound tool access.
 Mine sits at the lighter end of that spectrum (like Pi), on the principle that the hook boundary is sharp enough to carry the weight for now.
 The harness exposes an `AgentHooks` protocol: extension points at key moments in the loop, letting extensions intercept and shape behaviour without the runtime knowing they exist.
 For permissions, the two relevant hooks are `authorize_tool_call` and `process_tool_result`: the first can block or allow a tool call before it runs, and the second can rewrite the tool result after it runs.
 Examples of this are [`protected-paths`](https://github.com/eddmann/my-own-coding-agent/blob/main/examples/extensions/protected-paths.py), which rejects `write`/`edit` calls against configured paths, and [`commit-guard`](https://github.com/eddmann/my-own-coding-agent/blob/main/examples/extensions/commit-guard.py), which rejects `git commit` and `git push` invocations when the working tree is dirty.
+
+Sandboxing is the layer below permissions: permissions decide whether a call runs; sandboxing decides what blast radius it has when it does.
+Codex ships it on by default - Seatbelt on macOS, [bubblewrap](https://github.com/containers/bubblewrap) on Linux/WSL2, with `read-only`, `workspace-write` and `danger-full-access` modes.
+Claude Code uses the same primitives but leaves it opt-in via `/sandbox`, with the runtime [open-sourced](https://github.com/anthropic-experimental/sandbox-runtime) as a standalone package.
+OpenCode, Pi and mine lean lighter, being less prescriptive and leaving execution isolation to the user.
 
 Extensions themselves get their own [ring](#plugins--extensions) later in this post.
 
@@ -183,7 +192,7 @@ Extensions themselves get their own [ring](#plugins--extensions) later in this p
 
 A _session_ is the persistent record of a conversation: the messages exchanged, the model used, the tool calls made, anything the harness needs to pick the work back up later.
 
-The PHP loop's only memory was an in-memory array.
+The PHP loop's only memory was an array.
 On exit, the array naturally went away.
 The next run started from nothing.
 Fine for a five-minute experiment; not fine for a harness conversation I want to come back to tomorrow.
@@ -204,6 +213,8 @@ And this is what Pi does.
 The session is an immutable tree representation of entries: every action appends, nothing gets rewritten in place, and the original history stays on disk regardless of what happens to the active branch.
 
 I borrowed Pi's shape directly.
+
+![A session store backing an entry tree with full history persisted, branches preserved alongside the active leaf](sessions-and-state.png)
 
 ### Entries, not messages
 
@@ -254,6 +265,11 @@ msg#a (system)
 Nothing is deleted. The future you walked away from is still in the file.
 
 `ModelChangeEntry` is what lets you swap model mid-session on the active provider: the persistence layer records the provider and model for the selection, and each assistant message also carries its own `provider` and `model`, so reading a session months later tells you exactly which model said which turn.
+
+The tree records what was said and decided; it does not record the files the agent edited along the way.
+_Checkpoints_ are the missing half: snapshots of the working directory captured alongside session entries, so that `set_leaf` and `fork` can restore code to match the point you walked back to.
+Claude Code, Codex and OpenCode all tie file changes to conversation state, letting you rewind both together; Pi and mine lean lighter, leaving the working tree to the user's own version control.
+A checkpoint mechanism is the most obvious next addition, and it does not need to live in the runtime - Pi already has a [pi-rewind](https://github.com/arpagon/pi-rewind) extension doing exactly this with git-backed snapshots, and the same extension surface is open here.
 
 All told, this is one of the cleanest session-management designs I have come across, and the part of the harness I am most pleased with.
 
@@ -307,7 +323,6 @@ Output markdown with these headings in order:
 
 Rules:
 - Do NOT include system prompt text or policies.
-- Do NOT include secrets (API keys, tokens, passwords). Redact as [REDACTED].
 - Keep bullets short and actionable.
 ```
 
@@ -320,7 +335,7 @@ The result becomes the body of the `CompactionEntry` from the previous ring, and
 
 ### Compaction lives in the tree
 
-Compaction does not rewrite the conversation array.
+Compaction does not rewrite the conversation list.
 It appends a `CompactionEntry` carrying the summary and a pointer to the first kept message, hands the leaf to that new entry, and leaves the old messages untouched on disk.
 
 `_rebuild_messages()` notices the compaction on the active branch and stitches the result together on the fly: system messages still come through, then a synthesised system message carrying the summary, then the kept messages from `first_kept_entry_id` onwards.
@@ -328,6 +343,8 @@ The provider sees the short, summarised view.
 The file still holds the long original.
 
 A compaction is a narrowing of view, not a discarding of state.
+
+![Older turns from the full history are summarised and combined with recent turns to form the model's narrowed context](context-and-compaction.png)
 
 ### One more lever: prepare_context
 
@@ -352,7 +369,7 @@ Think of it as a one-page reference card: a name, a short description of what th
 
 Claude Code, Codex, OpenCode and Pi all converge on the same pattern: skills as Markdown `SKILL.md`-style files, and a catalogue of metadata (name, description, location) injected into the system prompt rather than the full bodies.
 The body itself is loaded on demand, through a read-style instruction or a dedicated skill-loading tool, when its description matches the task at hand.
-The `SKILL.md` shape has become a de facto standard.
+The `SKILL.md` shape is now an [open standard](https://agentskills.io/), originally Anthropic's.
 
 I borrowed the pattern straight across.
 
@@ -482,6 +499,8 @@ Handlers receive a `ctx` object with sub-APIs for runtime state and control:
 - `ctx.ui`: delivery-shell-bound UI helpers (only when a shell is attached)
 
 Extensions live in `~/.agent/extensions/`, in the project, or anywhere config points at.
+
+![Extensions plug into the runtime through four ports: register tools, hook events, intercept behaviour, and add commands](plugins-and-extensions.png)
 
 Three of the bundled examples are worth opening up: _sub-agents_, _plan mode_, and an _MCP adapter_.
 All three are features other coding agent harnesses tend to bake into the runtime; here, following Pi's lead, they are built on top of the same extension API any third-party extension uses.
@@ -613,6 +632,8 @@ The runtime is not parameterised by delivery. Delivery chooses which bits of its
 - The **headless CLI** is the thinnest. It takes a single prompt argument, runs the agent once, streams chunks to stdout, and exits. This is what scripts and CI jobs use.
 - The **web shell** does what the TUI does but in a browser: a FastAPI app with a WebSocket session bound to one runtime stack.
 
+![TUI, CLI, and Web UI shells all connecting to one shared agent runtime](delivery.png)
+
 ### One UI abstraction, three backends
 
 The interesting design point lives in the extension UI surface, again borrowed from Pi.
@@ -668,4 +689,5 @@ Delivery is how the user reaches the loop, and how the loop reaches back.
 A coding agent harness, read this way, is not "a loop that calls a model".
 It is a context-management system with a loop at its centre, plus a delivery shell so a user can reach it.
 
-Once you see it that way, Claude Code, Codex, Pi, OpenCode (and the rest) stop being distinct products and start looking like different answers to the same set of questions.
+Once you see it that way, Claude Code, Codex, Pi, OpenCode (and the rest) stop being distinct products.
+They are the same rings, drawn differently.

@@ -1,4 +1,5 @@
 import type { Resume } from "./types";
+import { formatDate } from "./dates";
 
 const WIDTH = 80;
 const BULLET = "-";
@@ -71,7 +72,7 @@ export function renderText(resume: Resume): string {
       const company = w.name ?? w.company ?? "";
       const position = w.position ?? "";
       const dates = w.startDate
-        ? ` (${w.startDate}${DASH}${w.endDate ?? "Present"})`
+        ? ` (${formatDate(w.startDate)} - ${formatDate(w.endDate)})`
         : "";
       const line = `${position} at ${company}${dates}`.trim();
       out += `${line}\n${underline(line, "-")}\n\n`;
@@ -93,7 +94,7 @@ export function renderText(resume: Resume): string {
         e.studyType && e.area
           ? `${e.studyType} in ${e.area}`
           : (e.studyType ?? e.area ?? "");
-      const line = `${qual}, ${e.institution} (${e.startDate ?? ""}${DASH}${e.endDate ?? "Present"})`;
+      const line = `${qual}, ${e.institution} (${formatDate(e.startDate)} - ${formatDate(e.endDate)})`;
       out += `${line}\n${underline(line, "-")}\n`;
       if (e.score) out += `Score: ${e.score}\n`;
       out += `\n`;
@@ -104,7 +105,7 @@ export function renderText(resume: Resume): string {
     const heading = `\nAWARDS`;
     out += `${heading}\n${underline(heading, "=")}\n\n`;
     for (const a of resume.awards) {
-      const head = `${a.title ?? ""}${a.awarder ? ` ${DASH} ${a.awarder}` : ""}${a.date ? ` (${a.date})` : ""}`;
+      const head = `${a.title ?? ""}${a.awarder ? ` ${DASH} ${a.awarder}` : ""}${a.date ? ` (${formatDate(a.date)})` : ""}`;
       out += `${head}\n${underline(head, "-")}\n`;
       if (a.summary) out += `${wrap(a.summary, WIDTH)}\n`;
       out += `\n`;

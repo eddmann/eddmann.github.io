@@ -13,17 +13,11 @@ import type {
   Work,
 } from "../lib/types";
 import { escapeHtml, renderInline } from "../lib/markdown";
-
-function year(date: string | undefined): string {
-  if (!date) return "Present";
-  const parsed = new Date(date);
-  return `${parsed.getUTCFullYear()}`;
-}
+import { formatDate } from "../lib/dates";
 
 function timeTag(date: string | undefined): string {
   if (!date) return `<span>Present</span>`;
-  const parsed = new Date(date);
-  return `<time datetime="${parsed.toISOString()}">${parsed.getUTCFullYear()}</time>`;
+  return `<time datetime="${escapeHtml(date)}">${escapeHtml(formatDate(date))}</time>`;
 }
 
 function hostFromUrl(url: string): string {
@@ -243,7 +237,7 @@ function renderAwards(awards: Award[]): string {
           ${a.title ? `<div class="text-lg font-semibold print:text-base">${escapeHtml(a.title)}</div>` : ""}
           <div class="text-sm text-neutral-500">
             ${a.awarder ? `<span>${escapeHtml(a.awarder)}</span>` : ""}
-            ${a.date ? `<span> &middot; ${escapeHtml(year(a.date))}</span>` : ""}
+            ${a.date ? `<span> &middot; ${escapeHtml(formatDate(a.date))}</span>` : ""}
           </div>
           ${a.summary ? `<p class="mt-2 leading-relaxed">${renderInline(a.summary)}</p>` : ""}
         </article>

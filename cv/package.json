@@ -1,17 +1,24 @@
 {
+  "name": "cv",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "resume serve --theme .  --resume cv.json",
-    "build:pdf": "resume export --theme . --resume cv.json cv.pdf",
-    "build:html": "resume export --theme . --resume cv.json cv.html",
-    "build:txt": "node text.js cv.json cv.txt"
+    "build": "bun run generate.ts",
+    "build:html": "bun run generate.ts --formats html",
+    "build:pdf": "bun run generate.ts --formats pdf",
+    "build:txt": "bun run generate.ts --formats txt",
+    "serve": "bun run generate.ts --serve",
+    "format": "bun x prettier --write \"**/*.{ts,json,md}\""
   },
   "dependencies": {
-    "handlebars": "^4.7.8",
-    "html-minifier": "^4.0.0",
-    "marked": "^11.1.1"
+    "puppeteer": "^24.43.1"
   },
+  "trustedDependencies": [
+    "puppeteer"
+  ],
   "devDependencies": {
-    "resume-cli": "^3.0.8"
+    "@types/bun": "^1.3.13",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
   }
 }

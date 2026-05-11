@@ -21,28 +21,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22.13.1'
-          cache: 'npm'
-          cache-dependency-path: 'cv/package-lock.json'
+          bun-version: '1.3.13'
 
       - name: Install dependencies
         working-directory: cv
-        run: npm ci --no-audit --no-fund
+        run: bun install --frozen-lockfile
 
-      - name: Build HTML
+      - name: Build CV (HTML, PDF, TXT)
         working-directory: cv
-        run: npm run build:html
-
-      - name: Build PDF
-        working-directory: cv
-        run: npm run build:pdf
-
-      - name: Build TXT
-        working-directory: cv
-        run: npm run build:txt
+        run: bun run build
 
       - name: Copy artifacts to static
         run: |

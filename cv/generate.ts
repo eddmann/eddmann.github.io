@@ -7,9 +7,11 @@ import { renderPdf } from "./lib/pdf";
 import { renderText } from "./lib/text";
 
 import minimal from "./templates/minimal";
+import editorial from "./templates/editorial";
 
 const TEMPLATES: Record<string, Template> = {
   minimal,
+  editorial,
 };
 
 type Format = "html" | "pdf" | "txt";

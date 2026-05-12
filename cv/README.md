@@ -1,13 +1,18 @@
 # CV
 
-My CV in [JSON Resume](https://jsonresume.org) format (`cv.json`), rendered to HTML, PDF and plain text by a small Bun pipeline.
+My CV in [JSON Resume](https://jsonresume.org) format, rendered to HTML, PDF and plain text by a small Bun pipeline.
 
-`cv.json` is the only file I edit. Everything else is generated:
+There are two source files, both hand-edited:
+
+- `cv.json` — the full version. Drives `cv.html` and `cv.txt`, and is published as the public JSON Resume on the site.
+- `cv.print.json` — a trimmed version. Drives `cv.pdf`, kept to a single page.
+
+Everything else is generated:
 
 - `generate.ts` is the entry point.
-- HTML templates live in `templates/<name>.ts` and return a single self-contained HTML string that loads Tailwind from the CDN.
+- HTML templates live in `templates/<name>.ts`. Each exports a single self-contained HTML string and loads Tailwind from the CDN.
 - The PDF is the HTML template printed via Puppeteer.
-- The text version is generated directly from `cv.json` and aims for 80-column readability.
+- The text version is rendered directly from the JSON for 80-column readability.
 
 ## Usage
 

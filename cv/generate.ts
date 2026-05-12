@@ -8,10 +8,16 @@ import { renderText } from "./lib/text";
 
 import minimal from "./templates/minimal";
 import editorial from "./templates/editorial";
+import phosphor from "./templates/phosphor";
+import y2k from "./templates/y2k";
+import zine from "./templates/zine";
 
 const TEMPLATES: Record<string, Template> = {
   minimal,
   editorial,
+  phosphor,
+  y2k,
+  zine,
 };
 
 type Format = "html" | "pdf" | "txt";

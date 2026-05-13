@@ -8,7 +8,7 @@ Hey there! I'm Edd 👋🏻, a Lead Software Engineer with 15+ years of experien
 
 Currently building end-to-end systems for the UK railway signalling sector - from ESP32 telemetry firmware over cellular GPRS through to AWS-native multi-tenant SaaS.
 
-Outside of client work, I'm building in the agentic AI ecosystem (coding agents, MCP servers, agent harnesses) and exploring programming-language design - sharing what I learn along the way on this blog.
+Outside of client work, I'm building practical AI-assisted developer tools, including coding-agent harnesses, MCP servers, and tools for local development workflows. I'm also continuing to explore programming-language design, sharing what I learn along the way on this blog.
 
 Based in London, UK · currently open to senior and lead engineering opportunities.
 

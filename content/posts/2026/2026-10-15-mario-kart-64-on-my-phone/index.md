@@ -56,7 +56,7 @@ width × height × 4 bytes
 So a texture that compresses well can still need a substantial amount of memory once the game draws it.
 And there are two caches to keep straight here.
 The renderer has a bounded, 1,024-entry least-recently-used texture cache, which can evict textures.
-Behind it, libultraship's [resource manager](https://github.com/Kenix3/libultraship/blob/f5c3843fe937320b64ff754fa6bf71b13ff5e7a1/src/ship/resource/ResourceManager.cpp#L100) retains the decoded resources used to create them.
+Behind it, libultraship's [resource manager](https://github.com/Kenix3/libultraship/blob/f5c3843fe937320b64ff754fa6bf71b13ff5e7a1/src/ship/resource/ResourceManager.cpp#L178) retains the decoded resources used to create them.
 Evicting a renderer texture doesn't also discard that decoded resource.
 
 As the race encounters different kart angles, animation frames and wheel states, it brings more replacements into use.
@@ -132,7 +132,7 @@ Releasing the gesture fires the boost.
 An upward or downward swipe sends an item forwards or behind.
 
 I wanted to keep the mini-turbo mechanic, whilst making it manageable with one thumb.
-The gesture layer supplies the controller inputs the game expects, so the original drift and boost behaviour stays underneath it.
+The gesture layer and that assist supply the controller inputs the game expects, so the original drift and boost behaviour stays underneath it.
 
 {{< video src="portrait-tour.mp4" muted="true" loop="true" poster="portrait-tour.webp" >}}
 
@@ -197,7 +197,7 @@ That lets the agent exercise the transitions as well as the individual screens.
 
 For memory, the harness samples `HEAPU8.length`: the allocated capacity of the WebAssembly linear memory.
 That doesn't report live allocations or the browser's total process and GPU memory.
-The assertion allows up to 64 MiB of additional capacity across the tested races, so passing it doesn't mean absolutely no growth occurred.
+The assertion allows up to 64 MiB of additional capacity between the end of the first race and the end of the last, so passing it doesn't mean absolutely no growth occurred.
 Trying the chosen pack in Safari on the phone still matters, especially when changing the pack or the assets a race will encounter.
 
 I still had to judge what the checks covered.

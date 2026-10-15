@@ -1,7 +1,6 @@
 ---
 layout: post
 title: 'Mario Kart 64 on My Phone: Giving the Agent a Test Drive'
-date: 2026-10-09
 meta: 'Bringing Mario Kart 64 to my phone with WebAssembly and Tour-inspired controls, and giving a coding agent a way to test the game.'
 summary: 'I brought Mario Kart 64 to my phone with WebAssembly, lighter textures and Tour-inspired controls, then gave the coding agent a way to test its changes before I played them myself.'
 tags: ['games', 'webassembly', 'pwa', 'agents']

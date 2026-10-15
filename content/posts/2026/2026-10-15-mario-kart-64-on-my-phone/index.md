@@ -33,7 +33,7 @@ The browser page handles ROM intake, storage, the canvas and touch controls, wit
 
 Players supply their own supported US ROM, which Kart64 checks and extracts locally without uploading it.
 The ROM is then removed from browser storage, leaving cached game data for later visits.
-On iPhone, adding it to the Home Screen makes it easier to pick up and play, although the browser still manages the storage.
+As a PWA, it can be added to the Home Screen on iPhone or Android, which makes it easier to pick up and play, although the browser still manages the storage.
 A service worker handles the cross-origin isolation needed by the threaded WebAssembly build on GitHub Pages, with a one-off reload on the first visit.
 
 ## The title screen was only the beginning
@@ -217,4 +217,4 @@ I could come back into the loop to play and critique the result.
 I could spend more time deciding how I wanted Mario Kart to feel on the phone, and less time driving the same test laps.
 
 You can [try Kart64 here](https://eddmann.com/kart64/), using your own ROM.
-Add it to your iPhone's Home Screen, choose the controls that suit you, and see how an old favourite feels upright.
+Add it to your Home Screen on iPhone or Android, choose the controls that suit you, and see how an old favourite feels upright.

@@ -127,7 +127,7 @@ For portrait Tour mode, I wanted steering, drifting and items to come from the s
 > Approximately the same first-lap bend: conventional portrait controls on the left, Tour on the right.
 
 Approaching a corner, I drag to steer, then flick and hold to start and maintain a drift.
-Whilst I'm holding, the control layer supplies the steering wiggle that Mario Kart 64 expects to charge a mini-turbo.
+Whilst I'm holding, a small drift assist in the patch supplies the steering wiggle that Mario Kart 64 expects to charge a mini-turbo.
 Releasing the gesture fires the boost.
 An upward or downward swipe sends an item forwards or behind.
 
